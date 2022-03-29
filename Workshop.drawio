@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2022-03-29T12:34:33.312Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.84 Safari/537.36" etag="OyMpuXxXD6zKcU9D6CZr" version="17.2.4" type="github" pages="2">
+<mxfile host="app.diagrams.net" modified="2022-03-29T12:56:55.673Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.84 Safari/537.36" etag="H-Uqal63KN61aQUBQpfj" version="17.2.4" type="github" pages="2">
   <diagram id="yHEwR7OAH_B-9P_8bYFm" name="White Diagram">
-    <mxGraphModel dx="2401" dy="816" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1916" dy="561" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -146,7 +146,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="d0ODCzbI8RBOmcCkagFK-16" value="n" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-          <mxGeometry x="499.5" y="680" width="20" height="20" as="geometry" />
+          <mxGeometry x="557" y="650" width="20" height="20" as="geometry" />
         </mxCell>
         <mxCell id="d0ODCzbI8RBOmcCkagFK-17" value="1" style="endArrow=open;html=1;endSize=12;startArrow=diamondThin;startSize=14;startFill=1;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;rounded=0;" parent="1" source="d0ODCzbI8RBOmcCkagFK-1" target="d0ODCzbI8RBOmcCkagFK-20" edge="1">
           <mxGeometry x="-0.9534" y="-4" relative="1" as="geometry">
@@ -201,7 +201,8 @@
             <mxPoint x="785.5" y="410" as="targetPoint" />
             <Array as="points">
               <mxPoint x="390" y="380" />
-              <mxPoint x="390" y="698" />
+              <mxPoint x="390" y="630" />
+              <mxPoint x="575" y="630" />
             </Array>
             <mxPoint as="offset" />
           </mxGeometry>
@@ -349,11 +350,23 @@
         <mxCell id="DufsHXcZonSDjpQGOB2f-27" value="&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;b&gt;Action Signatures:&lt;br&gt;Each action will have an &#39;act&#39; function that won&#39;t receive arguments,&lt;br&gt;so we need to think how to resolve the issue for functions that needs argument.&lt;br&gt;1. Using data class&lt;br&gt;2. Inheritance like SPL assignment 3&lt;/b&gt;&lt;br&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
           <mxGeometry x="-360" y="137.96" width="430" height="80" as="geometry" />
         </mxCell>
+        <mxCell id="e2aQ83muvxmv_wt6DRNk-1" value="OrderDTO" style="html=1;" vertex="1" parent="1">
+          <mxGeometry x="285" y="672.72" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="e2aQ83muvxmv_wt6DRNk-3" value="" style="endArrow=diamondThin;endFill=1;endSize=24;html=1;rounded=0;fontSize=11;" edge="1" parent="1" source="e2aQ83muvxmv_wt6DRNk-1" target="d0ODCzbI8RBOmcCkagFK-5">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="410" y="590" as="sourcePoint" />
+            <mxPoint x="570" y="590" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2aQ83muvxmv_wt6DRNk-4" value="n" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="395" y="676.72" width="20" height="20" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
   <diagram id="EWFmK8r26qtNGpCVvfDQ" name="Component Diagram">
-    <mxGraphModel grid="1" page="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1004" dy="528" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
