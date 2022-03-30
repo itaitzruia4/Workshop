@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2022-03-30T11:32:51.142Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.84 Safari/537.36" etag="fc4_TTx1x9VcRc3O-uW9" version="17.2.4" type="github" pages="2">
+<mxfile host="app.diagrams.net" modified="2022-03-30T12:32:21.024Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.84 Safari/537.36" etag="7885_dX7X9ZVs62_leiK" version="17.2.4" type="github" pages="2">
   <diagram id="yHEwR7OAH_B-9P_8bYFm" name="White Diagram">
     <mxGraphModel dx="2272" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -9,15 +9,6 @@
         </mxCell>
         <mxCell id="fPwFsAP3m-tS9zJUlsK5-3" value="«interface»&lt;br&gt;&lt;b&gt;SupplyExternalService&lt;/b&gt;" style="html=1;" parent="1" vertex="1">
           <mxGeometry x="1205" y="760" width="150" height="68.18" as="geometry" />
-        </mxCell>
-        <mxCell id="fPwFsAP3m-tS9zJUlsK5-4" value="«interface»&lt;br&gt;&lt;b&gt;Publisher&lt;/b&gt;" style="html=1;" parent="1" vertex="1">
-          <mxGeometry x="965" y="890" width="150" height="68.18" as="geometry" />
-        </mxCell>
-        <mxCell id="fPwFsAP3m-tS9zJUlsK5-5" value="«interface»&lt;br&gt;&lt;b&gt;Subscriber&lt;/b&gt;" style="html=1;" parent="1" vertex="1">
-          <mxGeometry x="1205" y="890" width="150" height="68.18" as="geometry" />
-        </mxCell>
-        <mxCell id="fPwFsAP3m-tS9zJUlsK5-6" value="Observer design pattern for real time notifications" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-          <mxGeometry x="1035" y="970" width="280" height="20" as="geometry" />
         </mxCell>
         <mxCell id="fPwFsAP3m-tS9zJUlsK5-7" value="External services whose implementation can be changed without hurting the system functionality" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="910" y="840" width="530" height="20" as="geometry" />
@@ -69,15 +60,6 @@
         </mxCell>
         <mxCell id="fPwFsAP3m-tS9zJUlsK5-21" value="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="1230" y="720" width="20" height="20" as="geometry" />
-        </mxCell>
-        <mxCell id="fPwFsAP3m-tS9zJUlsK5-22" value="1" style="endArrow=open;html=1;endSize=12;startArrow=diamondThin;startSize=14;startFill=0;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;rounded=0;" parent="1" source="fPwFsAP3m-tS9zJUlsK5-4" target="fPwFsAP3m-tS9zJUlsK5-5" edge="1">
-          <mxGeometry x="-1" y="3" relative="1" as="geometry">
-            <mxPoint x="915" y="880" as="sourcePoint" />
-            <mxPoint x="1075" y="880" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="fPwFsAP3m-tS9zJUlsK5-23" value="n" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-          <mxGeometry x="1185" y="895.45" width="20" height="20" as="geometry" />
         </mxCell>
         <mxCell id="fPwFsAP3m-tS9zJUlsK5-26" value="n" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="420" y="79.09" width="20" height="20" as="geometry" />
