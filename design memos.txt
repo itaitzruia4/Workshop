@@ -1,0 +1,4 @@
+1. Each store contains a founderID field. 
+Upon a manager request for store role members, we can obtain the founderID from the store,
+then reach the founder User instance with UserController.users dictionary (key=user id), 
+then recursively search the members field
