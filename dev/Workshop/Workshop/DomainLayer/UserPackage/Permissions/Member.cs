@@ -8,5 +8,6 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
 {
     class Member
     {
+        
     }
 }
