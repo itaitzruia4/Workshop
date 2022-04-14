@@ -2,3 +2,7 @@
 Upon a manager request for store role members, we can obtain the founderID from the store,
 then reach the founder User instance with UserController.users dictionary (key=user id), 
 then recursively search the members field
+2. Action signatures: 
+a. Each action will have an 'act' function that won't receive arguments, so we need to think how to resolve the issue for functions that needs argument.
+b. Using data class
+c. Inheritance like SPL assignment 3
