@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace Workshop.DomainLayer.UserPackage.Security
 {
-    interface ISecurityHandler
+    class HashSecurityHandler : ISecurityHandler
     {
-        string Encrypt(string message);
+        public string Encrypt(string message)
+        {
+            return message.GetHashCode().ToString();
+        }
     }
 }

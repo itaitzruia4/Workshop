@@ -8,5 +8,6 @@ namespace Workshop.DomainLayer.UserPackage
 {
     class User
     {
+     
     }
 }

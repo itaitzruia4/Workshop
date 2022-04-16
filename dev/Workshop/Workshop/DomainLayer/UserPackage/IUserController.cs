@@ -9,10 +9,9 @@ namespace Workshop.DomainLayer.UserPackage
 {
     interface IUserController
     {
-        void Register(string username, string password);
-
-        Member Login(string username, string password);
-
         User EnterMarket();
+        void Register(string username, string password);
+        Member Login(string username, string password);
+        void Logout(string username);
     }
 }
