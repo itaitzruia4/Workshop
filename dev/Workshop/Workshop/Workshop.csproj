@@ -58,8 +58,6 @@
     <Compile Include="DomainLayer\MarketPackage\Store.cs" />
     <Compile Include="DomainLayer\DomainFacade.cs" />
     <Compile Include="DomainLayer\UserPackage\IUserController.cs" />
-    <Compile Include="DomainLayer\UserPackage\Notifications\Notification.cs" />
-    <Compile Include="DomainLayer\UserPackage\Notifications\NotificationHandler.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\IAction.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\MarketManager.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\Member.cs" />
@@ -69,7 +67,7 @@
     <Compile Include="DomainLayer\UserPackage\Permissions\StoreOwner.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\StoreRole.cs" />
     <Compile Include="DomainLayer\UserPackage\Security\ISecurityHandler.cs" />
-    <Compile Include="DomainLayer\UserPackage\Security\SecurityHandler.cs" />
+    <Compile Include="DomainLayer\UserPackage\Security\HashSecurityHandler.cs" />
     <Compile Include="DomainLayer\UserPackage\Shopping\ShoppingBag.cs" />
     <Compile Include="DomainLayer\UserPackage\Shopping\ShoppingCart.cs" />
     <Compile Include="DomainLayer\UserPackage\User.cs" />
