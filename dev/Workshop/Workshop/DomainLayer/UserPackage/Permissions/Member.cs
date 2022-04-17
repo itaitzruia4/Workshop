@@ -6,25 +6,18 @@ using System.Threading.Tasks;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
-    class Member : User
+    public class Member : User
     {
-        private string username;
-        private string password;
+        private string _username;
+        internal string Username { get; }
+
+        private string _password;
+        internal string Password { get; }
 
         public Member(string username, string password)
         {
-            this.username = username;
-            this.password = password;
-        }
-
-        internal string GetPassword()
-        {
-            return password;
-        }
-
-        internal string GetUsername()
-        {
-            return username;
+            this._username = username;
+            this._password = password;
         }
     }
 }
