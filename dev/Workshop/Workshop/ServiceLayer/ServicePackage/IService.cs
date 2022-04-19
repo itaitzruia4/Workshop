@@ -7,12 +7,14 @@ using Workshop.ServiceLayer.ServiceObjects;
 
 namespace Workshop.ServiceLayer
 {
-    interface IService
+    public interface IService
     {
-        void InitializeSystem();
-        User EnterMarket();
-        void Register(string username, string password);
-        Member Login(string username, string password);
-        void Logout(string username);
+        Response<User> EnterMarket();
+
+        Response Register(string username, string password);
+
+        Response<Member> Login(string username, string password);
+
+        Response Logout(string username);
     }
 }

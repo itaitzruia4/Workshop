@@ -8,7 +8,7 @@ using Workshop.DomainLayer.UserPackage.Security;
 
 namespace Workshop.DomainLayer.UserPackage
 {
-    class UserController : IUserController
+    public class UserController : IUserController
     {
         private ISecurityHandler securityHandler;
         private Dictionary<string, Member> members;
@@ -17,6 +17,7 @@ namespace Workshop.DomainLayer.UserPackage
         public UserController(ISecurityHandler securityHandler)
         {
             this.securityHandler = securityHandler;
+            members = new Dictionary<string, Member>();
             InitializeSystem();
         }
 
@@ -26,7 +27,6 @@ namespace Workshop.DomainLayer.UserPackage
         public void InitializeSystem()
         {
             // TODO: add some pre-defined users (with at least one market manager) and encrypt their passwords
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -57,11 +57,14 @@ namespace Workshop.DomainLayer.UserPackage
         {
             EnsureNonEmptyUserDetails(username, password);
      
-            if (!members.ContainsKey(username))
+            if (!IsMember(username))
                 throw new ArgumentException($"Username {username} does not exist");
 
             if (currentUser == null)
                 throw new InvalidOperationException("You must enter the market first before logging in");
+
+            if (currentUser is Member)
+                throw new InvalidOperationException("You must log out first before loggin in");
 
             Member member = members[username];
 
@@ -89,7 +92,7 @@ namespace Workshop.DomainLayer.UserPackage
         private void EnsureNonEmptyUserDetails(string username, string password)
         {
             if (username == null || password == null)
-                throw new ArgumentNullException("Username or password cannot be null");
+                throw new ArgumentException("Username or password cannot be null");
             if (username.Trim().Equals("") || password.Trim().Equals(""))
                 throw new ArgumentException("Username or password cannot be empty");
         }
@@ -100,7 +103,7 @@ namespace Workshop.DomainLayer.UserPackage
         /// <param name="username">Username of the user that requests to log out</param>
         public void Logout(string username)
         {
-            if(!members.ContainsKey(username))
+            if(!IsMember(username))
                 throw new ArgumentException($"Username {username} does not exist");
             AssertCurrentUser(username);
 
@@ -116,7 +119,7 @@ namespace Workshop.DomainLayer.UserPackage
         {
             EnsureNonEmptyUserDetails(username, password);
 
-            if (members.ContainsKey(username))
+            if (IsMember(username))
                 throw new ArgumentException($"Username {username} already exists");
 
             string encryptedPassword = securityHandler.Encrypt(password);
@@ -132,6 +135,16 @@ namespace Workshop.DomainLayer.UserPackage
         {
             if ((!(currentUser is Member)) || !((Member)currentUser).Username.Equals(username))
                 throw new ArgumentException($"Username {username} is not logged in");
+        }
+
+        /// <summary>
+        /// Checks if a given username represents a registered member
+        /// </summary>
+        /// <param name="username">The name of the user to check</param>
+        /// <returns>true if the username is a valid member, otherwise false</returns>
+        public bool IsMember(string username)
+        {
+            return members.ContainsKey(username);
         }
     }
 }

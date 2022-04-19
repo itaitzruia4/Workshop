@@ -6,7 +6,17 @@ using System.Threading.Tasks;
 
 namespace Workshop.ServiceLayer
 {
-    class Response<T>: Response
+    public class Response<T>: Response
     {
+        public readonly T Value;
+        internal Response(string msg) : base(msg) { }
+        internal Response(T value) : base()
+        {
+            this.Value = value;
+        }
+        internal Response(T value, string msg) : base(msg)
+        {
+            this.Value = value;
+        }
     }
 }
