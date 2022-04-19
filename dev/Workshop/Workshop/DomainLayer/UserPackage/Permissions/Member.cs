@@ -8,23 +8,16 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
 {
     class Member : User
     {
-        private string username;
-        private string password;
+        private string _username;
+        public string Username { get; }
+
+        private string _password;
+        public string Password { get; }
 
         public Member(string username, string password)
         {
-            this.username = username;
-            this.password = password;
-        }
-
-        internal string GetPassword()
-        {
-            return password;
-        }
-
-        internal string GetUsername()
-        {
-            return username;
+            Username = username;
+            Password = password;
         }
     }
 }

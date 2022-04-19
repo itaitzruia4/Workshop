@@ -8,6 +8,11 @@ namespace Workshop.DomainLayer.UserPackage
 {
     class User
     {
-     
+        private ShoppingCart shoppingCart;
+
+        public User()
+        {
+            shoppingCart = new ShoppingCart();
+        }
     }
 }
