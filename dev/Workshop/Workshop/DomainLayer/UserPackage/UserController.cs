@@ -37,6 +37,9 @@ namespace Workshop.DomainLayer.UserPackage
         /// </returns>
         public User EnterMarket()
         {
+            if (currentUser != null)
+                throw new InvalidOperationException("You have already entered the market");
+
             currentUser = new User();
             return currentUser;
         }

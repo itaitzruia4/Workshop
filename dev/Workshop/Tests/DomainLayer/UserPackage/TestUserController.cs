@@ -45,7 +45,7 @@ namespace Tests
         [DataTestMethod]
         [DataRow("user", null)]
         [DataRow(null, "pass")]
-        [DataRow(null, null)] 
+        [DataRow(null, null)]
         [ExpectedException(typeof(ArgumentException), "Username or password cannot be empty")]
         public void TestRegister_NullDetails(string username, string password)
         {
@@ -53,7 +53,7 @@ namespace Tests
             Assert.IsFalse(userController.IsMember(username));
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("user", "pass")]
         [ExpectedException(typeof(ArgumentException))]
         public void TestRegister_UserExists(string username, string password)
@@ -62,6 +62,20 @@ namespace Tests
             userController.Register(username, password);
             Assert.IsTrue(userController.IsMember(username));
             userController.Register(username, password);
+        }
+
+        [TestMethod]
+        public void TestEnterMarket_Success()
+        {
+            userController.EnterMarket();
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException), "You have already entered the market")]
+        public void TestEnterMarket_AlreadyEntered()
+        {
+            userController.EnterMarket();
+            userController.EnterMarket();
         }
     }
 }
