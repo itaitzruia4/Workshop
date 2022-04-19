@@ -8,7 +8,7 @@ using Workshop.DomainLayer.UserPackage.Permissions;
 
 namespace Workshop.DomainLayer
 {
-    class Facade
+    public class Facade
     {
         public User EnterMarket()
         {
