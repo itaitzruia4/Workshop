@@ -52,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DomainLayer\Facade.cs" />
-    <Compile Include="DomainLayer\Loggers\EventLogger.cs" />
+    <Compile Include="DomainLayer\Loggers\Logger.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\Discount.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\DiscountPolicy.cs" />
     <Compile Include="DomainLayer\MarketPackage\IMarketController.cs" />
