@@ -52,7 +52,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DomainLayer\Facade.cs" />
-    <Compile Include="DomainLayer\Loggers\ErrorLogger.cs" />
     <Compile Include="DomainLayer\Loggers\EventLogger.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\Discount.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\DiscountPolicy.cs" />
