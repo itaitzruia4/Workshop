@@ -6,8 +6,13 @@ using System.Threading.Tasks;
 
 namespace Workshop.DomainLayer.UserPackage
 {
-    class User
+    public class User
     {
-     
+        private ShoppingCart shoppingCart;
+
+        public User()
+        {
+            shoppingCart = new ShoppingCart();
+        }
     }
 }

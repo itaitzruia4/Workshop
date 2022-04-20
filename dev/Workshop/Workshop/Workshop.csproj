@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{76306788-71F8-4052-9A95-943C203F4062}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <RootNamespace>Workshop</RootNamespace>
     <AssemblyName>Workshop</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net, Version=2.0.14.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.14\lib\net45\log4net.dll</HintPath>
@@ -48,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DomainLayer\Facade.cs" />
     <Compile Include="DomainLayer\Loggers\ErrorLogger.cs" />
     <Compile Include="DomainLayer\Loggers\EventLogger.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\Discount.cs" />
@@ -64,7 +68,6 @@
     <Compile Include="DomainLayer\MarketPackage\PurchasePolicy.cs" />
     <Compile Include="DomainLayer\MarketPackage\ShoppingBagProduct.cs" />
     <Compile Include="DomainLayer\MarketPackage\Store.cs" />
-    <Compile Include="DomainLayer\DomainFacade.cs" />
     <Compile Include="DomainLayer\UserPackage\IUserController.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\IAction.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\MarketManager.cs" />
@@ -80,6 +83,7 @@
     <Compile Include="DomainLayer\UserPackage\User.cs" />
     <Compile Include="DomainLayer\UserPackage\UserController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceLayer\ServiceObjects\Member.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Product.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Store.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\User.cs" />
