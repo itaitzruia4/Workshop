@@ -8,9 +8,10 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Workshop</RootNamespace>
     <AssemblyName>Workshop</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -35,8 +36,13 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net, Version=2.0.14.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.14\lib\net45\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -46,6 +52,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DomainLayer\Facade.cs" />
+    <Compile Include="DomainLayer\Loggers\ErrorLogger.cs" />
+    <Compile Include="DomainLayer\Loggers\EventLogger.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\Discount.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\DiscountPolicy.cs" />
     <Compile Include="DomainLayer\MarketPackage\IMarketController.cs" />
@@ -70,7 +78,6 @@
     <Compile Include="DomainLayer\UserPackage\Permissions\StoreOwner.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\StoreRole.cs" />
     <Compile Include="DomainLayer\UserPackage\Security\ISecurityHandler.cs" />
-    <Compile Include="DomainLayer\UserPackage\Security\HashSecurityHandler.cs" />
     <Compile Include="DomainLayer\UserPackage\Shopping\ShoppingBag.cs" />
     <Compile Include="DomainLayer\UserPackage\Shopping\ShoppingCart.cs" />
     <Compile Include="DomainLayer\UserPackage\User.cs" />
@@ -87,6 +94,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="log4net.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
