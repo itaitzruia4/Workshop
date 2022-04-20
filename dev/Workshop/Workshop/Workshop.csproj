@@ -58,7 +58,6 @@
     <Compile Include="DomainLayer\MarketPackage\Store.cs" />
     <Compile Include="DomainLayer\DomainFacade.cs" />
     <Compile Include="DomainLayer\UserPackage\IUserController.cs" />
-    <Compile Include="DomainLayer\UserPackage\Permissions\IAction.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\MarketManager.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\Member.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\Role.cs" />

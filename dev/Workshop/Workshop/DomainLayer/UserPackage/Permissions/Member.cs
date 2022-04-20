@@ -11,10 +11,13 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         private string username;
         private string password;
 
+        private List<Role> roles;
+
         public Member(string username, string password)
         {
             this.username = username;
             this.password = password;
+            roles = new List<Role>();
         }
 
         internal string GetPassword()

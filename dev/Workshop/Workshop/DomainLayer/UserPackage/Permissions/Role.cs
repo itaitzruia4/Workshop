@@ -8,5 +8,9 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
 {
     class Role
     {
+
+        public Role() { 
+            
+        }
     }
 }
