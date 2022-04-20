@@ -13,11 +13,12 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         public StoreOwner(Store store)
         {
             HashSet<Action> actions = new HashSet<Action>();
-            this.stores_to_actions.Add(store.getID(), new KeyValuePair<Store, HashSet<Action>>(store, actions));
+            this.stores_to_actions.Add(store.getID(), actions);
             actions.Add(Action.AddProduct);
             actions.Add(Action.RemoveProduct);
             actions.Add(Action.ChangeProductName);
-
+            actions.Add(Action.ChangeProductPrice);
+            actions.Add(Action.ChangeProductQuantity);
         }
     }
 }

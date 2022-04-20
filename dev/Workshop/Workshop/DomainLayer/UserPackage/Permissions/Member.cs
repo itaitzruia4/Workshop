@@ -29,5 +29,14 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         {
             return username;
         }
+        public Boolean IsAuthorized(int storeID, Action action)
+        {
+            foreach (Role role in roles) 
+            {
+                if(role.IsAuthorized(storeID, action))
+                    return true;
+            }
+            return false;
+        }
     }
 }

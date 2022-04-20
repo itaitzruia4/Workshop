@@ -8,9 +8,17 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
 {
     class Role
     {
+        // Store ID -1 means general actions (not store related)
+        protected Dictionary<int, HashSet<Action>> stores_to_actions;
+        public Role() {
+            stores_to_actions = new Dictionary<int, HashSet<Action>>();
+        }
 
-        public Role() { 
-            
+        public Boolean IsAuthorized(int storeID,Action action)
+        {
+            if(!stores_to_actions.ContainsKey(storeID))
+                return false;
+            return stores_to_actions[storeID].Contains(action);
         }
     }
 }

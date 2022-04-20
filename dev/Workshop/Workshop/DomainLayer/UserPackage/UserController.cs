@@ -8,16 +8,33 @@ using Workshop.DomainLayer.UserPackage.Security;
 
 namespace Workshop.DomainLayer.UserPackage
 {
+    enum Action
+    {
+        AddProduct,
+        RemoveProduct,
+        ChangeProductName,
+        ChangeProductPrice,
+        ChangeProductQuantity
+    }
+
     class UserController : IUserController
     {
         private ISecurityHandler securityHandler;
         private Dictionary<string, Member> members;
+        private Dictionary<int, Member> id_to_members;
         private Member loggedInUser = null;
 
         public UserController(ISecurityHandler securityHandler)
         {
             this.securityHandler = securityHandler;
             LoadAllMembers();
+        }
+
+        public bool IsAuthorized(int userId, int storeId, Action action)
+        {
+            if (!id_to_members.ContainsKey(userId))
+                throw new ArgumentException("User with id " + userId + " does not exist.");
+            return id_to_members[userId].IsAuthorized(storeId, action);
         }
 
         public void LoadAllMembers()
