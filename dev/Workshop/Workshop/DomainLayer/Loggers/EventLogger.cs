@@ -13,10 +13,9 @@ namespace Workshop.DomainLayer.Loggers
         {
 
         }
-        static void Main(string[] args)
+        public void LogEvent(string message)
         {
-            log.Info("Testing!");
-            Console.ReadLine();
+            log.Info(message);
         }
     }
 }
