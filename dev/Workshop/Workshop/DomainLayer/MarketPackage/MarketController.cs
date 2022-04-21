@@ -98,5 +98,21 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new MemberAccessException($"User {username} is not allowed to request information about the workers of store #{storeId}.");
             return userController.GetWorkers(storeId);
         }
+        public void OpenStore(string username, int storeId)
+        {
+            /*if (!IsAuthorized(username, storeId, Action.ChangeProductName))
+                throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
+            ValidateStoreExists(storeId);
+            stores[storeId].openStore();*/
+            throw new NotImplementedException();
+        }
+
+        public void CloseStore(string username, int storeId)
+        {
+            if (!IsAuthorized(username, storeId, Action.CloseStore))
+                throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
+            ValidateStoreExists(storeId);
+            stores[storeId].closeStore();
+        }
     }
 }

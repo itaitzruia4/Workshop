@@ -22,7 +22,8 @@ namespace Workshop.DomainLayer.MarketPackage
         void ChangeProductPrice(string username, int storeId, int productID, int price);
 
         void ChangeProductQuantity(string username, int storeId, int productID, int quantity);
-
         List<Member> GetWorkersInformation(string username, int storeId);
+        void CloseStore(string username, int storeId);
+
     }
 }

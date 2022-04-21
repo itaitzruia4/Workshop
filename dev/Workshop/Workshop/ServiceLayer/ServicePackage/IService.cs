@@ -23,6 +23,10 @@ namespace Workshop.ServiceLayer
 
         Response<StoreOwner> NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId);
 
+
         Response<List<Member>> GetWorkersInformation(string username, int storeId);
+
+        Response CloseStore(string username, int storeId);
+
     }
 }

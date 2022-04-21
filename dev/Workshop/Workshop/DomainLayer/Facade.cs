@@ -55,8 +55,13 @@ namespace Workshop.DomainLayer
             return MarketController.NominateStoreOwner(nominatedUsername, nominatedUsername, storeId);
         }
 
-        internal List<Member> GetWorkersInformation(string username, int storeId){
+        internal List<Member> GetWorkersInformation(string username, int storeId)
+        {
             return MarketController.GetWorkersInformation(username, storeId);
+        }
+        internal void CloseStore(string username, int storeId)
+        {
+            MarketController.CloseStore(username, storeId);
         }
     }
 }

@@ -16,6 +16,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         NominateStoreOwner,
         NominateStoreManager,
         GetWorkersInformation,
-        
+        OpenStore,
+        CloseStore,
     }
 }

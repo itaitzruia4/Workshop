@@ -10,6 +10,7 @@ using DomainMember = Workshop.DomainLayer.UserPackage.Permissions.Member;
 using DomainProduct = Workshop.DomainLayer.MarketPackage.Product;
 using DomainStoreManager = Workshop.DomainLayer.UserPackage.Permissions.StoreManager;
 using DomainStoreOwner = Workshop.DomainLayer.UserPackage.Permissions.StoreOwner;
+using DomainStoreFounder = Workshop.DomainLayer.UserPackage.Permissions.StoreFounder;
 
 namespace Workshop.ServiceLayer
 {
@@ -118,7 +119,8 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<List<Member>> GetWorkersInformation(string username, int storeId){
+        public Response<List<Member>> GetWorkersInformation(string username, int storeId)
+        {
             try
             {
                 List<DomainMember> members = Facade.GetWorkersInformation(username, storeId);
@@ -129,7 +131,18 @@ namespace Workshop.ServiceLayer
             {
                 return new Response<List<Member>>(e.Message);
             }
-
+        }
+        public Response CloseStore(string username, int storeId) 
+        {
+            try
+            {
+                Facade.CloseStore(username, storeId);
+                return new Response();
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message);
+            }
         }
     }
 }
