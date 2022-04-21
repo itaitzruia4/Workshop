@@ -12,11 +12,13 @@ namespace Workshop.DomainLayer.UserPackage
     {
         private ISecurityHandler securityHandler;
         private Dictionary<string, Member> members;
-        private User currentUser = null;
+        private User currentUser;
 
         public UserController(ISecurityHandler securityHandler)
         {
             this.securityHandler = securityHandler;
+            currentUser = null;
+
             members = new Dictionary<string, Member>();
             InitializeSystem();
         }
@@ -59,15 +61,13 @@ namespace Workshop.DomainLayer.UserPackage
         public Member Login(string username, string password)
         {
             EnsureNonEmptyUserDetails(username, password);
-     
+            EnsureEnteredMarket();
+
             if (!IsMember(username))
                 throw new ArgumentException($"Username {username} does not exist");
 
-            if (currentUser == null)
-                throw new InvalidOperationException("You must enter the market first before logging in");
-
             if (currentUser is Member)
-                throw new InvalidOperationException("You must log out first before loggin in");
+                throw new InvalidOperationException("User is already logged in");
 
             Member member = members[username];
 
@@ -100,6 +100,12 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new ArgumentException("Username or password cannot be empty");
         }
 
+        private void EnsureEnteredMarket()
+        {
+            if (currentUser == null)
+                throw new InvalidOperationException("You must enter the market first before logging in");
+        }
+
         /// <summary>
         /// Perform a logout attempt. If successfull, the current member returns to be a visitor.
         /// </summary>
@@ -121,6 +127,7 @@ namespace Workshop.DomainLayer.UserPackage
         public void Register(string username, string password)
         {
             EnsureNonEmptyUserDetails(username, password);
+            EnsureEnteredMarket();
 
             if (IsMember(username))
                 throw new ArgumentException($"Username {username} already exists");
