@@ -10,13 +10,15 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
 {
     class StoreOwner: StoreRole
     {
-        public StoreOwner(int storeId): base(storeId, new HashSet<Action>())
+        List<StoreRole> nominees;
+        public StoreOwner(int storeId): base(storeId)
         {
-            store_actions.Add(Action.AddProduct);
-            store_actions.Add(Action.RemoveProduct);
-            store_actions.Add(Action.ChangeProductName);
-            store_actions.Add(Action.ChangeProductPrice);
-            store_actions.Add(Action.ChangeProductQuantity);
+            this.nominees = new List<StoreRole>();
+            actions.Add(Action.AddProduct);
+            actions.Add(Action.RemoveProduct);
+            actions.Add(Action.ChangeProductName);
+            actions.Add(Action.ChangeProductPrice);
+            actions.Add(Action.ChangeProductQuantity);
         }
     }
 }

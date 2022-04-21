@@ -17,7 +17,7 @@ namespace Workshop.DomainLayer.MarketPackage
             stores = new Dictionary<int, Store>();
         }
 
-        private Boolean IsAuthorized(string username, int storeId, UserPackage.Action action)
+        private bool IsAuthorized(string username, int storeId, UserPackage.Action action)
         {
             return userController.IsAuthorized(username, storeId, action);
         }

@@ -8,18 +8,18 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
 {
     abstract class Role
     {
-        protected HashSet<Action> general_actions;
+        protected HashSet<Action> actions;
         public Role() 
         {
-            general_actions = new HashSet<Action>();
+            actions = new HashSet<Action>();
         }
 
         public bool IsAuthorized(Action action)
         {
-            return general_actions.Contains(action);
+            return actions.Contains(action);
         }
 
-        public abstract Boolean IsAuthorized(int storeID, Action action);
+        public abstract bool IsAuthorized(int storeID, Action action);
         
     }
 }
