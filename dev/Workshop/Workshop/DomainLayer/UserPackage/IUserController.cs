@@ -9,6 +9,7 @@ namespace Workshop.DomainLayer.UserPackage
 {
     interface IUserController
     {
+        void InitializeSystem();
         User EnterMarket();
         void Register(string username, string password);
         Member Login(string username, string password);

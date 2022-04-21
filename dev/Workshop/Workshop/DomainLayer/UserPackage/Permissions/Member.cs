@@ -6,28 +6,18 @@ using System.Threading.Tasks;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
-    class Member : User
+    public class Member : User
     {
-        private string username;
-        private string password;
+        internal string Username { get; }
+        internal string Password { get; }
 
         private List<Role> roles;
 
         public Member(string username, string password)
         {
-            this.username = username;
-            this.password = password;
+            Username = username;
+            Password = password;
             roles = new List<Role>();
-        }
-
-        internal string GetPassword()
-        {
-            return password;
-        }
-
-        internal string GetUsername()
-        {
-            return username;
         }
 
         public bool IsAuthorized(Action action)

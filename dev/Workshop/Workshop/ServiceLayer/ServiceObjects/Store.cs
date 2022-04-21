@@ -6,7 +6,17 @@ using System.Threading.Tasks;
 
 namespace Workshop.ServiceLayer.ServiceObjects
 {
-    class Store
+    public class Store
     {
+        public readonly IReadOnlyCollection<string> ProductsNames;
+        public readonly string Name;
+        public readonly string Owner;
+
+        internal Store(IReadOnlyCollection<string> productsNames, string name, string owner)
+        {
+            ProductsNames = productsNames;
+            Name = name;
+            Owner = owner;
+        }
     }
 }

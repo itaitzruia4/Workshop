@@ -28,16 +28,22 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
 
         public override bool Equals(object obj)
         {
-            if(obj == null)
-                return false;
-            if(obj.GetType() != typeof(StoreRole))
-                return false;
-            return storeId == ((StoreRole)obj).storeId;
+            return obj is StoreRole && storeId == ((StoreRole)obj).storeId;
         }
 
-        public bool ExistInNomineesChain(StoreRole role)
+        /// <summary>
+        /// Check for circularity in Store Role nominees
+        /// </summary>
+        /// <param name="candidate">The StoreRole candidate to be nominated </param>
+        /// <returns>True if the candidate is already a nominee, false otherwise</returns>
+        public bool ExistsInNomineesChain(StoreRole candidate)
         {
-
+            foreach(StoreRole nominee in this.nominees)
+            {
+                if (nominee.Equals(candidate) || nominee.ExistsInNomineesChain(candidate))
+                    return true;
+            }
+            return false;
         }
     }
 }

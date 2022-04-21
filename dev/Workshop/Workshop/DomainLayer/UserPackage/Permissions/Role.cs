@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
-    abstract class Role
+    public abstract class Role
     {
         protected HashSet<Action> actions;
         public Role() 
