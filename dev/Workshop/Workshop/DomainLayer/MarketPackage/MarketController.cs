@@ -81,5 +81,22 @@ namespace Workshop.DomainLayer.MarketPackage
             ValidateStoreExists(storeId);
             stores[storeId].ChangeProductQuantity(productID, quantity);
         }
+
+        /// <summary>
+        /// Get information about the workers of the store
+        /// </summary>
+        /// <param name="username">The name of the user requesting the information</param>
+        /// <param name="storeId">The ID of the store</param>
+        /// <returns>Information about the workers of the store</returns>
+        public List<Member> GetWorkersInformation(string username, int storeId)
+        {
+            ValidateStoreExists(storeId);
+            // Check that the user is the logged in member
+            userController.AssertCurrentUser(username);
+            // Check that the user is authorized to request this information
+            if (!userController.IsAuthorized(username, storeId, Action.GetWorkersInformation))
+                throw new MemberAccessException($"User {username} is not allowed to request information about the workers of store #{storeId}.");
+            return userController.GetWorkers(storeId);
+        }
     }
 }

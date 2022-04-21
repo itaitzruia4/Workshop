@@ -18,5 +18,7 @@ namespace Workshop.DomainLayer.UserPackage
         StoreOwner NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId);
         StoreManager NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId);
         bool IsAuthorized(string username, int storeId, Action action);
+        void AssertCurrentUser(string username);
+        List<Member> GetWorkers(int storeId);
     }
 }

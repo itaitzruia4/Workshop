@@ -15,5 +15,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         ChangeProductQuantity,
         NominateStoreOwner,
         NominateStoreManager,
+        GetWorkersInformation,
+        
     }
 }

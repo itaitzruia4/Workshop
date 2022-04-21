@@ -17,7 +17,6 @@ namespace Workshop.DomainLayer.UserPackage
         // TODO should user key be member ID or username?
         private OrderHandler<string> orderHandler;
         private Dictionary<string, Member> members;
-
         private User currentUser;
 
         public UserController(ISecurityHandler securityHandler)
@@ -111,6 +110,7 @@ namespace Workshop.DomainLayer.UserPackage
         public void InitializeSystem()
         {
             // TODO: add some pre-defined users (with at least one market manager) and encrypt their passwords
+            throw new NotImplementedException("UserController.InitializeSystem not implemented");
         }
 
         /// <summary>
@@ -223,7 +223,7 @@ namespace Workshop.DomainLayer.UserPackage
         /// Assert that current user is the user that 
         /// </summary>
         /// <param name="username"></param>
-        private void AssertCurrentUser(string username)
+        public void AssertCurrentUser(string username)
         {
             if ((!(currentUser is Member)) || !((Member)currentUser).Username.Equals(username))
                 throw new ArgumentException($"Username {username} is not logged in");
@@ -237,6 +237,16 @@ namespace Workshop.DomainLayer.UserPackage
         public bool IsMember(string username)
         {
             return members.ContainsKey(username);
+        }
+
+        public List<Member> GetWorkers(int storeId){
+            List<Member> workers = new List<Member>();
+            foreach (Member member in members.Values){
+                List<StoreRole> storeRoles = member.GetStoreRoles(storeId);
+                if (storeRoles.Count != 0)
+                    workers.Add(member);
+            }
+            return workers;
         }
     }
 }

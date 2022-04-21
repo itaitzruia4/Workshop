@@ -117,5 +117,19 @@ namespace Workshop.ServiceLayer
                 return new Response<StoreManager>(e.Message);
             }
         }
+
+        public Response<List<Member>> GetWorkersInformation(string username, int storeId){
+            try
+            {
+                List<DomainMember> members = Facade.GetWorkersInformation(username, storeId);
+                List<Member> returnMembers = members.Select(x => new Member(x)).ToList();
+                return new Response<List<Member>>(returnMembers);
+            }
+            catch (Exception e)
+            {
+                return new Response<List<Member>>(e.Message);
+            }
+
+        }
     }
 }
