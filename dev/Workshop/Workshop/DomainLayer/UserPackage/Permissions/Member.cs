@@ -29,7 +29,18 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         {
             return username;
         }
-        public Boolean IsAuthorized(int storeID, Action action)
+
+        public bool IsAuthorized(Action action)
+        {
+            foreach (Role role in roles)
+            {
+                if (role.IsAuthorized(action))
+                    return true;
+            }
+            return false;
+        }
+
+        public bool IsAuthorized(int storeID, Action action)
         {
             foreach (Role role in roles) 
             {
@@ -37,6 +48,16 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
                     return true;
             }
             return false;
+        }
+
+        public void AddRole(Role role)
+        {
+            foreach(Role role2 in roles)
+            {
+                if (role.Equals(role2))
+                    throw new Exception("This user is already holding the requested role.");
+            }
+            roles.Add(role);
         }
     }
 }

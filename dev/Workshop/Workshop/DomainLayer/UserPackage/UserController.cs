@@ -14,14 +14,14 @@ namespace Workshop.DomainLayer.UserPackage
         RemoveProduct,
         ChangeProductName,
         ChangeProductPrice,
-        ChangeProductQuantity
+        ChangeProductQuantity,
+        NominateStoreOwner
     }
 
     class UserController : IUserController
     {
         private ISecurityHandler securityHandler;
         private Dictionary<string, Member> members;
-        private Dictionary<int, Member> id_to_members;
         private Member loggedInUser = null;
 
         public UserController(ISecurityHandler securityHandler)
@@ -30,11 +30,23 @@ namespace Workshop.DomainLayer.UserPackage
             LoadAllMembers();
         }
 
-        public bool IsAuthorized(int userId, int storeId, Action action)
+        // Being called only from MarketController
+        public void NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId)
         {
-            if (!id_to_members.ContainsKey(userId))
-                throw new ArgumentException("User with id " + userId + " does not exist.");
-            return id_to_members[userId].IsAuthorized(storeId, action);
+            if (!members.ContainsKey(nominatorUsername))
+                throw new ArgumentException("Username " + nominatorUsername + " does not exist.");
+            if (!members.ContainsKey(nominatedUsername))
+                throw new ArgumentException("Username " + nominatedUsername + " does not exist.");
+            if (!members[nominatorUsername].IsAuthorized(storeId, Action.NominateStoreOwner))
+                throw new MemberAccessException("User " + nominatorUsername + " is not allowed to nominate owners in this store.");
+            members[nominatedUsername].AddRole(new StoreOwner(storeId));
+        }
+
+        public bool IsAuthorized(string username, int storeId, Action action)
+        {
+            if (!members.ContainsKey(username))
+                throw new ArgumentException("Username " + username + " does not exist.");
+            return members[username].IsAuthorized(storeId, action);
         }
 
         public void LoadAllMembers()

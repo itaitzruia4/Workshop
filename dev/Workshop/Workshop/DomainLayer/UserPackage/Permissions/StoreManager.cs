@@ -8,5 +8,8 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
 {
     class StoreManager: StoreRole
     {
+        public StoreManager(int storeId) : base(storeId, new HashSet<Action>())
+        {
+        }
     }
 }

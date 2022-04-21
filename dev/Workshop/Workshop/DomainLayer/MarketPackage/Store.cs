@@ -9,11 +9,15 @@ namespace Workshop.DomainLayer.MarketPackage
     class Store
     {
         private int id;
+        private string name;
         private Dictionary<int, Product> products;
 
-        public Store(int id)
+        public Store(int id, string name)
         {
             this.id = id;
+            if (this.name == null || this.name.Equals(""))
+                throw new ArgumentException("Store name cannot be empty.");
+            this.name = name;
             products = new Dictionary<int, Product>();
         }
 

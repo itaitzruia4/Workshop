@@ -6,19 +6,20 @@ using System.Threading.Tasks;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
-    class Role
+    abstract class Role
     {
-        // Store ID -1 means general actions (not store related)
-        protected Dictionary<int, HashSet<Action>> stores_to_actions;
-        public Role() {
-            stores_to_actions = new Dictionary<int, HashSet<Action>>();
+        protected HashSet<Action> general_actions;
+        public Role() 
+        {
+            general_actions = new HashSet<Action>();
         }
 
-        public Boolean IsAuthorized(int storeID,Action action)
+        public bool IsAuthorized(Action action)
         {
-            if(!stores_to_actions.ContainsKey(storeID))
-                return false;
-            return stores_to_actions[storeID].Contains(action);
+            return general_actions.Contains(action);
         }
+
+        public abstract Boolean IsAuthorized(int storeID, Action action);
+        
     }
 }

@@ -8,5 +8,8 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
 {
     class StoreFounder: StoreOwner
     {
+        public StoreFounder(int storeId) : base(storeId)
+        {
+        }
     }
 }
