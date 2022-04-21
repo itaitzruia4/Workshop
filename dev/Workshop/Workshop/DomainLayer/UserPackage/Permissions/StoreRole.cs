@@ -8,20 +8,20 @@ using Workshop.DomainLayer.MarketPackage;
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
 
-    class StoreRole: Role
+    public class StoreRole: Role
     {
-        protected int storeId;
+        public int StoreId { get; }
         private List<StoreRole> nominees;
 
         public StoreRole(int storeId): base()
         {
-            this.storeId = storeId;
+            this.StoreId = storeId;
             this.nominees = new List<StoreRole>();
         }
 
         public override bool IsAuthorized(int storeID, Action action)
         {
-            if(this.storeId != storeID)
+            if(this.StoreId != storeID)
                 return false;
 
             return base.IsAuthorized(action);
@@ -29,7 +29,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
 
         public override bool Equals(object obj)
         {
-            return obj is StoreRole && storeId == ((StoreRole)obj).storeId;
+            return obj is StoreRole && StoreId == ((StoreRole)obj).StoreId;
         }
 
         /// <summary>

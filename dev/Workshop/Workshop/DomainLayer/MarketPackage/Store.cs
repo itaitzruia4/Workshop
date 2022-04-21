@@ -26,7 +26,7 @@ namespace Workshop.DomainLayer.MarketPackage
             return this.id;
         }
 
-        public void AddProduct(int productID, string name, int price, int quantity)
+        public Product AddProduct(int productID, string name, string description, double price, int quantity)
         {
             ValidateID(productID);
             if (products.ContainsKey(productID))
@@ -34,7 +34,10 @@ namespace Workshop.DomainLayer.MarketPackage
             ValidateName(name);
             ValidatePrice(price);
             ValidateQuantity(quantity);
-            products.Add(productID, new Product(productID, name, price, quantity));
+
+            Product newProd = new Product(productID, name, description, price, quantity);
+            products.Add(productID, newProd);
+            return newProd;
         }
 
         public void RemoveProduct(int productID)
@@ -49,7 +52,7 @@ namespace Workshop.DomainLayer.MarketPackage
             ValidateID(productID);
             ValidateProductExist(productID);
             ValidateName(name);
-            products[productID].SetName(name);
+            products[productID].Name = name;
         }
 
         public void ChangeProductPrice(int productID, int price)
@@ -57,14 +60,14 @@ namespace Workshop.DomainLayer.MarketPackage
             ValidateID(productID);
             ValidateProductExist(productID);
             ValidatePrice(price);
-            products[productID].SetPrice(price);
+            products[productID].Price = price;
         }
         public void ChangeProductQuantity(int productID, int quantity)
         {
             ValidateID(productID);
             ValidateProductExist(productID);
             ValidateQuantity(quantity);
-            products[productID].SetQuantity(quantity);
+            products[productID].Quantity = quantity;
         }
 
         private void ValidateID(int ID)
@@ -85,7 +88,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new ArgumentException("Name cannot be empty.");
         }
 
-        private void ValidatePrice(int price)
+        private void ValidatePrice(double price)
         {
             if (price < 0)
                 throw new ArgumentOutOfRangeException("Price must be bigger than zero.");

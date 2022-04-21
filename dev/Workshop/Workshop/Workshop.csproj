@@ -65,7 +65,10 @@
     <Compile Include="DomainLayer\MarketPackage\PurchasePolicy.cs" />
     <Compile Include="DomainLayer\MarketPackage\ShoppingBagProduct.cs" />
     <Compile Include="DomainLayer\MarketPackage\Store.cs" />
+    <Compile Include="DomainLayer\Orders\OrderDTO.cs" />
+    <Compile Include="DomainLayer\Orders\OrderHandler.cs" />
     <Compile Include="DomainLayer\UserPackage\IUserController.cs" />
+    <Compile Include="DomainLayer\UserPackage\Permissions\Action.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\MarketManager.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\Member.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\Role.cs" />
@@ -82,6 +85,8 @@
     <Compile Include="ServiceLayer\ServiceObjects\Member.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Product.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Store.cs" />
+    <Compile Include="ServiceLayer\ServiceObjects\StoreManager.cs" />
+    <Compile Include="ServiceLayer\ServiceObjects\StoreOwner.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\User.cs" />
     <Compile Include="ServiceLayer\ServicePackage\IService.cs" />
     <Compile Include="ServiceLayer\Response.cs" />

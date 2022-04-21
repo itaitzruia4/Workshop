@@ -39,5 +39,20 @@ namespace Workshop.DomainLayer
         {
             UserController.Register(username, password);
         }
+
+        internal Product AddProduct(string username, int storeId, int productId, string productName, string description, double price, int quantity)
+        {
+            return MarketController.AddProductToStore(username, storeId, productId, productName, description, price, quantity);
+        }
+
+        internal StoreManager NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId)
+        {
+            return MarketController.NominateStoreManager(nominatedUsername, nominatedUsername, storeId);
+        }
+
+        internal StoreOwner NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId)
+        {
+            return MarketController.NominateStoreOwner(nominatedUsername, nominatedUsername, storeId);
+        }
     }
 }

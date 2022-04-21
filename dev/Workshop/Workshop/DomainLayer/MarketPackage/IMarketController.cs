@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DomainLayer.UserPackage.Permissions;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
     interface IMarketController
     {
-        void NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId);
+        StoreOwner NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId);
+        
+        StoreManager NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId);
 
-        void AddProductToStore(string username, int storeId, int productID, string name, int price, int quantity);
+        Product AddProductToStore(string username, int storeId, int productID, string name, string description, double price, int quantity);
 
         void RemoveProductFromStore(string username, int storeId, int productID);
 

@@ -8,7 +8,7 @@ using static Workshop.DomainLayer.UserPackage.Permissions.Role;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
-    class StoreOwner: StoreRole
+    public class StoreOwner: StoreRole
     {
         List<StoreRole> nominees;
         public StoreOwner(int storeId): base(storeId)

@@ -6,20 +6,10 @@ using System.Threading.Tasks;
 using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Security;
+using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 
 namespace Workshop.DomainLayer.UserPackage
 {
-    public enum Action
-    {
-        AddProduct,
-        RemoveProduct,
-        ChangeProductName,
-        ChangeProductPrice,
-        ChangeProductQuantity,
-        NominateStoreOwner,
-        NominateStoreManager,
-    }
-
     public class UserController: IUserController
     {
         private ISecurityHandler securityHandler;
@@ -40,7 +30,7 @@ namespace Workshop.DomainLayer.UserPackage
         }
 
         // Being called only from MarketController
-        public void NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId)
+        public StoreOwner NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId)
         {
             // Check that nominator is the logged in member
             AssertCurrentUser(nominatorUsername);
@@ -70,11 +60,13 @@ namespace Workshop.DomainLayer.UserPackage
             }
 
             // Finally, add the new role
-            nominated.AddRole(new StoreOwner(storeId));
+            StoreOwner newRole = new StoreOwner(storeId);
+            nominated.AddRole(newRole);
+            return newRole;
         }
 
         // Being called only from MarketController
-        internal void NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId)
+        public StoreManager NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId)
         {
             // Check that nominator is the logged in member
             AssertCurrentUser(nominatorUsername);
@@ -95,7 +87,9 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new InvalidOperationException($"User {nominatedUsername} is already a store owner/manager of store #{storeId}");
 
             // Finally, add the new role
-            nominated.AddRole(new StoreManager(storeId));
+            StoreManager newRole = new StoreManager(storeId);
+            nominated.AddRole(newRole);
+            return newRole;
         }
 
         private void EnsureMemberExists(string username)

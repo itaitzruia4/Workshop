@@ -7,6 +7,9 @@ using Workshop.DomainLayer;
 using Workshop.ServiceLayer.ServiceObjects;
 using DomainUser = Workshop.DomainLayer.UserPackage.User;
 using DomainMember = Workshop.DomainLayer.UserPackage.Permissions.Member;
+using DomainProduct = Workshop.DomainLayer.MarketPackage.Product;
+using DomainStoreManager = Workshop.DomainLayer.UserPackage.Permissions.StoreManager;
+using DomainStoreOwner = Workshop.DomainLayer.UserPackage.Permissions.StoreOwner;
 
 namespace Workshop.ServiceLayer
 {
@@ -70,6 +73,48 @@ namespace Workshop.ServiceLayer
             catch (Exception e)
             {
                 return new Response(e.Message);
+            }
+        }
+
+        public Response<Product> AddProduct(string username, int storeId, int productId, string productName, string description, double price, int quantity)
+        {
+            try
+            {
+                DomainProduct domainProduct = Facade.AddProduct(username, storeId, productId, productName, description, price, quantity);
+                Product serviceProduct = new Product(domainProduct);
+                return new Response<Product>(serviceProduct);
+            }
+            catch (Exception e)
+            {
+                return new Response<Product>(e.Message);
+            }
+        }
+
+        public Response<StoreOwner> NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId)
+        {
+            try
+            {
+                DomainStoreOwner domainOwner = Facade.NominateStoreOwner(nominatorUsername, nominatedUsername, storeId);
+                StoreOwner serviceOwner = new StoreOwner(domainOwner);
+                return new Response<StoreOwner>(serviceOwner);
+            }
+            catch (Exception e)
+            {
+                return new Response<StoreOwner>(e.Message);
+            }
+        }
+
+        public Response<StoreManager> NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId)
+        {
+            try
+            {
+                DomainStoreManager domainManager = Facade.NominateStoreManager(nominatorUsername, nominatedUsername, storeId);
+                StoreManager serviceManager = new StoreManager(domainManager);
+                return new Response<StoreManager>(serviceManager);
+            }
+            catch (Exception e)
+            {
+                return new Response<StoreManager>(e.Message);
             }
         }
     }
