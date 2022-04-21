@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Security;
 
@@ -15,14 +16,18 @@ namespace Workshop.DomainLayer.UserPackage
         ChangeProductName,
         ChangeProductPrice,
         ChangeProductQuantity,
-        NominateStoreOwner
+        NominateStoreOwner,
+        NominateStoreManager,
     }
 
     public class UserController: IUserController
     {
         private ISecurityHandler securityHandler;
-        private OrderHandler<User> orderHandler;
+
+        // TODO should user key be member ID or username?
+        private OrderHandler<string> orderHandler;
         private Dictionary<string, Member> members;
+
         private User currentUser;
 
         public UserController(ISecurityHandler securityHandler)
@@ -37,13 +42,66 @@ namespace Workshop.DomainLayer.UserPackage
         // Being called only from MarketController
         public void NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId)
         {
-            if (!members.ContainsKey(nominatorUsername))
-                throw new ArgumentException("Username " + nominatorUsername + " does not exist.");
-            if (!members.ContainsKey(nominatedUsername))
-                throw new ArgumentException("Username " + nominatedUsername + " does not exist.");
-            if (!members[nominatorUsername].IsAuthorized(storeId, Action.NominateStoreOwner))
-                throw new MemberAccessException("User " + nominatorUsername + " is not allowed to nominate owners in this store.");
-            members[nominatedUsername].AddRole(new StoreOwner(storeId));
+            // Check that nominator is the logged in member
+            AssertCurrentUser(nominatorUsername);
+
+            // Check that the nominated member is indeed a member
+            EnsureMemberExists(nominatedUsername);
+
+            Member nominator = members[nominatorUsername], nominated = members[nominatedUsername];
+
+            // Check that the nominator is authorized to nominate a store owner
+            if (!nominator.IsAuthorized(storeId, Action.NominateStoreOwner))
+                throw new MemberAccessException($"User {nominatorUsername} is not allowed to nominate owners in store #{storeId}.");
+
+            // Check that nominator is not a store owner and that there is no circular nomination
+            List<StoreRole> nominatedStoreRoles = nominated.GetStoreRoles(storeId), nominatorStoreRoles = nominator.GetStoreRoles(storeId);
+
+            foreach(StoreRole nominatedStoreRole in nominatedStoreRoles)
+            {
+                if (nominatedStoreRole is StoreOwner)
+                    throw new InvalidOperationException($"User {nominatedUsername} is already a store owner of store #{storeId}");
+
+                foreach (StoreRole nominatorStoreRole in nominatorStoreRoles)
+                {
+                    if (nominatedStoreRole.ContainsNominee(nominatorStoreRole))
+                        throw new InvalidOperationException($"User {nominatedUsername} was already nominated by {nominatorUsername} or one of its nominators");
+                }
+            }
+
+            // Finally, add the new role
+            nominated.AddRole(new StoreOwner(storeId));
+        }
+
+        // Being called only from MarketController
+        internal void NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId)
+        {
+            // Check that nominator is the logged in member
+            AssertCurrentUser(nominatorUsername);
+
+            // Check that the nominated member is indeed a member
+            EnsureMemberExists(nominatedUsername);
+
+            Member nominator = members[nominatorUsername], nominated = members[nominatedUsername];
+
+            // Check that the nominator is authorized to nominate a store owner
+            if (!nominator.IsAuthorized(storeId, Action.NominateStoreManager))
+                throw new MemberAccessException($"User {nominatorUsername} is not allowed to nominate managers in store #{storeId}.");
+
+            List<StoreRole> nominatedStoreRoles = nominated.GetStoreRoles(storeId), nominatorStoreRoles = nominator.GetStoreRoles(storeId);
+
+            // Check that nominator is not a store owner
+            if (nominatedStoreRoles.Count > 0)
+                throw new InvalidOperationException($"User {nominatedUsername} is already a store owner/manager of store #{storeId}");
+
+            // Finally, add the new role
+            nominated.AddRole(new StoreManager(storeId));
+        }
+
+        private void EnsureMemberExists(string username)
+        {
+            if (!IsMember(username))
+                throw new ArgumentException($"Username {username} does not exist");
         }
 
         public bool IsAuthorized(string username, int storeId, Action action)

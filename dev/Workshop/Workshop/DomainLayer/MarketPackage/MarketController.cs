@@ -24,22 +24,27 @@ namespace Workshop.DomainLayer.MarketPackage
 
         public void NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId)
         {
-            if (!stores.ContainsKey(storeId))
-                throw new ArgumentException("Store with ID " + storeId + " does not exist.");
+            ValidateStoreExists(storeId);
             userController.NominateStoreOwner(nominatorUsername, nominatedUsername, storeId);
         }
 
-        private void ValidateStoreExist(int ID)
+        public void NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId)
+        {
+            ValidateStoreExists(storeId);
+            userController.NominateStoreManager(nominatorUsername, nominatedUsername, storeId);
+        }
+
+        private void ValidateStoreExists(int ID)
         {
             if (!stores.ContainsKey(ID))
-                throw new Exception("Store ID does not exist");
+                throw new ArgumentException("Store ID does not exist");
         }
 
         public void AddProductToStore(string username, int storeId, int productID, string name, int price, int quantity)
         {
             if (!IsAuthorized(username, storeId, UserPackage.Action.AddProduct))
                 throw new MemberAccessException("This user is not authorized for adding products to the specified store.");
-            ValidateStoreExist(storeId);
+            ValidateStoreExists(storeId);
             stores[storeId].AddProduct(productID, name, price, quantity);
         }
 
@@ -47,7 +52,7 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             if (!IsAuthorized(username, storeId, UserPackage.Action.RemoveProduct))
                 throw new MemberAccessException("This user is not authorized for removing products from the specified store.");
-            ValidateStoreExist(storeId);
+            ValidateStoreExists(storeId);
             stores[storeId].RemoveProduct(productID);
         }
 
@@ -55,7 +60,7 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             if (!IsAuthorized(username, storeId, UserPackage.Action.ChangeProductName))
                 throw new MemberAccessException("This user is not authorized for changing products names in the specified store.");
-            ValidateStoreExist(storeId);
+            ValidateStoreExists(storeId);
             stores[storeId].ChangeProductName(productID, name);
         }
 
@@ -63,7 +68,7 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             if (!IsAuthorized(username, storeId, UserPackage.Action.ChangeProductPrice))
                 throw new MemberAccessException("This user is not authorized for changing products prices in the specified store.");
-            ValidateStoreExist(storeId);
+            ValidateStoreExists(storeId);
             stores[storeId].ChangeProductPrice(productID, price);
         }
 
@@ -71,7 +76,7 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             if (!IsAuthorized(username, storeId, UserPackage.Action.ChangeProductName))
                 throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
-            ValidateStoreExist(storeId);
+            ValidateStoreExists(storeId);
             stores[storeId].ChangeProductQuantity(productID, quantity);
         }
     }

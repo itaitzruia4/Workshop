@@ -19,7 +19,10 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             return actions.Contains(action);
         }
 
-        public abstract bool IsAuthorized(int storeID, Action action);
+        public virtual bool IsAuthorized(int storeID, Action action)
+        {
+            return false;
+        }
         
     }
 }

@@ -23,7 +23,8 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         {
             if(this.storeId != storeID)
                 return false;
-            return actions.Contains(action);
+
+            return base.IsAuthorized(action);
         }
 
         public override bool Equals(object obj)
@@ -35,12 +36,12 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         /// Check for circularity in Store Role nominees
         /// </summary>
         /// <param name="candidate">The StoreRole candidate to be nominated </param>
-        /// <returns>True if the candidate is already a nominee, false otherwise</returns>
-        public bool ExistsInNomineesChain(StoreRole candidate)
+        /// <returns>True if the candidate is already a nominee of this StoreRole, false otherwise</returns>
+        public bool ContainsNominee(StoreRole candidate)
         {
             foreach(StoreRole nominee in this.nominees)
             {
-                if (nominee.Equals(candidate) || nominee.ExistsInNomineesChain(candidate))
+                if (nominee.Equals(candidate) || nominee.ContainsNominee(candidate))
                     return true;
             }
             return false;

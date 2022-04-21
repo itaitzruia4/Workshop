@@ -49,5 +49,18 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             }
             roles.Add(role);
         }
+
+        internal List<StoreRole> GetStoreRoles(int storeId)
+        {
+            List<StoreRole> result = new List<StoreRole>();
+
+            foreach(Role role in roles)
+            {
+                if (role is StoreRole)
+                    result.Add((StoreRole) role);
+            }
+
+            return result;
+        }
     }
 }
