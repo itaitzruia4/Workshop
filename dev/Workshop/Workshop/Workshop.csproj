@@ -59,8 +59,6 @@
     <Compile Include="DomainLayer\MarketPackage\MarketController.cs" />
     <Compile Include="DomainLayer\MarketPackage\ExternalServices\Payment\PaymentAdapter.cs" />
     <Compile Include="DomainLayer\MarketPackage\ExternalServices\Supply\SupplyAdapter.cs" />
-    <Compile Include="DomainLayer\MarketPackage\Orders\OrderDTO.cs" />
-    <Compile Include="DomainLayer\MarketPackage\Orders\OrderHandler.cs" />
     <Compile Include="DomainLayer\MarketPackage\Product.cs" />
     <Compile Include="DomainLayer\MarketPackage\PurchasePolicy.cs" />
     <Compile Include="DomainLayer\MarketPackage\ShoppingBagProduct.cs" />

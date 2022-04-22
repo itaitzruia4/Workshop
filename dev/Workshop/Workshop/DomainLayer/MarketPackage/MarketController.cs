@@ -10,7 +10,7 @@ using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
-    class MarketController: IMarketController
+    public class MarketController: IMarketController
     {
         private IUserController userController;
         private OrderHandler<int> orderHandler;
@@ -69,6 +69,15 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new MemberAccessException("This user is not authorized for removing products from the specified store.");
             ValidateStoreExists(storeId);
             stores[storeId].RemoveProduct(productID);
+        }
+
+        public void ChangeProductDescription(string username, int storeId, int productID, string description)
+        {
+            userController.AssertCurrentUser(username);
+            if (!IsAuthorized(username, storeId, Action.ChangeProductDescription))
+                throw new MemberAccessException("This user is not authorized for changing products descriptions in the specified store.");
+            ValidateStoreExists(storeId);
+            stores[storeId].ChangeProductDescription(productID, description);
         }
 
         public void ChangeProductName(string username, int storeId, int productID, string name)
@@ -141,7 +150,7 @@ namespace Workshop.DomainLayer.MarketPackage
             stores[storeId].closeStore();
         }
 
-        public bool isStoreOpen(string username, int storeId)
+        public bool IsStoreOpen(string username, int storeId)
         {
             userController.AssertCurrentUser(username);
             ValidateStoreExists(storeId);

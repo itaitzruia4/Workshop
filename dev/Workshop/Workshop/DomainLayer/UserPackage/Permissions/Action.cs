@@ -13,6 +13,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         ChangeProductName,
         ChangeProductPrice,
         ChangeProductQuantity,
+        ChangeProductDescription,
         NominateStoreOwner,
         NominateStoreManager,
         GetWorkersInformation,

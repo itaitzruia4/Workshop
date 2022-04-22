@@ -1,8 +1,10 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Security;
+using Workshop.DomainLayer.MarketPackage;
 
 namespace Tests
 {
@@ -21,10 +23,10 @@ namespace Tests
             security = securityMock.Object;
 
             var userControllerMock = new Mock<IUserController>();
-            userControllerMock.Setup(x => x.AssertCurrentUser(It.IsAny<string>())).Returns(true))
-            userControllerMock.Setup(x => x.IsAuthorized(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action>)).Returns(true))
+            userControllerMock.Setup(x => x.AssertCurrentUser(It.IsAny<string>()));
+            userControllerMock.Setup(x => x.IsAuthorized(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Workshop.DomainLayer.UserPackage.Permissions.Action>())).Returns(true);
 
-            marketController = new MarketController(security);
+            marketController = new MarketController(userControllerMock.Object);
             marketController.InitializeMarketController();
         }
 
@@ -38,7 +40,8 @@ namespace Tests
         public void TestCloseStore_Success()
         {
             // Arrange
-            string username = "user1", int storeId = 1;
+            string username = "user1";
+            int storeId = 1;
 
             // Act
             marketController.CloseStore(username, storeId);

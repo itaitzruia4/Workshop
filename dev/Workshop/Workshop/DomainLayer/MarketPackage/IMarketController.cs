@@ -7,7 +7,7 @@ using Workshop.DomainLayer.UserPackage.Permissions;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
-    interface IMarketController
+    public interface IMarketController
     {
         void InitializeMarketController();
         StoreOwner NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId);
@@ -26,6 +26,6 @@ namespace Workshop.DomainLayer.MarketPackage
         List<Member> GetWorkersInformation(string username, int storeId);
         void CloseStore(string username, int storeId);
 
-        bool isStoreOpen(string username, int storeId);
+        bool IsStoreOpen(string username, int storeId);
     }
 }

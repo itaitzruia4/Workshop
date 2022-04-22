@@ -7,7 +7,7 @@ using Workshop.DomainLayer.MarketPackage;
 
 namespace Workshop.DomainLayer.Orders
 {
-    class OrderDTO
+    public class OrderDTO
     {
         public int id { get; set; }
         public string clientName { get; set; }

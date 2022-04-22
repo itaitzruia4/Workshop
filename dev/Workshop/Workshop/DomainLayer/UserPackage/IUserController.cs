@@ -8,7 +8,7 @@ using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 
 namespace Workshop.DomainLayer.UserPackage
 {
-    interface IUserController
+    public interface IUserController
     {
         void InitializeSystem();
         User EnterMarket();

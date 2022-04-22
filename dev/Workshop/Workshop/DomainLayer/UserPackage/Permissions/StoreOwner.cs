@@ -17,6 +17,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             actions.Add(Action.AddProduct);
             actions.Add(Action.RemoveProduct);
             actions.Add(Action.ChangeProductName);
+            actions.Add(Action.ChangeProductDescription);
             actions.Add(Action.ChangeProductPrice);
             actions.Add(Action.ChangeProductQuantity);
             actions.Add(Action.GetWorkersInformation);
