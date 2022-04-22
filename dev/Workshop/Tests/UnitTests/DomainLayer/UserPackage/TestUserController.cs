@@ -20,13 +20,14 @@ namespace Tests
             security = securityMock.Object;
 
             userController = new UserController(security);
+            userController.InitializeSystem();
         }
 
         [TestMethod]
         public void TestRegister_Success()
         {
             // Arrange
-            string username = "user1", password = "pass1";
+            string username = "test1", password = "pass1";
             userController.EnterMarket();
 
             // Act
@@ -60,7 +61,7 @@ namespace Tests
 
         [DataTestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void TestRegister_UserExists()
+        public void TestRegister_RegisterTwice()
         {
             string username = "user4", password = "pass4";
             Assert.IsFalse(userController.IsMember(username));
@@ -68,6 +69,17 @@ namespace Tests
 
             userController.Register(username, password);
             Assert.IsTrue(userController.IsMember(username));
+            userController.Register(username, password);
+        }
+
+        [DataTestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestRegister_UserExists()
+        {
+            string username = "member1", password = "pass12";
+            Assert.IsTrue(userController.IsMember(username));
+
+            userController.EnterMarket();            
             userController.Register(username, password);
         }
 
@@ -86,12 +98,14 @@ namespace Tests
         }
 
         [TestMethod]
-        public void TestLogin_Success()
+        [DataRow("member1", "pass1")]
+        [DataRow("member2", "pass2")]
+        [DataRow("member3", "pass3")]
+        [DataRow("member4", "pass4")]
+        public void TestLogin_Success(string username, string password)
         {
             // Arrange
-            string username = "user53", password = "pass53";
             userController.EnterMarket();
-            userController.Register(username, password);
 
             // Act
             userController.Login(username, password);
@@ -132,26 +146,24 @@ namespace Tests
         }
 
         [TestMethod]
-        [DataRow("user1", "pass1", "PASS1")]
-        [DataRow("user2", "pass2", "PASS2")]
+        [DataRow("member1", "PASS1")]
+        [DataRow("member2", "PASS2")]
         [ExpectedException(typeof(ArgumentException), "Wrong password")]
-        public void TestLogin_WrongPassword(string username, string originalPassword, string wrongPassword)
+        public void TestLogin_WrongPassword(string username, string password)
         {
             // Arrange
             userController.EnterMarket();
-            userController.Register(username, originalPassword);
 
             // Act
-            userController.Login(username, wrongPassword);
+            userController.Login(username, password);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException), "Current user already logged in")]
         public void TestLogin_ThisUserAlreadyLoggedIn()
         {
-            string username = "user1", password = "pass1";
+            string username = "member1", password = "pass1";
             userController.EnterMarket();
-            userController.Register(username, password);
 
             userController.Login(username, password);
             userController.Login(username, password);
@@ -161,10 +173,8 @@ namespace Tests
         [ExpectedException(typeof(InvalidOperationException), "Other user already logged in")]
         public void TestLogin_OtherUserAlreadyLoggedIn()
         {
-            string username1 = "user1", password1 = "pass1", username2 = "user2", password2 = "pass2";
+            string username1 = "member1", password1 = "pass1", username2 = "member2", password2 = "pass2";
             userController.EnterMarket();
-            userController.Register(username1, password1);
-            userController.Register(username2, password2);
 
             userController.Login(username1, password1);
             userController.Login(username2, password2);
@@ -173,9 +183,8 @@ namespace Tests
         [TestMethod]
         public void TestLogout_Success()
         {
-            string username = "user", password = "pass";
+            string username = "member1", password = "pass1";
             userController.EnterMarket();
-            userController.Register(username, password);
             userController.Login(username, password);
 
             userController.Logout(username);
@@ -192,9 +201,8 @@ namespace Tests
         [ExpectedException(typeof(ArgumentException), "No user logged in")]
         public void TestLogout_NoUserLoggedIn()
         {
-            string username = "user", password = "pass";
+            string username = "member1";
             userController.EnterMarket();
-            userController.Register(username, password);
             
             userController.Logout(username);
         }
@@ -203,10 +211,8 @@ namespace Tests
         [ExpectedException(typeof(ArgumentException), "Username not equal to logged in user name")]
         public void TestLogout_OtherUserLoggedIn()
         {
-            string username1 = "user1", password1 = "pass1", username2 = "user2", password2 = "pass2";
+            string username1 = "member1", password1 = "pass1", username2 = "member2", password2 = "pass2";
             userController.EnterMarket();
-            userController.Register(username1, password1);
-            userController.Register(username2, password2);
             userController.Login(username1, password1);
 
             userController.Logout(username2);

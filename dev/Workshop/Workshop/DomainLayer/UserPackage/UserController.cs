@@ -26,7 +26,6 @@ namespace Workshop.DomainLayer.UserPackage
             currentUser = null;
 
             members = new Dictionary<string, Member>();
-            InitializeSystem();
         }
 
         // Being called only from MarketController
@@ -110,7 +109,22 @@ namespace Workshop.DomainLayer.UserPackage
         /// </summary>
         public void InitializeSystem()
         {
-            // TODO: add some pre-defined users (with at least one market manager) and encrypt their passwords
+            Member member1 = new Member("member1", securityHandler.Encrypt("pass1"));
+            member1.AddRole(new StoreFounder(1));
+
+            Member member2 = new Member("member2", securityHandler.Encrypt("pass2"));
+            member2.AddRole(new StoreOwner(2));
+
+            Member member3 = new Member("member3", securityHandler.Encrypt("pass3"));
+            member3.AddRole(new StoreManager(3));
+
+            Member member4 = new Member("member4", securityHandler.Encrypt("pass4"));
+            member4.AddRole(new MarketManager());
+
+            members.Add(member1.Username, member1);
+            members.Add(member2.Username, member2);
+            members.Add(member3.Username, member3);
+            members.Add(member4.Username, member4);
         }
 
         /// <summary>
