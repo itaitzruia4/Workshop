@@ -34,11 +34,18 @@ namespace Workshop.DomainLayer.Orders
 
             foreach(OrderDTO order in this.orders[key])
             {
-                if (order.Id == orderID)
+                if (order.id == orderID)
                     return order;
             }
 
             return null;
+        }
+
+        public List<OrderDTO> GetOrders(T key)
+        {
+            if (!orders.ContainsKey(key))
+                return null;
+            return orders[key];
         }
     }
 }
