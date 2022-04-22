@@ -18,5 +18,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         GetWorkersInformation,
         OpenStore,
         CloseStore,
+        AddPermissionToStoreManager,
+        RemovePermissionFromStoreManager
     }
 }

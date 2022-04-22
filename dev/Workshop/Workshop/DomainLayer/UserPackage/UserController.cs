@@ -97,6 +97,60 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new ArgumentException($"Username {username} does not exist");
         }
 
+        public void AddPermissionToStoreManager(string ownerUsername, string managerUsername, int storeId, Action permission)
+        {
+            // Check that owner is the logged in member
+            AssertCurrentUser(ownerUsername);
+
+            // Check that the manager is indeed a member
+            EnsureMemberExists(managerUsername);
+
+            // Check that the owner is authorized for adding permissions
+            IsAuthorized(ownerUsername, storeId, Action.AddPermissionToStoreManager);
+
+            List<StoreRole> storeRoles = members[managerUsername].GetStoreRoles(storeId);
+
+            // Find the manager StoreRole object
+            foreach (StoreRole storeRole in storeRoles)
+            {
+                if (storeRole is StoreManager)
+                {
+                    // Add the permission to the manager
+                    storeRole.AddAction(permission);
+                    return;
+                }
+            }
+            // If not found manager role in roles list throw an exception.
+            throw new ArgumentException($"User {managerUsername} is not a store manager of store {storeId}");
+        }
+
+        public void RemovePermissionFromStoreManager(string ownerUsername, string managerUsername, int storeId, Action permission)
+        {
+            // Check that owner is the logged in member
+            AssertCurrentUser(ownerUsername);
+
+            // Check that the manager is indeed a member
+            EnsureMemberExists(managerUsername);
+
+            // Check that the owner is authorized for adding permissions
+            IsAuthorized(ownerUsername, storeId, Action.RemovePermissionFromStoreManager);
+
+            List<StoreRole> storeRoles = members[managerUsername].GetStoreRoles(storeId);
+
+            // Find the manager StoreRole object
+            foreach (StoreRole storeRole in storeRoles)
+            {
+                if (storeRole is StoreManager)
+                {
+                    // Add the permission to the manager
+                    storeRole.RemoveAction(permission);
+                    return;
+                }
+            }
+            // If not found manager role in roles list throw an exception.
+            throw new ArgumentException($"User {managerUsername} is not a store manager of store {storeId}");
+        }
+
         public bool IsAuthorized(string username, int storeId, Action action)
         {
             if (!members.ContainsKey(username))
