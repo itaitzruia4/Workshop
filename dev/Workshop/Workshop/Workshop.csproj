@@ -59,14 +59,13 @@
     <Compile Include="DomainLayer\MarketPackage\MarketController.cs" />
     <Compile Include="DomainLayer\MarketPackage\ExternalServices\Payment\PaymentAdapter.cs" />
     <Compile Include="DomainLayer\MarketPackage\ExternalServices\Supply\SupplyAdapter.cs" />
-    <Compile Include="DomainLayer\MarketPackage\Orders\OrderDTO.cs" />
-    <Compile Include="DomainLayer\MarketPackage\Orders\OrderHandler.cs" />
     <Compile Include="DomainLayer\MarketPackage\Product.cs" />
     <Compile Include="DomainLayer\MarketPackage\PurchasePolicy.cs" />
     <Compile Include="DomainLayer\MarketPackage\ShoppingBagProduct.cs" />
     <Compile Include="DomainLayer\MarketPackage\Store.cs" />
     <Compile Include="DomainLayer\Orders\OrderDTO.cs" />
     <Compile Include="DomainLayer\Orders\OrderHandler.cs" />
+    <Compile Include="DomainLayer\Reviews\IReviewHandler.cs" />
     <Compile Include="DomainLayer\UserPackage\IUserController.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\Action.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\MarketManager.cs" />

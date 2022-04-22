@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Workshop.DomainLayer.Loggers
 {
-    public class Logger: Workshop.DomainLayer.Loggers.ILogger
+    public class Logger
     {
         private static readonly log4net.ILog log;
         static Logger()

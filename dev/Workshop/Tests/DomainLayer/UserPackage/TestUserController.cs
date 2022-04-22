@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Security;
 
@@ -19,7 +20,12 @@ namespace Tests
             securityMock.Setup(x => x.Encrypt(It.IsAny<string>())).Returns((string s) => s);
             security = securityMock.Object;
 
-            userController = new UserController(security);
+            var reviewMock = new Mock<IReviewHandler>();
+            reviewMock.Setup(x => x.AddReview(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>()));
+            security = securityMock.Object;
+
+
+            userController = new UserController(security, null);
             userController.InitializeSystem();
         }
 
@@ -79,7 +85,7 @@ namespace Tests
             string username = "member1", password = "pass12";
             Assert.IsTrue(userController.IsMember(username));
 
-            userController.EnterMarket();            
+            userController.EnterMarket();
             userController.Register(username, password);
         }
 
@@ -203,7 +209,7 @@ namespace Tests
         {
             string username = "member1";
             userController.EnterMarket();
-            
+
             userController.Logout(username);
         }
 
@@ -211,7 +217,7 @@ namespace Tests
         [ExpectedException(typeof(ArgumentException), "Username not equal to logged in user name")]
         public void TestLogout_OtherUserLoggedIn()
         {
-            string username1 = "member1", password1 = "pass1", username2 = "member2", password2 = "pass2";
+            string username1 = "member1", password1 = "pass1", username2 = "member2";
             userController.EnterMarket();
             userController.Login(username1, password1);
 
