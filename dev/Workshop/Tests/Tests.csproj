@@ -63,8 +63,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+<<<<<<< HEAD
     <Compile Include="UnitTests\DomainLayer\Loggers\TestLogger.cs" />
     <Compile Include="UnitTests\DomainLayer\UserPackage\TestUserController.cs" />
+=======
+    <Compile Include="DomainLayer\Loggers\TestLogger.cs" />
+    <Compile Include="DomainLayer\UserPackage\TestMarketController.cs" />
+    <Compile Include="DomainLayer\UserPackage\TestUserController.cs" />
+>>>>>>> f78811f38db26fc9db6ab650e6160b1f9ff2585e
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

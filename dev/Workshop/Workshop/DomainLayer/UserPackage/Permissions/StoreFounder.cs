@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
-    class StoreFounder: StoreOwner
+    public class StoreFounder: StoreOwner
     {
         public StoreFounder(int storeId) : base(storeId)
         {
+            actions.Add(Action.CloseStore);
         }
     }
 }

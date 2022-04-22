@@ -8,6 +8,7 @@ namespace Workshop.DomainLayer.MarketPackage
 {
     class Store
     {
+        private bool open;
         private int id;
         private string name;
         private Dictionary<int, Product> products;
@@ -19,11 +20,26 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new ArgumentException("Store name cannot be empty.");
             this.name = name;
             products = new Dictionary<int, Product>();
+            this.open = true; //TODO: check if on init store supposed to be open or closed.
         }
-
         public int getID()
         {
             return this.id;
+        }
+
+        public bool isOpen()
+        {
+            return this.open;
+        }
+
+        public void openStore()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void closeStore()
+        {
+            this.open = false;
         }
 
         public Product AddProduct(int productID, string name, string description, double price, int quantity)

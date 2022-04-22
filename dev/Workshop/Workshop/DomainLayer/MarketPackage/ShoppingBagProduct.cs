@@ -8,5 +8,6 @@ namespace Workshop.DomainLayer.MarketPackage
 {
     class ShoppingBagProduct
     {
+        public int productId {get; set;}
     }
 }

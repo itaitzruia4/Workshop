@@ -23,6 +23,19 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         {
             return false;
         }
-        
+
+        public void AddAction(Action action)
+        {
+            if (actions.Contains(action))
+                throw new ArgumentException("This member already have the requested permission.");
+            actions.Add(action);
+        }
+        public void RemoveAction(Action action)
+        {
+            if (!actions.Contains(action))
+                throw new ArgumentException("This member already does not have the requested permission.");
+            actions.Remove(action);
+        }
+
     }
 }

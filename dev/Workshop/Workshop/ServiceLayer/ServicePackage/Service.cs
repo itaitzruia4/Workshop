@@ -10,6 +10,7 @@ using DomainMember = Workshop.DomainLayer.UserPackage.Permissions.Member;
 using DomainProduct = Workshop.DomainLayer.MarketPackage.Product;
 using DomainStoreManager = Workshop.DomainLayer.UserPackage.Permissions.StoreManager;
 using DomainStoreOwner = Workshop.DomainLayer.UserPackage.Permissions.StoreOwner;
+using DomainStoreFounder = Workshop.DomainLayer.UserPackage.Permissions.StoreFounder;
 
 namespace Workshop.ServiceLayer
 {
@@ -30,7 +31,7 @@ namespace Workshop.ServiceLayer
                 User serviceUser = new User(domainUser);
                 return new Response<User>(serviceUser);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return new Response<User>(e.Message);
             }
@@ -115,6 +116,59 @@ namespace Workshop.ServiceLayer
             catch (Exception e)
             {
                 return new Response<StoreManager>(e.Message);
+            }
+        }
+
+        public Response<List<Member>> GetWorkersInformation(string username, int storeId)
+        {
+            try
+            {
+                List<DomainMember> members = Facade.GetWorkersInformation(username, storeId);
+                List<Member> returnMembers = members.Select(x => new Member(x)).ToList();
+                return new Response<List<Member>>(returnMembers);
+            }
+            catch (Exception e)
+            {
+                return new Response<List<Member>>(e.Message);
+            }
+        }
+        public Response CloseStore(string username, int storeId)
+        {
+            try
+            {
+                Facade.CloseStore(username, storeId);
+                return new Response();
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message);
+            }
+        }
+
+        public Response<int> CreateNewStore(string creator, string storeName)
+        {
+            try
+            {
+                int storeId = Facade.CreateNewStore(creator, storeName);
+                return new Response<int>(storeId);
+            }
+            catch (Exception e)
+            {
+                return new Response<int>(e.Message);
+            }
+
+        }
+
+        public Response ReviewProduct(string user, int productId, string review)
+        {
+            try
+            {
+                Facade.ReviewProduct(user, productId, review);
+                return new Response();
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message);
             }
         }
     }

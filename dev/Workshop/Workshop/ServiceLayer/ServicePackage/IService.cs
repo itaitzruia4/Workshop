@@ -22,5 +22,14 @@ namespace Workshop.ServiceLayer
         Response<StoreManager> NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId);
 
         Response<StoreOwner> NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId);
+
+
+        Response<List<Member>> GetWorkersInformation(string username, int storeId);
+
+        Response CloseStore(string username, int storeId);
+
+        Response<int> CreateNewStore(string creator, string storeName);
+
+        Response ReviewProduct(string user, int productId, string review);
     }
 }

@@ -19,6 +19,10 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             actions.Add(Action.ChangeProductName);
             actions.Add(Action.ChangeProductPrice);
             actions.Add(Action.ChangeProductQuantity);
+            actions.Add(Action.GetWorkersInformation);
+            actions.Add(Action.AddPermissionToStoreManager);
+            actions.Add(Action.RemovePermissionFromStoreManager);
+            actions.Add(Action.GetStoreOrdersList);
         }
     }
 }

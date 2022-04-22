@@ -85,6 +85,7 @@
     <Compile Include="ServiceLayer\ServiceObjects\Member.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Product.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Store.cs" />
+    <Compile Include="ServiceLayer\ServiceObjects\StoreFounder.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\StoreManager.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\StoreOwner.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\User.cs" />

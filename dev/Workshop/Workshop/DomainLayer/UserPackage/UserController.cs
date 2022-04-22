@@ -4,27 +4,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.Orders;
+using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Security;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 
 namespace Workshop.DomainLayer.UserPackage
 {
-    public class UserController: IUserController
+    public class UserController : IUserController
     {
         private ISecurityHandler securityHandler;
+        private IReviewHandler reviewHandler;
 
         // TODO should user key be member ID or username?
         private OrderHandler<string> orderHandler;
         private Dictionary<string, Member> members;
-
         private User currentUser;
-
-        public UserController(ISecurityHandler securityHandler)
+        public UserController(ISecurityHandler securityHandler, IReviewHandler reviewHandler)
         {
             this.securityHandler = securityHandler;
             currentUser = null;
-
+            this.reviewHandler = reviewHandler;
             members = new Dictionary<string, Member>();
         }
 
@@ -46,7 +46,7 @@ namespace Workshop.DomainLayer.UserPackage
             // Check that nominator is not a store owner and that there is no circular nomination
             List<StoreRole> nominatedStoreRoles = nominated.GetStoreRoles(storeId), nominatorStoreRoles = nominator.GetStoreRoles(storeId);
 
-            foreach(StoreRole nominatedStoreRole in nominatedStoreRoles)
+            foreach (StoreRole nominatedStoreRole in nominatedStoreRoles)
             {
                 if (nominatedStoreRole is StoreOwner)
                     throw new InvalidOperationException($"User {nominatedUsername} is already a store owner of store #{storeId}");
@@ -95,6 +95,60 @@ namespace Workshop.DomainLayer.UserPackage
         {
             if (!IsMember(username))
                 throw new ArgumentException($"Username {username} does not exist");
+        }
+
+        public void AddPermissionToStoreManager(string ownerUsername, string managerUsername, int storeId, Action permission)
+        {
+            // Check that owner is the logged in member
+            AssertCurrentUser(ownerUsername);
+
+            // Check that the manager is indeed a member
+            EnsureMemberExists(managerUsername);
+
+            // Check that the owner is authorized for adding permissions
+            IsAuthorized(ownerUsername, storeId, Action.AddPermissionToStoreManager);
+
+            List<StoreRole> storeRoles = members[managerUsername].GetStoreRoles(storeId);
+
+            // Find the manager StoreRole object
+            foreach (StoreRole storeRole in storeRoles)
+            {
+                if (storeRole is StoreManager)
+                {
+                    // Add the permission to the manager
+                    storeRole.AddAction(permission);
+                    return;
+                }
+            }
+            // If not found manager role in roles list throw an exception.
+            throw new ArgumentException($"User {managerUsername} is not a store manager of store {storeId}");
+        }
+
+        public void RemovePermissionFromStoreManager(string ownerUsername, string managerUsername, int storeId, Action permission)
+        {
+            // Check that owner is the logged in member
+            AssertCurrentUser(ownerUsername);
+
+            // Check that the manager is indeed a member
+            EnsureMemberExists(managerUsername);
+
+            // Check that the owner is authorized for adding permissions
+            IsAuthorized(ownerUsername, storeId, Action.RemovePermissionFromStoreManager);
+
+            List<StoreRole> storeRoles = members[managerUsername].GetStoreRoles(storeId);
+
+            // Find the manager StoreRole object
+            foreach (StoreRole storeRole in storeRoles)
+            {
+                if (storeRole is StoreManager)
+                {
+                    // Add the permission to the manager
+                    storeRole.RemoveAction(permission);
+                    return;
+                }
+            }
+            // If not found manager role in roles list throw an exception.
+            throw new ArgumentException($"User {managerUsername} is not a store manager of store {storeId}");
         }
 
         public bool IsAuthorized(string username, int storeId, Action action)
@@ -175,7 +229,7 @@ namespace Workshop.DomainLayer.UserPackage
 
             // TODO figure out how to support multiple logged in users at once
             currentUser = member;
-            
+
             return member;
         }
 
@@ -208,7 +262,7 @@ namespace Workshop.DomainLayer.UserPackage
         /// <param name="username">Username of the user that requests to log out</param>
         public void Logout(string username)
         {
-            if(!IsMember(username))
+            if (!IsMember(username))
                 throw new ArgumentException($"Username {username} does not exist");
             AssertCurrentUser(username);
 
@@ -237,7 +291,7 @@ namespace Workshop.DomainLayer.UserPackage
         /// Assert that current user is the user that 
         /// </summary>
         /// <param name="username"></param>
-        private void AssertCurrentUser(string username)
+        public void AssertCurrentUser(string username)
         {
             if ((!(currentUser is Member)) || !((Member)currentUser).Username.Equals(username))
                 throw new ArgumentException($"Username {username} is not logged in");
@@ -251,6 +305,47 @@ namespace Workshop.DomainLayer.UserPackage
         public bool IsMember(string username)
         {
             return members.ContainsKey(username);
+        }
+
+        public List<Member> GetWorkers(int storeId)
+        {
+            List<Member> workers = new List<Member>();
+            foreach (Member member in members.Values)
+            {
+                List<StoreRole> storeRoles = member.GetStoreRoles(storeId);
+                if (storeRoles.Count != 0)
+                    workers.Add(member);
+            }
+            return workers;
+        }
+
+        public Member GetMember(string username)
+        {
+            if (IsMember(username))
+            {
+                return members[username];
+            }
+            throw new ArgumentException($"Username {username} is not a member");
+        }
+
+        public void ReviewProduct(string user, int productId, string review)
+        {
+            AssertCurrentUser(user);
+            List<OrderDTO> orders = orderHandler.GetOrders(user);
+            bool purchasedProduct = false;
+            foreach (OrderDTO order in orders)
+            {
+                if (order.ContainsProduct(productId))
+                {
+                    purchasedProduct = true;
+                    break;
+                }
+            }
+            if (!purchasedProduct)
+            {
+                throw new ArgumentException($"Username {user} did not purchase product {productId}");
+            }
+            reviewHandler.AddReview(user, productId, review);
         }
     }
 }
