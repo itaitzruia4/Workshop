@@ -15,6 +15,7 @@ namespace Workshop.DomainLayer.MarketPackage
         private IUserController userController;
         private OrderHandler<int> orderHandler;
         private Dictionary<int, Store> stores;
+        private static int STORE_COUNT = 0;
         public MarketController(IUserController userController)
         {
             this.userController = userController;
@@ -134,6 +135,18 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
             ValidateStoreExists(storeId);
             stores[storeId].closeStore();
+        }
+
+        public int CreateNewStore(string creator, string storeName){
+            userController.AssertCurrentUser(creator);
+            Member member = userController.GetMember(creator);
+            int storeId = STORE_COUNT;
+            Store store = new Store(storeId, storeName);
+            Role storeFounderRole = new StoreFounder(storeId);
+            member.AddRole(storeFounderRole);
+            stores[storeId] = store;
+            STORE_COUNT++;
+            return storeId;
         }
     }
 }

@@ -25,5 +25,6 @@ namespace Workshop.DomainLayer.MarketPackage
         List<Member> GetWorkersInformation(string username, int storeId);
         void CloseStore(string username, int storeId);
 
+        int CreateNewStore(string creator, string storeName);
     }
 }

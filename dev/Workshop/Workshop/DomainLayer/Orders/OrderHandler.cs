@@ -47,5 +47,16 @@ namespace Workshop.DomainLayer.Orders
                 return null;
             return orders[key];
         }
+
+        public bool PurchasedProduct(T key, int productId){
+            if (!orders.ContainsKey(key))
+                return false;
+            foreach (OrderDTO order in orders[key]){
+                if (order.ContainsProduct(productId)){
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

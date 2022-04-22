@@ -25,5 +25,13 @@ namespace Workshop.DomainLayer.Orders
             this.items = items;
             this.totalPrice = totalPrice;
         }
+
+        public bool ContainsProduct(int productId){
+            foreach (ShoppingBagProduct item in items){
+                if (item.productId == productId)
+                    return true;
+            }
+            return false;
+        }
     }
 }

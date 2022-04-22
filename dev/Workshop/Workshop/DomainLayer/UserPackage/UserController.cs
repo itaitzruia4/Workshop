@@ -10,7 +10,7 @@ using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 
 namespace Workshop.DomainLayer.UserPackage
 {
-    public class UserController: IUserController
+    public class UserController : IUserController
     {
         private ISecurityHandler securityHandler;
 
@@ -18,12 +18,12 @@ namespace Workshop.DomainLayer.UserPackage
         private OrderHandler<string> orderHandler;
         private Dictionary<string, Member> members;
         private User currentUser;
-
+        private IReviewController reviewController;
         public UserController(ISecurityHandler securityHandler)
         {
             this.securityHandler = securityHandler;
             currentUser = null;
-
+            this.reviewController = new ReviewController();
             members = new Dictionary<string, Member>();
             InitializeSystem();
         }
@@ -46,7 +46,7 @@ namespace Workshop.DomainLayer.UserPackage
             // Check that nominator is not a store owner and that there is no circular nomination
             List<StoreRole> nominatedStoreRoles = nominated.GetStoreRoles(storeId), nominatorStoreRoles = nominator.GetStoreRoles(storeId);
 
-            foreach(StoreRole nominatedStoreRole in nominatedStoreRoles)
+            foreach (StoreRole nominatedStoreRole in nominatedStoreRoles)
             {
                 if (nominatedStoreRole is StoreOwner)
                     throw new InvalidOperationException($"User {nominatedUsername} is already a store owner of store #{storeId}");
@@ -215,7 +215,7 @@ namespace Workshop.DomainLayer.UserPackage
 
             // TODO figure out how to support multiple logged in users at once
             currentUser = member;
-            
+
             return member;
         }
 
@@ -248,7 +248,7 @@ namespace Workshop.DomainLayer.UserPackage
         /// <param name="username">Username of the user that requests to log out</param>
         public void Logout(string username)
         {
-            if(!IsMember(username))
+            if (!IsMember(username))
                 throw new ArgumentException($"Username {username} does not exist");
             AssertCurrentUser(username);
 
@@ -293,14 +293,45 @@ namespace Workshop.DomainLayer.UserPackage
             return members.ContainsKey(username);
         }
 
-        public List<Member> GetWorkers(int storeId){
+        public List<Member> GetWorkers(int storeId)
+        {
             List<Member> workers = new List<Member>();
-            foreach (Member member in members.Values){
+            foreach (Member member in members.Values)
+            {
                 List<StoreRole> storeRoles = member.GetStoreRoles(storeId);
                 if (storeRoles.Count != 0)
                     workers.Add(member);
             }
             return workers;
+        }
+
+        public Member GetMember(string username)
+        {
+            if (IsMember(username))
+            {
+                return members[username];
+            }
+            throw new ArgumentException($"Username {username} is not a member");
+        }
+
+        public void ReviewProduct(string user, int productId, string review)
+        {
+            AssertCurrentUser(user);
+            List<OrderDTO> orders = orderHandler.GetOrders(user);
+            bool purchasedProduct = false;
+            foreach (OrderDTO order in orders)
+            {
+                if (order.ContainsProduct(productId))
+                {
+                    purchasedProduct = true;
+                    break;
+                }
+            }
+            if (!purchasedProduct)
+            {
+                throw new ArgumentException($"Username {user} did not purchase product {productId}");
+            }
+            reviewController.AddReview(user, productId, review);
         }
     }
 }

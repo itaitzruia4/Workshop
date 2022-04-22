@@ -13,6 +13,8 @@ namespace Workshop.DomainLayer.UserPackage
         void InitializeSystem();
         User EnterMarket();
         void Register(string username, string password);
+        bool IsMember(string username);
+        Member GetMember(string username);
         Member Login(string username, string password);
         void Logout(string username);
         StoreOwner NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId);
@@ -20,5 +22,6 @@ namespace Workshop.DomainLayer.UserPackage
         bool IsAuthorized(string username, int storeId, Action action);
         void AssertCurrentUser(string username);
         List<Member> GetWorkers(int storeId);
+        void ReviewProduct(string user, int productId, string review);
     }
 }

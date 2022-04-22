@@ -28,5 +28,8 @@ namespace Workshop.ServiceLayer
 
         Response CloseStore(string username, int storeId);
 
+        Response<int> CreateNewStore(string creator, string storeName);
+
+        Response ReviewProduct(string user, int productId, string review);
     }
 }
