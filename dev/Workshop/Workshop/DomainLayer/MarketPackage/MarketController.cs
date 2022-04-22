@@ -22,6 +22,11 @@ namespace Workshop.DomainLayer.MarketPackage
             stores = new Dictionary<int, Store>();
         }
 
+        public void InitializeMarketController()
+        {
+            //TODO: implement
+        }
+
         private bool IsAuthorized(string username, int storeId, Action action)
         {
             userController.AssertCurrentUser(username);
@@ -134,6 +139,13 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
             ValidateStoreExists(storeId);
             stores[storeId].closeStore();
+        }
+
+        public bool isStoreOpen(string username, int storeId)
+        {
+            userController.AssertCurrentUser(username);
+            ValidateStoreExists(storeId);
+            return stores[storeId].isOpen();
         }
     }
 }
