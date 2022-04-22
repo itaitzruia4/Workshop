@@ -67,6 +67,7 @@
     <Compile Include="DomainLayer\StoresAndProducts\TestStore.cs" />
     <Compile Include="DomainLayer\UserPackage\TestMarketController.cs" />
     <Compile Include="DomainLayer\UserPackage\TestUserController.cs" />
+    <Compile Include="DomainLayer\UserPackage\RolesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

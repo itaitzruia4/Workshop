@@ -25,8 +25,9 @@ namespace Tests
             var userControllerMock = new Mock<IUserController>();
             userControllerMock.Setup(x => x.AssertCurrentUser(It.IsAny<string>()));
             userControllerMock.Setup(x => x.IsAuthorized(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Workshop.DomainLayer.UserPackage.Permissions.Action>())).Returns(true);
+            userController = userControllerMock.Object;
 
-            marketController = new MarketController(userControllerMock.Object);
+            marketController = new MarketController(userController);
             marketController.InitializeMarketController();
         }
 

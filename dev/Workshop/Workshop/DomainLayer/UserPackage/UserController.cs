@@ -164,7 +164,7 @@ namespace Workshop.DomainLayer.UserPackage
         public void InitializeSystem()
         {
             // TODO: add some pre-defined users (with at least one market manager) and encrypt their passwords
-            throw new NotImplementedException("UserController.InitializeSystem not implemented");
+            //throw new NotImplementedException("UserController.InitializeSystem not implemented");
         }
 
         /// <summary>
