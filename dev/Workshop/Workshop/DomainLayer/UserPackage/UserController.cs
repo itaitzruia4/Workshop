@@ -26,6 +26,146 @@ namespace Workshop.DomainLayer.UserPackage
             currentUser = null;
             this.reviewHandler = reviewHandler;
             members = new Dictionary<string, Member>();
+            this.orderHandler = new OrderHandler<string>();
+        }
+
+        //*******************************
+        // System Actions:
+        //*******************************
+
+        /// <summary>
+        /// Load all members of the system
+        /// </summary>
+        public void InitializeSystem()
+        {
+            Member member1 = new Member("member1", securityHandler.Encrypt("pass1"));
+            member1.AddRole(new StoreFounder(1));
+
+            Member member2 = new Member("member2", securityHandler.Encrypt("pass2"));
+            member2.AddRole(new StoreOwner(2));
+
+            Member member3 = new Member("member3", securityHandler.Encrypt("pass3"));
+            member3.AddRole(new StoreManager(3));
+
+            Member member4 = new Member("member4", securityHandler.Encrypt("pass4"));
+            member4.AddRole(new MarketManager());
+
+            members.Add(member1.Username, member1);
+            members.Add(member2.Username, member2);
+            members.Add(member3.Username, member3);
+            members.Add(member4.Username, member4);
+        }
+
+        //*******************************
+        // General Visitor-Guest Actions:
+        //*******************************
+
+        /// <summary>
+        /// Enter the market as a Visitor, updating the current user of the system
+        /// </summary>
+        /// <returns>
+        /// A <c>User</c> instance representing the guest who entered the market
+        /// </returns>
+        public User EnterMarket()
+        {
+            if (currentUser != null)
+                throw new InvalidOperationException("You have already entered the market");
+
+            currentUser = new User();
+            return currentUser;
+        }
+
+        /// <summary>
+        /// User exits the market
+        /// </summary>
+        public void ExitMarket()
+        {
+            currentUser = null;
+        }
+
+        /// <summary>
+        /// Attempt a registeration action. If successful, a new member is added to the system.
+        /// </summary>
+        /// <param name="username">Username to be registered</param>
+        /// <param name="password">Password of the user that registers to the system</param>
+        public void Register(string username, string password)
+        {
+            EnsureNonEmptyUserDetails(username, password);
+            EnsureEnteredMarket();
+
+            if (IsMember(username))
+                throw new ArgumentException($"Username {username} already exists");
+
+            string encryptedPassword = securityHandler.Encrypt(password);
+            Member newMember = new Member(username, encryptedPassword);
+            members.Add(username, newMember);
+        }
+
+        /// <summary>
+        /// Perform a login attempt. If successfull, the current visitor becomes a Member.
+        /// </summary>
+        /// <param name="username">
+        /// Inserted username for login
+        /// </param>
+        /// <param name="password">
+        /// Inserted password for login
+        /// </param>
+        /// <returns>
+        /// The logged in member
+        /// </returns>
+        public Member Login(string username, string password)
+        {
+            EnsureNonEmptyUserDetails(username, password);
+            EnsureEnteredMarket();
+
+            if (!IsMember(username))
+                throw new ArgumentException($"Username {username} does not exist");
+
+            if (currentUser is Member)
+                throw new InvalidOperationException("User is already logged in");
+
+            Member member = members[username];
+
+            string encryptedTruePassword = member.Password,
+                   encryptedPasswordInput = securityHandler.Encrypt(password);
+
+            if (!encryptedPasswordInput.Equals(encryptedTruePassword))
+                throw new ArgumentException("Wrong password");
+
+            // TODO figure out how to support multiple logged in users at once
+            currentUser = member;
+
+            return member;
+        }
+
+        /// <summary>
+        /// Perform a logout attempt. If successfull, the current member returns to be a visitor.
+        /// </summary>
+        /// <param name="username">Username of the user that requests to log out</param>
+        public void Logout(string username)
+        {
+            if (!IsMember(username))
+                throw new ArgumentException($"Username {username} does not exist");
+            AssertCurrentUser(username);
+
+            currentUser = new User();
+        }
+
+        /// <summary>
+        /// Input verification for non-empty username and password
+        /// </summary>
+        /// <param name="username">
+        /// Username inserted by the user
+        /// </param>
+        /// <param name="password">
+        /// Password inserted by the user
+        /// </param>
+        private void EnsureNonEmptyUserDetails(string username, string password)
+        {
+            if (username == null || password == null)
+                throw new ArgumentException("Username or password cannot be null");
+            if (username.Trim().Equals("") || password.Trim().Equals(""))
+                throw new ArgumentException("Username or password cannot be empty");
         }
 
         // Being called only from MarketController
@@ -158,134 +298,12 @@ namespace Workshop.DomainLayer.UserPackage
             return members[username].IsAuthorized(storeId, action);
         }
 
-        /// <summary>
-        /// Load all members of the system
-        /// </summary>
-        public void InitializeSystem()
-        {
-            Member member1 = new Member("member1", securityHandler.Encrypt("pass1"));
-            member1.AddRole(new StoreFounder(1));
-
-            Member member2 = new Member("member2", securityHandler.Encrypt("pass2"));
-            member2.AddRole(new StoreOwner(2));
-
-            Member member3 = new Member("member3", securityHandler.Encrypt("pass3"));
-            member3.AddRole(new StoreManager(3));
-
-            Member member4 = new Member("member4", securityHandler.Encrypt("pass4"));
-            member4.AddRole(new MarketManager());
-
-            members.Add(member1.Username, member1);
-            members.Add(member2.Username, member2);
-            members.Add(member3.Username, member3);
-            members.Add(member4.Username, member4);
-        }
-
-        /// <summary>
-        /// Enter the market as a Visitor, updating the current user of the system
-        /// </summary>
-        /// <returns>
-        /// A <c>User</c> instance representing the guest who entered the market
-        /// </returns>
-        public User EnterMarket()
-        {
-            if (currentUser != null)
-                throw new InvalidOperationException("You have already entered the market");
-
-            currentUser = new User();
-            return currentUser;
-        }
-
-        /// <summary>
-        /// Perform a login attempt. If successfull, the current visitor becomes a Member.
-        /// </summary>
-        /// <param name="username">
-        /// Inserted username for login
-        /// </param>
-        /// <param name="password">
-        /// Inserted password for login
-        /// </param>
-        /// <returns>
-        /// The logged in member
-        /// </returns>
-        public Member Login(string username, string password)
-        {
-            EnsureNonEmptyUserDetails(username, password);
-            EnsureEnteredMarket();
-
-            if (!IsMember(username))
-                throw new ArgumentException($"Username {username} does not exist");
-
-            if (currentUser is Member)
-                throw new InvalidOperationException("User is already logged in");
-
-            Member member = members[username];
-
-            string encryptedTruePassword = member.Password,
-                   encryptedPasswordInput = securityHandler.Encrypt(password);
-
-            if (!encryptedPasswordInput.Equals(encryptedTruePassword))
-                throw new ArgumentException("Wrong password");
-
-            // TODO figure out how to support multiple logged in users at once
-            currentUser = member;
-
-            return member;
-        }
-
-        /// <summary>
-        /// Input verification for non-empty username and password
-        /// </summary>
-        /// <param name="username">
-        /// Username inserted by the user
-        /// </param>
-        /// <param name="password">
-        /// Password inserted by the user
-        /// </param>
-        private void EnsureNonEmptyUserDetails(string username, string password)
-        {
-            if (username == null || password == null)
-                throw new ArgumentException("Username or password cannot be null");
-            if (username.Trim().Equals("") || password.Trim().Equals(""))
-                throw new ArgumentException("Username or password cannot be empty");
-        }
-
         private void EnsureEnteredMarket()
         {
             if (currentUser == null)
                 throw new InvalidOperationException("You must enter the market first before logging in");
         }
-
-        /// <summary>
-        /// Perform a logout attempt. If successfull, the current member returns to be a visitor.
-        /// </summary>
-        /// <param name="username">Username of the user that requests to log out</param>
-        public void Logout(string username)
-        {
-            if (!IsMember(username))
-                throw new ArgumentException($"Username {username} does not exist");
-            AssertCurrentUser(username);
-
-            currentUser = new User();
-        }
-
-        /// <summary>
-        /// Attempt a registeration action. If successful, a new member is added to the system.
-        /// </summary>
-        /// <param name="username">Username to be registered</param>
-        /// <param name="password">Password of the user that registers to the system</param>
-        public void Register(string username, string password)
-        {
-            EnsureNonEmptyUserDetails(username, password);
-            EnsureEnteredMarket();
-
-            if (IsMember(username))
-                throw new ArgumentException($"Username {username} already exists");
-
-            string encryptedPassword = securityHandler.Encrypt(password);
-            Member newMember = new Member(username, encryptedPassword);
-            members.Add(username, newMember);
-        }
+        
 
         /// <summary>
         /// Assert that current user is the user that 

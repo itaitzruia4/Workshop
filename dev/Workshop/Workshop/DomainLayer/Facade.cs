@@ -23,6 +23,11 @@ namespace Workshop.DomainLayer
             return UserController.EnterMarket();
         }
 
+        public void ExitMarket()
+        {
+            UserController.ExitMarket();
+        }
+
         public Member Login(string username, string password)
         {
             return UserController.Login(username, password);

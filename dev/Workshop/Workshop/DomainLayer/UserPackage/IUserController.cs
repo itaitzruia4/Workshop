@@ -12,6 +12,7 @@ namespace Workshop.DomainLayer.UserPackage
     {
         void InitializeSystem();
         User EnterMarket();
+        void ExitMarket();
         void Register(string username, string password);
         bool IsMember(string username);
         Member GetMember(string username);

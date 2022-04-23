@@ -11,6 +11,8 @@ namespace Workshop.ServiceLayer
     {
         Response<User> EnterMarket();
 
+        Response ExitMarket();
+
         Response Register(string username, string password);
 
         Response<Member> Login(string username, string password);
@@ -22,7 +24,6 @@ namespace Workshop.ServiceLayer
         Response<StoreManager> NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId);
 
         Response<StoreOwner> NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId);
-
 
         Response<List<Member>> GetWorkersInformation(string username, int storeId);
 

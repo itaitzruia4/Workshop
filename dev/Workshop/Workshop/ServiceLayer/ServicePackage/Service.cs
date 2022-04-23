@@ -37,6 +37,19 @@ namespace Workshop.ServiceLayer
             }
         }
 
+        public Response ExitMarket()
+        {
+            try
+            {
+                facade.ExitMarket();
+                return new Response();
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message);
+            }
+        }
+
         public Response Register(string username, string password)
         {
             try
