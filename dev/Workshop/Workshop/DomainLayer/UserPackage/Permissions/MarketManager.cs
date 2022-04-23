@@ -8,11 +8,10 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
 {
     class MarketManager: Role
     {
-        public override bool IsAuthorized(int storeID, Action action)
+        public MarketManager()
         {
-            return false;
+            actions.Add(Action.ViewClosedStore);
         }
-
         public override bool Equals(object obj)
         {
             if (obj == null)

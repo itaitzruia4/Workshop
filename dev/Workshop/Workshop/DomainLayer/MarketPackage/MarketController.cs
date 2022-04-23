@@ -23,9 +23,14 @@ namespace Workshop.DomainLayer.MarketPackage
             stores = new Dictionary<int, Store>();
         }
 
-        public void InitializeMarketController()
+        public void InitializeSystem()
         {
-            //TODO: implement
+            stores.Add(1, new Store(1, "Sport store"));
+            stores.Add(2, new Store(2, "Drug store"));
+            stores.Add(3, new Store(3, "Supermarket"));
+            stores.Add(4, new Store(4, "Electronics store"));
+            stores.Add(5, new Store(5, "Convenience store"));
+            STORE_COUNT = 5;
         }
 
         private bool IsAuthorized(string username, int storeId, Action action)
@@ -57,6 +62,7 @@ namespace Workshop.DomainLayer.MarketPackage
         public Product AddProductToStore(string username, int storeId, int productID, string name, string description, double price, int quantity)
         {
             userController.AssertCurrentUser(username);
+            ViewStorePermission(username, storeId);
             if (!IsAuthorized(username, storeId, Action.AddProduct))
                 throw new MemberAccessException("This user is not authorized for adding products to the specified store.");
             ValidateStoreExists(storeId);
@@ -66,6 +72,7 @@ namespace Workshop.DomainLayer.MarketPackage
         public void RemoveProductFromStore(string username, int storeId, int productID)
         {
             userController.AssertCurrentUser(username);
+            ViewStorePermission(username, storeId);
             if (!IsAuthorized(username, storeId, Action.RemoveProduct))
                 throw new MemberAccessException("This user is not authorized for removing products from the specified store.");
             ValidateStoreExists(storeId);
@@ -75,6 +82,7 @@ namespace Workshop.DomainLayer.MarketPackage
         public void ChangeProductDescription(string username, int storeId, int productID, string description)
         {
             userController.AssertCurrentUser(username);
+            ViewStorePermission(username, storeId);
             if (!IsAuthorized(username, storeId, Action.ChangeProductDescription))
                 throw new MemberAccessException("This user is not authorized for changing products descriptions in the specified store.");
             ValidateStoreExists(storeId);
@@ -84,6 +92,7 @@ namespace Workshop.DomainLayer.MarketPackage
         public void ChangeProductName(string username, int storeId, int productID, string name)
         {
             userController.AssertCurrentUser(username);
+            ViewStorePermission(username, storeId);
             if (!IsAuthorized(username, storeId, Action.ChangeProductName))
                 throw new MemberAccessException("This user is not authorized for changing products names in the specified store.");
             ValidateStoreExists(storeId);
@@ -93,6 +102,7 @@ namespace Workshop.DomainLayer.MarketPackage
         public void ChangeProductPrice(string username, int storeId, int productID, int price)
         {
             userController.AssertCurrentUser(username);
+            ViewStorePermission(username, storeId);
             if (!IsAuthorized(username, storeId, Action.ChangeProductPrice))
                 throw new MemberAccessException("This user is not authorized for changing products prices in the specified store.");
             ValidateStoreExists(storeId);
@@ -102,6 +112,7 @@ namespace Workshop.DomainLayer.MarketPackage
         public void ChangeProductQuantity(string username, int storeId, int productID, int quantity)
         {
             userController.AssertCurrentUser(username);
+            ViewStorePermission(username, storeId);
             if (!IsAuthorized(username, storeId, Action.ChangeProductName))
                 throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
             ValidateStoreExists(storeId);
@@ -111,7 +122,9 @@ namespace Workshop.DomainLayer.MarketPackage
         public List<OrderDTO> GetStoreOrdersList(string username, int storeId)
         {
             userController.AssertCurrentUser(username);
+            ViewStorePermission(username, storeId);
             IsAuthorized(username, storeId, Action.GetStoreOrdersList);
+
             List<OrderDTO> orders = this.orderHandler.GetOrders(storeId);
             if (orders == null)
                 throw new Exception($"Store {storeId} does not exist or it does not have previous orders.");
@@ -130,6 +143,7 @@ namespace Workshop.DomainLayer.MarketPackage
             // Check that the user is the logged in member
             userController.AssertCurrentUser(username);
             // Check that the user is authorized to request this information
+            ViewStorePermission(username, storeId);
             if (!userController.IsAuthorized(username, storeId, Action.GetWorkersInformation))
                 throw new MemberAccessException($"User {username} is not allowed to request information about the workers of store #{storeId}.");
             return userController.GetWorkers(storeId);
@@ -146,9 +160,23 @@ namespace Workshop.DomainLayer.MarketPackage
         public void CloseStore(string username, int storeId)
         {
             if (!IsAuthorized(username, storeId, Action.CloseStore))
-                throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
+                throw new MemberAccessException("This user is not authorized to close this specified store.");
             ValidateStoreExists(storeId);
-            stores[storeId].closeStore();
+            if (IsStoreOpen(username, storeId)) { stores[storeId].closeStore(); }
+            else
+            {
+                throw new Exception($"Store {storeId} already closed.");
+            }
+        }
+
+        public void ViewStorePermission(string username, int storeId)
+        {
+            userController.AssertCurrentUser(username);
+            ValidateStoreExists(storeId);
+            if (!IsStoreOpen(username,storeId) && !userController.IsAuthorized(username, storeId, Action.ViewClosedStore))
+            {
+                throw new Exception($"user {username} is not permited to view closed Store {storeId}.");
+            }
         }
 
         public int CreateNewStore(string creator, string storeName) {
