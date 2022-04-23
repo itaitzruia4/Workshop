@@ -63,11 +63,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DomainLayer\Loggers\TestLogger.cs" />
-    <Compile Include="DomainLayer\StoresAndProducts\TestStore.cs" />
-    <Compile Include="DomainLayer\UserPackage\TestMarketController.cs" />
-    <Compile Include="DomainLayer\UserPackage\TestUserController.cs" />
-    <Compile Include="DomainLayer\UserPackage\RolesTests.cs" />
+    <Compile Include="UnitTests\DomainLayer\Loggers\TestLogger.cs" />
+    <Compile Include="UnitTests\DomainLayer\MarketPackage\TestStore.cs" />
+    <Compile Include="UnitTests\DomainLayer\MarketPackage\TestMarketController.cs" />
+    <Compile Include="UnitTests\DomainLayer\UserPackage\TestUserController.cs" />
+    <Compile Include="UnitTests\DomainLayer\UserPackage\RolesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
