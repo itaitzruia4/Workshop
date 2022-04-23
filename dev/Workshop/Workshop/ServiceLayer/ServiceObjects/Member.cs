@@ -10,6 +10,7 @@ namespace Workshop.ServiceLayer.ServiceObjects
     public class Member : User
     {
         public readonly string Username;
+        public IReadOnlyCollection<Role> roles;
 
         public Member(DomainMember DomainMember): base(DomainMember)
         {
