@@ -41,23 +41,23 @@ namespace Workshop.DomainLayer.Reviews
             }
             else
             {
-                temp[user] = Review;
+                temp[user] = review;
             }
         }
         private void AddToUserReviews(string user, int productId, ReviewDTO review)
         {
             if (!userReviews.ContainsKey(user))
             {
-                userReviews.Add(user, new Dictionary<int, List<ReviewDTO>>());
+                userReviews.Add(user, new Dictionary<int, ReviewDTO>());
             }
-            Dictionary<int, List<ReviewDTO>> temp = userReviews[user];
+            Dictionary<int, ReviewDTO> temp = userReviews[user];
             if (!temp.ContainsKey(productId))
             {
                 temp.Add(productId, review);
             }
             else
             {
-                temp[productId] = ReviewDTO;
+                temp[productId] = review;
             }
         }
     }
