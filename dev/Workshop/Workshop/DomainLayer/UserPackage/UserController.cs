@@ -43,7 +43,7 @@ namespace Workshop.DomainLayer.UserPackage
             if (!nominator.IsAuthorized(storeId, Action.NominateStoreOwner))
                 throw new MemberAccessException($"User {nominatorUsername} is not allowed to nominate owners in store #{storeId}.");
 
-            // Check that nominator is not a store owner and that there is no circular nomination
+            // Check that nominated is not a store owner and that there is no circular nomination
             List<StoreRole> nominatedStoreRoles = nominated.GetStoreRoles(storeId), nominatorStoreRoles = nominator.GetStoreRoles(storeId);
 
             foreach (StoreRole nominatedStoreRole in nominatedStoreRoles)
@@ -81,7 +81,7 @@ namespace Workshop.DomainLayer.UserPackage
 
             List<StoreRole> nominatedStoreRoles = nominated.GetStoreRoles(storeId), nominatorStoreRoles = nominator.GetStoreRoles(storeId);
 
-            // Check that nominator is not a store owner
+            // Check that nominated is not a store owner
             if (nominatedStoreRoles.Count > 0)
                 throw new InvalidOperationException($"User {nominatedUsername} is already a store owner/manager of store #{storeId}");
 
