@@ -157,16 +157,20 @@ namespace Workshop.DomainLayer.MarketPackage
             if (!IsAuthorized(username, storeId, Action.CloseStore))
                 throw new MemberAccessException("This user is not authorized to close this specified store.");
             ValidateStoreExists(storeId);
-            stores[storeId].closeStore();
+            if (IsStoreOpen(username, storeId)) { stores[storeId].closeStore(); }
+            else
+            {
+                throw new Exception($"Store {storeId} already closed.");
+            }
         }
 
-        private void ViewStorePermission(string username, int storeId)
+        public void ViewStorePermission(string username, int storeId)
         {
             userController.AssertCurrentUser(username);
             ValidateStoreExists(storeId);
             if (!IsStoreOpen(username,storeId) && !userController.IsAuthorized(username, storeId, Action.ViewClosedStore))
             {
-                throw new MemberAccessException("This user is not authorized to view information on this specified closed store.");
+                throw new Exception($"user {username} is not permited to view closed Store {storeId}.");
             }
         }
 

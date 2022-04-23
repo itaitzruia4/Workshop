@@ -40,5 +40,17 @@ namespace Tests
             Assert.IsFalse(marketController.IsStoreOpen(username, storeId));
         }
 
+        [TestMethod]
+        public void TestCloseStore_Failure()
+        {
+            // Arrange
+            string username = "user1"; int storeId = 1;
+
+            // Act
+            marketController.CloseStore(username, storeId);
+
+            // Assert
+            Assert.ThrowsException<Exception>(() => marketController.CloseStore(username, storeId));
+        }
     }
 }

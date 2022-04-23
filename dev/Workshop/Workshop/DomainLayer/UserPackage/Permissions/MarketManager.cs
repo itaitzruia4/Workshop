@@ -12,11 +12,6 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         {
             actions.Add(Action.ViewClosedStore);
         }
-        public override bool IsAuthorized(int storeID, Action action)
-        {
-            return false;
-        }
-
         public override bool Equals(object obj)
         {
             if (obj == null)
