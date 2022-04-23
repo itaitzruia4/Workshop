@@ -199,7 +199,7 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         {
             userController.Logout("imaginary_user");
         }
-
+        
         [TestMethod]
         [ExpectedException(typeof(ArgumentException), "No user logged in")]
         public void TestLogout_NoUserLoggedIn()
@@ -266,6 +266,82 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             
             // Act + Assert
             Assert.ThrowsException<ArgumentException>(() => userController.NominateStoreOwner(nominatorName, nominatedName, storeId));
+        }
+
+        [TestMethod]
+        [DataRow("member3", "pass3", 2)]
+        public void TestNominateStoreOwner_NominatedStoreOwner(string nominatorName, string nominatorPassword, int storeId)
+        {
+            // Arrange
+            string nominatedName = "member2";
+            userController.EnterMarket();
+            userController.Login(nominatorName, nominatorPassword);
+
+            // Act + Assert
+            Assert.ThrowsException<InvalidOperationException>(() => userController.NominateStoreOwner(nominatorName, nominatedName, storeId));
+        }
+
+        //TODO: TestNominateStoreOwner_CircularNomination
+
+        [TestMethod]
+        [DataRow("member1", "pass1", 1)]
+        [DataRow("member2", "pass2", 2)]
+        public void TestNominateStoreManager_Success(string nominatorName, string nominatorPassword, int storeId)
+        {
+            // Arrange
+            string nominatedName = "member5";
+            userController.EnterMarket();
+            userController.Login(nominatorName, nominatorPassword);
+
+            // Act
+            StoreManager storeManager = userController.NominateStoreManager(nominatorName, nominatedName, storeId);
+
+            // Assert
+            Member nominee = userController.GetMember(nominatedName);
+            List<StoreRole> nominatedStoreRoles = nominee.GetStoreRoles(storeId);
+            Assert.AreEqual(nominatedStoreRoles.Count, 1);
+            Assert.AreSame(storeManager, nominatedStoreRoles[0]);
+        }
+
+
+        [TestMethod]
+        [DataRow("member3", "pass3", 3)]
+        [DataRow("member4", "pass4", 3)]
+        public void TestNominateStoreManager_NotAuthorized(string nominatorName, string nominatorPassword, int storeId)
+        {
+            // Arrange
+            string nominatedName = "member5";
+            userController.EnterMarket();
+            userController.Login(nominatorName, nominatorPassword);
+
+            // Act + Assert
+            Assert.ThrowsException<MemberAccessException>(() => userController.NominateStoreManager(nominatorName, nominatedName, storeId));
+        }
+
+        [TestMethod]
+        [DataRow("member1", "pass1", 1)]
+        [DataRow("member2", "pass2", 2)]
+        public void TestNominateStoreManager_NominatorNotLoggedIn(string nominatorName, string nominatorPassword, int storeId)
+        {
+            // Arrange
+            string nominatedName = "member5";
+            userController.EnterMarket();
+
+            // Act + Assert
+            Assert.ThrowsException<ArgumentException>(() => userController.NominateStoreManager(nominatorName, nominatedName, storeId));
+        }
+
+        [TestMethod]
+        [DataRow("member3", "pass3", 2)]
+        public void TestNominateStoreManager_NominatedStoreOwner(string nominatorName, string nominatorPassword, int storeId)
+        {
+            // Arrange
+            string nominatedName = "member2";
+            userController.EnterMarket();
+            userController.Login(nominatorName, nominatorPassword);
+
+            // Act + Assert
+            Assert.ThrowsException<InvalidOperationException>(() => userController.NominateStoreManager(nominatorName, nominatedName, storeId));
         }
     }
 }

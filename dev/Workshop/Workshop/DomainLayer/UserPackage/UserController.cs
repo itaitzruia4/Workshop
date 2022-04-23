@@ -165,12 +165,17 @@ namespace Workshop.DomainLayer.UserPackage
         {
             Member member1 = new Member("member1", securityHandler.Encrypt("pass1"));
             member1.AddRole(new StoreFounder(1));
+            member1.AddRole(new StoreFounder(2));
+            member1.AddRole(new StoreFounder(3));
+            member1.AddRole(new StoreFounder(4));
+            member1.AddRole(new StoreFounder(5));
 
-            Member member2 = new Member("member2", securityHandler.Encrypt("pass2"));
+            Member member2 = new Member("member2", securityHandler.Encrypt("pass2"));           
             member2.AddRole(new StoreOwner(2));
 
-            Member member3 = new Member("member3", securityHandler.Encrypt("pass3"));
+            Member member3 = new Member("member3", securityHandler.Encrypt("pass3"));        
             member3.AddRole(new StoreManager(3));
+            member3.AddRole(new StoreOwner(2));
 
             Member member4 = new Member("member4", securityHandler.Encrypt("pass4"));
             member4.AddRole(new MarketManager());
