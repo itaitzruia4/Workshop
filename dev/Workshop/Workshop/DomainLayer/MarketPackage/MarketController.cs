@@ -25,12 +25,11 @@ namespace Workshop.DomainLayer.MarketPackage
 
         public void InitializeSystem()
         {
-            stores.Add(1, new Store(1, "Sport store"));
-            stores.Add(2, new Store(2, "Drug store"));
-            stores.Add(3, new Store(3, "Supermarket"));
-            stores.Add(4, new Store(4, "Electronics store"));
-            stores.Add(5, new Store(5, "Convenience store"));
-            STORE_COUNT = 5;
+            CreateNewStore("User1", "Sport store");
+            CreateNewStore("User2", "Drug store");
+            CreateNewStore("User3", "Supermarket");
+            CreateNewStore("User4", "Electronics store");
+            CreateNewStore("User5", "Convenience store");
         }
 
         private bool IsAuthorized(string username, int storeId, Action action)
@@ -175,12 +174,15 @@ namespace Workshop.DomainLayer.MarketPackage
             ValidateStoreExists(storeId);
             if (!IsStoreOpen(username,storeId) && !userController.IsAuthorized(username, storeId, Action.ViewClosedStore))
             {
-                throw new Exception($"user {username} is not permited to view closed Store {storeId}.");
+                throw new Exception($"User {username} is not permitted to view closed store {storeId}.");
             }
         }
 
         public int CreateNewStore(string creator, string storeName) {
             userController.AssertCurrentUser(creator);
+            if (String.IsNullOrWhiteSpace(storeName)){
+                throw new ArgumentException($"User {creator} requestted to create a store with an empty name.");
+            }
             Member member = userController.GetMember(creator);
             int storeId = STORE_COUNT;
             Store store = new Store(storeId, storeName);
