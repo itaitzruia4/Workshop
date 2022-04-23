@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Workshop.DomainLayer.UserPackage.Security
 {
-    class HashSecurityHandler : ISecurityHandler
+    public class HashSecurityHandler : ISecurityHandler
     {
         public string Encrypt(string message)
         {

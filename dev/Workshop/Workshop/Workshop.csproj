@@ -66,6 +66,8 @@
     <Compile Include="DomainLayer\Orders\OrderDTO.cs" />
     <Compile Include="DomainLayer\Orders\OrderHandler.cs" />
     <Compile Include="DomainLayer\Reviews\IReviewHandler.cs" />
+    <Compile Include="DomainLayer\Reviews\ReviewDTO.cs" />
+    <Compile Include="DomainLayer\Reviews\ReviewHandler.cs" />
     <Compile Include="DomainLayer\UserPackage\IUserController.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\Action.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\MarketManager.cs" />
@@ -75,6 +77,7 @@
     <Compile Include="DomainLayer\UserPackage\Permissions\StoreManager.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\StoreOwner.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\StoreRole.cs" />
+    <Compile Include="DomainLayer\UserPackage\Security\HashSecurityHandler.cs" />
     <Compile Include="DomainLayer\UserPackage\Security\ISecurityHandler.cs" />
     <Compile Include="DomainLayer\UserPackage\Shopping\ShoppingBag.cs" />
     <Compile Include="DomainLayer\UserPackage\Shopping\ShoppingCart.cs" />

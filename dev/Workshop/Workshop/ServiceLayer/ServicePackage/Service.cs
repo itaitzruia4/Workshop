@@ -16,18 +16,18 @@ namespace Workshop.ServiceLayer
 {
     class Service : IService
     {
-        private Facade Facade;
+        private Facade facade;
 
         public Service(Facade facade)
         {
-            Facade = facade;
+            this.facade = new Facade();
         }
 
         public Response<User> EnterMarket()
         {
             try
             {
-                DomainUser domainUser = Facade.EnterMarket();
+                DomainUser domainUser = facade.EnterMarket();
                 User serviceUser = new User(domainUser);
                 return new Response<User>(serviceUser);
             }
@@ -41,7 +41,7 @@ namespace Workshop.ServiceLayer
         {
             try
             {
-                Facade.Register(username, password);
+                facade.Register(username, password);
                 return new Response();
             }
             catch (Exception e)
@@ -54,7 +54,7 @@ namespace Workshop.ServiceLayer
         {
             try
             {
-                DomainMember domainMember = Facade.Login(username, password);
+                DomainMember domainMember = facade.Login(username, password);
                 Member serviceMember = new Member(domainMember);
                 return new Response<Member>(serviceMember);
             }
@@ -68,7 +68,7 @@ namespace Workshop.ServiceLayer
         {
             try
             {
-                Facade.Logout(username);
+                facade.Logout(username);
                 return new Response();
             }
             catch (Exception e)
@@ -81,7 +81,7 @@ namespace Workshop.ServiceLayer
         {
             try
             {
-                DomainProduct domainProduct = Facade.AddProduct(username, storeId, productId, productName, description, price, quantity);
+                DomainProduct domainProduct = facade.AddProduct(username, storeId, productId, productName, description, price, quantity);
                 Product serviceProduct = new Product(domainProduct);
                 return new Response<Product>(serviceProduct);
             }
@@ -95,7 +95,7 @@ namespace Workshop.ServiceLayer
         {
             try
             {
-                DomainStoreOwner domainOwner = Facade.NominateStoreOwner(nominatorUsername, nominatedUsername, storeId);
+                DomainStoreOwner domainOwner = facade.NominateStoreOwner(nominatorUsername, nominatedUsername, storeId);
                 StoreOwner serviceOwner = new StoreOwner(domainOwner);
                 return new Response<StoreOwner>(serviceOwner);
             }
@@ -109,7 +109,7 @@ namespace Workshop.ServiceLayer
         {
             try
             {
-                DomainStoreManager domainManager = Facade.NominateStoreManager(nominatorUsername, nominatedUsername, storeId);
+                DomainStoreManager domainManager = facade.NominateStoreManager(nominatorUsername, nominatedUsername, storeId);
                 StoreManager serviceManager = new StoreManager(domainManager);
                 return new Response<StoreManager>(serviceManager);
             }
@@ -123,7 +123,7 @@ namespace Workshop.ServiceLayer
         {
             try
             {
-                List<DomainMember> members = Facade.GetWorkersInformation(username, storeId);
+                List<DomainMember> members = facade.GetWorkersInformation(username, storeId);
                 List<Member> returnMembers = members.Select(x => new Member(x)).ToList();
                 return new Response<List<Member>>(returnMembers);
             }
@@ -136,7 +136,7 @@ namespace Workshop.ServiceLayer
         {
             try
             {
-                Facade.CloseStore(username, storeId);
+                facade.CloseStore(username, storeId);
                 return new Response();
             }
             catch (Exception e)
@@ -149,7 +149,7 @@ namespace Workshop.ServiceLayer
         {
             try
             {
-                int storeId = Facade.CreateNewStore(creator, storeName);
+                int storeId = facade.CreateNewStore(creator, storeName);
                 return new Response<int>(storeId);
             }
             catch (Exception e)
@@ -163,7 +163,7 @@ namespace Workshop.ServiceLayer
         {
             try
             {
-                Facade.ReviewProduct(user, productId, review);
+                facade.ReviewProduct(user, productId, review);
                 return new Response();
             }
             catch (Exception e)

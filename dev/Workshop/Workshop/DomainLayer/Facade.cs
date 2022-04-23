@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Workshop.DomainLayer.MarketPackage;
+using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Permissions;
+using Workshop.DomainLayer.UserPackage.Security;
 
 namespace Workshop.DomainLayer
 {
@@ -14,10 +12,10 @@ namespace Workshop.DomainLayer
         private IUserController UserController;
         private IMarketController MarketController;
 
-        internal Facade(IUserController userController, IMarketController marketController)
+        internal Facade()
         {
             UserController = new UserController(new HashSecurityHandler(), new ReviewHandler());
-            MarketController = marketController(UserController);
+            MarketController = new MarketController(UserController);
         }
 
         public User EnterMarket()
