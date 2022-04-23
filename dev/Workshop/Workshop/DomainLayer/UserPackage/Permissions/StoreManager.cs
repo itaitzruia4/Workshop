@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
-    class StoreManager
+    public class StoreManager: StoreRole
     {
+        public StoreManager(int storeId) : base(storeId)
+        {
+        }
     }
 }

@@ -6,7 +6,18 @@ using System.Threading.Tasks;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
-    class MarketManager
+    class MarketManager: Role
     {
+        public override bool IsAuthorized(int storeID, Action action)
+        {
+            return false;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                return false;
+            return obj.GetType() != typeof(MarketManager);
+        }
     }
 }
