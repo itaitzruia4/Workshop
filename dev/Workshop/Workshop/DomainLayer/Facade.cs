@@ -16,8 +16,8 @@ namespace Workshop.DomainLayer
 
         internal Facade(IUserController userController, IMarketController marketController)
         {
-            UserController = userController;
-            MarketController = marketController;
+            UserController = new UserController(new HashSecurityHandler(), new ReviewHandler());
+            MarketController = marketController(UserController);
         }
 
         public User EnterMarket()

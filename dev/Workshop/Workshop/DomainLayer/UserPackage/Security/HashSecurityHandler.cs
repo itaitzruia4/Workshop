@@ -10,7 +10,7 @@ namespace Workshop.DomainLayer.UserPackage.Security
     {
         public string Encrypt(string message)
         {
-            return message.GetHashCode().ToString();
+            throw new NotImplementedException();
         }
     }
 }
