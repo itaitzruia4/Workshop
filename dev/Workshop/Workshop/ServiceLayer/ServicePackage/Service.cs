@@ -18,7 +18,7 @@ namespace Workshop.ServiceLayer
     {
         private Facade facade;
 
-        public Service(Facade facade)
+        public Service()
         {
             this.facade = new Facade();
         }
