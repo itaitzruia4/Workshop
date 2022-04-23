@@ -23,9 +23,14 @@ namespace Workshop.DomainLayer.MarketPackage
             stores = new Dictionary<int, Store>();
         }
 
-        public void InitializeMarketController()
+        public void InitializeSystem()
         {
-            stores.Add(1, new Store(1, "HentaiStore"));
+            stores.Add(1, new Store(1, "Sport store"));
+            stores.Add(2, new Store(2, "Drug store"));
+            stores.Add(3, new Store(3, "Supermarket"));
+            stores.Add(4, new Store(4, "Electronics store"));
+            stores.Add(5, new Store(5, "Convenience store"));
+            STORE_COUNT = 5;
         }
 
         private bool IsAuthorized(string username, int storeId, Action action)

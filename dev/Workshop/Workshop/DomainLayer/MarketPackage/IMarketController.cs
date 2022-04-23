@@ -9,7 +9,7 @@ namespace Workshop.DomainLayer.MarketPackage
 {
     public interface IMarketController
     {
-        void InitializeMarketController();
+        void InitializeSystem();
         StoreOwner NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId);
         
         StoreManager NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId);
