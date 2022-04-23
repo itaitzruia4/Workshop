@@ -1,16 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
+using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Security;
 
-namespace Tests
+namespace Tests.UnitTests.DomainLayer.UserPackage
 {
     [TestClass]
     public class TestUserController
     {
-        private ISecurityHandler security;
         private UserController userController;
 
         [TestInitialize]
@@ -18,14 +19,11 @@ namespace Tests
         {
             var securityMock = new Mock<ISecurityHandler>();
             securityMock.Setup(x => x.Encrypt(It.IsAny<string>())).Returns((string s) => s);
-            security = securityMock.Object;
 
             var reviewMock = new Mock<IReviewHandler>();
             reviewMock.Setup(x => x.AddReview(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>()));
-            security = securityMock.Object;
 
-
-            userController = new UserController(security, null);
+            userController = new UserController(securityMock.Object, reviewMock.Object);
             userController.InitializeSystem();
         }
 
@@ -65,8 +63,7 @@ namespace Tests
             Assert.IsFalse(userController.IsMember(username));
         }
 
-        [DataTestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [TestMethod]
         public void TestRegister_RegisterTwice()
         {
             string username = "user4", password = "pass4";
@@ -75,7 +72,7 @@ namespace Tests
 
             userController.Register(username, password);
             Assert.IsTrue(userController.IsMember(username));
-            userController.Register(username, password);
+            Assert.ThrowsException<ArgumentException>(() => userController.Register(username, password));
         }
 
         [DataTestMethod]
@@ -222,6 +219,53 @@ namespace Tests
             userController.Login(username1, password1);
 
             userController.Logout(username2);
+        }
+
+        [TestMethod]
+        [DataRow("member1", "pass1", 1)]
+        [DataRow("member2", "pass2", 2)]
+        public void TestNominateStoreOwner_Success(string nominatorName, string nominatorPassword, int storeId)
+        {
+            // Arrange
+            string nominatedName = "member5";
+            userController.EnterMarket();
+            userController.Login(nominatorName, nominatorPassword);
+
+            // Act
+            StoreOwner storeOwner = userController.NominateStoreOwner(nominatorName, nominatedName, storeId);
+
+            // Assert
+            Member nominee = userController.GetMember(nominatedName);
+            List<StoreRole> nominatedStoreRoles = nominee.GetStoreRoles(storeId);
+            Assert.AreEqual(nominatedStoreRoles.Count, 1);
+            Assert.AreSame(storeOwner, nominatedStoreRoles[0]);
+        }
+
+        [TestMethod]
+        [DataRow("member3", "pass3", 3)]
+        [DataRow("member4", "pass4", 3)]
+        public void TestNominateStoreOwner_NotAuthorized(string nominatorName, string nominatorPassword, int storeId)
+        {
+            // Arrange
+            string nominatedName = "member5";
+            userController.EnterMarket();
+            userController.Login(nominatorName, nominatorPassword);
+
+            // Act + Assert
+            Assert.ThrowsException<MemberAccessException>(() => userController.NominateStoreOwner(nominatorName, nominatedName, storeId));
+        }
+
+        [TestMethod]
+        [DataRow("member1", "pass1", 1)]
+        [DataRow("member2", "pass2", 2)]
+        public void TestNominateStoreOwner_NominatorNotLoggedIn(string nominatorName, string nominatorPassword, int storeId)
+        {
+            // Arrange
+            string nominatedName = "member5";
+            userController.EnterMarket();
+            
+            // Act + Assert
+            Assert.ThrowsException<ArgumentException>(() => userController.NominateStoreOwner(nominatorName, nominatedName, storeId));
         }
     }
 }

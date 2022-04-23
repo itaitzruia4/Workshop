@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Workshop.DomainLayer.MarketPackage;
 
-namespace Tests
+namespace Tests.UnitTests.DomainLayer.MarketPackage
 {
     [TestClass]
     public class TestMarketController

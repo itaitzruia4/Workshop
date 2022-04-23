@@ -175,10 +175,13 @@ namespace Workshop.DomainLayer.UserPackage
             Member member4 = new Member("member4", securityHandler.Encrypt("pass4"));
             member4.AddRole(new MarketManager());
 
+            Member member5 = new Member("member5", securityHandler.Encrypt("pass5"));
+
             members.Add(member1.Username, member1);
             members.Add(member2.Username, member2);
             members.Add(member3.Username, member3);
             members.Add(member4.Username, member4);
+            members.Add(member5.Username, member5);
         }
 
         /// <summary>
