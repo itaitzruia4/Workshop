@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
-    class Store
+    public class Store
     {
         private bool open;
         private int id;
@@ -16,7 +16,7 @@ namespace Workshop.DomainLayer.MarketPackage
         public Store(int id, string name)
         {
             this.id = id;
-            if (this.name == null || this.name.Equals(""))
+            if (name == null || name.Equals(""))
                 throw new ArgumentException("Store name cannot be empty.");
             this.name = name;
             products = new Dictionary<int, Product>();
@@ -71,7 +71,14 @@ namespace Workshop.DomainLayer.MarketPackage
             products[productID].Name = name;
         }
 
-        public void ChangeProductPrice(int productID, int price)
+        public void ChangeProductDescription(int productID, string description)
+        {
+            ValidateID(productID);
+            ValidateProductExist(productID);
+            products[productID].Description = description;
+        }
+
+        public void ChangeProductPrice(int productID, double price)
         {
             ValidateID(productID);
             ValidateProductExist(productID);
@@ -114,6 +121,13 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             if (quantity < 0)
                 throw new ArgumentOutOfRangeException("Quntity must be zero or above.");
+        }
+
+        public Product GetProduct(int productId)
+        {
+            if (!products.ContainsKey(productId))
+                throw new ArgumentException($"Product with ID {productId} does not exist in the store.");
+            return products[productId];
         }
     }
 }

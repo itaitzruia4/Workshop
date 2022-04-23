@@ -8,7 +8,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
 {
     public class Member : User
     {
-        internal string Username { get; }
+        public string Username { get; }
         internal string Password { get; }
 
         private List<Role> roles;

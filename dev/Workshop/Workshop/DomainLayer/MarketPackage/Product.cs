@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
-    class Product
+    public class Product
     {
         public int Id { get; set; }
         public string Name { get; set; }
