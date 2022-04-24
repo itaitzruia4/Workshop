@@ -32,6 +32,11 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             return obj is StoreRole && StoreId == ((StoreRole)obj).StoreId;
         }
 
+        public void AddNominee(StoreRole nominee)
+        {
+            this.nominees.Add(nominee);
+        }
+
         /// <summary>
         /// Check for circularity in Store Role nominees
         /// </summary>

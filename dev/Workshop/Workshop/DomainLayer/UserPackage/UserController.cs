@@ -201,6 +201,11 @@ namespace Workshop.DomainLayer.UserPackage
             // Finally, add the new role
             StoreOwner newRole = new StoreOwner(storeId);
             nominated.AddRole(newRole);
+
+            // Add the new manager to the nominator's nominees list
+            StoreRole nominatorStoreOwner = nominatorStoreRoles.Last();
+            nominatorStoreOwner.AddNominee(newRole);
+
             return newRole;
         }
 
@@ -228,6 +233,11 @@ namespace Workshop.DomainLayer.UserPackage
             // Finally, add the new role
             StoreManager newRole = new StoreManager(storeId);
             nominated.AddRole(newRole);
+
+            // Add the new manager to the nominator's nominees list
+            StoreRole nominatorStoreRole = nominatorStoreRoles.Last();
+            nominatorStoreRole.AddNominee(newRole);
+            
             return newRole;
         }
 
