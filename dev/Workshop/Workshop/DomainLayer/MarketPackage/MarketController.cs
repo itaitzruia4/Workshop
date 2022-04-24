@@ -307,22 +307,22 @@ namespace Workshop.DomainLayer.MarketPackage
             HashSet<int> storesIds = new HashSet<int>();
             foreach(Product product in products)
             {
-                int storesId = getStoreIdByProduct(product.Id);
+                int storesId = GetStoreIdByProduct(product.Id);
                 if(storesId != -1)
                 {
-                    storesIds.add(storeId);
+                    storesIds.Add(storeId);
                 }
             }
             List<int> storesReviewsGrades = new List<int>();
-            foreach(Store store in storesIds)
+            foreach(Store store in stores.Values)
             {
-                storesPrices.add(userController.getAvgStoreStars(store));
+                storesPrices.add(userController.GetAvgStoreStars(store));
             }
             return storesReviewsGrades;
         }
-        private int getStoreIdByProduct(int productId)
+        private int GetStoreIdByProduct(int productId)
         {
-            foreach(Store store in stores)
+            foreach(Store store in stores.Values)
             {
                 try
                 {
