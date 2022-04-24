@@ -9,6 +9,6 @@ namespace Workshop.DomainLayer.MarketPackage.ExternalServices.Payment
     public interface IPaymentExternalService
     {
 
-        bool payAmount(string username, int amount);
+        bool PayAmount(string username, int amount);
     }
 }

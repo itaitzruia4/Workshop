@@ -184,7 +184,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
         }
 
-        public int CreateNewStore(string creator, string storeName) {
+        public StoreDTO CreateNewStore(string creator, string storeName) {
             userController.AssertCurrentUser(creator);
             if (String.IsNullOrWhiteSpace(storeName)){
                 throw new ArgumentException($"User {creator} requestted to create a store with an empty name.");
@@ -196,7 +196,7 @@ namespace Workshop.DomainLayer.MarketPackage
             member.AddRole(storeFounderRole);
             stores[storeId] = store;
             STORE_COUNT++;
-            return storeId;
+            return store.ToDTO();
         }
 
         public bool IsStoreOpen(string username, int storeId)
@@ -235,7 +235,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             throw new ArgumentException($"Product with ID {productId} does not exist in the market.");
         }
-        internal List<ProductDTO> SearchProduct(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview, int storeReview)
+        internal List<ProductDTO> SearchProduct(string username, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview, int storeReview)
         {
             List<Product> products = new List<Product>();
             userController.AssertCurrentUser(username);
@@ -245,69 +245,69 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             else if (keyWords != "")
             {
-                List<Product> products = getProductByKeywords(keyWords);
+                List<Product> products = GetProductByKeywords(keyWords);
             }
             else if (catagory != "")
             {
-                List<Product> products = getProductByCatagory(catagory);
+                List<Product> products = GetProductByCatagory(catagory);
             }
-            return filterProducts(products, minPrice, maxPrice, productReview, storeReview);
+            return FilterProducts(products, minPrice, maxPrice, productReview, storeReview);
         }
         //todo move search to user add add a call
-        public List<ProductDTO> filterProducts(Product products, int minPrice, int maxPrice, int productReview, int storeReview)
+        public List<ProductDTO> FilterProducts(Product products, int minPrice, int maxPrice, int productReview, int storeReview)
         {
             //List<Product> products = SearchAllProduct(productName,keyWords,catagory);
             List<Product> goodProducts = new List<Product>();
             if(minPrice != -1)
             {
-                goodProducts = filterByMin(products,getPrices(products),minPrice);
+                goodProducts = filterByMin(products, GetPrices(products), minPrice);
             }
             if(maxPrice != -1)
             {
-                goodProducts = filterByMax(goodProducts,getPrices(goodProducts),maxPrice);
+                goodProducts = filterByMax(goodProducts,GetPrices(goodProducts),maxPrice);
             }
             if(productReview != -1)
             {
-                goodProducts = filterByMin(goodProducts,getProductsReviewsGrades(goodProducts),productReview);
+                goodProducts = filterByMin(goodProducts,GetProductsReviewsGrades(goodProducts),productReview);
             }
             if(storeReview != -1)
             {
-                goodProducts = filterByMin(goodProducts,getStoresReviewsGrades(goodProducts),storeReview);
+                goodProducts = filterByMin(goodProducts,GetStoresReviewsGrades(goodProducts),storeReview);
             }
             List<int> productsDTOs = new List<ProductDTO>();
             foreach(Product product in goodProducts)
             {
-                productsDTOs.add(product.GetProductDTO());
+                productsDTOs.Add(product.ToProductDTO());
             }
             return productsDTOs;
         }
 
-        private List<int> getPrices(List<Product> products)
+        private List<int> GetPrices(List<Product> products)
         {
             List<int> productsPrices = new List<int>();
             foreach(Product product in products)
             {
-                productsPrices.add(product.getPrice());
+                productsPrices.Add(product.GetPrice());
             }
             return productsPrices;
         }
 
-        private List<int> getProductsReviewsGrades(List<Product> products)
+        private List<int> GetProductsReviewsGrades(List<Product> products)
         {
             List<int> productsReviewsGrades = new List<int>();
             foreach(Product product in products)
             {
-                productsReviewsGrades.add(userController.getAvgProductStars(product));
+                productsReviewsGrades.Add(userController.GetAvgProductStars(product));
             }
             return productsReviewsGrades;
         }
 
-        private List<int> getStoresReviewsGrades(List<Product> products)
+        private List<int> GetStoresReviewsGrades(List<Product> products)
         {
             HashSet<int> storesIds = new HashSet<int>();
             foreach(Product product in products)
             {
-                int storesId = getStoreIdByProduct(product.getID());
+                int storesId = getStoreIdByProduct(product.Id);
                 if(storesId != -1)
                 {
                     storesIds.add(storeId);

@@ -18,7 +18,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
         public void PayAmount(string username, int amount)
         {
-            if(!externalService.payAmount(username, amount))
+            if(!externalService.PayAmount(username, amount))
             {
                 throw new Exception($"user {username} cannot pay ${amount}");
             }

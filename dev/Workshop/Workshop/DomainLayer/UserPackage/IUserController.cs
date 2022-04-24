@@ -23,6 +23,10 @@ namespace Workshop.DomainLayer.UserPackage
         bool IsAuthorized(string username, int storeId, Action action);
         void AssertCurrentUser(string username);
         List<Member> GetWorkers(int storeId);
-        void ReviewProduct(string user, int productId, string review);
+        void ReviewProduct(string user, int productId, string review, int stars);
+        void BuyCart(string user);
+        void EditCart(string user, int productId, int newQuantity);
+        ShoppingCartDTO ViewCart(string user);
+        void AddToCart(string user, object p);
     }
 }

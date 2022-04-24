@@ -129,5 +129,10 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new ArgumentException($"Product with ID {productId} does not exist in the store.");
             return products[productId];
         }
+
+        internal StoreDTO ToDTO()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

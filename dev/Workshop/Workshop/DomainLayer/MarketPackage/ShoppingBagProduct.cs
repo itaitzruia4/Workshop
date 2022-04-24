@@ -8,6 +8,19 @@ namespace Workshop.DomainLayer.MarketPackage
 {
     public class ShoppingBagProduct
     {
-        public int productId {get; set;}
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public double Price { get; set; }
+        public int Quantity { get; set; }
+        public string Description { get; set; }
+
+        public ShoppingBagProduct(int id, string name, string description, double price, int quantity)
+        {
+            this.Id = id;
+            this.Name = name;
+            this.Description = description;
+            this.Price = price;
+            this.Quantity = quantity;
+        }
     }
 }

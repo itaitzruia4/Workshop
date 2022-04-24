@@ -23,13 +23,13 @@ namespace Workshop.DomainLayer.MarketPackage
             this.Quantity = quantity;
         }
 
-        public ProductDTO GetProductDTO()
+        public ProductDTO ToProductDTO()
         {
             return new ProductDTO(Id,Name,Description,Price,Quantity);
         }
-        public ShopingBagProduct GetShopingBagProduct(int quantity)
+        public ShoppingBagProduct ToGetShopingBagProduct(int quantity)
         {
-            return new ShopingBagProduct(Id,Name,Price,quantity);
+            return new ShoppingBagProduct(Id,Name,Price,quantity);
         }
     }
 }
