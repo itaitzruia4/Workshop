@@ -55,6 +55,14 @@
     <Compile Include="DomainLayer\Loggers\Logger.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\Discount.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\DiscountPolicy.cs" />
+    <Compile Include="DomainLayer\MarketPackage\ExternalServices\Payment\IMarketPaymentService.cs" />
+    <Compile Include="DomainLayer\MarketPackage\ExternalServices\Payment\IPaymentExternalService.cs" />
+    <Compile Include="DomainLayer\MarketPackage\ExternalServices\Payment\PaymentExternalService.cs" />
+    <Compile Include="DomainLayer\MarketPackage\ExternalServices\Payment\ProxyPaymentExternalService.cs" />
+    <Compile Include="DomainLayer\MarketPackage\ExternalServices\Supply\IMarketSupplyService.cs" />
+    <Compile Include="DomainLayer\MarketPackage\ExternalServices\Supply\ISupplyExternalService.cs" />
+    <Compile Include="DomainLayer\MarketPackage\ExternalServices\Supply\ProxySupplyExternalService.cs" />
+    <Compile Include="DomainLayer\MarketPackage\ExternalServices\Supply\SupplyExternalService.cs" />
     <Compile Include="DomainLayer\MarketPackage\IMarketController.cs" />
     <Compile Include="DomainLayer\MarketPackage\MarketController.cs" />
     <Compile Include="DomainLayer\MarketPackage\ExternalServices\Payment\PaymentAdapter.cs" />

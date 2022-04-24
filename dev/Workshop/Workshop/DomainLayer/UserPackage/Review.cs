@@ -18,9 +18,16 @@ namespace Workshop.DomainLayer.UserPackage
 
         public Review(string user, int productId, string review)
         {
+            ValidateReviewContent(review);
             this.reviewer = user;
             this.review = review;
             this.productId = productId;
+        }
+
+        private void ValidateReviewContent(string review){
+            if (String.IsNullOrWhiteSpace(review)){
+                throw new ArgumentException("A review can not be empty.");
+            }
         }
     }
 }

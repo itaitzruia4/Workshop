@@ -375,5 +375,34 @@ namespace Workshop.DomainLayer.UserPackage
             }
             reviewHandler.AddReview(user, productId, review);
         }
+
+
+        public List<Product> addToCart(int userId,ShopingBagProduct product, int quantity)
+        {
+            AssertCurrentUser(userId);
+            this.currentUser.addToCart(product,storeId,quantity);
+        }
+
+        public ShoppingCartDTO viewCart(string user)
+        {
+            AssertCurrentUser(userId);
+            return currentUser.viewCart();
+        }
+        public void editCart(string user, int productId, int newQuantity)
+        {
+            AssertCurrentUser(userId);
+            if(newQuantity<0)
+            {
+                throw new ArgumentException($"Quantity {newQuantity} can not be a negtive number");
+            }
+            if(newQuantity=0)
+            {
+                currentUser.deleteFromCart(productId);
+            }
+            else
+            {
+                currentUser.changeQuantityInCart(productId,newQuantity);
+            }
+        }
     }
 }

@@ -223,5 +223,17 @@ namespace Tests
 
             userController.Logout(username2);
         }
+
+        [TestMethod]
+        public void TestReviewProduct_Success(){
+            userController.ReviewProduct("User1", 1, "Honest review123");
+        }
+
+        [TestMethod]
+        [DataRow("")]
+        [DataRow(null)]
+        public void TestReviewProduct_Failure(string review){
+            Assert.ThrowsException<ArgumentException>(() => userController.ReviewProduct("User1", 1, review));
+        }
     }
 }

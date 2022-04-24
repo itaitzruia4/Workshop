@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using Workshop.DomainLayer.MarketPackage;
+using Workshop.DomainLayer.MarketPackage.ExternalServices.Payment;
+using Workshop.DomainLayer.MarketPackage.ExternalServices.Supply;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Permissions;
@@ -14,8 +16,14 @@ namespace Workshop.DomainLayer
 
         internal Facade()
         {
+            IPaymentExternalService paymentExternalService = new ProxyPaymentExternalService(null);
+            IMarketPaymentService paymentService = new PaymentAdapter(paymentExternalService);
+
+            ISupplyExternalService supplyExternalService = new ProxySupplyExternalService(null);
+            IMarketSupplyService supplyService = new SupplyAdapter(supplyExternalService);
+
             UserController = new UserController(new HashSecurityHandler(), new ReviewHandler());
-            MarketController = new MarketController(UserController);
+            MarketController = new MarketController(UserController, paymentService, supplyService);
         }
 
         public User EnterMarket()
@@ -72,9 +80,38 @@ namespace Workshop.DomainLayer
             return MarketController.CreateNewStore(creator, storeName);
         }
 
-        internal void ReviewProduct(string user, int productId, string review)
+        internal void ReviewProduct(string user, int productId, string review, int stars)
         {
-            UserController.ReviewProduct(user, productId, review);
+            UserController.ReviewProduct(user, productId, review, stars);
         }
+        internal ProductDTO getProductInfo(string user, int productId)
+        {
+            return MarketController.getProductInfo(user, productId);
+        }
+        internal StoreDTO getStoreInfo(string user, int storeId)
+        {
+            return MarketController.getStoreInfo(user, storeId);
+        }
+        internal List<ProductDTO> SearchProduct(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
+        {
+            return MarketController.SearchProduct(user, productId, keyWords,catagory,minPrice,maxPrice,productReview,storeReview);
+        }
+        internal void addToCart(string user, int productId, int storeId,int quantity)
+        {
+            UserController.addToCart(user, MarketController.getProductForSale(productId,storeId,quantity));
+        }
+        internal ShoppingCartDTO viewCart(string user)
+        {
+            return UserController.viewCart(user);
+        }
+        internal void editCart(string user, int productId, int newQuantity)
+        {
+            UserController.editCart(user, productId, newQuantity);
+        }
+        internal void buyCart(string user)
+        {
+            UserController.buyCart(user);
+        }
+        
     }
 }
