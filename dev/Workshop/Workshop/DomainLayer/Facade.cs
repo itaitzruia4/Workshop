@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using Workshop.DomainLayer.MarketPackage;
+using Workshop.DomainLayer.MarketPackage.ExternalServices.Payment;
+using Workshop.DomainLayer.MarketPackage.ExternalServices.Supply;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Permissions;
@@ -14,8 +16,14 @@ namespace Workshop.DomainLayer
 
         internal Facade()
         {
+            IPaymentExternalService paymentExternalService = new ProxyPaymentExternalService(null);
+            IMarketPaymentService paymentService = new PaymentAdapter(paymentExternalService);
+
+            ISupplyExternalService supplyExternalService = new ProxySupplyExternalService(null);
+            IMarketSupplyService supplyService = new SupplyAdapter(supplyExternalService);
+
             UserController = new UserController(new HashSecurityHandler(), new ReviewHandler());
-            MarketController = new MarketController(UserController);
+            MarketController = new MarketController(UserController, paymentService, supplyService);
         }
 
         public User EnterMarket()

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DomainLayer.MarketPackage.ExternalServices.Payment;
+using Workshop.DomainLayer.MarketPackage.ExternalServices.Supply;
 using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Permissions;
@@ -15,11 +17,15 @@ namespace Workshop.DomainLayer.MarketPackage
         private IUserController userController;
         private OrderHandler<int> orderHandler;
         private Dictionary<int, Store> stores;
+        private IMarketPaymentService paymentService;
+        private IMarketSupplyService supplyService;
         private static int STORE_COUNT = 0;
-        public MarketController(IUserController userController)
+        public MarketController(IUserController userController, IMarketPaymentService paymentService, IMarketSupplyService supplyService)
         {
             this.userController = userController;
             this.orderHandler = new OrderHandler<int>();
+            this.paymentService = paymentService;
+            this.supplyService = supplyService;
             stores = new Dictionary<int, Store>();
         }
 

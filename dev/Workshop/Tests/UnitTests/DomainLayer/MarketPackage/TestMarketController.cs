@@ -6,6 +6,9 @@ using Workshop.DomainLayer.UserPackage;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 using System.Collections.Generic;
 using Workshop.DomainLayer.UserPackage.Permissions;
+using Workshop.DomainLayer.MarketPackage.ExternalServices.Payment;
+using Workshop.DomainLayer.MarketPackage.ExternalServices.Supply;
+
 namespace Tests
 {
     [TestClass]
@@ -21,7 +24,8 @@ namespace Tests
             userControllerMock.Setup(x => x.AssertCurrentUser(It.IsAny<string>())).Callback((string user) => {});
             userControllerMock.Setup(x => x.IsAuthorized(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action>())).Returns(true);
             userControllerMock.Setup(x => x.GetWorkers(It.IsAny<int>())).Returns(new List<Member>(new Member[]{new Member("Worker1", "pass1")}));
-            marketController = new MarketController(userControllerMock.Object);
+
+            marketController = new MarketController(userControllerMock.Object, paymentService, supplyService);
             marketController.InitializeSystem();
 
             // marketController = new MarketController();
