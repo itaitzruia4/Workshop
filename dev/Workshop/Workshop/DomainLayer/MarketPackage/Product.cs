@@ -22,5 +22,14 @@ namespace Workshop.DomainLayer.MarketPackage
             this.Price = price;
             this.Quantity = quantity;
         }
+
+        public ProductDTO GetProductDTO()
+        {
+            return new ProductDTO(Id,Name,Description,Price,Quantity);
+        }
+        public ShopingBagProduct GetShopingBagProduct(int quantity)
+        {
+            return new ShopingBagProduct(Id,Name,Price,quantity);
+        }
     }
 }
