@@ -42,6 +42,9 @@ namespace Workshop.DomainLayer.UserPackage
         {
             Member member1 = new Member("member1", securityHandler.Encrypt("pass1"));
             member1.AddRole(new StoreFounder(1));
+            List<ShoppingBagProduct> member1prods = new List<ShoppingBagProduct>();
+            member1prods.Add(new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1));
+            orderHandler.addOrder(new OrderDTO(1, "member1", "whatever", "blasToysRus", member1prods, 12.30), "member1");
 
             Member member2 = new Member("member2", securityHandler.Encrypt("pass2"));
             member2.AddRole(new StoreOwner(2));

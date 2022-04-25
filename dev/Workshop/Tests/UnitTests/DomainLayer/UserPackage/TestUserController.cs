@@ -5,7 +5,7 @@ using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Security;
 
-namespace Tests
+namespace Tests.UnitTests.DomainLayer.UserPackage
 {
     [TestClass]
     public class TestUserController
@@ -230,10 +230,7 @@ namespace Tests
             int id = 1;
             string review = "Honest review123";
             userController.Login(username, "pass1");
-            ReviewDTO res = userController.ReviewProduct(username, id, review);
-            Assert.Equals(res.Review, review);
-            Assert.Equals(res.Reviewer, username);
-            Assert.Equals(res.ProductId, id);
+            userController.ReviewProduct(username, id, review);
         }
 
         [TestMethod]

@@ -12,9 +12,9 @@ namespace Workshop.DomainLayer.Reviews
 {
     public class ReviewDTO
     {
-        string Review { get; set; }
-        string Reviewer { get; set; }
-        int ProductId { get; set; }
+        public string Review { get; set; }
+        public string Reviewer { get; set; }
+        public int ProductId { get; set; }
 
         public ReviewDTO(string user, int productId, string review)
         {
