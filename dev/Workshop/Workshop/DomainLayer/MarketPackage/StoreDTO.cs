@@ -13,7 +13,7 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             this.id = id;
             this.name = name;
-            products = products;
+            this.products = products;
             this.open = true;
         }
     }

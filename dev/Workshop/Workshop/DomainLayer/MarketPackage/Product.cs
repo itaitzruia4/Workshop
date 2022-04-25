@@ -31,7 +31,7 @@ namespace Workshop.DomainLayer.MarketPackage
         }
         public ShoppingBagProduct GetShoppingBagProduct(int quantity)
         {
-            return new ShoppingBagProduct(Id,Name,Price,quantity);
+            return new ShoppingBagProduct(Id,Name,Description,Price,quantity);
         }
     }
 }

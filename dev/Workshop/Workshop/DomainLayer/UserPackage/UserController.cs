@@ -369,12 +369,11 @@ namespace Workshop.DomainLayer.UserPackage
         }
 
 
-        public ShoppingBagProduct addToCart(string username, int productId, int storeId, int quantity)
+        public ShoppingBagProduct addToCart(string username, ShoppingBagProduct product, int storeId)
         {
             //ShoppingBagProduct 
-            //AssertCurrentUser(username);
-            //return this.currentUser.addToCart(product,storeId);
-            return null;
+            AssertCurrentUser(username);
+            return this.currentUser.addToCart(product,storeId);
         }
 
         public ShoppingCartDTO viewCart(string user)

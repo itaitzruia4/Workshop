@@ -28,7 +28,7 @@ namespace Workshop.DomainLayer.Orders
 
         public bool ContainsProduct(int productId){
             foreach (ShoppingBagProduct item in items){
-                if (item.productId == productId)
+                if (item.Id == productId)
                     return true;
             }
             return false;

@@ -17,7 +17,7 @@ namespace Workshop.DomainLayer.UserPackage
             shoppingCart = new ShoppingCart();
         }
 
-        public ProductDTO addToCart(ShoppingBagProduct product, int storeId)
+        public ShoppingBagProduct addToCart(ShoppingBagProduct product, int storeId)
         {
             return this.shoppingCart.addToCart(product,storeId);
         }
@@ -27,7 +27,7 @@ namespace Workshop.DomainLayer.UserPackage
         }
         internal void deleteFromCart(int productId)
         {
-            int bagNum = shoppingCart.HasProduct(productId);
+            int bagNum = shoppingCart.checkIfHasBag(productId);
             if(bagNum != -1)
             {
                 shoppingCart.deleteProduct(productId,bagNum);
@@ -35,7 +35,7 @@ namespace Workshop.DomainLayer.UserPackage
         }
         internal void changeQuantityInCart(int productId, int newQuantity)
         {
-            int bagNum = shoppingCart.HasProduct(productId);
+            int bagNum = shoppingCart.checkIfHasBag(productId);
             if(bagNum != -1)
             {
                 shoppingCart.changeQuantity(productId, newQuantity,bagNum);

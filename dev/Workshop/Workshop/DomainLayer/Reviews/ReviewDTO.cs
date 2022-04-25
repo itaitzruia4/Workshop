@@ -22,7 +22,7 @@ namespace Workshop.DomainLayer.Reviews
             this.Reviewer = user;
             this.Review = review;
             this.ProductId = productId;
-            this.Grade = grade;
+            //this.Grade = grade;
         }
     }
 }

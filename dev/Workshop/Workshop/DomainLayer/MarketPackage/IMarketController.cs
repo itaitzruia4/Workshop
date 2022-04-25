@@ -42,5 +42,6 @@ namespace Workshop.DomainLayer.MarketPackage
 
         void BuyCart(string user);
         ShoppingBagProduct getProductForSale(int productId, int storeId, int quantity);
+        ShoppingBagProduct addToBag(string user, int productId, int storeId, int quantity);
     }
 }

@@ -99,9 +99,9 @@ namespace Workshop.DomainLayer
         {
             return MarketController.SearchProduct(user, productId, keyWords,catagory,minPrice,maxPrice,productReview);
         }
-        internal void addToCart(string user, int productId, int storeId,int quantity)
+        internal ShoppingBagProduct addToCart(string user, int productId, int storeId,int quantity)
         {
-            UserController.addToCart(user, MarketController.getProductForSale(productId,storeId,quantity), storeId);
+            return MarketController.addToBag(user, productId, storeId, quantity);
         }
         internal ShoppingCartDTO viewCart(string user)
         {

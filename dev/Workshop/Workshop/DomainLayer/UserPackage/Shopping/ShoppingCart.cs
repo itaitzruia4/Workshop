@@ -17,7 +17,7 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
             shoppingBags = new Dictionary<int,ShoppingBag>();
         }
 
-        public ProductDTO addToCart(ShoppingBagProduct product, int storeId)
+        public ShoppingBagProduct addToCart(ShoppingBagProduct product, int storeId)
         {
             if(checkIfHasBag(storeId) != -1)
             {
@@ -51,7 +51,7 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
         }
         internal void changeQuantity(int productId,int newQuantity, int bagNum)
         {
-            shoppingBags[bagNum].deleteProduct(productId,newQuantity);
+            shoppingBags[bagNum].changeQuantity(productId,newQuantity);
         }
     }
 }

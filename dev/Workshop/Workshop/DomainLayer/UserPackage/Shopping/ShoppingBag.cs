@@ -19,14 +19,14 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
             products = new Dictionary<int,ShoppingBagProduct>();
         }
 
-        public ProductDTO addToBag(ShoppingBagProduct product)
+        public ShoppingBagProduct addToBag(ShoppingBagProduct product)
         {
             if(!products.ContainsKey(product.Id))
             {
                 products.Add(product.Id,product);
             }
             products[product.Id].Quantity +=product.Quantity;
-            return product.GetProductDTO();
+            return product;
         }
         internal ShoppingBagDTO GetShoppingBagDTO()
         {

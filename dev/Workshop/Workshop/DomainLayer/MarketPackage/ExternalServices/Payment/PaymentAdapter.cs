@@ -16,7 +16,7 @@ namespace Workshop.DomainLayer.MarketPackage
             this.externalService = externalService;
         }
 
-        public void PayAmount(string username, int amount)
+        public void PayAmount(string username, double amount)
         {
             if(!externalService.payAmount(username, amount))
             {

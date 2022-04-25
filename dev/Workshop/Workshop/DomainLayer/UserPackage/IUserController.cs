@@ -27,7 +27,7 @@ namespace Workshop.DomainLayer.UserPackage
         void AssertCurrentUser(string username);
         List<Member> GetWorkers(int storeId);
         ReviewDTO ReviewProduct(string user, int productId, string review);
-        ShoppingBagProduct addToCart(string user, int productId, int storeId, int quantity);
+        ShoppingBagProduct addToCart(string user, ShoppingBagProduct shoppingBagProduct, int storeId);
         ShoppingCartDTO viewCart(string user);
         void editCart(string user, int productId, int newQuantity);
     }

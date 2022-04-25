@@ -299,22 +299,23 @@ namespace Workshop.DomainLayer.MarketPackage
             return productsDTOs;
         }
 
-        private List<int> getPrices(List<Product> products)
+        private List<double> getPrices(List<Product> products)
         {
-            List<int> productsPrices = new List<int>();
+            List<double> productsPrices = new List<double>();
             foreach(Product product in products)
             {
-                productsPrices.add(product.getPrice());
+                productsPrices.Add(product.Price);
             }
             return productsPrices;
         }
 
-        private List<int> getProductsReviewsGrades(List<Product> products)
+        private List<double> getProductsReviewsGrades(List<Product> products)
         {
-            List<int> productsReviewsGrades = new List<int>();
+            List<double> productsReviewsGrades = new List<double>();
             foreach(Product product in products)
             {
-                productsReviewsGrades.add(userController.getAvgProductStars(product));
+                //todo add when we add stars, convert to double to compare ez
+                //productsReviewsGrades.Add(userController.getAvgProductStars(product));
             }
             return productsReviewsGrades;
         }
@@ -324,22 +325,23 @@ namespace Workshop.DomainLayer.MarketPackage
             HashSet<int> storesIds = new HashSet<int>();
             foreach(Product product in products)
             {
-                int storesId = getStoreIdByProduct(product.getID());
-                if(storesId != -1)
+                int storeId = getStoreIdByProduct(product.Id);
+                if(storeId != -1)
                 {
-                    storesIds.add(storeId);
+                    storesIds.Add(storeId);
                 }
             }
             List<int> storesReviewsGrades = new List<int>();
-            foreach(Store store in storesIds)
+            foreach(int store in storesIds)
             {
-                storesPrices.add(userController.getAvgStoreStars(store));
+                //todo add when we add stars
+                //storesPrices.add(userController.getAvgStoreStars(store));
             }
             return storesReviewsGrades;
         }
         private int getStoreIdByProduct(int productId)
         {
-            foreach(Store store in stores)
+            foreach(Store store in stores.Values)
             {
                 try
                 {
@@ -354,27 +356,27 @@ namespace Workshop.DomainLayer.MarketPackage
         }
         
 
-        private List<Product> filterByMin(List<Product> products,List<int> filterByList, int key)
+        private List<Product> filterByMin(List<Product> products,List<double> filterByList, double key)
         {
             List<Product> goodProducts = new List<Product>();
-            for(int i=0;i<products.length();i++)
+            for(int i=0;i<products.Count;i++)
             {
                 if(filterByList[i] > key)
                 {
-                    goodProducts.add(products[i]);
+                    goodProducts.Add(products[i]);
                 }
             }
             return goodProducts;
         }
 
-        private List<Product> filterByMax(List<Product> products,List<int> filterByList, int key)
+        private List<Product> filterByMax(List<Product> products,List<double> filterByList, double key)
         {
             List<Product> goodProducts = new List<Product>();
-            for(int i=0;i<products.length();i++)
+            for(int i=0;i<products.Count;i++)
             {
                 if(filterByList[i] < key)
                 {
-                    goodProducts.add(products[i]);
+                    goodProducts.Add(products[i]);
                 }
             }
             return goodProducts;
@@ -383,11 +385,11 @@ namespace Workshop.DomainLayer.MarketPackage
         private List<Product> filterByEq(List<Product> products,List<int> filterByList, int key)
         {
             List<Product> goodProducts = new List<Product>();
-            for(int i=0;i<products.length();i++)
+            for(int i=0;i<products.Count;i++)
             {
-                if(filterByList[i] = key)
+                if(filterByList[i] == key)
                 {
-                    goodProducts.add(products[i]);
+                    goodProducts.Add(products[i]);
                 }
             }
             return goodProducts;
@@ -395,18 +397,18 @@ namespace Workshop.DomainLayer.MarketPackage
         public ShoppingBagProduct getProductForSale(int productId,int storeId,int quantity)
         {
             ValidateStoreExists(storeId);
-            stores[storeId].getProduct(productId).GetShoppingBagProduct(quantity);
+            return stores[storeId].GetProduct(productId).GetShoppingBagProduct(quantity);
         }
         public void BuyCart(string userId)
         {
-            ShoppingCartDTO shoppingCart = UserController.viewCart(userId);
+            ShoppingCartDTO shoppingCart = userController.viewCart(userId);
             Dictionary<int,List<ProductDTO>> productsSoFar = new Dictionary<int, List<ProductDTO>>();
             try
             {
                 foreach (int storeId in shoppingCart.shoppingBags.Keys)
                 {
                     stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
-                    productsSoFar.Add(storeId,shoppingCart.shoppingBags[storeId]);  
+                    productsSoFar.Add(storeId,shoppingCart.shoppingBags[storeId].products);  
                 }
                 paymentService.PayAmount(userId,shoppingCart.getPrice());  
             }
@@ -423,6 +425,11 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             
 
+        }
+
+        public ShoppingBagProduct addToBag(string user, int productId, int storeId, int quantity)
+        {
+            return userController.addToCart(user, getProductForSale(productId, storeId, quantity), storeId);
         }
     }
 }

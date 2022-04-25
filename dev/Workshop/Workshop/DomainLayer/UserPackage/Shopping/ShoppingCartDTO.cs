@@ -5,7 +5,7 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
 {
     public class ShoppingCartDTO
     {
-        private Dictionary<int,ShoppingBagDTO> shoppingBags { get; set; }
+        public Dictionary<int,ShoppingBagDTO> shoppingBags { get; set; }
 
         public ShoppingCartDTO(Dictionary<int,ShoppingBagDTO> shoppingBags)
         {
