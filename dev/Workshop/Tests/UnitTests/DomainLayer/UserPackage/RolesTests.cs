@@ -7,13 +7,12 @@ using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Security;
 
-namespace Tests.DomainLayer.UserPackage
+namespace Tests.UnitTests.DomainLayer.UserPackage
 {
     [TestClass]
     public class RolesTests
     {
         private IUserController userController;
-        // private MarketController marketController;
         private Member member;
 
         [TestInitialize]

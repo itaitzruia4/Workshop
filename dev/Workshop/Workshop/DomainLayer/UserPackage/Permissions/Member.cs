@@ -50,7 +50,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             roles.Add(role);
         }
 
-        internal List<StoreRole> GetStoreRoles(int storeId)
+        public List<StoreRole> GetStoreRoles(int storeId)
         {
             List<StoreRole> result = new List<StoreRole>();
 

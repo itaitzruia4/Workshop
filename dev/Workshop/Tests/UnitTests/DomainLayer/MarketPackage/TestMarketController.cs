@@ -9,7 +9,7 @@ using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.MarketPackage.ExternalServices.Payment;
 using Workshop.DomainLayer.MarketPackage.ExternalServices.Supply;
 
-namespace Tests
+namespace Tests.UnitTests.DomainLayer.MarketPackage
 {
     [TestClass]
     public class TestMarketController
