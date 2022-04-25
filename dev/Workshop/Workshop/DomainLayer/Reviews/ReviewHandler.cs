@@ -21,11 +21,12 @@ namespace Workshop.DomainLayer.Reviews
             userReviews = new Dictionary<string, Dictionary<int, ReviewDTO>>();
         }
 
-        public void AddReview(string user, int productId, string review, int stars)
+        public ReviewDTO AddReview(string user, int productId, string review)
         {
-            ReviewDTO toAdd = new ReviewDTO(user, productId, review, stars);
-            AddToProductReviews(productId, user, toAdd);
-            AddToUserReviews(user, productId, toAdd);
+            ReviewDTO reviewDTO = new ReviewDTO(user, productId, review);
+            AddToProductReviews(productId, user, reviewDTO);
+            AddToUserReviews(user, productId, reviewDTO);
+            return reviewDTO;
         }
 
         private void AddToProductReviews(int productId, string user, ReviewDTO review)

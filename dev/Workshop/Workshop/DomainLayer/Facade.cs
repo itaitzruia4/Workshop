@@ -6,6 +6,9 @@ using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Security;
+using Workshop.DomainLayer.UserPackage.Shopping;
+
+
 
 namespace Workshop.DomainLayer
 {
@@ -75,42 +78,42 @@ namespace Workshop.DomainLayer
             MarketController.CloseStore(username, storeId);
         }
 
-        internal StoreDTO CreateNewStore(string creator, string storeName)
+        internal int CreateNewStore(string creator, string storeName)
         {
             return MarketController.CreateNewStore(creator, storeName);
         }
 
-        internal void ReviewProduct(string user, int productId, string review, int stars)
+        internal ReviewDTO ReviewProduct(string user, int productId, string review)
         {
-            UserController.ReviewProduct(user, productId, review, stars);
+            return UserController.ReviewProduct(user, productId, review);
         }
-        internal Product GetProductInfo(string user, int productId)
+        internal ProductDTO getProductInfo(string user, int productId)
         {
-            return MarketController.GetProductInfo(user, productId);
+            return MarketController.getProductInfo(user, productId);
         }
-        internal Store GetStoreInfo(string user, int storeId)
+        internal StoreDTO getStoreInfo(string user, int storeId)
         {
-            return MarketController.GetStoreInfo(user, storeId);
+            return MarketController.getStoreInfo(user, storeId);
         }
         internal List<ProductDTO> SearchProduct(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
         {
-            return MarketController.SearchProduct(user, productId, keyWords,catagory,minPrice,maxPrice,productReview,storeReview);
+            return MarketController.SearchProduct(user, productId, keyWords,catagory,minPrice,maxPrice,productReview);
         }
-        internal void AddToCart(string user, int productId, int storeId,int quantity)
+        internal ShoppingBagProduct addToCart(string user, int productId, int storeId,int quantity)
         {
-            UserController.AddToCart(user, MarketController.GetProductForSale(productId,storeId,quantity));
+            return MarketController.addToBag(user, productId, storeId, quantity);
         }
-        internal ShoppingCartDTO ViewCart(string user)
+        internal ShoppingCartDTO viewCart(string user)
         {
-            return UserController.ViewCart(user);
+            return UserController.viewCart(user);
         }
-        internal void EditCart(string user, int productId, int newQuantity)
+        internal void editCart(string user, int productId, int newQuantity)
         {
-            UserController.EditCart(user, productId, newQuantity);
+            UserController.editCart(user, productId, newQuantity);
         }
         internal void BuyCart(string user)
         {
-            UserController.BuyCart(user);
+            MarketController.BuyCart(user);
         }
         
     }

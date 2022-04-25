@@ -8,6 +8,6 @@ namespace Workshop.DomainLayer.MarketPackage.ExternalServices.Payment
 {
     public interface IMarketPaymentService
     {
-        void PayAmount(string username, int amount);
+        void PayAmount(string username, double amount);
     }
 }

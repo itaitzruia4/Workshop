@@ -1,24 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
-    public class StoreDTO
+    public class ProductDTO
     {
-        public bool IsOpen { get; set; }
         public int Id { get; set; }
         public string Name { get; set; }
-        public Dictionary<int, Product> Products { get; set; }
+        public string Description { get; set; }
+        public double Price { get; set; }
+        public int Quantity { get; set; }
 
-        public StoreDTO(int id, string name, Dictionary<int, Product> products, bool open)
+        public ProductDTO(int id, string name, string description, double price, int quantity)
         {
             this.Id = id;
             this.Name = name;
-            this.Products = products;
-            this.IsOpen = true;
+            this.Description = description;
+            this.Price = price;
+            this.Quantity = quantity;
         }
     }
 }

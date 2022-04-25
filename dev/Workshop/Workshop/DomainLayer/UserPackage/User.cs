@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DomainLayer.UserPackage.Shopping;
+using Workshop.DomainLayer.MarketPackage;
 
 namespace Workshop.DomainLayer.UserPackage
 {
@@ -15,9 +17,9 @@ namespace Workshop.DomainLayer.UserPackage
             shoppingCart = new ShoppingCart();
         }
 
-        public void addToCart(ProductDTO product, int storeId)
+        public ShoppingBagProduct addToCart(ShoppingBagProduct product, int storeId)
         {
-            this.shoppingCart.addToCart(product,storeId);
+            return this.shoppingCart.addToCart(product,storeId);
         }
         internal ShoppingCartDTO viewShopingCart()
         {
@@ -25,7 +27,7 @@ namespace Workshop.DomainLayer.UserPackage
         }
         internal void deleteFromCart(int productId)
         {
-            int bagNum = shoppingCart.HasProduct(productId);
+            int bagNum = shoppingCart.checkIfHasBag(productId);
             if(bagNum != -1)
             {
                 shoppingCart.deleteProduct(productId,bagNum);
@@ -33,7 +35,7 @@ namespace Workshop.DomainLayer.UserPackage
         }
         internal void changeQuantityInCart(int productId, int newQuantity)
         {
-            int bagNum = shoppingCart.HasProduct(productId);
+            int bagNum = shoppingCart.checkIfHasBag(productId);
             if(bagNum != -1)
             {
                 shoppingCart.changeQuantity(productId, newQuantity,bagNum);

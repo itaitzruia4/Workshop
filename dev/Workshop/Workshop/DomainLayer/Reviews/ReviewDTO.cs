@@ -17,12 +17,12 @@ namespace Workshop.DomainLayer.Reviews
         int ProductId { get; set; }
         int Grade { get; set; }
 
-        public ReviewDTO(string user, int productId, string review, int grade)
+        public ReviewDTO(string user, int productId, string review)
         {
             this.Reviewer = user;
             this.Review = review;
             this.ProductId = productId;
-            this.Grade = grade;
+            //this.Grade = grade;
         }
     }
 }

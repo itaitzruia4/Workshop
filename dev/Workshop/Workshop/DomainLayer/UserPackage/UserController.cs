@@ -8,6 +8,8 @@ using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Security;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
+using Workshop.DomainLayer.MarketPackage;
+using Workshop.DomainLayer.UserPackage.Shopping;
 
 namespace Workshop.DomainLayer.UserPackage
 {
@@ -356,7 +358,7 @@ namespace Workshop.DomainLayer.UserPackage
             throw new ArgumentException($"Username {username} is not a member");
         }
 
-        public void ReviewProduct(string user, int productId, string review)
+        public ReviewDTO ReviewProduct(string user, int productId, string review)
         {
             AssertCurrentUser(user);
             List<OrderDTO> orders = orderHandler.GetOrders(user);
@@ -373,29 +375,30 @@ namespace Workshop.DomainLayer.UserPackage
             {
                 throw new ArgumentException($"Username {user} did not purchase product {productId}");
             }
-            reviewHandler.AddReview(user, productId, review);
+            return reviewHandler.AddReview(user, productId, review);
         }
 
 
-        public List<Product> addToCart(int userId,ShopingBagProduct product, int quantity)
+        public ShoppingBagProduct addToCart(string username, ShoppingBagProduct product, int storeId)
         {
-            AssertCurrentUser(userId);
-            this.currentUser.addToCart(product,storeId,quantity);
+            //ShoppingBagProduct 
+            AssertCurrentUser(username);
+            return this.currentUser.addToCart(product,storeId);
         }
 
         public ShoppingCartDTO viewCart(string user)
         {
-            AssertCurrentUser(userId);
-            return currentUser.viewCart();
+            AssertCurrentUser(user);
+            return currentUser.viewShopingCart();
         }
         public void editCart(string user, int productId, int newQuantity)
         {
-            AssertCurrentUser(userId);
+            AssertCurrentUser(user);
             if(newQuantity<0)
             {
                 throw new ArgumentException($"Quantity {newQuantity} can not be a negtive number");
             }
-            if(newQuantity=0)
+            if(newQuantity == 0)
             {
                 currentUser.deleteFromCart(productId);
             }
