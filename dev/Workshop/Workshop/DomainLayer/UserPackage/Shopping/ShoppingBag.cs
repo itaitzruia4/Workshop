@@ -3,38 +3,41 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DomainLayer.MarketPackage;
+using Workshop.DomainLayer.UserPackage.Shopping;
 
-namespace Workshop.DomainLayer.UserPackage
+namespace Workshop.DomainLayer.UserPackage.Shopping
 {
-    class ShoppingBag
+    public class ShoppingBag
     {
-        private string storeId;
-        private Dictionary<int, List<ShoppingBagProduct>> products;
+        private int storeId;
+        private Dictionary<int, ShoppingBagProduct> products;
 
         public ShoppingBag(int storeId)
         {
-            this.storeId = store;
-            products = new Dictionary<int,List<ShoppingBagProduct>>();
+            this.storeId = storeId;
+            products = new Dictionary<int,ShoppingBagProduct>();
         }
 
-        public void addToBag(ShopingBagProduct product)
+        public ShoppingBagProduct addToBag(ShoppingBagProduct product)
         {
-            if(!products.ContainsKey(product.getId()))
+            if(!products.ContainsKey(product.Id))
             {
-                products.add(product.getId(),product);
+                products.Add(product.Id,product);
             }
-            shoppingBags[product.getId()].Quantity +=product.Quantity;
+            products[product.Id].Quantity +=product.Quantity;
+            return product;
         }
         internal ShoppingBagDTO GetShoppingBagDTO()
         {
-            Dictionary<int,List<Product>> shoppingBagsDTOs = new Dictionary<int, List<Product>>();
+            List<ProductDTO> productsDTOs = new List<ProductDTO>();
             foreach (int key in products.Keys)
             {
-                shoppingBagsDTOs.Add(key,products[key].getProductDTO());
+                productsDTOs.Add(products[key].GetProductDTO());
             }
-            return new ShoppingBagDTO(storeId,shoppingBagsDTOs);
+            return new ShoppingBagDTO(storeId, productsDTOs);
         }
-        public int HasProduct(int ProductId)
+        public bool HasProduct(int ProductId)
         {
             return products.ContainsKey(ProductId);
         }

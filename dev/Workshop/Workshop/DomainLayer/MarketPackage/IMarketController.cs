@@ -28,14 +28,20 @@ namespace Workshop.DomainLayer.MarketPackage
 
         void CloseStore(string username, int storeId);
         
-        StoreDTO CreateNewStore(string creator, string storeName);
+        int CreateNewStore(string creator, string storeName);
 
         bool IsStoreOpen(string username, int storeId);
 
         void ViewStorePermission(string username, int storeId);
-        object GetProductForSale(int productId, int storeId, int quantity);
-        List<ProductDTO> SearchProduct(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview, object storeReview);
-        Store GetStoreInfo(string user, int storeId);
-        Product GetProductInfo(string user, int productId);
+
+        ProductDTO getProductInfo(string user, int productId);
+
+        StoreDTO getStoreInfo(string user, int storeId);
+
+        List<ProductDTO> SearchProduct(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview);
+
+        void BuyCart(string user);
+        ShoppingBagProduct getProductForSale(int productId, int storeId, int quantity);
+        ShoppingBagProduct addToBag(string user, int productId, int storeId, int quantity);
     }
 }

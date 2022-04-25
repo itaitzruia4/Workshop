@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DomainLayer.UserPackage.Shopping;
+using Workshop.DomainLayer.MarketPackage;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
@@ -23,13 +25,13 @@ namespace Workshop.DomainLayer.MarketPackage
             this.Quantity = quantity;
         }
 
-        public ProductDTO ToProductDTO()
+        public ProductDTO GetProductDTO()
         {
             return new ProductDTO(Id,Name,Description,Price,Quantity);
         }
-        public ShoppingBagProduct ToGetShopingBagProduct(int quantity)
+        public ShoppingBagProduct GetShoppingBagProduct(int quantity)
         {
-            return new ShoppingBagProduct(Id,Name,Price,quantity);
+            return new ShoppingBagProduct(Id,Name,Description,Price,quantity);
         }
     }
 }

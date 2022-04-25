@@ -2,7 +2,7 @@
 using System;
 using Workshop.DomainLayer.Loggers;
 
-namespace Tests.DomainLayer.Loggers
+namespace Tests.UnitTests.DomainLayer.Loggers
 {
     [TestClass]
     public class TestLogger

@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DomainLayer.MarketPackage;
+using Workshop.DomainLayer.UserPackage.Shopping;
 
-namespace Workshop.DomainLayer.UserPackage
+namespace Workshop.DomainLayer.UserPackage.Shopping
 {
-    class ShoppingCart
+    public class ShoppingCart
     {
         private Dictionary<int,ShoppingBag> shoppingBags { get; set; }
 
@@ -15,28 +17,28 @@ namespace Workshop.DomainLayer.UserPackage
             shoppingBags = new Dictionary<int,ShoppingBag>();
         }
 
-        public void addToCart(ShopingBagProduct product, int storeId)
+        public ShoppingBagProduct addToCart(ShoppingBagProduct product, int storeId)
         {
-            if(!checkIfHasBag(storeId))
+            if(checkIfHasBag(storeId) != -1)
             {
-                shoppingBags.add(storeId,new ShoppingBag(storeId));
+                shoppingBags.Add(storeId,new ShoppingBag(storeId));
             }
-            shoppingBags[storeId].addToBag(product);
+            return shoppingBags[storeId].addToBag(product);
         }
         public ShoppingCartDTO getShoppingCartDTO()
         {
             Dictionary<int,ShoppingBagDTO> shoppingBagsDTOs = new Dictionary<int, ShoppingBagDTO>();
             foreach (int key in shoppingBags.Keys)
             {
-                shoppingBagsDTOs.Add(key,shoppingBags[key].getShopingBagDTO());
+                shoppingBagsDTOs.Add(key,shoppingBags[key].GetShoppingBagDTO());
             }
             return new ShoppingCartDTO(shoppingBagsDTOs);
         }
-        public int HasProduct(int ProductId)
+        public int checkIfHasBag(int ProductId)
         {
             foreach (int key in shoppingBags.Keys)
             {
-                if(shoppingBag[key].HasProduct(ProductId))
+                if(shoppingBags[key].HasProduct(ProductId))
                 {
                     return key;
                 }
@@ -49,7 +51,7 @@ namespace Workshop.DomainLayer.UserPackage
         }
         internal void changeQuantity(int productId,int newQuantity, int bagNum)
         {
-            shoppingBags[bagNum].deleteProduct(productId,newQuantity);
+            shoppingBags[bagNum].changeQuantity(productId,newQuantity);
         }
     }
 }

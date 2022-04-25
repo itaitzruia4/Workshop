@@ -5,10 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.MarketPackage.ExternalServices.Payment;
 using Workshop.DomainLayer.MarketPackage.ExternalServices.Supply;
+using Workshop.DomainLayer.MarketPackage.ExternalServices;
+using Workshop.DomainLayer.MarketPackage;
 using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
+using Workshop.DomainLayer.UserPackage.Shopping;
+
+
+
 
 namespace Workshop.DomainLayer.MarketPackage
 {
@@ -184,7 +190,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
         }
 
-        public StoreDTO CreateNewStore(string creator, string storeName) {
+        public int CreateNewStore(string creator, string storeName) {
             userController.AssertCurrentUser(creator);
             if (String.IsNullOrWhiteSpace(storeName)){
                 throw new ArgumentException($"User {creator} requestted to create a store with an empty name.");
@@ -196,7 +202,7 @@ namespace Workshop.DomainLayer.MarketPackage
             member.AddRole(storeFounderRole);
             stores[storeId] = store;
             STORE_COUNT++;
-            return store.ToDTO();
+            return storeId;
         }
 
         public bool IsStoreOpen(string username, int storeId)
@@ -206,24 +212,24 @@ namespace Workshop.DomainLayer.MarketPackage
             return stores[storeId].isOpen();
         }
 
-        public ProductDTO getProductInfo(string user, int productId)
+        public ProductDTO getProductInfo(string username, int productId)
         {
             userController.AssertCurrentUser(username);
-            product product = getProduct(productId);
-            return product.getProductDTO();
+            Product product = getProduct(productId);
+            return product.GetProductDTO();
         }
 
-        public StoreDTO getStoreInfo(string user, int storeId)
+        public StoreDTO getStoreInfo(string username, int storeId)
         {
             userController.AssertCurrentUser(username);
             ValidateStoreExists(storeId);
             Store store = stores[storeId];
-            return store.getStoreDTO();
+            return store.GetStoreDTO();
         }
 
-        private product getProduct(int productId)
+        private Product getProduct(int productId)
         {
-            foreach(Store store in stores)
+            foreach(Store store in stores.Values)
             {
                 try
                 {
@@ -235,7 +241,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             throw new ArgumentException($"Product with ID {productId} does not exist in the market.");
         }
-        internal List<ProductDTO> SearchProduct(string username, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview, int storeReview)
+        public List<ProductDTO> SearchProduct(string username, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
         {
             List<Product> products = new List<Product>();
             userController.AssertCurrentUser(username);
@@ -245,82 +251,95 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             else if (keyWords != "")
             {
-                List<Product> products = GetProductByKeywords(keyWords);
+                products = getProductByKeywords(keyWords);
             }
             else if (catagory != "")
             {
-                List<Product> products = GetProductByCatagory(catagory);
+                products = getProductByCatagory(catagory);
             }
-            return FilterProducts(products, minPrice, maxPrice, productReview, storeReview);
+            return filterProducts(products, minPrice, maxPrice, productReview);
         }
+
+        private List<Product> getProductByCatagory(string catagory)
+        {
+            throw new NotImplementedException();
+        }
+
+        private List<Product> getProductByKeywords(string keyWords)
+        {
+            throw new NotImplementedException();
+        }
+
         //todo move search to user add add a call
-        public List<ProductDTO> FilterProducts(Product products, int minPrice, int maxPrice, int productReview, int storeReview)
+        public List<ProductDTO> filterProducts(List<Product> products, int minPrice, int maxPrice, int productReview)
         {
             //List<Product> products = SearchAllProduct(productName,keyWords,catagory);
             List<Product> goodProducts = new List<Product>();
             if(minPrice != -1)
             {
-                goodProducts = filterByMin(products, GetPrices(products), minPrice);
+                goodProducts = filterByMin(products,getPrices(products),minPrice);
             }
             if(maxPrice != -1)
             {
-                goodProducts = filterByMax(goodProducts,GetPrices(goodProducts),maxPrice);
+                goodProducts = filterByMax(goodProducts,getPrices(goodProducts),maxPrice);
             }
             if(productReview != -1)
             {
-                goodProducts = filterByMin(goodProducts,GetProductsReviewsGrades(goodProducts),productReview);
+                goodProducts = filterByMin(goodProducts,getProductsReviewsGrades(goodProducts),productReview);
             }
-            if(storeReview != -1)
+            /*if(storeReview != -1)
             {
-                goodProducts = filterByMin(goodProducts,GetStoresReviewsGrades(goodProducts),storeReview);
-            }
-            List<int> productsDTOs = new List<ProductDTO>();
+                goodProducts = filterByMin(goodProducts,getStoresReviewsGrades(goodProducts),storeReview);
+            }*/
+            List<ProductDTO> productsDTOs = new List<ProductDTO>();
             foreach(Product product in goodProducts)
             {
-                productsDTOs.Add(product.ToProductDTO());
+                productsDTOs.Add(product.GetProductDTO());
             }
             return productsDTOs;
         }
 
-        private List<int> GetPrices(List<Product> products)
+        private List<double> getPrices(List<Product> products)
         {
-            List<int> productsPrices = new List<int>();
+            List<double> productsPrices = new List<double>();
             foreach(Product product in products)
             {
-                productsPrices.Add(product.GetPrice());
+                productsPrices.Add(product.Price);
             }
             return productsPrices;
         }
 
-        private List<int> GetProductsReviewsGrades(List<Product> products)
+        private List<double> getProductsReviewsGrades(List<Product> products)
         {
-            List<int> productsReviewsGrades = new List<int>();
+            List<double> productsReviewsGrades = new List<double>();
             foreach(Product product in products)
             {
-                productsReviewsGrades.Add(userController.GetAvgProductStars(product));
+                //todo add when we add stars, convert to double to compare ez
+                //productsReviewsGrades.Add(userController.getAvgProductStars(product));
             }
             return productsReviewsGrades;
         }
 
-        private List<int> GetStoresReviewsGrades(List<Product> products)
+        private List<int> getStoresReviewsGrades(List<Product> products)
         {
             HashSet<int> storesIds = new HashSet<int>();
             foreach(Product product in products)
             {
-                int storesId = GetStoreIdByProduct(product.Id);
-                if(storesId != -1)
+                int storeId = getStoreIdByProduct(product.Id);
+                if(storeId != -1)
                 {
                     storesIds.Add(storeId);
                 }
             }
             List<int> storesReviewsGrades = new List<int>();
-            foreach(Store store in stores.Values)
+            foreach(int store in storesIds)
             {
-                storesPrices.add(userController.GetAvgStoreStars(store));
+                //todo add when we add stars
+                //storesPrices.add(userController.getAvgStoreStars(store));
             }
             return storesReviewsGrades;
         }
-        private int GetStoreIdByProduct(int productId)
+        private int getStoreIdByProduct(int productId)
         {
             foreach(Store store in stores.Values)
             {
@@ -337,27 +356,27 @@ namespace Workshop.DomainLayer.MarketPackage
         }
         
 
-        private List<Product> filterByMin(List<Product> products,List<int> filterByList, int key)
+        private List<Product> filterByMin(List<Product> products,List<double> filterByList, double key)
         {
             List<Product> goodProducts = new List<Product>();
-            for(int i=0;i<products.length();i++)
+            for(int i=0;i<products.Count;i++)
             {
                 if(filterByList[i] > key)
                 {
-                    goodProducts.add(products[i]);
+                    goodProducts.Add(products[i]);
                 }
             }
             return goodProducts;
         }
 
-        private List<Product> filterByMax(List<Product> products,List<int> filterByList, int key)
+        private List<Product> filterByMax(List<Product> products,List<double> filterByList, double key)
         {
             List<Product> goodProducts = new List<Product>();
-            for(int i=0;i<products.length();i++)
+            for(int i=0;i<products.Count;i++)
             {
                 if(filterByList[i] < key)
                 {
-                    goodProducts.add(products[i]);
+                    goodProducts.Add(products[i]);
                 }
             }
             return goodProducts;
@@ -366,19 +385,51 @@ namespace Workshop.DomainLayer.MarketPackage
         private List<Product> filterByEq(List<Product> products,List<int> filterByList, int key)
         {
             List<Product> goodProducts = new List<Product>();
-            for(int i=0;i<products.length();i++)
+            for(int i=0;i<products.Count;i++)
             {
-                if(filterByList[i] = key)
+                if(filterByList[i] == key)
                 {
-                    goodProducts.add(products[i]);
+                    goodProducts.Add(products[i]);
                 }
             }
             return goodProducts;
         }
-        public ShopingBagProduct getProductForSale(int productId,int storeId,int quantity)
+        public ShoppingBagProduct getProductForSale(int productId,int storeId,int quantity)
         {
             ValidateStoreExists(storeId);
-            stores[storeId].getProduct(productId).GetShopingBagProduct(quantity);
+            return stores[storeId].GetProduct(productId).GetShoppingBagProduct(quantity);
+        }
+        public void BuyCart(string userId)
+        {
+            ShoppingCartDTO shoppingCart = userController.viewCart(userId);
+            Dictionary<int,List<ProductDTO>> productsSoFar = new Dictionary<int, List<ProductDTO>>();
+            try
+            {
+                foreach (int storeId in shoppingCart.shoppingBags.Keys)
+                {
+                    stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
+                    productsSoFar.Add(storeId,shoppingCart.shoppingBags[storeId].products);  
+                }
+                paymentService.PayAmount(userId,shoppingCart.getPrice());  
+            }
+            catch (ArgumentException)
+            {
+                //restore taken products till we have a smarter way of threding
+                foreach (int storeId in productsSoFar.Keys)
+                {
+                    foreach (ProductDTO item in productsSoFar[storeId])
+                    {
+                       stores[storeId].restoreProduct(item);   
+                    }
+                }  
+            }
+            
+
+        }
+
+        public ShoppingBagProduct addToBag(string user, int productId, int storeId, int quantity)
+        {
+            return userController.addToCart(user, getProductForSale(productId, storeId, quantity), storeId);
         }
     }
 }
