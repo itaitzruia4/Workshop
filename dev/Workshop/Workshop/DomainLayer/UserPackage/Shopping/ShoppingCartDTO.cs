@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using Workshop.DomainLayer.MarketPackage;
+
 namespace Workshop.DomainLayer.UserPackage.Shopping
 {
     public class ShoppingCartDTO
@@ -6,11 +9,11 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
 
         public ShoppingCartDTO(Dictionary<int,ShoppingBagDTO> shoppingBags)
         {
-            shoppingBags = shoppingBags;
+            this.shoppingBags = shoppingBags;
         }
-        public int getPrice()
+        public double getPrice()
         {
-            int price = 0;
+            double price = 0;
             foreach (ShoppingBagDTO bag in shoppingBags.Values)
             {
                 foreach (ProductDTO product in bag.products)

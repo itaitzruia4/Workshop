@@ -134,29 +134,34 @@ namespace Workshop.DomainLayer.MarketPackage
         internal ShoppingBagDTO validateBagInStockAndGet(ShoppingBagDTO shoppingBag)
         {
             
-                    foreach (productDTO product in shoppingBag)
-                    {
-                        if(products.ContainsKey(product.Id)&products[product.Id].Quantity>product.Quantity)
-                        {
-                            products[product.Id].Quantity -= product.Quantity;
-                        }
-                        else {
-                            throw new ArgumentException($"store {id} doesn't has enough {product.Name} in stock");
-                        }
+            foreach (ProductDTO product in shoppingBag.products)
+            {
+                if(products.ContainsKey(product.Id)&products[product.Id].Quantity>product.Quantity)
+                {
+                    products[product.Id].Quantity -= product.Quantity;
+                }
+                else {
+                    throw new ArgumentException($"store {id} doesn't has enough {product.Name} in stock");
+                }
                         
-                    }  
+            }  
             return shoppingBag;     
         }
         internal void restoreProduct(ProductDTO product)
         {
             if(products.ContainsKey(product.Id))
             {
-                products[product.id].Quantity += product.Quantity;
+                products[product.Id].Quantity += product.Quantity;
             }
             else
             {
                 products.Add(product.Id,new Product(product.Id,product.Name,product.Description,product.Price,product.Quantity));
             }
+        }
+
+        internal StoreDTO GetStoreDTO()
+        {
+            throw new NotImplementedException();
         }
     }
 }

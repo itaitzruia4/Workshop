@@ -83,9 +83,9 @@ namespace Workshop.DomainLayer
             return MarketController.CreateNewStore(creator, storeName);
         }
 
-        internal void ReviewProduct(string user, int productId, string review, int stars)
+        internal ReviewDTO ReviewProduct(string user, int productId, string review)
         {
-            UserController.ReviewProduct(user, productId, review, stars);
+            return UserController.ReviewProduct(user, productId, review);
         }
         internal ProductDTO getProductInfo(string user, int productId)
         {
@@ -97,11 +97,11 @@ namespace Workshop.DomainLayer
         }
         internal List<ProductDTO> SearchProduct(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
         {
-            return MarketController.SearchProduct(user, productId, keyWords,catagory,minPrice,maxPrice,productReview,storeReview);
+            return MarketController.SearchProduct(user, productId, keyWords,catagory,minPrice,maxPrice,productReview);
         }
         internal void addToCart(string user, int productId, int storeId,int quantity)
         {
-            UserController.addToCart(user, MarketController.getProductForSale(productId,storeId,quantity));
+            UserController.addToCart(user, MarketController.getProductForSale(productId,storeId,quantity), storeId);
         }
         internal ShoppingCartDTO viewCart(string user)
         {
@@ -111,10 +111,9 @@ namespace Workshop.DomainLayer
         {
             UserController.editCart(user, productId, newQuantity);
         }
-        internal void buyCart(string user)
+        internal void BuyCart(string user)
         {
-            ShoppingCartDTO shoppingCart = UserController.viewCart(user);
-            MarketController.buyCart(shoppingCart,user);
+            MarketController.BuyCart(user);
         }
         
     }

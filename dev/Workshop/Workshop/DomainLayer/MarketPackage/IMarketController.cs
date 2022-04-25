@@ -33,5 +33,14 @@ namespace Workshop.DomainLayer.MarketPackage
         bool IsStoreOpen(string username, int storeId);
 
         void ViewStorePermission(string username, int storeId);
+
+        ProductDTO getProductInfo(string user, int productId);
+
+        StoreDTO getStoreInfo(string user, int storeId);
+
+        List<ProductDTO> SearchProduct(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview);
+
+        void BuyCart(string user);
+        ShoppingBagProduct getProductForSale(int productId, int storeId, int quantity);
     }
 }

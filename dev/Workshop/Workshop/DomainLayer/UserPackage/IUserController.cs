@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DomainLayer.MarketPackage;
+using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage.Permissions;
+using Workshop.DomainLayer.UserPackage.Shopping;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 
 namespace Workshop.DomainLayer.UserPackage
@@ -23,6 +26,9 @@ namespace Workshop.DomainLayer.UserPackage
         bool IsAuthorized(string username, int storeId, Action action);
         void AssertCurrentUser(string username);
         List<Member> GetWorkers(int storeId);
-        void ReviewProduct(string user, int productId, string review);
+        ReviewDTO ReviewProduct(string user, int productId, string review);
+        ShoppingBagProduct addToCart(string user, int productId, int storeId, int quantity);
+        ShoppingCartDTO viewCart(string user);
+        void editCart(string user, int productId, int newQuantity);
     }
 }

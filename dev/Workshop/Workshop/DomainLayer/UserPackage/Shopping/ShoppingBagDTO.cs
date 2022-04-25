@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using Workshop.DomainLayer.MarketPackage;
+
 namespace Workshop.DomainLayer.UserPackage.Shopping
 {
     public class ShoppingBagDTO

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Workshop.DomainLayer.MarketPackage
 {
     public class StoreDTO

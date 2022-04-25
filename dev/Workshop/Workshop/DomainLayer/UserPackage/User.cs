@@ -17,9 +17,9 @@ namespace Workshop.DomainLayer.UserPackage
             shoppingCart = new ShoppingCart();
         }
 
-        public void addToCart(ProductDTO product, int storeId)
+        public ProductDTO addToCart(ShoppingBagProduct product, int storeId)
         {
-            this.shoppingCart.addToCart(product,storeId);
+            return this.shoppingCart.addToCart(product,storeId);
         }
         internal ShoppingCartDTO viewShopingCart()
         {

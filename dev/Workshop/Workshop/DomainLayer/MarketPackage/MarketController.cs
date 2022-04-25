@@ -212,24 +212,24 @@ namespace Workshop.DomainLayer.MarketPackage
             return stores[storeId].isOpen();
         }
 
-        public ProductDTO getProductInfo(string user, int productId)
+        public ProductDTO getProductInfo(string username, int productId)
         {
             userController.AssertCurrentUser(username);
-            product product = getProduct(productId);
-            return product.getProductDTO();
+            Product product = getProduct(productId);
+            return product.GetProductDTO();
         }
 
-        public StoreDTO getStoreInfo(string user, int storeId)
+        public StoreDTO getStoreInfo(string username, int storeId)
         {
             userController.AssertCurrentUser(username);
             ValidateStoreExists(storeId);
             Store store = stores[storeId];
-            return store.getStoreDTO();
+            return store.GetStoreDTO();
         }
 
         private Product getProduct(int productId)
         {
-            foreach(Store store in stores)
+            foreach(Store store in stores.Values)
             {
                 try
                 {
@@ -241,7 +241,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             throw new ArgumentException($"Product with ID {productId} does not exist in the market.");
         }
-        internal List<ProductDTO> SearchProduct(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview, int storeReview)
+        public List<ProductDTO> SearchProduct(string username, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
         {
             List<Product> products = new List<Product>();
             userController.AssertCurrentUser(username);
@@ -251,16 +251,27 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             else if (keyWords != "")
             {
-                List<Product> products = getProductByKeywords(keyWords);
+                products = getProductByKeywords(keyWords);
             }
             else if (catagory != "")
             {
-                List<Product> products = getProductByCatagory(catagory);
+                products = getProductByCatagory(catagory);
             }
-            return filterProducts(products, minPrice, maxPrice, productReview, storeReview);
+            return filterProducts(products, minPrice, maxPrice, productReview);
         }
+
+        private List<Product> getProductByCatagory(string catagory)
+        {
+            throw new NotImplementedException();
+        }
+
+        private List<Product> getProductByKeywords(string keyWords)
+        {
+            throw new NotImplementedException();
+        }
+
         //todo move search to user add add a call
-        public List<ProductDTO> filterProducts(Product products, int minPrice, int maxPrice, int productReview, int storeReview)
+        public List<ProductDTO> filterProducts(List<Product> products, int minPrice, int maxPrice, int productReview)
         {
             //List<Product> products = SearchAllProduct(productName,keyWords,catagory);
             List<Product> goodProducts = new List<Product>();
@@ -276,14 +287,14 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 goodProducts = filterByMin(goodProducts,getProductsReviewsGrades(goodProducts),productReview);
             }
-            if(storeReview != -1)
+            /*if(storeReview != -1)
             {
                 goodProducts = filterByMin(goodProducts,getStoresReviewsGrades(goodProducts),storeReview);
-            }
-            List<int> productsDTOs = new List<ProductDTO>();
+            }*/
+            List<ProductDTO> productsDTOs = new List<ProductDTO>();
             foreach(Product product in goodProducts)
             {
-                productsDTOs.add(product.GetProductDTO());
+                productsDTOs.Add(product.GetProductDTO());
             }
             return productsDTOs;
         }
@@ -386,8 +397,9 @@ namespace Workshop.DomainLayer.MarketPackage
             ValidateStoreExists(storeId);
             stores[storeId].getProduct(productId).GetShoppingBagProduct(quantity);
         }
-        public void BuyCart(ShoppingCartDTO shoppingCart,string userId)
+        public void BuyCart(string userId)
         {
+            ShoppingCartDTO shoppingCart = UserController.viewCart(userId);
             Dictionary<int,List<ProductDTO>> productsSoFar = new Dictionary<int, List<ProductDTO>>();
             try
             {
