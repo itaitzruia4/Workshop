@@ -5,10 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.MarketPackage.ExternalServices.Payment;
 using Workshop.DomainLayer.MarketPackage.ExternalServices.Supply;
+using Workshop.DomainLayer.MarketPackage.ExternalServices;
 using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
+using Workshop.DomainLayer.UserPackage.Shopping;
+
+
+
 
 namespace Workshop.DomainLayer.MarketPackage
 {
@@ -221,7 +226,7 @@ namespace Workshop.DomainLayer.MarketPackage
             return store.getStoreDTO();
         }
 
-        private product getProduct(int productId)
+        private Product getProduct(int productId)
         {
             foreach(Store store in stores)
             {
@@ -375,10 +380,36 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             return goodProducts;
         }
-        public ShopingBagProduct getProductForSale(int productId,int storeId,int quantity)
+        public ShoppingBagProduct getProductForSale(int productId,int storeId,int quantity)
         {
             ValidateStoreExists(storeId);
-            stores[storeId].getProduct(productId).GetShopingBagProduct(quantity);
+            stores[storeId].getProduct(productId).GetShoppingBagProduct(quantity);
+        }
+        public void BuyCart(ShoppingCartDTO shoppingCart,string userId)
+        {
+            Dictionary<int,List<ProductDTO>> productsSoFar = new Dictionary<int, List<ProductDTO>>();
+            try
+            {
+                foreach (int storeId in shoppingCart.shoppingBags.Keys)
+                {
+                    stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
+                    productsSoFar.Add(storeId,shoppingCart.shoppingBags[storeId]);  
+                }
+                paymentService.PayAmount(userId,shoppingCart.getPrice());  
+            }
+            catch (ArgumentException)
+            {
+                //restore taken products till we have a smarter way of threding
+                foreach (int storeId in productsSoFar.Keys)
+                {
+                    foreach (ProductDTO item in productsSoFar[storeId])
+                    {
+                       stores[storeId].restoreProduct(item);   
+                    }
+                }  
+            }
+            
+
         }
     }
 }

@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DomainLayer.UserPackage.Shopping;
 
-namespace Workshop.DomainLayer.UserPackage
+namespace Workshop.DomainLayer.UserPackage.Shopping
 {
-    class ShoppingCart
+    public class ShoppingCart
     {
         private Dictionary<int,ShoppingBag> shoppingBags { get; set; }
 
@@ -15,7 +16,7 @@ namespace Workshop.DomainLayer.UserPackage
             shoppingBags = new Dictionary<int,ShoppingBag>();
         }
 
-        public void addToCart(ShopingBagProduct product, int storeId)
+        public void addToCart(ShoppingBagProduct product, int storeId)
         {
             if(!checkIfHasBag(storeId))
             {

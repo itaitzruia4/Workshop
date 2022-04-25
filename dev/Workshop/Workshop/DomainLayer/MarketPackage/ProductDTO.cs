@@ -1,3 +1,4 @@
+
 namespace Workshop.DomainLayer.MarketPackage
 {
     public class ProductDTO

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DomainLayer.UserPackage.Shopping;
+using Workshop.DomainLayer.MarketPackage;
 
 namespace Workshop.DomainLayer.UserPackage
 {

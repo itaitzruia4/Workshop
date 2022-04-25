@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DomainLayer.UserPackage.Shopping;
+using Workshop.DomainLayer.MarketPackage;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
@@ -128,6 +130,33 @@ namespace Workshop.DomainLayer.MarketPackage
             if (!products.ContainsKey(productId))
                 throw new ArgumentException($"Product with ID {productId} does not exist in the store.");
             return products[productId];
+        }
+        internal ShoppingBagDTO validateBagInStockAndGet(ShoppingBagDTO shoppingBag)
+        {
+            
+                    foreach (productDTO product in shoppingBag)
+                    {
+                        if(products.ContainsKey(product.Id)&products[product.Id].Quantity>product.Quantity)
+                        {
+                            products[product.Id].Quantity -= product.Quantity;
+                        }
+                        else {
+                            throw new ArgumentException($"store {id} doesn't has enough {product.Name} in stock");
+                        }
+                        
+                    }  
+            return shoppingBag;     
+        }
+        internal void restoreProduct(ProductDTO product)
+        {
+            if(products.ContainsKey(product.Id))
+            {
+                products[product.id].Quantity += product.Quantity;
+            }
+            else
+            {
+                products.Add(product.Id,new Product(product.Id,product.Name,product.Description,product.Price,product.Quantity));
+            }
         }
     }
 }

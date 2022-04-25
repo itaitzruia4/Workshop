@@ -6,6 +6,9 @@ using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Security;
+using Workshop.DomainLayer.UserPackage.Shopping;
+
+
 
 namespace Workshop.DomainLayer
 {
@@ -110,7 +113,8 @@ namespace Workshop.DomainLayer
         }
         internal void buyCart(string user)
         {
-            UserController.buyCart(user);
+            ShoppingCartDTO shoppingCart = UserController.viewCart(user);
+            MarketController.buyCart(shoppingCart,user);
         }
         
     }

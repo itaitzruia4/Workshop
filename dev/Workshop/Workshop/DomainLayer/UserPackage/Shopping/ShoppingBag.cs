@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DomainLayer.UserPackage.Shopping;
 
-namespace Workshop.DomainLayer.UserPackage
+namespace Workshop.DomainLayer.UserPackage.Shopping
 {
-    class ShoppingBag
+    public class ShoppingBag
     {
         private string storeId;
         private Dictionary<int, List<ShoppingBagProduct>> products;
@@ -17,7 +18,7 @@ namespace Workshop.DomainLayer.UserPackage
             products = new Dictionary<int,List<ShoppingBagProduct>>();
         }
 
-        public void addToBag(ShopingBagProduct product)
+        public void addToBag(ShoppingBagProduct product)
         {
             if(!products.ContainsKey(product.getId()))
             {
@@ -27,12 +28,12 @@ namespace Workshop.DomainLayer.UserPackage
         }
         internal ShoppingBagDTO GetShoppingBagDTO()
         {
-            Dictionary<int,List<Product>> shoppingBagsDTOs = new Dictionary<int, List<Product>>();
+            Dictionary<int,List<productsDTO>> productsDTOs = new Dictionary<int, List<Product>>();
             foreach (int key in products.Keys)
             {
                 shoppingBagsDTOs.Add(key,products[key].getProductDTO());
             }
-            return new ShoppingBagDTO(storeId,shoppingBagsDTOs);
+            return new ShoppingBagDTO(storeId,products);
         }
         public int HasProduct(int ProductId)
         {

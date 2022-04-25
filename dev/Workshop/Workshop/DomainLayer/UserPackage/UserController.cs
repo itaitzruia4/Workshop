@@ -8,6 +8,7 @@ using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Security;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
+using Workshop.DomainLayer.MarketPackage;
 
 namespace Workshop.DomainLayer.UserPackage
 {
@@ -367,7 +368,7 @@ namespace Workshop.DomainLayer.UserPackage
         }
 
 
-        public List<Product> addToCart(int userId,ShopingBagProduct product, int quantity)
+        public List<Product> addToCart(int userId,ShoppingBagProduct product, int quantity)
         {
             AssertCurrentUser(userId);
             this.currentUser.addToCart(product,storeId,quantity);
@@ -376,7 +377,7 @@ namespace Workshop.DomainLayer.UserPackage
         public ShoppingCartDTO viewCart(string user)
         {
             AssertCurrentUser(userId);
-            return currentUser.viewCart();
+            return currentUser.viewShopingCart();
         }
         public void editCart(string user, int productId, int newQuantity)
         {
