@@ -14,7 +14,7 @@ using DomainStoreFounder = Workshop.DomainLayer.UserPackage.Permissions.StoreFou
 
 namespace Workshop.ServiceLayer
 {
-    class Service : IService
+    public class Service : IService
     {
         private Facade facade;
 
