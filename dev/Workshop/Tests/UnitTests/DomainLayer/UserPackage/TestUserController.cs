@@ -21,11 +21,10 @@ namespace Tests
             security = securityMock.Object;
 
             var reviewMock = new Mock<IReviewHandler>();
-            reviewMock.Setup(x => x.AddReview(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>()));
-            security = securityMock.Object;
+            reviewMock.Setup(x => x.AddReview(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>())).Returns<ReviewDTO>(null);
 
 
-            userController = new UserController(security, null);
+            userController = new UserController(security, reviewMock.Object);
             userController.InitializeSystem();
         }
 
@@ -226,7 +225,15 @@ namespace Tests
 
         [TestMethod]
         public void TestReviewProduct_Success(){
-            userController.ReviewProduct("User1", 1, "Honest review123");
+            userController.EnterMarket();
+            string username = "member1";
+            int id = 1;
+            string review = "Honest review123";
+            userController.Login(username, "pass1");
+            ReviewDTO res = userController.ReviewProduct(username, id, review);
+            Assert.Equals(res.Review, review);
+            Assert.Equals(res.Reviewer, username);
+            Assert.Equals(res.ProductId, id);
         }
 
         [TestMethod]

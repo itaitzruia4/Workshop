@@ -23,9 +23,15 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
             userControllerMock = new Mock<IUserController>();
             userControllerMock.Setup(x => x.AssertCurrentUser(It.IsAny<string>())).Callback((string user) => {});
             userControllerMock.Setup(x => x.IsAuthorized(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action>())).Returns(true);
-            userControllerMock.Setup(x => x.GetWorkers(It.IsAny<int>())).Returns(new List<Member>(new Member[]{new Member("Worker1", "pass1")}));
+            userControllerMock.Setup(x => x.GetWorkers(It.IsAny<int>())).Returns(new List<Member>(new Member[] {new Member("Worker1", "pass1")}));
 
-            marketController = new MarketController(userControllerMock.Object, paymentService, supplyService);
+            Mock<IMarketPaymentService> paymentMock = new Mock<IMarketPaymentService>();
+            paymentMock.Setup(x => x.PayAmount(It.IsAny<string>(), It.IsAny<double>())).Callback((string username, double amount) => {});
+
+            Mock<IMarketSupplyService> supplyMock = new Mock<IMarketSupplyService>();
+            supplyMock.Setup(x => x.supplyToAddress(It.IsAny<string>(), It.IsAny<string>())).Callback((string username, string address) => { });
+
+            marketController = new MarketController(userControllerMock.Object, paymentMock.Object, supplyMock.Object);
             marketController.InitializeSystem();
 
             // marketController = new MarketController();

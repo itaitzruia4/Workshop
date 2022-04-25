@@ -10,7 +10,7 @@ namespace Workshop.DomainLayer.MarketPackage.ExternalServices.Payment
     {
         public PaymentExternalService() { }
 
-        public bool payAmount(string username, double amount)
+        public bool PayAmount(string username, double amount)
         {
             return true;
         }
