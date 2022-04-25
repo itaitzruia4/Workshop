@@ -3,10 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DomainLayer.MarketPackage;
+using static Workshop.DomainLayer.UserPackage.Permissions.Role;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
-    class StoreOwner
+    public class StoreOwner: StoreRole
     {
+        List<StoreRole> nominees;
+        public StoreOwner(int storeId): base(storeId)
+        {
+            this.nominees = new List<StoreRole>();
+            actions.Add(Action.AddProduct);
+            actions.Add(Action.RemoveProduct);
+            actions.Add(Action.ChangeProductName);
+            actions.Add(Action.ChangeProductDescription);
+            actions.Add(Action.ChangeProductPrice);
+            actions.Add(Action.ChangeProductQuantity);
+            actions.Add(Action.GetWorkersInformation);
+            actions.Add(Action.AddPermissionToStoreManager);
+            actions.Add(Action.RemovePermissionFromStoreManager);
+            actions.Add(Action.GetStoreOrdersList);
+            actions.Add(Action.ViewClosedStore);
+        }
     }
 }

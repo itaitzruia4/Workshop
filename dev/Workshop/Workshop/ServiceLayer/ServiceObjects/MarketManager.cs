@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Workshop.DomainLayer.UserPackage.Permissions
+namespace Workshop.ServiceLayer.ServiceObjects
 {
-    interface IAction
+    class MarketManager: Role
     {
     }
 }
