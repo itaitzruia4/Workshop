@@ -226,9 +226,14 @@ namespace Tests
         [TestMethod]
         public void TestReviewProduct_Success(){
             userController.EnterMarket();
-            userController.Login("member1", "pass1");
-
-            userController.ReviewProduct("member1", 1, "Honest review123");
+            string username = "member1";
+            int id = 1;
+            string review = "Honest review123";
+            userController.Login(username, "pass1");
+            ReviewDTO res = userController.ReviewProduct(username, id, review);
+            Assert.Equals(res.Review, review);
+            Assert.Equals(res.Reviewer, username);
+            Assert.Equals(res.ProductId, id);
         }
 
         [TestMethod]
