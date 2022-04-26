@@ -23,7 +23,7 @@ namespace Workshop.DomainLayer.Loggers
         public static Logger Instance
         {
             get{
-                instance.Value;
+                return instance.Value;
             }
         }
 
@@ -41,7 +41,7 @@ namespace Workshop.DomainLayer.Loggers
             }
         }
 
-        public void LogDebug(string mesesage)
+        public void LogDebug(string message)
         {
             lock(loggingLock){
                 log.Debug(message);

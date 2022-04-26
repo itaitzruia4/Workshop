@@ -9,12 +9,6 @@ namespace Tests.UnitTests.DomainLayer.Loggers
     {
         private Logger log;
 
-        [TestInitialize]
-        public void Setup()
-        {
-            log = new Logger();
-        }
-
         [TestMethod]
         public void TestLogEvent()
         {
