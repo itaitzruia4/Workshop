@@ -16,13 +16,14 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
     {
         private MarketController marketController;
         private Mock<IUserController> userControllerMock;
+        
         [TestInitialize]
         public void Setup()
         {
 
             userControllerMock = new Mock<IUserController>();
             userControllerMock.Setup(x => x.AssertCurrentUser(It.IsAny<string>())).Callback((string user) => {});
-            userControllerMock.Setup(x => x.IsAuthorized(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action>())).Returns(true);
+            userControllerMock.Setup(x => x.IsAuthorized(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action>())).Callback(async (string user, int storeId, Action action) => {if (action == Action.GetWorkersInformation) return !user.Equals("Notallowed Cohen"); return true;});
             userControllerMock.Setup(x => x.GetWorkers(It.IsAny<int>())).Returns(new List<Member>(new Member[] {new Member("Worker1", "pass1")}));
             userControllerMock.Setup(x => x.GetMember(It.IsAny<string>())).Returns(new Member("StoreFounder1", "pass1"));
 
@@ -72,7 +73,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
 
         [TestMethod]
         public void TestGetWorkersInformation_Failure_NoPermission(){
-            Assert.ThrowsException<ArgumentException>(() => marketController.GetWorkersInformation("User2", 1));
+            Assert.ThrowsException<ArgumentException>(() => marketController.GetWorkersInformation("Notallowed Cohen", 1));
         }
 
         [TestMethod]
