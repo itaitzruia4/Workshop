@@ -73,7 +73,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
 
         [TestMethod]
         public void TestGetWorkersInformation_Failure_NoPermission(){
-            Assert.ThrowsException<ArgumentException>(() => marketController.GetWorkersInformation("Notallowed Cohen", 1));
+            Assert.ThrowsException<MemberAccessException>(() => marketController.GetWorkersInformation("Notallowed Cohen", 1));
         }
 
         [TestMethod]
