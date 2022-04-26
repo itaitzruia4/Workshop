@@ -24,6 +24,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
             userControllerMock.Setup(x => x.AssertCurrentUser(It.IsAny<string>())).Callback((string user) => {});
             userControllerMock.Setup(x => x.IsAuthorized(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action>())).Returns(true);
             userControllerMock.Setup(x => x.GetWorkers(It.IsAny<int>())).Returns(new List<Member>(new Member[] {new Member("Worker1", "pass1")}));
+            userControllerMock.Setup(x => x.GetMember(It.IsAny<string>())).Returns(new Member("StoreFounder1", "pass1"));
 
             Mock<IMarketPaymentService> paymentMock = new Mock<IMarketPaymentService>();
             paymentMock.Setup(x => x.PayAmount(It.IsAny<string>(), It.IsAny<double>())).Callback((string username, double amount) => {});
@@ -42,7 +43,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         public void TestCloseStore_Success()
         {
             // Arrange
-            string username = "user1"; int storeId = 0;
+            string username = "user1"; int storeId = 1;
 
             // Act
             marketController.CloseStore(username, storeId);
@@ -55,7 +56,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         public void TestCloseStore_Failure()
         {
             // Arrange
-            string username = "user1"; int storeId = 0;
+            string username = "user1"; int storeId = 1;
 
             // Act
             marketController.CloseStore(username, storeId);
@@ -77,7 +78,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         [TestMethod]
         public void TestCreateNewStore_Success(){
             int result = marketController.CreateNewStore("User1", "Cool store123");
-            Assert.Equals(result, 6);
+            Assert.AreEqual(result, 5);
         }
 
         [DataTestMethod]

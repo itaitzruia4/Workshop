@@ -33,6 +33,7 @@ namespace Workshop.DomainLayer.MarketPackage
             this.paymentService = paymentService;
             this.supplyService = supplyService;
             stores = new Dictionary<int, Store>();
+            STORE_COUNT = 0;
         }
 
         public void InitializeSystem()
