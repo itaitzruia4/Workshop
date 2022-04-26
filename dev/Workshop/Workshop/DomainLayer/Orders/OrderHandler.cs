@@ -44,7 +44,7 @@ namespace Workshop.DomainLayer.Orders
         public List<OrderDTO> GetOrders(T key)
         {
             if (!orders.ContainsKey(key))
-                return null;
+                return new List<OrderDTO>();
             return orders[key];
         }
 

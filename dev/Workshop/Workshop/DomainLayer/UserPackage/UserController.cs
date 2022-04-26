@@ -10,6 +10,7 @@ using Workshop.DomainLayer.UserPackage.Security;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 using Workshop.DomainLayer.MarketPackage;
 using Workshop.DomainLayer.UserPackage.Shopping;
+using Workshop.DomainLayer.Loggers;
 
 namespace Workshop.DomainLayer.UserPackage
 {
@@ -40,8 +41,12 @@ namespace Workshop.DomainLayer.UserPackage
         /// </summary>
         public void InitializeSystem()
         {
+            Logger.Instance.LogEvent("Starting initializing the system - User Controller");
             Member member1 = new Member("member1", securityHandler.Encrypt("pass1"));
             member1.AddRole(new StoreFounder(1));
+            List<ShoppingBagProduct> member1prods = new List<ShoppingBagProduct>();
+            member1prods.Add(new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1));
+            orderHandler.addOrder(new OrderDTO(1, "member1", "whatever", "blasToysRus", member1prods, 12.30), "member1");
 
             Member member2 = new Member("member2", securityHandler.Encrypt("pass2"));
             member2.AddRole(new StoreOwner(2));
@@ -56,6 +61,7 @@ namespace Workshop.DomainLayer.UserPackage
             members.Add(member2.Username, member2);
             members.Add(member3.Username, member3);
             members.Add(member4.Username, member4);
+            Logger.Instance.LogEvent("Finished initializing the system - User Controller");
         }
 
         //*************************************************************************************************************
@@ -70,10 +76,12 @@ namespace Workshop.DomainLayer.UserPackage
         /// </returns>
         public User EnterMarket()
         {
+            Logger.Instance.LogEvent("User trying to enter the market");
             if (currentUser != null)
                 throw new InvalidOperationException("You have already entered the market");
 
             currentUser = new User();
+            Logger.Instance.LogEvent("User entered the market successfuly");
             return currentUser;
         }
 
@@ -82,7 +90,9 @@ namespace Workshop.DomainLayer.UserPackage
         /// </summary>
         public void ExitMarket()
         {
+            Logger.Instance.LogEvent("User trying to exit the market");
             currentUser = null;
+            Logger.Instance.LogEvent("User exited the market successfuly");
         }
 
         /// <summary>
@@ -92,6 +102,7 @@ namespace Workshop.DomainLayer.UserPackage
         /// <param name="password">Password of the user that registers to the system</param>
         public void Register(string username, string password)
         {
+            Logger.Instance.LogEvent("Trying to register user " + username);
             EnsureNonEmptyUserDetails(username, password);
             EnsureEnteredMarket();
 
@@ -101,6 +112,7 @@ namespace Workshop.DomainLayer.UserPackage
             string encryptedPassword = securityHandler.Encrypt(password);
             Member newMember = new Member(username, encryptedPassword);
             members.Add(username, newMember);
+            Logger.Instance.LogEvent("Successfuly registered user " + username);
         }
 
         /// <summary>
@@ -117,6 +129,7 @@ namespace Workshop.DomainLayer.UserPackage
         /// </returns>
         public Member Login(string username, string password)
         {
+            Logger.Instance.LogEvent("Trying to login user " + username);
             EnsureNonEmptyUserDetails(username, password);
             EnsureEnteredMarket();
 
@@ -136,7 +149,7 @@ namespace Workshop.DomainLayer.UserPackage
 
             // TODO figure out how to support multiple logged in users at once
             currentUser = member;
-
+            Logger.Instance.LogEvent("Successfuly logged in user " + username);
             return member;
         }
 
@@ -146,11 +159,13 @@ namespace Workshop.DomainLayer.UserPackage
         /// <param name="username">Username of the user that requests to log out</param>
         public void Logout(string username)
         {
+            Logger.Instance.LogEvent("Trying to log out user " + username);
             if (!IsMember(username))
                 throw new ArgumentException($"Username {username} does not exist");
             AssertCurrentUser(username);
 
             currentUser = new User();
+            Logger.Instance.LogEvent("Successfuly logged out user " + username);
         }
 
         /// <summary>
@@ -173,6 +188,7 @@ namespace Workshop.DomainLayer.UserPackage
         // Being called only from MarketController
         public StoreOwner NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId)
         {
+            Logger.Instance.LogEvent("User " + nominatorUsername + " is trying to nominate " + nominatedUsername + " as a store owner of store " + storeId);
             // Check that nominator is the logged in member
             AssertCurrentUser(nominatorUsername);
 
@@ -207,13 +223,14 @@ namespace Workshop.DomainLayer.UserPackage
             // Add the new manager to the nominator's nominees list
             StoreRole nominatorStoreOwner = nominatorStoreRoles.Last();
             nominatorStoreOwner.AddNominee(newRole);
-
+            Logger.Instance.LogEvent("User " + nominatorUsername + " successfuly nominated " + nominatedUsername + " as a store owner of store " + storeId);
             return newRole;
         }
 
         // Being called only from MarketController
         public StoreManager NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId)
         {
+            Logger.Instance.LogEvent("User " + nominatorUsername + " is trying to nominate " + nominatedUsername + " as a store manager of store " + storeId);
             // Check that nominator is the logged in member
             AssertCurrentUser(nominatorUsername);
 
@@ -239,7 +256,7 @@ namespace Workshop.DomainLayer.UserPackage
             // Add the new manager to the nominator's nominees list
             StoreRole nominatorStoreRole = nominatorStoreRoles.Last();
             nominatorStoreRole.AddNominee(newRole);
-            
+            Logger.Instance.LogEvent("User " + nominatorUsername + " successfuly nominated " + nominatedUsername + " as a store manager of store " + storeId);
             return newRole;
         }
 
@@ -251,6 +268,7 @@ namespace Workshop.DomainLayer.UserPackage
 
         public void AddPermissionToStoreManager(string ownerUsername, string managerUsername, int storeId, Action permission)
         {
+            Logger.Instance.LogEvent("User " + ownerUsername + " is trying to add permission to " + managerUsername + " in store " + storeId);
             // Check that owner is the logged in member
             AssertCurrentUser(ownerUsername);
 
@@ -269,15 +287,18 @@ namespace Workshop.DomainLayer.UserPackage
                 {
                     // Add the permission to the manager
                     storeRole.AddAction(permission);
+                    Logger.Instance.LogEvent("User " + ownerUsername + " successfuly added permission to " + managerUsername + " in store " + storeId);
                     return;
                 }
             }
             // If not found manager role in roles list throw an exception.
+            Logger.Instance.LogEvent("User " + ownerUsername + " FAILED to add permission to " + managerUsername + " in store " + storeId);
             throw new ArgumentException($"User {managerUsername} is not a store manager of store {storeId}");
         }
 
         public void RemovePermissionFromStoreManager(string ownerUsername, string managerUsername, int storeId, Action permission)
         {
+            Logger.Instance.LogEvent("User " + ownerUsername + " trying to remove permission from " + managerUsername + " in store " + storeId);
             // Check that owner is the logged in member
             AssertCurrentUser(ownerUsername);
 
@@ -296,10 +317,12 @@ namespace Workshop.DomainLayer.UserPackage
                 {
                     // Add the permission to the manager
                     storeRole.RemoveAction(permission);
+                    Logger.Instance.LogEvent("User " + ownerUsername + " successfuly removed permission from " + managerUsername + " in store " + storeId);
                     return;
                 }
             }
             // If not found manager role in roles list throw an exception.
+            Logger.Instance.LogEvent("User " + ownerUsername + " FAILED to removed permission from " + managerUsername + " in store " + storeId);
             throw new ArgumentException($"User {managerUsername} is not a store manager of store {storeId}");
         }
 
@@ -360,6 +383,7 @@ namespace Workshop.DomainLayer.UserPackage
 
         public ReviewDTO ReviewProduct(string user, int productId, string review)
         {
+            Logger.Instance.LogEvent("User " + user + " is trying to review product " + productId);
             AssertCurrentUser(user);
             List<OrderDTO> orders = orderHandler.GetOrders(user);
             bool purchasedProduct = false;
@@ -373,8 +397,10 @@ namespace Workshop.DomainLayer.UserPackage
             }
             if (!purchasedProduct)
             {
+                Logger.Instance.LogEvent("User " + user + " FAILED to review product " + productId);
                 throw new ArgumentException($"Username {user} did not purchase product {productId}");
             }
+            Logger.Instance.LogEvent("User " + user + " successfuly reviewed product " + productId);
             return reviewHandler.AddReview(user, productId, review);
         }
 
@@ -382,20 +408,24 @@ namespace Workshop.DomainLayer.UserPackage
         public ShoppingBagProduct addToCart(string username, ShoppingBagProduct product, int storeId)
         {
             //ShoppingBagProduct 
+            Logger.Instance.LogEvent("User " + username + " is trying to add a product to his cart from store " + storeId);
             AssertCurrentUser(username);
             return this.currentUser.addToCart(product,storeId);
         }
 
         public ShoppingCartDTO viewCart(string user)
         {
+            Logger.Instance.LogEvent("User " + user + " is trying to view his cart");
             AssertCurrentUser(user);
             return currentUser.viewShopingCart();
         }
         public void editCart(string user, int productId, int newQuantity)
         {
+            Logger.Instance.LogEvent("User " + user + " is trying to edit the quantity of " + productId + " in his cart");
             AssertCurrentUser(user);
-            if(newQuantity<0)
+            if(newQuantity < 0)
             {
+                Logger.Instance.LogEvent("User " + user + " failed to edit the quantity of " + productId + " in his cart");
                 throw new ArgumentException($"Quantity {newQuantity} can not be a negtive number");
             }
             if(newQuantity == 0)
@@ -406,6 +436,7 @@ namespace Workshop.DomainLayer.UserPackage
             {
                 currentUser.changeQuantityInCart(productId,newQuantity);
             }
+            Logger.Instance.LogEvent("User " + user + " successfuly edited the quantity of " + productId + " in his cart");
         }
     }
 }

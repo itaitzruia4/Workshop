@@ -1,8 +1,12 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 namespace Workshop.DomainLayer.Loggers
 {
-    interface ILogger{
-        void LogEvent(string message);
-        void LogError(string message);
-        void LogDebug(string message);
+    interface ILogger
+    {
     }
 }
