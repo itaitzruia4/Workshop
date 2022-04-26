@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Tests.IntegrationTests
 {
-    internal class SystemTests
+    public class SystemTests
     {
         private static string credentials = "Good";
 
@@ -17,7 +17,8 @@ namespace Tests.IntegrationTests
         {
             return new Service();
         }
-
+        
+        [Fact]
         public void TestSystemInitiation()
         {
             IService service = InitSystem();
@@ -26,6 +27,7 @@ namespace Tests.IntegrationTests
             //Assert.NotNull(srv.getExternalConnections());
         }
 
+        [Fact]
         public void TestEnterMarket_Good()
         {
             IService service = InitSystem();
@@ -34,6 +36,7 @@ namespace Tests.IntegrationTests
             Assert.NotNull(ru.Value);
         }
 
+        [Fact]
         public void TestEnterMarket_Bad()
         {
             IService service = InitSystem();
@@ -41,6 +44,7 @@ namespace Tests.IntegrationTests
             Assert.True(service.EnterMarket().ErrorOccured);
         }
 
+        [Fact]
         public void TestExitMarket_Good()
         {
             IService service = InitSystem();
@@ -48,12 +52,14 @@ namespace Tests.IntegrationTests
             Assert.False(service.ExitMarket().ErrorOccured);
         }
 
+        [Fact]
         public void TestExitMarket_Bad1()
         {
             IService service = InitSystem();
             Assert.True(service.ExitMarket().ErrorOccured);
         }
 
+        [Fact]
         public void TestExitMarket_Bad2()
         {
             IService service = InitSystem();
@@ -62,6 +68,7 @@ namespace Tests.IntegrationTests
             Assert.True(service.ExitMarket().ErrorOccured);
         }
 
+        [Fact]
         public void TestRegister_Good()
         {
             IService service = InitSystem();
@@ -69,6 +76,7 @@ namespace Tests.IntegrationTests
             Assert.False(service.Register(credentials, credentials).ErrorOccured);
         }
 
+        [Fact]
         public void TestRegister_Bad1()
         {
             IService service = InitSystem();
@@ -76,6 +84,7 @@ namespace Tests.IntegrationTests
             Assert.True(service.Register("TestRegister_Bad1", credentials).ErrorOccured);
         }
 
+        [Fact]
         public void TestRegister_Bad2()
         {
             IService service = InitSystem();
@@ -83,6 +92,7 @@ namespace Tests.IntegrationTests
             Assert.True(service.Register(credentials, "TestRegister_Bad2").ErrorOccured);
         }
 
+        [Fact]
         public void TestRegister_Bad3()
         {
             IService service = InitSystem();
@@ -90,6 +100,7 @@ namespace Tests.IntegrationTests
             Assert.True(service.Register(credentials, credentials).ErrorOccured);
         }
 
+        [Fact]
         public void TestLogin_Good()
         {
             IService service = InitSystem();
@@ -99,12 +110,14 @@ namespace Tests.IntegrationTests
             Assert.NotNull(rMember.Value);
         }
 
+        [Fact]
         public void TestLogin_Bad1()
         {
             IService service = InitSystem();
             Assert.True(service.Login("Fake1", "Fake2").ErrorOccured);
         }
 
+        [Fact]
         public void TestLogin_Bad2()
         {
             IService service = InitSystem();
@@ -112,6 +125,7 @@ namespace Tests.IntegrationTests
             Assert.True(service.Login(credentials, "Fake2").ErrorOccured);
         }
 
+        [Fact]
         public void TestLogin_Bad3()
         {
             IService service = InitSystem();
@@ -119,6 +133,7 @@ namespace Tests.IntegrationTests
             Assert.True(service.Login("Fake1", credentials).ErrorOccured);
         }
 
+        [Fact]
         public void TestLogout_Good()
         {
             IService service = InitSystem();
@@ -127,6 +142,7 @@ namespace Tests.IntegrationTests
             Assert.False(service.Logout(credentials).ErrorOccured);
         }
 
+        [Fact]
         public void TestLogout_Bad1()
         {
             IService service = InitSystem();
@@ -136,18 +152,21 @@ namespace Tests.IntegrationTests
             Assert.True(service.Logout(credentials).ErrorOccured);
         }
 
+        [Fact]
         public void TestLogout_Bad2()
         {
             IService service = InitSystem();
             Assert.True(service.Logout("TestLogout_Bad2").ErrorOccured);
         }
 
+        [Fact]
         public void TestLogout_Bad3()
         {
             IService service = InitSystem();
             Assert.True(service.Logout(null).ErrorOccured);
         }
 
+        [Fact]
         public void TestAddProduct_Good()
         {
             IService service = InitSystem();
@@ -156,6 +175,7 @@ namespace Tests.IntegrationTests
             Assert.False(service.AddProduct(credentials, storeId, 0, credentials, credentials, 1, 1).ErrorOccured);
         }
 
+        [Fact]
         public void TestAddProduct_Bad()
         {
             IService service = InitSystem();
@@ -164,6 +184,7 @@ namespace Tests.IntegrationTests
             Assert.True(service.AddProduct(credentials, storeId, 0, credentials, credentials, 1, 1).ErrorOccured);
         }
 
+        [Fact]
         public void TestNominateStoreOwner_Good()
         {
             IService service = InitSystem();
@@ -174,6 +195,7 @@ namespace Tests.IntegrationTests
             Assert.False(service.NominateStoreOwner(credentials, "Who?", storeId).ErrorOccured);
         }
 
+        [Fact]
         public void TestNominateStoreOwner_Bad()
         {
             IService service = InitSystem();
@@ -185,6 +207,7 @@ namespace Tests.IntegrationTests
             Assert.True(service.NominateStoreOwner(credentials, "Who?", storeId).ErrorOccured);
         }
 
+        [Fact]
         public void TestNominateStoreManager_Good()
         {
             IService service = InitSystem();
@@ -195,6 +218,7 @@ namespace Tests.IntegrationTests
             Assert.False(service.NominateStoreManager(credentials, "Who?", storeId).ErrorOccured);
         }
 
+        [Fact]
         public void TestNominateStoreManager_Bad()
         {
             IService service = InitSystem();
@@ -206,6 +230,7 @@ namespace Tests.IntegrationTests
             Assert.True(service.NominateStoreManager(credentials, "Who?", storeId).ErrorOccured);
         }
 
+        [Fact]
         public void TestGetWorkersInformation_Good()
         {
             IService service = InitSystem();
@@ -215,6 +240,7 @@ namespace Tests.IntegrationTests
             Assert.False(service.GetWorkersInformation(credentials, storeId).ErrorOccured);
         }
 
+        [Fact]
         public void TestGetWorkersInformation_Bad()
         {
             IService service = InitSystem();
@@ -226,6 +252,7 @@ namespace Tests.IntegrationTests
             Assert.True(service.GetWorkersInformation("Who?", storeId).ErrorOccured);
         }
 
+        [Fact]
         public void TestCloseStore_Good()
         {
             IService service = InitSystem();
@@ -235,6 +262,7 @@ namespace Tests.IntegrationTests
             Assert.False(service.CloseStore(credentials, storeId).ErrorOccured);
         }
 
+        [Fact]
         public void TestCloseStore_Bad()
         {
             IService service = InitSystem();
@@ -246,6 +274,7 @@ namespace Tests.IntegrationTests
             Assert.False(service.CloseStore("Who?", storeId).ErrorOccured);
         }
 
+        [Fact]
         public void TestCreateNewStore_Good()
         {
             IService service = InitSystem();
@@ -256,11 +285,14 @@ namespace Tests.IntegrationTests
             Assert.True(res.Value >= 0);
         }
 
+        [Fact]
         public void TestCreateNewStore_Bad()
         {
             IService service = InitSystem();
             Assert.False(service.CreateNewStore(credentials, credentials).ErrorOccured);
         }
+
+        [Fact]
         public void TestReviewProduct_Good()
         {
             IService service = InitSystem();
@@ -271,6 +303,7 @@ namespace Tests.IntegrationTests
             Assert.False(service.ReviewProduct(credentials, 0, "Blank").ErrorOccured);
         }
 
+        [Fact]
         public void TestReviewProduct_Bad1()
         {
             IService service = InitSystem();
@@ -282,6 +315,7 @@ namespace Tests.IntegrationTests
             Assert.True(service.ReviewProduct(credentials, 0, "Blank").ErrorOccured);
         }
 
+        [Fact]
         public void TestReviewProduct_Bad2()
         {
             IService service = InitSystem();
