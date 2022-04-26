@@ -38,11 +38,13 @@ namespace Workshop.DomainLayer.MarketPackage
 
         public void InitializeSystem()
         {
+            Logger.Instance.LogEvent("Started initializing the system - Market Controller");
             CreateNewStore("User1", "Sport store");
             CreateNewStore("User2", "Drug store");
             CreateNewStore("User3", "Supermarket");
             CreateNewStore("User4", "Electronics store");
             CreateNewStore("User5", "Convenience store");
+            Logger.Instance.LogEvent("Finished initializing the system - Market Controller");
         }
 
         private bool IsAuthorized(string username, int storeId, Action action)
