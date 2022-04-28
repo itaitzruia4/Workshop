@@ -41,6 +41,7 @@ namespace Workshop.DomainLayer.UserPackage
         /// </summary>
         public void InitializeSystem()
         {
+            /*
             Logger.Instance.LogEvent("Starting initializing the system - User Controller");
             Member member1 = new Member("member1", securityHandler.Encrypt("pass1"));
             member1.AddRole(new StoreFounder(1));
@@ -62,6 +63,7 @@ namespace Workshop.DomainLayer.UserPackage
             members.Add(member3.Username, member3);
             members.Add(member4.Username, member4);
             Logger.Instance.LogEvent("Finished initializing the system - User Controller");
+            */
         }
 
         //*************************************************************************************************************
