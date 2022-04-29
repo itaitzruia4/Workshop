@@ -7,9 +7,9 @@ using Workshop.ServiceLayer;
 using Workshop.ServiceLayer.ServiceObjects;
 using Xunit;
 
-namespace Tests.IntegrationTests
+namespace Tests.AcceptanceTests
 {
-    public class SystemTests
+    public class AcceptanceTests
     {
         private static string credentials = "Good";
 

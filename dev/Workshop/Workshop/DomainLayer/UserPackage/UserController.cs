@@ -41,29 +41,11 @@ namespace Workshop.DomainLayer.UserPackage
         /// </summary>
         public void InitializeSystem()
         {
-            /*
             Logger.Instance.LogEvent("Starting initializing the system - User Controller");
-            Member member1 = new Member("member1", securityHandler.Encrypt("pass1"));
-            member1.AddRole(new StoreFounder(1));
-            List<ShoppingBagProduct> member1prods = new List<ShoppingBagProduct>();
-            member1prods.Add(new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1));
-            orderHandler.addOrder(new OrderDTO(1, "member1", "whatever", "blasToysRus", member1prods, 12.30), "member1");
+            Member admin = new Member("admin", securityHandler.Encrypt("admin"));
+            admin.AddRole(new MarketManager());
 
-            Member member2 = new Member("member2", securityHandler.Encrypt("pass2"));
-            member2.AddRole(new StoreOwner(2));
-
-            Member member3 = new Member("member3", securityHandler.Encrypt("pass3"));
-            member3.AddRole(new StoreManager(3));
-
-            Member member4 = new Member("member4", securityHandler.Encrypt("pass4"));
-            member4.AddRole(new MarketManager());
-
-            members.Add(member1.Username, member1);
-            members.Add(member2.Username, member2);
-            members.Add(member3.Username, member3);
-            members.Add(member4.Username, member4);
             Logger.Instance.LogEvent("Finished initializing the system - User Controller");
-            */
         }
 
         //*************************************************************************************************************
@@ -338,7 +320,7 @@ namespace Workshop.DomainLayer.UserPackage
         private void EnsureEnteredMarket()
         {
             if (currentUser == null)
-                throw new InvalidOperationException("You must enter the market first before logging in");
+                throw new InvalidOperationException("You must enter the market first");
         }
         
 

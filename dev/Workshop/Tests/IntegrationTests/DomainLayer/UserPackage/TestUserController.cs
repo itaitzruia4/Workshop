@@ -6,7 +6,7 @@ using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Security;
 
-namespace Tests.UnitTests.DomainLayer.UserPackage
+namespace Tests.IntegrationTests.DomainLayer.UserPackage
 {
     [TestClass]
     public class TestUserController
@@ -16,13 +16,10 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         [TestInitialize]
         public void Setup()
         {
-            var securityMock = new Mock<ISecurityHandler>();
-            securityMock.Setup(x => x.Encrypt(It.IsAny<string>())).Returns((string s) => s);
+            ISecurityHandler security = new HashSecurityHandler();
+            IReviewHandler review = new ReviewHandler();
 
-            var reviewMock = new Mock<IReviewHandler>();
-            reviewMock.Setup(x => x.AddReview(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>())).Returns<ReviewDTO>(null);
-
-            userController = new UserController(securityMock.Object, reviewMock.Object);
+            userController = new UserController(security, review);
             userController.InitializeSystem();
 
             userController.EnterMarket();
@@ -241,7 +238,8 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         }
 
         [TestMethod]
-        public void TestReviewProduct_Success(){
+        public void TestReviewProduct_Success()
+        {
             userController.EnterMarket();
             string username = "member1";
             int id = 1;
@@ -253,7 +251,8 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         [TestMethod]
         [DataRow("")]
         [DataRow(null)]
-        public void TestReviewProduct_Failure(string review){
+        public void TestReviewProduct_Failure(string review)
+        {
             Assert.ThrowsException<ArgumentException>(() => userController.ReviewProduct("User1", 1, review));
         }
     }

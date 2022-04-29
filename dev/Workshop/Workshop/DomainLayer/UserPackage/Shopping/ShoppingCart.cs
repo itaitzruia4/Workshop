@@ -19,7 +19,7 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
 
         public ShoppingBagProduct addToCart(ShoppingBagProduct product, int storeId)
         {
-            if(checkIfHasBag(storeId) != -1)
+            if(checkIfHasBag(storeId) == -1)
             {
                 shoppingBags.Add(storeId,new ShoppingBag(storeId));
             }
