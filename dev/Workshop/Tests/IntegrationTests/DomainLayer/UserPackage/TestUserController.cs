@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using Workshop.DomainLayer.MarketPackage;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;

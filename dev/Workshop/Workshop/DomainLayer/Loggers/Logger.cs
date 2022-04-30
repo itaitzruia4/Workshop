@@ -28,26 +28,17 @@ namespace Workshop.DomainLayer.Loggers
 
         public void LogEvent(string message)
         {
-            lock(this)
-            {
-                log.Info(message);
-            }
+            log.Info(message);
         }
 
         public void LogError(string message)
         {
-            lock(this)
-            {
-                log.Error(message);
-            }
+            log.Error(message);
         }
 
         public void LogDebug(string message)
         {
-            lock(this)
-            {
-                log.Debug(message);
-            }
+            log.Debug(message);
         }
     }
 }
