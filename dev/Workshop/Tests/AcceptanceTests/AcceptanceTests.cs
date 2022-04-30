@@ -170,18 +170,17 @@ namespace Tests.AcceptanceTests
         public void TestAddProduct_Good()
         {
             IService service = InitSystem();
-            int storeId = 0;
-            storeId = service.CreateNewStore(credentials, credentials).Value;
-            Assert.False(service.AddProduct(credentials, storeId, 0, credentials, credentials, 1, 1).ErrorOccured);
+            Store store = service.CreateNewStore(credentials, credentials).Value;
+            Assert.False(service.AddProduct(credentials, store.StoreId, 0, credentials, credentials, 1, 1).ErrorOccured);
         }
 
         [Fact]
         public void TestAddProduct_Bad()
         {
             IService service = InitSystem();
-            int storeId = service.CreateNewStore(credentials, credentials).Value;
-            Assert.False(service.AddProduct(credentials, storeId, 0, credentials, credentials, 1, 1).ErrorOccured);
-            Assert.True(service.AddProduct(credentials, storeId, 0, credentials, credentials, 1, 1).ErrorOccured);
+            Store store = service.CreateNewStore(credentials, credentials).Value;
+            Assert.False(service.AddProduct(credentials, store.StoreId, 0, credentials, credentials, 1, 1).ErrorOccured);
+            Assert.True(service.AddProduct(credentials, store.StoreId, 0, credentials, credentials, 1, 1).ErrorOccured);
         }
 
         [Fact]
@@ -190,9 +189,9 @@ namespace Tests.AcceptanceTests
             IService service = InitSystem();
             service.Register(credentials, credentials);
             service.Login(credentials, credentials);
-            int storeId = service.CreateNewStore(credentials, credentials).Value;
+            Store store = service.CreateNewStore(credentials, credentials).Value;
             service.Register("Who?", "Who?");
-            Assert.False(service.NominateStoreOwner(credentials, "Who?", storeId).ErrorOccured);
+            Assert.False(service.NominateStoreOwner(credentials, "Who?", store.StoreId).ErrorOccured);
         }
 
         [Fact]
@@ -201,10 +200,10 @@ namespace Tests.AcceptanceTests
             IService service = InitSystem();
             service.Register(credentials, credentials);
             service.Login(credentials, credentials);
-            int storeId = service.CreateNewStore(credentials, credentials).Value;
+            Store store = service.CreateNewStore(credentials, credentials).Value;
             service.Register("Who?", "Who?");
-            service.NominateStoreOwner(credentials, "Who?", storeId);
-            Assert.True(service.NominateStoreOwner(credentials, "Who?", storeId).ErrorOccured);
+            service.NominateStoreOwner(credentials, "Who?", store.StoreId);
+            Assert.True(service.NominateStoreOwner(credentials, "Who?", store.StoreId).ErrorOccured);
         }
 
         [Fact]
@@ -213,9 +212,9 @@ namespace Tests.AcceptanceTests
             IService service = InitSystem();
             service.Register(credentials, credentials);
             service.Login(credentials, credentials);
-            int storeId = service.CreateNewStore(credentials, credentials).Value;
+            Store store = service.CreateNewStore(credentials, credentials).Value;
             service.Register("Who?", "Who?");
-            Assert.False(service.NominateStoreManager(credentials, "Who?", storeId).ErrorOccured);
+            Assert.False(service.NominateStoreManager(credentials, "Who?", store.StoreId).ErrorOccured);
         }
 
         [Fact]
@@ -224,10 +223,10 @@ namespace Tests.AcceptanceTests
             IService service = InitSystem();
             service.Register(credentials, credentials);
             service.Login(credentials, credentials);
-            int storeId = service.CreateNewStore(credentials, credentials).Value;
+            Store store = service.CreateNewStore(credentials, credentials).Value;
             service.Register("Who?", "Who?");
-            service.NominateStoreManager(credentials, "Who?", storeId);
-            Assert.True(service.NominateStoreManager(credentials, "Who?", storeId).ErrorOccured);
+            service.NominateStoreManager(credentials, "Who?", store.StoreId);
+            Assert.True(service.NominateStoreManager(credentials, "Who?", store.StoreId).ErrorOccured);
         }
 
         [Fact]
@@ -236,8 +235,8 @@ namespace Tests.AcceptanceTests
             IService service = InitSystem();
             service.Register(credentials, credentials);
             service.Login(credentials, credentials);
-            int storeId = service.CreateNewStore(credentials, credentials).Value;
-            Assert.False(service.GetWorkersInformation(credentials, storeId).ErrorOccured);
+            Store store = service.CreateNewStore(credentials, credentials).Value;
+            Assert.False(service.GetWorkersInformation(credentials, store.StoreId).ErrorOccured);
         }
 
         [Fact]
@@ -248,8 +247,8 @@ namespace Tests.AcceptanceTests
             service.Login(credentials, credentials);
             service.Register("Who?", "Who?");
             service.Login("Who?", "Who?");
-            int storeId = service.CreateNewStore(credentials, credentials).Value;
-            Assert.True(service.GetWorkersInformation("Who?", storeId).ErrorOccured);
+            Store store = service.CreateNewStore(credentials, credentials).Value;
+            Assert.True(service.GetWorkersInformation("Who?", store.StoreId).ErrorOccured);
         }
 
         [Fact]
@@ -258,8 +257,8 @@ namespace Tests.AcceptanceTests
             IService service = InitSystem();
             service.Register(credentials, credentials);
             service.Login(credentials, credentials);
-            int storeId = service.CreateNewStore(credentials, credentials).Value;
-            Assert.False(service.CloseStore(credentials, storeId).ErrorOccured);
+            Store store = service.CreateNewStore(credentials, credentials).Value;
+            Assert.False(service.CloseStore(credentials, store.StoreId).ErrorOccured);
         }
 
         [Fact]
@@ -270,8 +269,8 @@ namespace Tests.AcceptanceTests
             service.Login(credentials, credentials);
             service.Register("Who?", "Who?");
             service.Login("Who?", "Who?");
-            int storeId = service.CreateNewStore(credentials, credentials).Value;
-            Assert.False(service.CloseStore("Who?", storeId).ErrorOccured);
+            Store store = service.CreateNewStore(credentials, credentials).Value;
+            Assert.False(service.CloseStore("Who?", store.StoreId).ErrorOccured);
         }
 
         [Fact]
@@ -280,9 +279,9 @@ namespace Tests.AcceptanceTests
             IService service = InitSystem();
             service.Register(credentials, credentials);
             service.Login(credentials, credentials);
-            Response<int> res = service.CreateNewStore(credentials, credentials);
+            Response<Store> res = service.CreateNewStore(credentials, credentials);
             Assert.False(res.ErrorOccured);
-            Assert.True(res.Value >= 0);
+            Assert.NotNull(res.Value);
         }
 
         [Fact]
@@ -298,8 +297,8 @@ namespace Tests.AcceptanceTests
             IService service = InitSystem();
             service.Register(credentials, credentials);
             service.Login(credentials, credentials);
-            int storeId = service.CreateNewStore(credentials, credentials).Value;
-            service.AddProduct(credentials, storeId, 0, credentials, credentials, 1, 1);
+            Store store = service.CreateNewStore(credentials, credentials).Value;
+            service.AddProduct(credentials, store.StoreId, 0, credentials, credentials, 1, 1);
             Assert.False(service.ReviewProduct(credentials, 0, "Blank").ErrorOccured);
         }
 
@@ -309,8 +308,8 @@ namespace Tests.AcceptanceTests
             IService service = InitSystem();
             service.Register(credentials, credentials);
             service.Login(credentials, credentials);
-            int storeId = service.CreateNewStore(credentials, credentials).Value;
-            service.AddProduct(credentials, storeId, 0, credentials, credentials, 1, 1);
+            Store store = service.CreateNewStore(credentials, credentials).Value;
+            service.AddProduct(credentials, store.StoreId, 0, credentials, credentials, 1, 1);
             service.Logout(credentials);
             Assert.True(service.ReviewProduct(credentials, 0, "Blank").ErrorOccured);
         }
@@ -321,8 +320,8 @@ namespace Tests.AcceptanceTests
             IService service = InitSystem();
             service.Register(credentials, credentials);
             service.Login(credentials, credentials);
-            int storeId = service.CreateNewStore(credentials, credentials).Value;
-            service.AddProduct(credentials, storeId, 0, credentials, credentials, 1, 1);
+            Store store = service.CreateNewStore(credentials, credentials).Value;
+            service.AddProduct(credentials, store.StoreId, 0, credentials, credentials, 1, 1);
             Assert.True(service.ReviewProduct(credentials, -1, "Blank").ErrorOccured);
         }
     }

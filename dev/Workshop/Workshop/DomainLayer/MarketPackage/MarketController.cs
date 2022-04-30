@@ -196,7 +196,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
         }
 
-        public int CreateNewStore(string creator, string storeName) {
+        public Store CreateNewStore(string creator, string storeName) {
             userController.AssertCurrentUser(creator);
             if (String.IsNullOrWhiteSpace(storeName)){
                 throw new ArgumentException($"User {creator} requestted to create a store with an empty name.");
@@ -207,15 +207,14 @@ namespace Workshop.DomainLayer.MarketPackage
             Store store = new Store(storeId, storeName);
             stores[storeId] = store;
             STORE_COUNT++;
-            // TODO should return STORE
-            return storeId;
+            return store;
         }
 
         public bool IsStoreOpen(string username, int storeId)
         {
             userController.AssertCurrentUser(username);
             ValidateStoreExists(storeId);
-            return stores[storeId].isOpen();
+            return stores[storeId].IsOpen();
         }
 
         public ProductDTO getProductInfo(string username, int productId)
@@ -352,7 +351,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 try
                 {
                     store.GetProduct(productId);
-                    return store.getID();
+                    return store.GetId();
                 }
                 catch (ArgumentException)
                 {
