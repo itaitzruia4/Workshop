@@ -170,10 +170,16 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new ArgumentException("Username or password cannot be empty");
         }
 
+        public void AddStoreFounder(string username, int storeId)
+        {
+            Member member = GetMember(username);
+            member.AddRole(new StoreFounder(storeId));
+        }
+
         // Being called only from MarketController
         public StoreOwner NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId)
         {
-            Logger.Instance.LogEvent("User " + nominatorUsername + " is trying to nominate " + nominatedUsername + " as a store owner of store " + storeId);
+            Logger.Instance.LogEvent($"User {nominatedUsername} is trying to nominate {nominatedUsername} as a store owner of store {storeId}");
             // Check that nominator is the logged in member
             AssertCurrentUser(nominatorUsername);
 
@@ -185,6 +191,11 @@ namespace Workshop.DomainLayer.UserPackage
             // Check that the nominator is authorized to nominate a store owner
             if (!nominator.IsAuthorized(storeId, Action.NominateStoreOwner))
                 throw new MemberAccessException($"User {nominatorUsername} is not allowed to nominate owners in store #{storeId}.");
+
+            if (nominatorUsername.Equals(nominatedUsername))
+            {
+                throw new InvalidOperationException($"User {nominatorUsername} cannot nominate itself to be a Store Owner");
+            }
 
             // Check that nominator is not a store owner and that there is no circular nomination
             List<StoreRole> nominatedStoreRoles = nominated.GetStoreRoles(storeId), nominatorStoreRoles = nominator.GetStoreRoles(storeId);
@@ -227,6 +238,11 @@ namespace Workshop.DomainLayer.UserPackage
             // Check that the nominator is authorized to nominate a store owner
             if (!nominator.IsAuthorized(storeId, Action.NominateStoreManager))
                 throw new MemberAccessException($"User {nominatorUsername} is not allowed to nominate managers in store #{storeId}.");
+
+            if (nominatorUsername.Equals(nominatedUsername))
+            {
+                throw new InvalidOperationException($"User {nominatorUsername} cannot nominate itself to be a Store Manager");
+            }
 
             List<StoreRole> nominatedStoreRoles = nominated.GetStoreRoles(storeId), nominatorStoreRoles = nominator.GetStoreRoles(storeId);
 

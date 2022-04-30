@@ -30,5 +30,6 @@ namespace Workshop.DomainLayer.UserPackage
         ShoppingBagProduct addToCart(string user, ShoppingBagProduct shoppingBagProduct, int storeId);
         ShoppingCartDTO viewCart(string user);
         void editCart(string user, int productId, int newQuantity);
+        void AddStoreFounder(string username, int storeId);
     }
 }

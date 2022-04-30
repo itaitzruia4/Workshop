@@ -45,7 +45,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             foreach(Role role2 in roles)
             {
                 if (role.Equals(role2))
-                    throw new Exception("This user is already holding the requested role.");
+                    throw new InvalidOperationException("This user is already holding the requested role.");
             }
             roles.Add(role);
         }
