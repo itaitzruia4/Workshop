@@ -44,7 +44,6 @@ namespace Workshop.DomainLayer.UserPackage
             Logger.Instance.LogEvent("Starting initializing the system - User Controller");
             Member admin = new Member("admin", securityHandler.Encrypt("admin"));
             admin.AddRole(new MarketManager());
-
             Logger.Instance.LogEvent("Finished initializing the system - User Controller");
         }
 
@@ -172,7 +171,6 @@ namespace Workshop.DomainLayer.UserPackage
         // Being called only from MarketController
         public StoreOwner NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId)
         {
-            Logger.Instance.LogEvent("User " + nominatorUsername + " is trying to nominate " + nominatedUsername + " as a store owner of store " + storeId);
             // Check that nominator is the logged in member
             AssertCurrentUser(nominatorUsername);
 
@@ -214,7 +212,6 @@ namespace Workshop.DomainLayer.UserPackage
         // Being called only from MarketController
         public StoreManager NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId)
         {
-            Logger.Instance.LogEvent("User " + nominatorUsername + " is trying to nominate " + nominatedUsername + " as a store manager of store " + storeId);
             // Check that nominator is the logged in member
             AssertCurrentUser(nominatorUsername);
 
