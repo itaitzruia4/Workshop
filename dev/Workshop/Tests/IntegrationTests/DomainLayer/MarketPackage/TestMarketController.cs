@@ -14,6 +14,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
     {
         private UserController userController;
         private MarketController marketController;
+
         [TestInitialize]
         public void Setup()
         {
@@ -33,11 +34,12 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             userController.EnterMarket();
 
             userController.Register("member1", "pass1");
+            userController.Register("member2", "pass2");
             userController.Login("member1", "pass1");
-            marketController.CreateNewStore("member1", "shop1");
-
-            userController.ExitMarket();
+            Store store1 = marketController.CreateNewStore("member1", "shop1");
+            userController.NominateStoreManager("member1", "member2", store1.GetId());
         }
+
         [TestMethod]
         public void TestGetWorkersInformation_Success()
         {
@@ -53,14 +55,29 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [TestMethod]
         public void TestCreateNewStore_Success()
         {
-            int result = marketController.CreateNewStore("User1", "Cool store123");
-            Assert.AreEqual(result, 5);
+            string storeName = "Cool store 123";
+            Store result = marketController.CreateNewStore("member1", storeName);
+            Assert.AreEqual(result.GetStoreName(), storeName);
+            Assert.AreEqual(result.GetProducts().Count, 0);
+            Assert.AreEqual(result.IsOpen(), true);
         }
+
+        [TestMethod]
+        public void TestCreateNewStore_Failure_NotLoggedIn()
+        {
+            string username = "CompletelyRandomNameNoChanceAnyoneWouldEverWriteIt";
+            userController.Logout("member1");
+            userController.Register(username, "pass");
+            Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(username, "Store123"));
+        }
+
 
         [DataTestMethod]
         [DataRow(null, null)]
-        [DataRow("User1", "")]
-        public void TestCreateNewStore_Failure(string username, string storeName)
+        [DataRow("", "")]
+        [DataRow(null, "")]
+        [DataRow("", null)]
+        public void TestCreateNewStore_Failure_EmptyOrNullInput(string username, string storeName)
         {
             Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(username, storeName));
         }

@@ -26,15 +26,15 @@ namespace Workshop.DomainLayer.MarketPackage
         private Dictionary<int, Store> stores;
         private IMarketPaymentService paymentService;
         private IMarketSupplyService supplyService;
-        private static int STORE_COUNT = 0;
+        private static int STORE_COUNT = 1;
+
         public MarketController(IUserController userController, IMarketPaymentService paymentService, IMarketSupplyService supplyService)
         {
             this.userController = userController;
             this.orderHandler = new OrderHandler<int>();
             this.paymentService = paymentService;
             this.supplyService = supplyService;
-            stores = new Dictionary<int, Store>();
-            STORE_COUNT = 0;
+            this.stores = new Dictionary<int, Store>();
         }
 
         public void InitializeSystem()
@@ -213,7 +213,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
         }
 
-        public int CreateNewStore(string creator, string storeName) {
+        public Store CreateNewStore(string creator, string storeName) {
             Logger.Instance.LogEvent($"{creator} is trying to create a new store: \"{storeName}\".");
             userController.AssertCurrentUser(creator);
             if (String.IsNullOrWhiteSpace(storeName)){
@@ -226,7 +226,7 @@ namespace Workshop.DomainLayer.MarketPackage
             stores[storeId] = store;
             STORE_COUNT++;
             Logger.Instance.LogEvent($"{creator} successfuly created store \"{storeName}\", and received a new store ID: {storeId}.");
-            return storeId;
+            return store;
         }
 
         public bool IsStoreOpen(string username, int storeId)
