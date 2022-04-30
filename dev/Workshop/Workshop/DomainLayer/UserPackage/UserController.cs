@@ -96,8 +96,11 @@ namespace Workshop.DomainLayer.UserPackage
 
             string encryptedPassword = securityHandler.Encrypt(password);
             Member newMember = new Member(username, encryptedPassword);
-            members.TryAdd(username, newMember);
-            Logger.Instance.LogEvent("Successfuly registered user " + username);
+            if (members.TryAdd(username, newMember))
+                Logger.Instance.LogEvent("Successfuly registered user " + username);
+            else
+                throw new ArgumentException($"Username {username} already exists");
+            
         }
 
         /// <summary>
