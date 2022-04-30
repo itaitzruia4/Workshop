@@ -169,6 +169,12 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new ArgumentException("Username or password cannot be empty");
         }
 
+        public void AddStoreFounder(string username, int storeId)
+        {
+            Member member = GetMember(username);
+            member.AddRole(new StoreFounder(storeId));
+        }
+
         // Being called only from MarketController
         public StoreOwner NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId)
         {

@@ -201,13 +201,13 @@ namespace Workshop.DomainLayer.MarketPackage
             if (String.IsNullOrWhiteSpace(storeName)){
                 throw new ArgumentException($"User {creator} requestted to create a store with an empty name.");
             }
-            Member member = userController.GetMember(creator);
             int storeId = STORE_COUNT;
+            userController.AddStoreFounder(creator, storeId);
+
             Store store = new Store(storeId, storeName);
-            Role storeFounderRole = new StoreFounder(storeId);
-            member.AddRole(storeFounderRole);
             stores[storeId] = store;
             STORE_COUNT++;
+            // TODO should return STORE
             return storeId;
         }
 

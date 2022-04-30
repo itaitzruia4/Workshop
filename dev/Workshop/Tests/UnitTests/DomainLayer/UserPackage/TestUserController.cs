@@ -12,6 +12,7 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
     public class TestUserController
     {
         private UserController userController;
+        private int member2StoreId = 1;
 
         [TestInitialize]
         public void Setup()
@@ -34,15 +35,15 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             // orderHandler.addOrder(new OrderDTO(1, "member1", "whatever", "blasToysRus", member1prods, 12.30), "member1");
             userController.Logout("member1");
 
+            userController.Register("member3", "pass3");
+
             userController.Register("member2", "pass2");
             userController.Login("member2", "pass2");
             // TODO invoke Create store for member2
-            userController.Logout("member2");
+            userController.AddStoreFounder("member2", member2StoreId);
+            userController.NominateStoreManager("member2", "member3", member2StoreId);
 
-            userController.Register("member3", "pass3");
-            userController.Login("member3", "pass3");
-            // TODO nominate member3 to store manager
-            userController.Logout("member3");
+            userController.Logout("member2");
 
             userController.ExitMarket();
         }
@@ -238,6 +239,15 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             userController.Login(username1, password1);
 
             userController.Logout(username2);
+        }
+
+        [TestMethod]
+        public void TestNominateStoreOwner_Success()
+        {
+            userController.EnterMarket();
+            string nominator = "member2";
+            userController.Login(nominator, "pass2");
+            userController.NominateStoreOwner(nominator, "member1", 1);
         }
 
         [TestMethod]

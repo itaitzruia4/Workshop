@@ -25,6 +25,8 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             actions.Add(Action.RemovePermissionFromStoreManager);
             actions.Add(Action.GetStoreOrdersList);
             actions.Add(Action.ViewClosedStore);
+            actions.Add(Action.NominateStoreOwner);
+            actions.Add(Action.NominateStoreManager);
         }
     }
 }
