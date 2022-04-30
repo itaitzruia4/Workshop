@@ -90,7 +90,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         [DataTestMethod]
         [DataRow(null, null)]
         [DataRow("User1", "")]
-        public void TestCreateNewStore_Failure(string username, string storeName){
+        public void TestCreateNewStore_Failure_EmptyOrNullInput(string username, string storeName){
             Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(username, storeName));
         }
     }

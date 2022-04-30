@@ -407,13 +407,16 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             int id = 1;
             string review = "Honest review123";
             userController.Login(username, "pass1");
-            userController.ReviewProduct(username, id, review);
+            ReviewDTO dto = userController.ReviewProduct(username, id, review);
+            Assert.Equals(review, dto.Review);
+            Assert.Equals(dto.Reviewer, username);
+            Assert.Equals(dto.ProductId, id);
         }
 
         [TestMethod]
         [DataRow("")]
         [DataRow(null)]
-        public void TestReviewProduct_Failure(string review)
+        public void TestReviewProduct_Failure_EmptyOrNullReview(string review)
         {
             Assert.ThrowsException<ArgumentException>(() => userController.ReviewProduct("User1", 1, review));
         }
