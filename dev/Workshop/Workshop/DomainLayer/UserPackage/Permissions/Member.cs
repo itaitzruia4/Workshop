@@ -20,6 +20,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             Username = username;
             Password = password;
             roles = new List<Role>();
+            this.rwl = new ReaderWriterLock();
         }
 
         public bool IsAuthorized(Action action)
