@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Workshop.DomainLayer.MarketPackage;
+using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Security;
@@ -33,7 +35,9 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             userController.Login("member1", "pass1");
             userController.addToCart("member1", new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1), 1);
             // TODO invoke BuyCart for member1
-            // orderHandler.addOrder(new OrderDTO(1, "member1", "whatever", "blasToysRus", member1prods, 12.30), "member1");
+            List<ShoppingBagProduct> member1prods = new List<ShoppingBagProduct>();
+            member1prods.Add(new ShoppingBagProduct(1, "prod1", "desc1", 11.90, 3));
+            userController.AddOrder(new OrderDTO(1, "member1", "whatever", "blasToysRus", member1prods, 12.30), "member1");
             userController.Logout("member1");
 
             userController.Register("member3", "pass3");

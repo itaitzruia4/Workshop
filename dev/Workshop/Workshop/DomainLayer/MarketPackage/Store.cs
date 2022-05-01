@@ -14,6 +14,8 @@ namespace Workshop.DomainLayer.MarketPackage
         private int id { get; set; }
         private string name { get; set; }
         private Dictionary<int, Product> products { get; set; }
+        private DiscountPolicy discountPolicy { get; set; }
+        private PurchasePolicy purchasePolicy { get; set; }
 
         public Store(int id, string name)
         {
@@ -23,6 +25,8 @@ namespace Workshop.DomainLayer.MarketPackage
             this.name = name;
             products = new Dictionary<int, Product>();
             this.open = true; //TODO: check if on init store supposed to be open or closed.
+            this.discountPolicy = new DiscountPolicy();
+            this.purchasePolicy = new PurchasePolicy();
         }
         public int GetId()
         {
