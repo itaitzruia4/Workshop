@@ -13,9 +13,7 @@ using Workshop.DomainLayer.UserPackage.Permissions;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using Workshop.DomainLayer.Loggers;
-
-
-
+using System.Threading;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
@@ -56,7 +54,18 @@ namespace Workshop.DomainLayer.MarketPackage
             Logger.Instance.LogEvent($"{nominatorUsername} is trying to nominate {nominatedUsername} to be a store owner of store {storeId}");
             userController.AssertCurrentUser(nominatorUsername);
             ValidateStoreExists(storeId);
-            return userController.NominateStoreOwner(nominatorUsername, nominatedUsername, storeId);
+            ReaderWriterLock rwl = stores[storeId].getLock();
+            StoreOwner nominatedUser = null;
+            rwl.AcquireReaderLock(Timeout.Infinite);
+            try
+            {
+                nominatedUser = userController.NominateStoreOwner(nominatorUsername, nominatedUsername, storeId);
+            }
+            finally
+            {
+                rwl.ReleaseReaderLock();
+            }
+            return nominatedUser;
         }
 
         public StoreManager NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId)
