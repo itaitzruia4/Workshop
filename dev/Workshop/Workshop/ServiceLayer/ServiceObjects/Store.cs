@@ -3,20 +3,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DomainStore = Workshop.DomainLayer.MarketPackage.Store;
+using DomainProduct = Workshop.DomainLayer.MarketPackage.Product;
 
 namespace Workshop.ServiceLayer.ServiceObjects
 {
     public class Store
     {
-        public readonly IReadOnlyCollection<string> ProductsNames;
+        public readonly IReadOnlyDictionary<int, Product> Products;
         public readonly string Name;
-        public readonly string Owner;
+        public readonly int StoreId;
+        public readonly bool Open;
 
-        internal Store(IReadOnlyCollection<string> productsNames, string name, string owner)
+        internal Store(IReadOnlyDictionary<int, Product> products, string name)
         {
-            ProductsNames = productsNames;
+            Products = products;
             Name = name;
-            Owner = owner;
+        }
+
+        internal Store(DomainStore domainStore)
+        {
+            IReadOnlyDictionary<int, DomainProduct> domainProducts = domainStore.GetProducts();
+            Dictionary<int, Product> products = new Dictionary<int, Product>();
+            foreach (int productId in domainProducts.Keys)
+            {
+                products[productId] = new Product(domainProducts[productId]);
+            }
+            Products = products;
+            Name = domainStore.GetStoreName();
+            StoreId = domainStore.GetId();
+            Open = domainStore.IsOpen();
         }
     }
 }

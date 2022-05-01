@@ -4,6 +4,7 @@ using Workshop.DomainLayer.MarketPackage;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Security;
+using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 
 namespace Tests.IntegrationTests.DomainLayer.UserPackage
 {
@@ -11,6 +12,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
     public class TestUserController
     {
         private UserController userController;
+        private int member2StoreId = 1;
 
         [TestInitialize]
         public void Setup()
@@ -30,15 +32,22 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             // orderHandler.addOrder(new OrderDTO(1, "member1", "whatever", "blasToysRus", member1prods, 12.30), "member1");
             userController.Logout("member1");
 
+            userController.Register("member3", "pass3");
+            userController.Register("member4", "pass4");
+
             userController.Register("member2", "pass2");
             userController.Login("member2", "pass2");
-            // TODO invoke Create store for member2
+            userController.AddStoreFounder("member2", member2StoreId);
+
+            userController.NominateStoreManager("member2", "member3", member2StoreId);
+            userController.AddPermissionToStoreManager("member2", "member3", 1, Action.NominateStoreOwner);
+            userController.AddPermissionToStoreManager("member2", "member3", 1, Action.NominateStoreManager);
+
+            userController.NominateStoreOwner("member2", "member4", member2StoreId);
+
             userController.Logout("member2");
 
-            userController.Register("member3", "pass3");
-            userController.Login("member3", "pass3");
-            // TODO nominate member3 to store manager
-            userController.Logout("member3");
+            userController.Register("member5", "pass5");
 
             userController.ExitMarket();
         }
@@ -237,6 +246,160 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         }
 
         [TestMethod]
+        [DataRow("member2", "pass2")]
+        [DataRow("member3", "pass3")]
+        [DataRow("member4", "pass4")]
+        public void TestNominateStoreOwner_Success(string nominator, string nominatorPassword)
+        {
+            userController.EnterMarket();
+            userController.Login(nominator, nominatorPassword);
+            userController.NominateStoreOwner(nominator, "member1", member2StoreId);
+        }
+
+        [TestMethod]
+        [DataRow("member2")]
+        [DataRow("member3")]
+        [DataRow("member4")]
+        public void TestNominateStoreOwner_NominatorNotLoggedIn(string nominator)
+        {
+            userController.EnterMarket();
+            Assert.ThrowsException<ArgumentException>(() => userController.NominateStoreOwner(nominator, "member1", member2StoreId));
+        }
+
+        [TestMethod]
+        [DataRow("member2", "pass2")]
+        [DataRow("member3", "pass3")]
+        [DataRow("member4", "pass4")]
+        public void TestNominateStoreOwner_NoSuchNominated(string nominator, string nominatorPassword)
+        {
+            userController.EnterMarket();
+            userController.Login(nominator, nominatorPassword);
+            Assert.ThrowsException<ArgumentException>(() => userController.NominateStoreOwner(nominator, "arya stark", member2StoreId));
+        }
+
+        [TestMethod]
+        public void TestNominateStoreOwner_NoPermission()
+        {
+            userController.EnterMarket();
+            string nominator = "member1";
+            userController.Login(nominator, "pass1");
+            Assert.ThrowsException<MemberAccessException>(() => userController.NominateStoreOwner(nominator, "member5", member2StoreId));
+        }
+
+        [TestMethod]
+        [DataRow("member2", "pass2")]
+        [DataRow("member3", "pass3")]
+        public void TestNominateStoreOwner_NominatedAlreadyStoreOwner(string nominator, string nominatorPassword)
+        {
+            userController.EnterMarket();
+            userController.Login(nominator, nominatorPassword);
+            Assert.ThrowsException<InvalidOperationException>(() => userController.NominateStoreOwner(nominator, "member4", member2StoreId));
+        }
+
+        [TestMethod]
+        [DataRow("member2", "pass2")]
+        [DataRow("member3", "pass3")]
+        [DataRow("member4", "pass4")]
+        public void TestNominateStoreOwner_SelfNomination(string nominator, string nominatorPassword)
+        {
+            userController.EnterMarket();
+            userController.Login(nominator, nominatorPassword);
+            Assert.ThrowsException<InvalidOperationException>(() => userController.NominateStoreOwner(nominator, nominator, member2StoreId));
+        }
+
+        [TestMethod]
+        [DataRow("member3", "pass3")]
+        [DataRow("member4", "pass4")]
+        public void TestNominateStoreOwner_CircularNomination(string nominator, string nominatorPassword)
+        {
+            userController.EnterMarket();
+            userController.Login(nominator, nominatorPassword);
+            Assert.ThrowsException<InvalidOperationException>(() => userController.NominateStoreOwner(nominator, "member2", member2StoreId));
+        }
+
+        [TestMethod]
+        [DataRow("member2", "pass2")]
+        [DataRow("member3", "pass3")]
+        [DataRow("member4", "pass4")]
+        public void TestNominateStoreManager_Success(string nominator, string nominatorPassword)
+        {
+            userController.EnterMarket();
+            userController.Login(nominator, nominatorPassword);
+            userController.NominateStoreManager(nominator, "member1", member2StoreId);
+        }
+
+        [TestMethod]
+        [DataRow("member2")]
+        [DataRow("member3")]
+        [DataRow("member4")]
+        public void TestNominateStoreManager_NominatorNotLoggedIn(string nominator)
+        {
+            userController.EnterMarket();
+            Assert.ThrowsException<ArgumentException>(() => userController.NominateStoreManager(nominator, "member1", member2StoreId));
+        }
+
+        [TestMethod]
+        [DataRow("member2", "pass2")]
+        [DataRow("member3", "pass3")]
+        [DataRow("member4", "pass4")]
+        public void TestNominateStoreManager_NoSuchNominated(string nominator, string nominatorPassword)
+        {
+            userController.EnterMarket();
+            userController.Login(nominator, nominatorPassword);
+            Assert.ThrowsException<ArgumentException>(() => userController.NominateStoreManager(nominator, "arya stark", member2StoreId));
+        }
+
+        [TestMethod]
+        public void TestNominateStoreManager_NoPermission()
+        {
+            userController.EnterMarket();
+            string nominator = "member1";
+            userController.Login(nominator, "pass1");
+            Assert.ThrowsException<MemberAccessException>(() => userController.NominateStoreManager(nominator, "member5", member2StoreId));
+        }
+
+        [TestMethod]
+        [DataRow("member2", "pass2")]
+        [DataRow("member3", "pass3")]
+        public void TestNominateStoreManager_NominatedAlreadyStoreOwner(string nominator, string nominatorPassword)
+        {
+            userController.EnterMarket();
+            userController.Login(nominator, nominatorPassword);
+            Assert.ThrowsException<InvalidOperationException>(() => userController.NominateStoreManager(nominator, "member4", member2StoreId));
+        }
+
+        [TestMethod]
+        [DataRow("member2", "pass2")]
+        [DataRow("member4", "pass4")]
+        public void TestNominateStoreManager_NominatedAlreadyStoreManager(string nominator, string nominatorPassword)
+        {
+            userController.EnterMarket();
+            userController.Login(nominator, nominatorPassword);
+            Assert.ThrowsException<InvalidOperationException>(() => userController.NominateStoreManager(nominator, "member3", member2StoreId));
+        }
+
+        [TestMethod]
+        [DataRow("member2", "pass2")]
+        [DataRow("member3", "pass3")]
+        [DataRow("member4", "pass4")]
+        public void TestNominateStoreManager_SelfNomination(string nominator, string nominatorPassword)
+        {
+            userController.EnterMarket();
+            userController.Login(nominator, nominatorPassword);
+            Assert.ThrowsException<InvalidOperationException>(() => userController.NominateStoreManager(nominator, nominator, member2StoreId));
+        }
+
+        [TestMethod]
+        [DataRow("member3", "pass3")]
+        [DataRow("member4", "pass4")]
+        public void TestNominateStoreManager_CircularNomination(string nominator, string nominatorPassword)
+        {
+            userController.EnterMarket();
+            userController.Login(nominator, nominatorPassword);
+            Assert.ThrowsException<InvalidOperationException>(() => userController.NominateStoreManager(nominator, "member2", member2StoreId));
+        }
+
+        [TestMethod]
         public void TestReviewProduct_Success()
         {
             userController.EnterMarket();
@@ -244,13 +407,16 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             int id = 1;
             string review = "Honest review123";
             userController.Login(username, "pass1");
-            userController.ReviewProduct(username, id, review);
+            ReviewDTO dto = userController.ReviewProduct(username, id, review);
+            Assert.Equals(review, dto.Review);
+            Assert.Equals(dto.Reviewer, username);
+            Assert.Equals(dto.ProductId, id);
         }
 
         [TestMethod]
         [DataRow("")]
         [DataRow(null)]
-        public void TestReviewProduct_Failure(string review)
+        public void TestReviewProduct_Failure_EmptyOrNullReview(string review)
         {
             Assert.ThrowsException<ArgumentException>(() => userController.ReviewProduct("User1", 1, review));
         }

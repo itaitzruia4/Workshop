@@ -78,14 +78,19 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
 
         [TestMethod]
         public void TestCreateNewStore_Success(){
-            int result = marketController.CreateNewStore("User1", "Cool store123");
-            Assert.AreEqual(result, 5);
+            string username = "User1";
+            string storeName = "Cool store 123";
+            Store result = marketController.CreateNewStore(username, storeName);
+            Assert.AreEqual(result.GetStoreName(), storeName);
+            Assert.AreEqual(result.GetProducts().Count, 0);
+            Assert.AreEqual(result.IsOpen(), true);
+
         }
 
         [DataTestMethod]
         [DataRow(null, null)]
         [DataRow("User1", "")]
-        public void TestCreateNewStore_Failure(string username, string storeName){
+        public void TestCreateNewStore_Failure_EmptyOrNullInput(string username, string storeName){
             Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(username, storeName));
         }
     }
