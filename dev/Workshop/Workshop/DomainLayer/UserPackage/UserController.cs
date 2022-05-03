@@ -11,6 +11,7 @@ using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 using Workshop.DomainLayer.MarketPackage;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using Workshop.DomainLayer.Loggers;
+using System.Collections.Concurrent;
 
 namespace Workshop.DomainLayer.UserPackage
 {
@@ -21,14 +22,14 @@ namespace Workshop.DomainLayer.UserPackage
 
         // TODO should user key be member ID or username?
         private OrderHandler<string> orderHandler;
-        private Dictionary<string, Member> members;
+        private ConcurrentDictionary<string, Member> members;
         private User currentUser;
         public UserController(ISecurityHandler securityHandler, IReviewHandler reviewHandler)
         {
             this.securityHandler = securityHandler;
             currentUser = null;
             this.reviewHandler = reviewHandler;
-            members = new Dictionary<string, Member>();
+            members = new ConcurrentDictionary<string, Member>();
             this.orderHandler = new OrderHandler<string>();
         }
 
@@ -94,8 +95,11 @@ namespace Workshop.DomainLayer.UserPackage
 
             string encryptedPassword = securityHandler.Encrypt(password);
             Member newMember = new Member(username, encryptedPassword);
-            members.Add(username, newMember);
-            Logger.Instance.LogEvent("Successfuly registered user " + username);
+            if (members.TryAdd(username, newMember))
+                Logger.Instance.LogEvent("Successfuly registered user " + username);
+            else
+                throw new ArgumentException($"Username {username} already exists");
+            
         }
 
         /// <summary>

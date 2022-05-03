@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using Workshop.DomainLayer.MarketPackage;
+using System.Threading;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
@@ -17,6 +18,8 @@ namespace Workshop.DomainLayer.MarketPackage
         private DiscountPolicy discountPolicy { get; set; }
         private PurchasePolicy purchasePolicy { get; set; }
 
+        private ReaderWriterLock rwl;
+
         public Store(int id, string name)
         {
             this.id = id;
@@ -25,8 +28,14 @@ namespace Workshop.DomainLayer.MarketPackage
             this.name = name;
             products = new Dictionary<int, Product>();
             this.open = true; //TODO: check if on init store supposed to be open or closed.
+            this.rwl = new ReaderWriterLock();
             this.discountPolicy = new DiscountPolicy();
             this.purchasePolicy = new PurchasePolicy();
+        }
+
+        public ReaderWriterLock getLock()
+        {
+            return this.rwl;
         }
         public int GetId()
         {
