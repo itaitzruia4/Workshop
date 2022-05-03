@@ -35,6 +35,7 @@ namespace Workshop.DomainLayer.MarketPackage
             this.paymentService = paymentService;
             this.supplyService = supplyService;
             this.stores = new Dictionary<int, Store>();
+            STORE_COUNT = 1;
         }
 
         public void InitializeSystem()
@@ -70,7 +71,7 @@ namespace Workshop.DomainLayer.MarketPackage
         private void ValidateStoreExists(int ID)
         {
             if (!stores.ContainsKey(ID))
-                throw new ArgumentException("Store ID does not exist");
+                throw new ArgumentException($"Store ID {ID} does not exist");
         }
 
         public Product AddProductToStore(string username, int storeId, int productID, string name, string description, double price, int quantity)
@@ -198,7 +199,7 @@ namespace Workshop.DomainLayer.MarketPackage
             if (IsStoreOpen(username, storeId)) { stores[storeId].closeStore(); }
             else
             {
-                throw new Exception($"Store {storeId} already closed.");
+                throw new ArgumentException($"Store {storeId} already closed.");
             }
             Logger.Instance.LogEvent($"{username} successfuly closed store {storeId}.");
         }
