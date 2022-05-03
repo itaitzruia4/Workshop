@@ -111,7 +111,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             catch
             {
-                throw new ArgumentException("Store ID does not exist");
+                throw new ArgumentException($"Store ID {storeId} does not exist");
             }
             finally
             {
@@ -265,7 +265,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
                 orders = this.orderHandler.GetOrders(storeId);
                 if (orders == null)
-                    throw new Exception($"Store {storeId} does not exist or it does not have previous orders.");
+                    throw new ArgumentException($"Store {storeId} does not exist or it does not have previous orders.");
                 storesLocks[storeId].ReleaseReaderLock();
             }
             return orders;
@@ -331,7 +331,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 if (IsStoreOpen(username, storeId)) { stores[storeId].closeStore(); }
                 else
                 {
-                    throw new Exception($"Store {storeId} already closed.");
+                    throw new ArgumentException($"Store {storeId} already closed.");
                 }
                 storesLocks[storeId].ReleaseWriterLock();
             }
