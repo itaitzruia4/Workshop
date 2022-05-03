@@ -36,6 +36,7 @@ namespace Workshop.DomainLayer.MarketPackage
             this.supplyService = supplyService;
             this.stores = new ConcurrentDictionary<int, Store>();
             this.storesLocks = new ConcurrentDictionary<int, ReaderWriterLock>();
+            STORE_COUNT = 1;
         }
 
         public void InitializeSystem()
@@ -96,7 +97,7 @@ namespace Workshop.DomainLayer.MarketPackage
         private void ValidateStoreExists(int ID)
         {
             if (!stores.ContainsKey(ID))
-                throw new ArgumentException("Store ID does not exist");
+                throw new ArgumentException($"Store ID {ID} does not exist");
         }
 
         public Product AddProductToStore(string username, int storeId, int productID, string name, string description, double price, int quantity)

@@ -35,6 +35,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
 
             marketController = new MarketController(userControllerMock.Object, paymentMock.Object, supplyMock.Object);
             marketController.InitializeSystem();
+            Store store1 = marketController.CreateNewStore("StoreFounder1", "shop1");
 
             // marketController = new MarketController();
             // userController = new UserController(security);
@@ -44,7 +45,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         public void TestCloseStore_Success()
         {
             // Arrange
-            string username = "user1"; int storeId = 1;
+            string username = "StoreFounder1"; int storeId = 1;
 
             // Act
             marketController.CloseStore(username, storeId);
@@ -57,13 +58,13 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         public void TestCloseStore_Failure()
         {
             // Arrange
-            string username = "user1"; int storeId = 1;
+            string username = "StoreFounder1"; int storeId = 1;
 
-            // Act
+            //act
             marketController.CloseStore(username, storeId);
 
             // Assert
-            Assert.ThrowsException<Exception>(() => marketController.CloseStore(username, storeId));
+            Assert.ThrowsException<ArgumentException>(() => marketController.CloseStore(username, storeId));
         }
 
         [TestMethod]

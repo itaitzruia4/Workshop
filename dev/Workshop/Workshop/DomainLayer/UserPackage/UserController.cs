@@ -440,5 +440,13 @@ namespace Workshop.DomainLayer.UserPackage
             }
             Logger.Instance.LogEvent("User " + user + " successfuly edited the quantity of " + productId + " in his cart");
         }
+
+        public void AddOrder(OrderDTO order, string username)
+        {
+            Logger.Instance.LogEvent("User " + username + " is trying to add new order with ID " + order.id);
+            AssertCurrentUser(username);
+            orderHandler.addOrder(order, username);
+            Logger.Instance.LogEvent("User " + username + " added new order with ID " + order.id + " successfuly");
+        }
     }
 }

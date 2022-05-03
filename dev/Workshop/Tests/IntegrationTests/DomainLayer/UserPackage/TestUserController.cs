@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Workshop.DomainLayer.MarketPackage;
+using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Security;
@@ -28,8 +30,10 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             userController.Register("member1", "pass1");
             userController.Login("member1", "pass1");
             userController.addToCart("member1", new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1), 1);
-            // TODO invoke BuyCart for member1
-            // orderHandler.addOrder(new OrderDTO(1, "member1", "whatever", "blasToysRus", member1prods, 12.30), "member1");
+
+            List<ShoppingBagProduct> member1prods = new List<ShoppingBagProduct>();
+            member1prods.Add(new ShoppingBagProduct(1, "prod1", "desc1", 11.90, 3));
+            userController.AddOrder(new OrderDTO(1, "member1", "whatever", "blasToysRus", member1prods, 12.30), "member1");
             userController.Logout("member1");
 
             userController.Register("member3", "pass3");
@@ -408,9 +412,9 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             string review = "Honest review123";
             userController.Login(username, "pass1");
             ReviewDTO dto = userController.ReviewProduct(username, id, review);
-            Assert.Equals(review, dto.Review);
-            Assert.Equals(dto.Reviewer, username);
-            Assert.Equals(dto.ProductId, id);
+            Assert.AreEqual(review, dto.Review);
+            Assert.AreEqual(dto.Reviewer, username);
+            Assert.AreEqual(dto.ProductId, id);
         }
 
         [TestMethod]

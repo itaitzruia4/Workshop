@@ -41,6 +41,32 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         }
 
         [TestMethod]
+        public void TestCloseStore_Success()
+        {
+            // Arrange
+            string username = "member1"; int storeId = 1;
+
+            // Act
+            marketController.CloseStore(username, storeId);
+
+            // Assert
+            Assert.IsFalse(marketController.IsStoreOpen(username, storeId));
+        }
+
+        [TestMethod]
+        public void TestCloseStore_Failure()
+        {
+            // Arrange
+            string username = "member1"; int storeId = 1;
+
+            //act
+            marketController.CloseStore(username, storeId);
+
+            // Assert
+            Assert.ThrowsException<ArgumentException>(() => marketController.CloseStore(username, storeId));
+        }
+
+        [TestMethod]
         public void TestGetWorkersInformation_Success()
         {
             CollectionAssert.AreEqual(userController.GetWorkers(1), marketController.GetWorkersInformation("member1", 1));
