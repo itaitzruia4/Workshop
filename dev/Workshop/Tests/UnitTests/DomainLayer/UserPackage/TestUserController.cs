@@ -24,7 +24,8 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             securityMock.Setup(x => x.Encrypt(It.IsAny<string>())).Returns((string s) => s);
 
             var reviewMock = new Mock<IReviewHandler>();
-            reviewMock.Setup(x => x.AddReview(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>())).Returns<ReviewDTO>(null);
+            reviewMock.Setup(x => x.AddReview(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>()))
+                                   .Returns((string u, int pid, string r) => new ReviewDTO(u, pid, r));
 
             userController = new UserController(securityMock.Object, reviewMock.Object);
             userController.InitializeSystem();
@@ -34,7 +35,7 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             userController.Register("member1", "pass1");
             userController.Login("member1", "pass1");
             userController.addToCart("member1", new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1), 1);
-            // TODO invoke BuyCart for member1
+            
             List<ShoppingBagProduct> member1prods = new List<ShoppingBagProduct>();
             member1prods.Add(new ShoppingBagProduct(1, "prod1", "desc1", 11.90, 3));
             userController.AddOrder(new OrderDTO(1, "member1", "whatever", "blasToysRus", member1prods, 12.30), "member1");
@@ -414,13 +415,16 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             int id = 1;
             string review = "Honest review123";
             userController.Login(username, "pass1");
-            userController.ReviewProduct(username, id, review);
+            ReviewDTO dto = userController.ReviewProduct(username, id, review);
+            Assert.AreEqual(review, dto.Review);
+            Assert.AreEqual(dto.Reviewer, username);
+            Assert.AreEqual(dto.ProductId, id);
         }
 
         [TestMethod]
         [DataRow("")]
         [DataRow(null)]
-        public void TestReviewProduct_Failure(string review){
+        public void TestReviewProduct_Failure_EmptyOrNullReview(string review){
             Assert.ThrowsException<ArgumentException>(() => userController.ReviewProduct("User1", 1, review));
         }
     }
