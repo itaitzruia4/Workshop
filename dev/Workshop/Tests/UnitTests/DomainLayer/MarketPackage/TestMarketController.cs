@@ -16,13 +16,14 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
     {
         private MarketController marketController;
         private Mock<IUserController> userControllerMock;
+        
         [TestInitialize]
         public void Setup()
         {
 
             userControllerMock = new Mock<IUserController>();
             userControllerMock.Setup(x => x.AssertCurrentUser(It.IsAny<string>())).Callback((string user) => {});
-            userControllerMock.Setup(x => x.IsAuthorized(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action>())).Returns(true);
+            userControllerMock.Setup(x => x.IsAuthorized(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action>())).Returns((string user, int storeId, Action action) => !user.Equals("Notallowed Cohen"));
             userControllerMock.Setup(x => x.GetWorkers(It.IsAny<int>())).Returns(new List<Member>(new Member[] {new Member("Worker1", "pass1")}));
             userControllerMock.Setup(x => x.GetMember(It.IsAny<string>())).Returns(new Member("StoreFounder1", "pass1"));
 
@@ -34,6 +35,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
 
             marketController = new MarketController(userControllerMock.Object, paymentMock.Object, supplyMock.Object);
             marketController.InitializeSystem();
+            Store store1 = marketController.CreateNewStore("StoreFounder1", "shop1");
 
             // marketController = new MarketController();
             // userController = new UserController(security);
@@ -43,7 +45,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         public void TestCloseStore_Success()
         {
             // Arrange
-            string username = "user1"; int storeId = 1;
+            string username = "StoreFounder1"; int storeId = 1;
 
             // Act
             marketController.CloseStore(username, storeId);
@@ -56,13 +58,13 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         public void TestCloseStore_Failure()
         {
             // Arrange
-            string username = "user1"; int storeId = 1;
+            string username = "StoreFounder1"; int storeId = 1;
 
-            // Act
+            //act
             marketController.CloseStore(username, storeId);
 
             // Assert
-            Assert.ThrowsException<Exception>(() => marketController.CloseStore(username, storeId));
+            Assert.ThrowsException<ArgumentException>(() => marketController.CloseStore(username, storeId));
         }
 
         [TestMethod]
@@ -72,19 +74,24 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
 
         [TestMethod]
         public void TestGetWorkersInformation_Failure_NoPermission(){
-            Assert.ThrowsException<ArgumentException>(() => marketController.GetWorkersInformation("User2", 1));
+            Assert.ThrowsException<MemberAccessException>(() => marketController.GetWorkersInformation("Notallowed Cohen", 1));
         }
 
         [TestMethod]
         public void TestCreateNewStore_Success(){
-            int result = marketController.CreateNewStore("User1", "Cool store123");
-            Assert.AreEqual(result, 5);
+            string username = "User1";
+            string storeName = "Cool store 123";
+            Store result = marketController.CreateNewStore(username, storeName);
+            Assert.AreEqual(result.GetStoreName(), storeName);
+            Assert.AreEqual(result.GetProducts().Count, 0);
+            Assert.AreEqual(result.IsOpen(), true);
+
         }
 
         [DataTestMethod]
         [DataRow(null, null)]
         [DataRow("User1", "")]
-        public void TestCreateNewStore_Failure(string username, string storeName){
+        public void TestCreateNewStore_Failure_EmptyOrNullInput(string username, string storeName){
             Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(username, storeName));
         }
     }

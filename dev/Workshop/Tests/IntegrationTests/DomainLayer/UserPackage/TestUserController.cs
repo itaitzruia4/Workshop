@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using Workshop.DomainLayer.MarketPackage;
 using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.Reviews;
@@ -9,7 +8,7 @@ using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Security;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 
-namespace Tests.UnitTests.DomainLayer.UserPackage
+namespace Tests.IntegrationTests.DomainLayer.UserPackage
 {
     [TestClass]
     public class TestUserController
@@ -20,14 +19,10 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         [TestInitialize]
         public void Setup()
         {
-            var securityMock = new Mock<ISecurityHandler>();
-            securityMock.Setup(x => x.Encrypt(It.IsAny<string>())).Returns((string s) => s);
+            ISecurityHandler security = new HashSecurityHandler();
+            IReviewHandler review = new ReviewHandler();
 
-            var reviewMock = new Mock<IReviewHandler>();
-            reviewMock.Setup(x => x.AddReview(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>()))
-                                   .Returns((string u, int pid, string r) => new ReviewDTO(u, pid, r));
-
-            userController = new UserController(securityMock.Object, reviewMock.Object);
+            userController = new UserController(security, review);
             userController.InitializeSystem();
 
             userController.EnterMarket();
@@ -35,7 +30,7 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             userController.Register("member1", "pass1");
             userController.Login("member1", "pass1");
             userController.addToCart("member1", new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1), 1);
-            
+
             List<ShoppingBagProduct> member1prods = new List<ShoppingBagProduct>();
             member1prods.Add(new ShoppingBagProduct(1, "prod1", "desc1", 11.90, 3));
             userController.AddOrder(new OrderDTO(1, "member1", "whatever", "blasToysRus", member1prods, 12.30), "member1");
@@ -409,7 +404,8 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         }
 
         [TestMethod]
-        public void TestReviewProduct_Success(){
+        public void TestReviewProduct_Success()
+        {
             userController.EnterMarket();
             string username = "member1";
             int id = 1;
@@ -424,7 +420,8 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         [TestMethod]
         [DataRow("")]
         [DataRow(null)]
-        public void TestReviewProduct_Failure_EmptyOrNullReview(string review){
+        public void TestReviewProduct_Failure_EmptyOrNullReview(string review)
+        {
             Assert.ThrowsException<ArgumentException>(() => userController.ReviewProduct("User1", 1, review));
         }
     }

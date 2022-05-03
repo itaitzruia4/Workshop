@@ -76,9 +76,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IntegrationTests\SystemTests.cs" />
-    <Compile Include="UnitTests\DomainLayer\Loggers\TestLogger.cs" />
-    <Compile Include="UnitTests\DomainLayer\MarketPackage\TestStore.cs" />
+    <Compile Include="AcceptanceTests\AcceptanceTests.cs" />
+    <Compile Include="IntegrationTests\DomainLayer\MarketPackage\TestMarketController.cs" />
+    <Compile Include="IntegrationTests\DomainLayer\UserPackage\TestUserController.cs" />
+    <Compile Include="IntegrationTests\DomainLayer\MarketPackage\TestStore.cs" />
     <Compile Include="UnitTests\DomainLayer\MarketPackage\TestMarketController.cs" />
     <Compile Include="UnitTests\DomainLayer\UserPackage\TestUserController.cs" />
     <Compile Include="UnitTests\DomainLayer\UserPackage\RolesTests.cs" />
