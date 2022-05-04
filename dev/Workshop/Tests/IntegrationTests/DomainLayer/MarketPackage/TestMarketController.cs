@@ -35,6 +35,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
 
             userController.Register("member1", "pass1");
             userController.Register("member2", "pass2");
+            userController.Register("Notallowed cohen", "pass");
             userController.Login("member1", "pass1");
             Store store1 = marketController.CreateNewStore("member1", "shop1");
             userController.NominateStoreManager("member1", "member2", store1.GetId());
@@ -75,7 +76,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [TestMethod]
         public void TestGetWorkersInformation_Failure_NoPermission()
         {
-            Assert.ThrowsException<MemberAccessException>(() => marketController.GetWorkersInformation("Notallowed Cohen", 1));
+            userController.Login("Notallowed cohen", "pass");
+            Assert.ThrowsException<MemberAccessException>(() => marketController.GetWorkersInformation("Notallowed cohen", 1));
         }
 
         [TestMethod]
