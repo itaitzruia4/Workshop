@@ -75,6 +75,7 @@ namespace Workshop.DomainLayer.UserPackage
         public void ExitMarket()
         {
             Logger.Instance.LogEvent("User trying to exit the market");
+            EnsureEnteredMarket();
             currentUser = null;
             Logger.Instance.LogEvent("User exited the market successfuly");
         }

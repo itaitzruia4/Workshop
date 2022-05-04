@@ -104,8 +104,7 @@ namespace Tests.AcceptanceTests
 
         [TestMethod]
         public void TestLogin_Good()
-        {
-            
+        {   
             service.Register(credentials, credentials);
             Response<Member> rMember = service.Login(credentials, credentials);
             Assert.IsFalse(rMember.ErrorOccured);
