@@ -1,0 +1,110 @@
+body {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: #2b2828;
+}
+
+.App {
+    text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.section__stores {
+    color: white;
+}
+
+.stores-header{
+    color: white;
+}
+
+ul {
+    width: 100%;
+    overflow: auto;
+    display: inline;
+    color: white;
+}
+
+.stores {
+    max-height: 175px;
+    display: flex;
+    flex-direction: column;
+    clear: both;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 2px;
+    font-family: Helvetica, Arial, sans-serif;
+    border: solid 2px #86BB71;
+
+}
+
+.stores::-webkit-scrollbar {
+    width: 10px;
+    
+}
+.stores::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.5);
+    background-color: #bfb7b7;
+    border-radius: 8px;
+}
+
+.deleteBtn {
+    margin-left: 50px;
+    margin-top: 10px;
+    color: darkgrey;
+    background-color: transparent;
+    border-color: #ccc;
+    font-size: 20px;
+    border: 0;
+}
+
+.deleteBtn:hover {
+    color: white;
+}
+
+
+.AddStore {
+    padding: 1rem 2rem;
+}
+
+input{
+    border: 0;
+}
+input:focus{
+    border-bottom-style: solid;
+}
