@@ -60,6 +60,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DomainLayer\MarketPackage\Discounts\CategoryDiscount.cs" />
+    <Compile Include="DomainLayer\MarketPackage\Discounts\DiscountAndComposite.cs" />
+    <Compile Include="DomainLayer\MarketPackage\Discounts\DiscountOrComposite.cs" />
+    <Compile Include="DomainLayer\MarketPackage\Discounts\DiscountTerm.cs" />
+    <Compile Include="DomainLayer\MarketPackage\Discounts\DiscountTermComposite.cs" />
+    <Compile Include="DomainLayer\MarketPackage\Discounts\DiscountTermSimple.cs" />
+    <Compile Include="DomainLayer\MarketPackage\Discounts\DiscountXorComposite.cs" />
+    <Compile Include="DomainLayer\MarketPackage\Discounts\MaxComposite.cs" />
+    <Compile Include="DomainLayer\MarketPackage\Discounts\PriceAction.cs" />
+    <Compile Include="DomainLayer\MarketPackage\Discounts\PriceActionComposite.cs" />
+    <Compile Include="DomainLayer\MarketPackage\Discounts\PriceActionSimple.cs" />
+    <Compile Include="DomainLayer\MarketPackage\Discounts\ProductDiscount.cs" />
+    <Compile Include="DomainLayer\MarketPackage\Discounts\StoreDiscount.cs" />
+    <Compile Include="DomainLayer\MarketPackage\Discounts\SumComposite.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DomainLayer\Facade.cs" />
     <Compile Include="DomainLayer\Loggers\Logger.cs" />
