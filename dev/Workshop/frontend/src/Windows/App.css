@@ -1,0 +1,52 @@
+body {
+    background-color: #2b2828;
+}
+
+.all{
+    margin-top: 120px;
+}
+
+.welcome_msg {
+    margin-left: 110px;
+}
+
+.userInput {
+    margin-left: 280px;
+}
+
+.buttons {
+    margin-left: 280px;
+    text-align: center;
+    display: block;
+    font-size: 20px;
+}
+
+.username_textbox {
+    width: 34%;
+    font-size: 20px;
+    display: block;
+}
+
+.password_textbox {
+    width: 34%;
+    font-size: 20px;
+    display: block;
+}
+
+.login_btn {
+    width: 35%;
+    display: block;
+    font-size: 20px;
+}
+
+.register_btn {
+    width: 35%;
+    display: block;
+    font-size: 20px;
+}
+
+.cag_btn {
+    width: 35%;
+    display: block;
+    font-size: 20px;
+}

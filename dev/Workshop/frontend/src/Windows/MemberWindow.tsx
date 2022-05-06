@@ -1,5 +1,5 @@
 import React from 'react';
-import './App.css';
+import './MemberWindow.css';
 
 type IStore = {
     id: number;
@@ -10,7 +10,7 @@ type IStores = {
     stores: IStore[],
 }
 
-function App() {
+function MemberWindow() {
     const [stores, setStores] = React.useState<IStores>({ stores: [] });
     const addStores = (title: string) => {
         setStores({
@@ -48,7 +48,7 @@ const StoresComponent: React.FC<{
     stores: IStores,
     toggleStores: (id: number) => void,
     deleteStores: (id: number) => void
-}> = ({stores, toggleStores, deleteStores }) => {
+}> = ({ stores, toggleStores, deleteStores }) => {
     const deleteStore = (id: number) => {
         if (window.confirm(`Are you sure you want to delete this store?`)) {
             deleteStores(id);
@@ -71,7 +71,7 @@ const StoresComponent: React.FC<{
             </ul> : <div>No store has been created</div>}
         </div>
     );
-   
+
 };
 
 const AddStoresComponent = ({ addStores }: { addStores: (text: string) => void }) => {
@@ -100,4 +100,4 @@ const AddStoresComponent = ({ addStores }: { addStores: (text: string) => void }
     );
 };
 
-export default App;
+export default MemberWindow;
