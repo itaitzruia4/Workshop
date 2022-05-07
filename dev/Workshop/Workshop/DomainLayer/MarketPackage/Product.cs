@@ -33,5 +33,9 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             return new ShoppingBagProduct(Id,Name,Description,Price,quantity);
         }
+        public bool EqualsFields(ProductDTO product)
+        {
+            return (this.Id == product.Id) && (this.Name == product.Name) && (this.Price == product.Price) && (this.Quantity == product.Quantity) && (this.Description == product.Description);
+        }
     }
 }
