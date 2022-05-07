@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -54,13 +55,13 @@ namespace Tests.AcceptanceTests
         }
 
         [TestMethod]
-        public void TestExitMarket_Bad1()
+        public void TestExitMarket_Bad_NeverEntered()
         {
             Assert.IsTrue(service.ExitMarket().ErrorOccured);
         }
 
         [TestMethod]
-        public void TestExitMarket_Bad2()
+        public void TestExitMarket_Bad_ExitTwice()
         {
             service.EnterMarket();
             Assert.IsFalse(service.ExitMarket().ErrorOccured);
@@ -189,7 +190,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(username, password);
             int storeId = service.CreateNewStore(username, "RandomStore").Value.StoreId;
-            TestLogin_Good(nominated, nominated);
+            TestRegister_Good(nominated, nominated);
             Assert.IsFalse(service.NominateStoreOwner(username, nominated, storeId).ErrorOccured);
             return storeId;
         }
@@ -208,7 +209,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(username, password);
             int storeId = service.CreateNewStore(username, "RandomStore").Value.StoreId;
-            Assert.IsFalse(service.NominateStoreOwner(username, username, storeId).ErrorOccured);
+            Assert.IsTrue(service.NominateStoreOwner(username, username, storeId).ErrorOccured);
         }
 
 
@@ -218,9 +219,9 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(username, password);
             int storeId = service.CreateNewStore(username, "RandomStore").Value.StoreId;
-            TestLogin_Good(nominated, nominated);
-            TestLogin_Good(nominator, nominator);
-            Assert.IsFalse(service.NominateStoreOwner(nominator, nominated, storeId).ErrorOccured);
+            TestRegister_Good(nominated, nominated);
+            TestRegister_Good(nominator, nominator);
+            Assert.IsTrue(service.NominateStoreOwner(nominator, nominated, storeId).ErrorOccured);
         }
 
 
@@ -230,7 +231,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(username, password);
             int storeId = service.CreateNewStore(username, "RandomStore").Value.StoreId;
-            TestLogin_Good(nominated, nominated);
+            TestRegister_Good(nominated, nominated);
             Assert.IsFalse(service.NominateStoreManager(username, nominated, storeId).ErrorOccured);
             return storeId;
         }
@@ -249,7 +250,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(username, password);
             int storeId = service.CreateNewStore(username, "RandomStore").Value.StoreId;
-            Assert.IsFalse(service.NominateStoreManager(username, username, storeId).ErrorOccured);
+            Assert.IsTrue(service.NominateStoreManager(username, username, storeId).ErrorOccured);
         }
 
 
@@ -259,9 +260,10 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(username, password);
             int storeId = service.CreateNewStore(username, "RandomStore").Value.StoreId;
-            TestLogin_Good(nominated, nominated);
+            Assert.IsFalse(service.Logout(username).ErrorOccured);
+            TestRegister_Good(nominated, nominated);
             TestLogin_Good(nominator, nominator);
-            Assert.IsFalse(service.NominateStoreManager(nominator, nominated, storeId).ErrorOccured);
+            Assert.IsTrue(service.NominateStoreManager(nominator, nominated, storeId).ErrorOccured);
         }
 
         [DataTestMethod]
@@ -278,8 +280,9 @@ namespace Tests.AcceptanceTests
         public void TestGetWorkersInformation_Bad(string username, string password, string npUser)
         {
             TestLogin_Good(username, password);
-            TestLogin_Good(npUser, npUser);
             int storeId = service.CreateNewStore(username, "RandomStore").Value.StoreId;
+            Assert.IsFalse(service.Logout(username).ErrorOccured);
+            TestLogin_Good(npUser, npUser);
             Assert.IsTrue(service.GetWorkersInformation(npUser, storeId).ErrorOccured);
         }
 
@@ -297,9 +300,10 @@ namespace Tests.AcceptanceTests
         public void TestCloseStore_Bad(string username, string password, string npUser)
         {
             TestLogin_Good(username, password);
-            TestLogin_Good(npUser, npUser);
             int storeId = service.CreateNewStore(username, username).Value.StoreId;
-            Assert.IsFalse(service.CloseStore(npUser, storeId).ErrorOccured);
+            Assert.IsFalse(service.Logout(username).ErrorOccured);
+            TestLogin_Good(npUser, npUser);
+            Assert.IsTrue(service.CloseStore(npUser, storeId).ErrorOccured);
         }
 
         [DataTestMethod]
@@ -328,6 +332,7 @@ namespace Tests.AcceptanceTests
         [DataRow(username, password)]
         public void TestReviewProduct_Good(string username, string password)
         {
+            //Not suppose to pass we need to implement buying a product
             TestLogin_Good(username, password);
             int storeId = service.CreateNewStore(username, "RandomStore").Value.StoreId;
             service.AddProduct(password, storeId, 0, "TestReviewProduct", "Good", 1, 1);
@@ -354,5 +359,7 @@ namespace Tests.AcceptanceTests
             service.AddProduct(password, storeId, 0, "TestReviewProduct", "Good", 1, 1);
             Assert.IsTrue(service.ReviewProduct(username, 2, "Blank").ErrorOccured);
         }
+
+
     }
 }

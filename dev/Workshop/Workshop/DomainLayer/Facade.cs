@@ -61,12 +61,12 @@ namespace Workshop.DomainLayer
 
         internal StoreManager NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId)
         {
-            return MarketController.NominateStoreManager(nominatedUsername, nominatedUsername, storeId);
+            return MarketController.NominateStoreManager(nominatorUsername, nominatedUsername, storeId);
         }
 
         internal StoreOwner NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId)
         {
-            return MarketController.NominateStoreOwner(nominatedUsername, nominatedUsername, storeId);
+            return MarketController.NominateStoreOwner(nominatorUsername, nominatedUsername, storeId);
         }
 
         internal List<Member> GetWorkersInformation(string username, int storeId)
