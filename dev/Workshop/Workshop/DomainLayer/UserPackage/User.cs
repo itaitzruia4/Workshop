@@ -41,5 +41,10 @@ namespace Workshop.DomainLayer.UserPackage
                 shoppingCart.changeQuantity(productId, newQuantity,bagNum);
             }
         }
+
+        internal void ClearCart()
+        {
+            shoppingCart.Clear();
+        }
     }
 }

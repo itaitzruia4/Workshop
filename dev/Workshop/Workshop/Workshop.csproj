@@ -102,6 +102,8 @@
     <Compile Include="ServiceLayer\ServiceObjects\Member.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Product.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Role.cs" />
+    <Compile Include="ServiceLayer\ServiceObjects\ShoppingBag.cs" />
+    <Compile Include="ServiceLayer\ServiceObjects\ShoppingCart.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Store.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\StoreFounder.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\StoreManager.cs" />

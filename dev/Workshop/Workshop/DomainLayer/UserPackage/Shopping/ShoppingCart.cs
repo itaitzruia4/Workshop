@@ -45,6 +45,12 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
             }
             return -1;
         }
+
+        internal void Clear()
+        {
+            shoppingBags.Clear();
+        }
+
         internal void deleteProduct(int productId, int bagNum)
         {
             shoppingBags[bagNum].deleteProduct(productId);

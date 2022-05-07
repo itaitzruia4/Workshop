@@ -6,6 +6,7 @@ using Workshop.DomainLayer.MarketPackage.ExternalServices.Supply;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Security;
+using Workshop.DomainLayer.UserPackage.Shopping;
 
 namespace Tests.IntegrationTests.DomainLayer.MarketPackage
 {
@@ -63,6 +64,23 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         public void TestCreateNewStore_Failure(string username, string storeName)
         {
             Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(username, storeName));
+        }
+
+        //checks cart is empty and products were taken from stores
+        [DataTestMethod]
+        [DataRow("member1", "here", 1, 3)]
+        [DataRow("member1", "here", 1, 4)]
+        public void BuyCart(string user, string address, int productId, int userQuantity)
+        {
+            userController.EnterMarket();
+            userController.Login("member1", "pass1");
+            int storeId = marketController.CreateNewStore(user, "store");
+            marketController.AddProductToStore(user, storeId, productId, "someName", "someDesc", 10.0, 5);
+            ShoppingBagProduct product2 = userController.addToCart(user, new ShoppingBagProduct(productId, "someName", "someDesc", 10.0, userQuantity), storeId);
+            int leftovers = marketController.getStoreInfo(user, storeId).products[productId].Quantity - userQuantity;
+            marketController.BuyCart(user, address);
+            Assert.IsTrue(userController.viewCart(user).shoppingBags.Count==0);
+            Assert.IsTrue(marketController.getStoreInfo(user,storeId).products[productId].Quantity == leftovers);
         }
 
     }

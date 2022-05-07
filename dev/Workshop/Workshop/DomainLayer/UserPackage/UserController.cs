@@ -400,7 +400,7 @@ namespace Workshop.DomainLayer.UserPackage
             AssertCurrentUser(user);
             return currentUser.viewShopingCart();
         }
-        public void editCart(string user, int productId, int newQuantity)
+        public ShoppingCartDTO editCart(string user, int productId, int newQuantity)
         {
             Logger.Instance.LogEvent("User " + user + " is trying to edit the quantity of " + productId + " in his cart");
             AssertCurrentUser(user);
@@ -418,6 +418,12 @@ namespace Workshop.DomainLayer.UserPackage
                 currentUser.changeQuantityInCart(productId,newQuantity);
             }
             Logger.Instance.LogEvent("User " + user + " successfuly edited the quantity of " + productId + " in his cart");
+            return currentUser.viewShopingCart();
+        }
+
+        public void ClearUserCart()
+        {
+            currentUser.ClearCart();
         }
     }
 }

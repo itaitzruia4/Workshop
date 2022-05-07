@@ -32,5 +32,15 @@ namespace Workshop.ServiceLayer
         Response<int> CreateNewStore(string creator, string storeName);
 
         Response ReviewProduct(string user, int productId, string review);
+
+        Response<List<Product>> SearchProduct(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview);
+
+        Response<Product> addToCart(string user, int productId, int storeId, int quantity);
+
+        Response<ShoppingCart> viewCart(string user);
+
+        Response<ShoppingCart> editCart(string user, int productId, int newQuantity);
+
+        Response BuyCart(string user, string address);
     }
 }

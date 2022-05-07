@@ -40,7 +40,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
         List<ProductDTO> SearchProduct(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview);
 
-        void BuyCart(string user);
+        void BuyCart(string user,string address);
         ShoppingBagProduct getProductForSale(int productId, int storeId, int quantity);
         ShoppingBagProduct addToBag(string user, int productId, int storeId, int quantity);
     }

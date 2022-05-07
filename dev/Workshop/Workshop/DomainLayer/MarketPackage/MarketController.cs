@@ -272,7 +272,14 @@ namespace Workshop.DomainLayer.MarketPackage
             userController.AssertCurrentUser(username);
             if(productId != -1)
             {
-                products.Add(getProduct(productId));
+                try
+                {
+                    products.Add(getProduct(productId));
+                }
+                catch
+                {
+
+                }
             }
             else if (keyWords != "")
             {
@@ -287,12 +294,14 @@ namespace Workshop.DomainLayer.MarketPackage
 
         private List<Product> getProductByCatagory(string catagory)
         {
-            throw new NotImplementedException();
+            return new List<Product>();
+            //throw new NotImplementedException();
         }
 
         private List<Product> getProductByKeywords(string keyWords)
         {
-            throw new NotImplementedException();
+            return new List<Product>();
+            //throw new NotImplementedException();
         }
 
         //todo move search to user add add a call
@@ -308,11 +317,11 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 goodProducts = filterByMax(goodProducts,getPrices(goodProducts),maxPrice);
             }
-            if(productReview != -1)
+            /*if(productReview != -1)
             {
                 goodProducts = filterByMin(goodProducts,getProductsReviewsGrades(goodProducts),productReview);
             }
-            /*if(storeReview != -1)
+            if(storeReview != -1)
             {
                 goodProducts = filterByMin(goodProducts,getStoresReviewsGrades(goodProducts),storeReview);
             }*/
@@ -422,9 +431,12 @@ namespace Workshop.DomainLayer.MarketPackage
         public ShoppingBagProduct getProductForSale(int productId, int storeId, int quantity)
         {
             ValidateStoreExists(storeId);
-            return stores[storeId].GetProduct(productId).GetShoppingBagProduct(quantity);
+            if(stores[storeId].GetProduct(productId).Quantity >= quantity){
+                return stores[storeId].GetProduct(productId).GetShoppingBagProduct(quantity);
+            }
+            throw new ArgumentException("Store doesn't has enough from the product");
         }
-        public void BuyCart(string userId)
+        public void BuyCart(string userId,string address)
         {
             Logger.Instance.LogEvent($"User {userId} is trying to buy his cart.");
             ShoppingCartDTO shoppingCart = userController.viewCart(userId);
@@ -436,7 +448,9 @@ namespace Workshop.DomainLayer.MarketPackage
                     stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
                     productsSoFar.Add(storeId,shoppingCart.shoppingBags[storeId].products);  
                 }
+                supplyService.supplyToAddress(userId, address);
                 paymentService.PayAmount(userId,shoppingCart.getPrice());
+                userController.ClearUserCart();
                 Logger.Instance.LogEvent($"User {userId} successfuly paid {shoppingCart.getPrice()} and purchased his cart.");
             }
             catch (ArgumentException)

@@ -25,7 +25,7 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
             {
                 products.Add(product.Id,product);
             }
-            products[product.Id].Quantity +=product.Quantity;
+            else products[product.Id].Quantity +=product.Quantity;
             return product;
         }
         internal ShoppingBagDTO GetShoppingBagDTO()

@@ -4,6 +4,7 @@ using Workshop.DomainLayer.MarketPackage;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Security;
+using Workshop.DomainLayer.UserPackage.Shopping;
 
 namespace Tests.IntegrationTests.DomainLayer.UserPackage
 {

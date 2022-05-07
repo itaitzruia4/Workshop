@@ -29,6 +29,7 @@ namespace Workshop.DomainLayer.UserPackage
         ReviewDTO ReviewProduct(string user, int productId, string review);
         ShoppingBagProduct addToCart(string user, ShoppingBagProduct shoppingBagProduct, int storeId);
         ShoppingCartDTO viewCart(string user);
-        void editCart(string user, int productId, int newQuantity);
+        ShoppingCartDTO editCart(string user, int productId, int newQuantity);
+        void ClearUserCart();
     }
 }
