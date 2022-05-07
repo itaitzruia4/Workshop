@@ -78,7 +78,7 @@ namespace Workshop.DomainLayer
             MarketController.CloseStore(username, storeId);
         }
 
-        internal int CreateNewStore(string creator, string storeName)
+        internal Store CreateNewStore(string creator, string storeName)
         {
             return MarketController.CreateNewStore(creator, storeName);
         }

@@ -12,6 +12,7 @@ using DomainProductDTO = Workshop.DomainLayer.MarketPackage.ProductDTO;
 using DomainStoreManager = Workshop.DomainLayer.UserPackage.Permissions.StoreManager;
 using DomainStoreOwner = Workshop.DomainLayer.UserPackage.Permissions.StoreOwner;
 using DomainStoreFounder = Workshop.DomainLayer.UserPackage.Permissions.StoreFounder;
+using DomainStore = Workshop.DomainLayer.MarketPackage.Store;
 
 namespace Workshop.ServiceLayer
 {
@@ -159,16 +160,17 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<int> CreateNewStore(string creator, string storeName)
+        public Response<Store> CreateNewStore(string creator, string storeName)
         {
             try
             {
-                int storeId = facade.CreateNewStore(creator, storeName);
-                return new Response<int>(storeId);
+                DomainStore domainStore = facade.CreateNewStore(creator, storeName);
+                Store store = new Store(domainStore);
+                return new Response<Store>(store);
             }
             catch (Exception e)
             {
-                return new Response<int>(e.Message);
+                return new Response<Store>(e.Message);
             }
 
         }
