@@ -117,9 +117,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [DataRow("member1", "here", 1, 4)]
         public void BuyCart(string user, string address, int productId, int userQuantity)
         {
-            userController.EnterMarket();
-            userController.Login("member1", "pass1");
-            int storeId = marketController.CreateNewStore(user, "store");
+            int storeId = marketController.CreateNewStore(user, "store").GetId();
             marketController.AddProductToStore(user, storeId, productId, "someName", "someDesc", 10.0, 5);
             ShoppingBagProduct product2 = userController.addToCart(user, new ShoppingBagProduct(productId, "someName", "someDesc", 10.0, userQuantity), storeId);
             int leftovers = marketController.getStoreInfo(user, storeId).products[productId].Quantity - userQuantity;

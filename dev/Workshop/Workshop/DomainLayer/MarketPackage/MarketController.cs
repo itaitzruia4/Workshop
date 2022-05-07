@@ -396,7 +396,7 @@ namespace Workshop.DomainLayer.MarketPackage
             finally
             {
                 Store store = stores[storeId];
-                store.GetStoreDTO();
+                storeDTO = store.GetStoreDTO();
                 storesLocks[storeId].ReleaseWriterLock();
             }
             return storeDTO;

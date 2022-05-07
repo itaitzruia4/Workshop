@@ -102,7 +102,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         public void TestSearchProduct_Success(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
         {
             marketController.CreateNewStore(user, "store");
-            marketController.AddProductToStore(user, 0, productId, "someName", "someDesc", 10.0, 2);
+            marketController.AddProductToStore(user, 1, productId, "someName", "someDesc", 10.0, 2);
             Product product = new Product(productId, "someName", "someDesc", 10.0, 2);
             List<Product> products = new List<Product>();
             products.Add(product);
@@ -119,7 +119,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         public void TestSearchProduct_Failure(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
         {
             marketController.CreateNewStore(user, "store");
-            marketController.AddProductToStore(user, 0, 1, "someName", "someDesc", 10.0, 2);
+            marketController.AddProductToStore(user, 1, 1, "someName", "someDesc", 10.0, 2);
             Product product = new Product(productId, "someName", "someDesc", 10.0, 2);
             List<ProductDTO> empty = new List<ProductDTO>();
             CollectionAssert.AreEqual(empty,marketController.SearchProduct(user, productId, keyWords, catagory, minPrice, maxPrice, productReview));
@@ -127,23 +127,23 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
 
 
         [DataTestMethod]
-        [DataRow("User1", 1, 0, 3)]
+        [DataRow("User1", 1, 1, 3)]
         public void TestAddToCart_Success(string user, int productId, int storeId, int quantity)
         {
             marketController.CreateNewStore(user, "store");
             //Product product = new Product(productId, "someName", "someDesc", 10.0, quantity);
-            Product product = marketController.AddProductToStore(user, 0, 1, "someName", "someDesc", 10.0, 3);
+            Product product = marketController.AddProductToStore(user, 1, 1, "someName", "someDesc", 10.0, 3);
             Assert.IsTrue(product.EqualsFields(marketController.addToBag(user, productId, storeId, quantity).GetProductDTO()));
         }
 
         [DataTestMethod]
-        [DataRow("User1", 2, 0, 3)] //wrong id;
-        [DataRow("User1", 1, 1, 3)] //wrong store;
-        [DataRow("User1", 1, 0, 4)] //wrong quantity;
+        [DataRow("User1", 2, 1, 3)] //wrong id;
+        [DataRow("User1", 1, 0, 3)] //wrong store;
+        [DataRow("User1", 1, 1, 4)] //wrong quantity;
         public void TestAddToCart_Failure(string user, int productId, int storeId, int quantity)
         {
             marketController.CreateNewStore(user, "store");
-            marketController.AddProductToStore(user, 0, 1, "someName", "someDesc", 10.0, 2);
+            marketController.AddProductToStore(user, 1, 1, "someName", "someDesc", 10.0, 2);
             Assert.ThrowsException<ArgumentException>(() => marketController.addToBag(user, productId, storeId, quantity));
             Product product = new Product(productId, "someName", "someDesc", 10.0, 2);
         }
