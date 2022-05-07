@@ -8,6 +8,7 @@ using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Security;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
+using ShoppingCartDTO = Workshop.DomainLayer.UserPackage.Shopping.ShoppingCartDTO;
 
 namespace Tests.UnitTests.DomainLayer.UserPackage
 {
@@ -426,6 +427,74 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         [DataRow(null)]
         public void TestReviewProduct_Failure_EmptyOrNullReview(string review){
             Assert.ThrowsException<ArgumentException>(() => userController.ReviewProduct("User1", 1, review));
+        }
+
+        [DataTestMethod]
+        [DataRow("member2", 1, "product1", "desc", 12.0, 1, 1)] //normal case
+        [DataRow("member2", 2, "product2", "descp", 15.0, 3, 1)] //normal case
+        [DataRow("member2", 1, "product3", "desci", 4.0, 5, 1)] //normal case
+        public void TestviewCart_Success(string user, int prodId, string prodName, string desc, double price, int quantity, int storeId)
+        {
+            userController.EnterMarket();
+            userController.Login("member2", "pass2");
+            ShoppingBagProduct product2 = userController.addToCart(user, new ShoppingBagProduct(prodId, prodName, desc, price, quantity), storeId);
+            ShoppingCartDTO shoppingCart = userController.viewCart(user);
+            //Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(preInsertedProduct.GetProductDTO()));
+            Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(product2.GetProductDTO()));
+        }
+
+        [DataTestMethod]
+        [DataRow("member1", 1, "product1", "desc", 12.0, 1, 1)] //not loggedin user
+        [DataRow("member3", 2, "product2", "descp", 15.0, 3, 1)] //not loggedin user
+        public void TestviewCart_Failure(string user, int prodId, string prodName, string desc, double price, int quantity, int storeId)
+        {
+            userController.EnterMarket();
+            userController.Login("member2", "pass2");
+            ShoppingBagProduct product2 = userController.addToCart("member2", new ShoppingBagProduct(prodId, prodName, desc, price, quantity), storeId);
+            Assert.ThrowsException<ArgumentException>(() => userController.viewCart(user));
+            //Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(preInsertedProduct.GetProductDTO()));
+            //Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(product2.GetProductDTO()));
+        }
+
+        [DataTestMethod]
+        [DataRow("member2", 1, "product1", "desc", 12.0, 1, 1,1)] //normal case
+        [DataRow("member2", 1, "product1", "descp", 15.0, 3, 1,1)] //normal case
+        [DataRow("member2", 1, "product1", "desci", 4.0, 1, 5,1)] //normal case
+        public void TestEditCart_Success(string user, int prodId, string prodName, string desc, double price, int quantity,int newQuantity, int storeId)
+        {
+            userController.EnterMarket();
+            userController.Login("member2", "pass2");
+            ShoppingBagProduct product2 = userController.addToCart(user, new ShoppingBagProduct(prodId, prodName, desc, price, quantity), storeId);
+            ShoppingCartDTO shoppingCart = userController.editCart(user, prodId, newQuantity);
+            //Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(preInsertedProduct.GetProductDTO()));
+            ProductDTO product = product2.GetProductDTO();
+            product.Quantity = newQuantity;
+            Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(product));
+        }
+
+        [DataTestMethod]
+        [DataRow("member2", 1, "product1", "desc", 12.0, 1, 0, 1)] //normal case
+        [DataRow("member2", 1, "product1", "descp", 15.0, 3, 0, 1)] //normal case
+        public void TestEditCartDelete_Success(string user, int prodId, string prodName, string desc, double price, int quantity, int newQuantity, int storeId)
+        {
+            userController.EnterMarket();
+            userController.Login("member2", "pass2");
+            ShoppingBagProduct product2 = userController.addToCart(user, new ShoppingBagProduct(prodId, prodName, desc, price, quantity), storeId);
+            ShoppingCartDTO shoppingCart = userController.editCart(user, prodId, newQuantity);
+            //Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(preInsertedProduct.GetProductDTO()));
+            Assert.IsTrue(shoppingCart.shoppingBags[1].products.Count==0);
+        }
+
+        [DataTestMethod] //prodId is 1
+        [DataRow("member2", 1, "product1", "desc", 12.0, 1, -1, 1)] //negative quantity
+        [DataRow("member2", 5, "product5", "descp", 15.0, 3, 0, 1)] //not a real product delete
+        [DataRow("member2", 5, "product5", "desci", 4.0, 1, 5, 1)] //not a real product edit
+        public void TestEditCart_Failure(string user, int prodId, string prodName, string desc, double price, int quantity, int newQuantity, int storeId)
+        {
+            userController.EnterMarket();
+            userController.Login("member2", "pass2");
+            ShoppingBagProduct product2 = userController.addToCart(user, new ShoppingBagProduct(1, prodName, desc, price, quantity), storeId);
+            Assert.ThrowsException<ArgumentException>(() => userController.editCart(user, prodId, newQuantity));
         }
     }
 }
