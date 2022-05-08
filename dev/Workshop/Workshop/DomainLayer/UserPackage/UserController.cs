@@ -11,6 +11,7 @@ using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 using Workshop.DomainLayer.MarketPackage;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using Workshop.DomainLayer.Loggers;
+using System.Collections.Concurrent;
 
 namespace Workshop.DomainLayer.UserPackage
 {
@@ -21,14 +22,14 @@ namespace Workshop.DomainLayer.UserPackage
 
         // TODO should user key be member ID or username?
         private OrderHandler<string> orderHandler;
-        private Dictionary<string, Member> members;
+        private ConcurrentDictionary<string, Member> members;
         private User currentUser;
         public UserController(ISecurityHandler securityHandler, IReviewHandler reviewHandler)
         {
             this.securityHandler = securityHandler;
             currentUser = null;
             this.reviewHandler = reviewHandler;
-            members = new Dictionary<string, Member>();
+            members = new ConcurrentDictionary<string, Member>();
             this.orderHandler = new OrderHandler<string>();
         }
 
@@ -41,29 +42,10 @@ namespace Workshop.DomainLayer.UserPackage
         /// </summary>
         public void InitializeSystem()
         {
-            /*
             Logger.Instance.LogEvent("Starting initializing the system - User Controller");
-            Member member1 = new Member("member1", securityHandler.Encrypt("pass1"));
-            member1.AddRole(new StoreFounder(1));
-            List<ShoppingBagProduct> member1prods = new List<ShoppingBagProduct>();
-            member1prods.Add(new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1));
-            orderHandler.addOrder(new OrderDTO(1, "member1", "whatever", "blasToysRus", member1prods, 12.30), "member1");
-
-            Member member2 = new Member("member2", securityHandler.Encrypt("pass2"));
-            member2.AddRole(new StoreOwner(2));
-
-            Member member3 = new Member("member3", securityHandler.Encrypt("pass3"));
-            member3.AddRole(new StoreManager(3));
-
-            Member member4 = new Member("member4", securityHandler.Encrypt("pass4"));
-            member4.AddRole(new MarketManager());
-
-            members.Add(member1.Username, member1);
-            members.Add(member2.Username, member2);
-            members.Add(member3.Username, member3);
-            members.Add(member4.Username, member4);
+            Member admin = new Member("admin", securityHandler.Encrypt("admin"));
+            admin.AddRole(new MarketManager());
             Logger.Instance.LogEvent("Finished initializing the system - User Controller");
-            */
         }
 
         //*************************************************************************************************************
@@ -113,8 +95,11 @@ namespace Workshop.DomainLayer.UserPackage
 
             string encryptedPassword = securityHandler.Encrypt(password);
             Member newMember = new Member(username, encryptedPassword);
-            members.Add(username, newMember);
-            Logger.Instance.LogEvent("Successfuly registered user " + username);
+            if (members.TryAdd(username, newMember))
+                Logger.Instance.LogEvent("Successfuly registered user " + username);
+            else
+                throw new ArgumentException($"Username {username} already exists");
+            
         }
 
         /// <summary>
@@ -187,10 +172,16 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new ArgumentException("Username or password cannot be empty");
         }
 
+        public void AddStoreFounder(string username, int storeId)
+        {
+            Member member = GetMember(username);
+            member.AddRole(new StoreFounder(storeId));
+        }
+
         // Being called only from MarketController
         public StoreOwner NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId)
         {
-            Logger.Instance.LogEvent("User " + nominatorUsername + " is trying to nominate " + nominatedUsername + " as a store owner of store " + storeId);
+            Logger.Instance.LogEvent($"User {nominatedUsername} is trying to nominate {nominatedUsername} as a store owner of store {storeId}");
             // Check that nominator is the logged in member
             AssertCurrentUser(nominatorUsername);
 
@@ -202,6 +193,11 @@ namespace Workshop.DomainLayer.UserPackage
             // Check that the nominator is authorized to nominate a store owner
             if (!nominator.IsAuthorized(storeId, Action.NominateStoreOwner))
                 throw new MemberAccessException($"User {nominatorUsername} is not allowed to nominate owners in store #{storeId}.");
+
+            if (nominatorUsername.Equals(nominatedUsername))
+            {
+                throw new InvalidOperationException($"User {nominatorUsername} cannot nominate itself to be a Store Owner");
+            }
 
             // Check that nominator is not a store owner and that there is no circular nomination
             List<StoreRole> nominatedStoreRoles = nominated.GetStoreRoles(storeId), nominatorStoreRoles = nominator.GetStoreRoles(storeId);
@@ -232,7 +228,6 @@ namespace Workshop.DomainLayer.UserPackage
         // Being called only from MarketController
         public StoreManager NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId)
         {
-            Logger.Instance.LogEvent("User " + nominatorUsername + " is trying to nominate " + nominatedUsername + " as a store manager of store " + storeId);
             // Check that nominator is the logged in member
             AssertCurrentUser(nominatorUsername);
 
@@ -244,6 +239,11 @@ namespace Workshop.DomainLayer.UserPackage
             // Check that the nominator is authorized to nominate a store owner
             if (!nominator.IsAuthorized(storeId, Action.NominateStoreManager))
                 throw new MemberAccessException($"User {nominatorUsername} is not allowed to nominate managers in store #{storeId}.");
+
+            if (nominatorUsername.Equals(nominatedUsername))
+            {
+                throw new InvalidOperationException($"User {nominatorUsername} cannot nominate itself to be a Store Manager");
+            }
 
             List<StoreRole> nominatedStoreRoles = nominated.GetStoreRoles(storeId), nominatorStoreRoles = nominator.GetStoreRoles(storeId);
 
@@ -338,7 +338,7 @@ namespace Workshop.DomainLayer.UserPackage
         private void EnsureEnteredMarket()
         {
             if (currentUser == null)
-                throw new InvalidOperationException("You must enter the market first before logging in");
+                throw new InvalidOperationException("You must enter the market first");
         }
         
 
@@ -421,7 +421,7 @@ namespace Workshop.DomainLayer.UserPackage
             AssertCurrentUser(user);
             return currentUser.viewShopingCart();
         }
-        public void editCart(string user, int productId, int newQuantity)
+        public ShoppingCartDTO editCart(string user, int productId, int newQuantity)
         {
             Logger.Instance.LogEvent("User " + user + " is trying to edit the quantity of " + productId + " in his cart");
             AssertCurrentUser(user);
@@ -439,6 +439,20 @@ namespace Workshop.DomainLayer.UserPackage
                 currentUser.changeQuantityInCart(productId,newQuantity);
             }
             Logger.Instance.LogEvent("User " + user + " successfuly edited the quantity of " + productId + " in his cart");
+            return currentUser.viewShopingCart();
+        }
+
+        public void ClearUserCart()
+        {
+            currentUser.ClearCart();
+        }
+
+        public void AddOrder(OrderDTO order, string username)
+        {
+            Logger.Instance.LogEvent("User " + username + " is trying to add new order with ID " + order.id);
+            AssertCurrentUser(username);
+            orderHandler.addOrder(order, username);
+            Logger.Instance.LogEvent("User " + username + " added new order with ID " + order.id + " successfuly");
         }
     }
 }

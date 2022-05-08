@@ -78,7 +78,7 @@ namespace Workshop.DomainLayer
             MarketController.CloseStore(username, storeId);
         }
 
-        internal int CreateNewStore(string creator, string storeName)
+        internal Store CreateNewStore(string creator, string storeName)
         {
             return MarketController.CreateNewStore(creator, storeName);
         }
@@ -107,13 +107,13 @@ namespace Workshop.DomainLayer
         {
             return UserController.viewCart(user);
         }
-        internal void editCart(string user, int productId, int newQuantity)
+        internal ShoppingCartDTO editCart(string user, int productId, int newQuantity)
         {
-            UserController.editCart(user, productId, newQuantity);
+            return UserController.editCart(user, productId, newQuantity);
         }
-        internal void BuyCart(string user)
+        internal void BuyCart(string user,string address)
         {
-            MarketController.BuyCart(user);
+            MarketController.BuyCart(user,address);
         }
         
     }
