@@ -375,7 +375,6 @@ namespace Tests.AcceptanceTests
         [DataRow(username, password)]
         public void TestReviewProduct_Good(string username, string password)
         {
-            //Not suppose to pass we need to implement buying a product
             TestLogin_Good(username, password);
             int storeId = service.CreateNewStore(username, "RandomStore").Value.StoreId;
             int prodId = service.AddProduct(username, storeId, 0, "TestReviewProduct", "Good", 1, 2).Value.Id;
@@ -417,14 +416,62 @@ namespace Tests.AcceptanceTests
             Response BuyCart(string user, string address);
          */
 
+        public void AssertProductsEqual(Product prodA, Product prodB)
+        {
+            Assert.Equals(prodA.Id, prodB.Id);
+            Assert.Equals(prodA.Name, prodB.Name);
+            Assert.Equals(prodA.BasePrice, prodB.BasePrice);
+            Assert.Equals(prodA.Description, prodB.Description);
+            Assert.Equals(prodA.Quantity, prodB.Quantity);
+        }
+
+        public void AssertProductsNotEqual(Product prodA, Product prodB)
+        {
+            Assert.AreNotEqual(prodA.Id, prodB.Id);
+            Assert.AreNotEqual(prodA.Name, prodB.Name);
+        }
+
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestSearchProduct_Good(string username, string password)
+        public void TestSearchProduct_Good_SpecificProduct(string username, string password)
+        {
+            Product prod = TestAddProduct_Good(username, password, product);
+            Response<List<Product>> searchResult = service.SearchProduct(username, prod.Id, prod.Name, "",-1 , -1, -1);
+            Assert.IsFalse(searchResult.ErrorOccured);
+            AssertProductsEqual(prod, searchResult.Value.First());
+        }
+
+        [DataTestMethod]
+        [DataRow(username, password)]
+        public void TestSearchProduct_Good_SearchForEveryProduct(string username, string password)
+        {
+            Product prod = TestAddProduct_Good(username, password, product);
+            Response<List<Product>> searchResult = service.SearchProduct(username, -1, "", "", -1, -1, -1);
+            Assert.IsFalse(searchResult.ErrorOccured);
+            Assert.IsTrue(searchResult.Value.Count() > 0);
+        }
+
+        [DataTestMethod]
+        [DataRow(username, password)]
+        public void TestSearchProduct_Bad_NoProducts(string username, string password)
+        {
+            TestLogin_Good(username, password);
+            int storeId = service.CreateNewStore(username, "RandomStore").Value.StoreId;
+            Response<List<Product>> searchResult = service.SearchProduct(username, -1, "", "", -1, -1, -1);
+            Assert.IsFalse(searchResult.ErrorOccured);
+            Assert.Equals(searchResult.Value.Count(), 0);
+        }
+
+        [DataTestMethod]
+        [DataRow(username, password)]
+        public void TestSearchProduct_Bad_WrongName(string username, string password)
         {
             TestLogin_Good(username, password);
             int storeId = service.CreateNewStore(username, "RandomStore").Value.StoreId;
             Product prod = TestAddProduct_Good(username, password, product);
-            //Response<List<Product>> searchResult = service.SearchProduct(username, prod.Id, prod.Name, "", prod.BasePrice, prod.BasePrice, "?");
+            Response<List<Product>> searchResult = service.SearchProduct(username, -1, "Worong", "", -1, -1, -1);
+            Assert.IsFalse(searchResult.ErrorOccured);
+            AssertProductsNotEqual(prod, searchResult.Value.First());
         }
 
 
