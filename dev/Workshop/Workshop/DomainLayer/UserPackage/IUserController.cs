@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.MarketPackage;
+using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Shopping;
@@ -29,6 +30,9 @@ namespace Workshop.DomainLayer.UserPackage
         ReviewDTO ReviewProduct(string user, int productId, string review);
         ShoppingBagProduct addToCart(string user, ShoppingBagProduct shoppingBagProduct, int storeId);
         ShoppingCartDTO viewCart(string user);
-        void editCart(string user, int productId, int newQuantity);
+        void AddStoreFounder(string username, int storeId);
+        void AddOrder(OrderDTO order, string username);
+        ShoppingCartDTO editCart(string user, int productId, int newQuantity);
+        void ClearUserCart();
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Workshop.DomainLayer.MarketPackage.Discounts
 {
-    public class Discount
+    public class DiscountOrComposite: DiscountTermComposite
     {
     }
 }
