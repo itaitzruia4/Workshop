@@ -10,15 +10,26 @@ namespace Workshop.DomainLayer.MarketPackage.Discounts
     public class PriceActionSimple: PriceAction
     {
         private double percentage;
+        private Filter filter;
 
-        public PriceActionSimple(double percentage) 
+        // The filter recieves a product and returns true if the discount is valid for the product
+        public delegate bool Filter(ProductDTO product);
+
+        public PriceActionSimple(double percentage, Filter filter) 
         {
-            this.percentage = percentage; 
+            this.percentage = percentage;
+            this.filter = filter;
         }
 
         public double CalculatePriceAction(ShoppingBagDTO shoppingBag)
         {
-            return percentage;
+            double discount = 0;
+            foreach (ProductDTO item in shoppingBag.products)
+            {
+                if (filter(item))
+                    discount += ((percentage / 100) * item.Price);
+            }
+            return discount;
         }
     }
 }
