@@ -8,11 +8,9 @@ using Workshop.ServiceLayer.ServiceObjects;
 using DomainUser = Workshop.DomainLayer.UserPackage.User;
 using DomainMember = Workshop.DomainLayer.UserPackage.Permissions.Member;
 using DomainProduct = Workshop.DomainLayer.MarketPackage.Product;
-using DomainProductDTO = Workshop.DomainLayer.MarketPackage.ProductDTO;
 using DomainStoreManager = Workshop.DomainLayer.UserPackage.Permissions.StoreManager;
 using DomainStoreOwner = Workshop.DomainLayer.UserPackage.Permissions.StoreOwner;
 using DomainStoreFounder = Workshop.DomainLayer.UserPackage.Permissions.StoreFounder;
-using DomainStore = Workshop.DomainLayer.MarketPackage.Store;
 
 namespace Workshop.ServiceLayer
 {
@@ -160,17 +158,16 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<Store> CreateNewStore(string creator, string storeName)
+        public Response<int> CreateNewStore(string creator, string storeName)
         {
             try
             {
-                DomainStore domainStore = facade.CreateNewStore(creator, storeName);
-                Store store = new Store(domainStore);
-                return new Response<Store>(store);
+                int storeId = facade.CreateNewStore(creator, storeName);
+                return new Response<int>(storeId);
             }
             catch (Exception e)
             {
-                return new Response<Store>(e.Message);
+                return new Response<int>(e.Message);
             }
 
         }
@@ -180,72 +177,6 @@ namespace Workshop.ServiceLayer
             try
             {
                 facade.ReviewProduct(user, productId, review);
-                return new Response();
-            }
-            catch (Exception e)
-            {
-                return new Response(e.Message);
-            }
-        }
-
-        public Response<List<Product>> SearchProduct(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
-        {
-            try
-            {
-                List<DomainProductDTO> products = facade.SearchProduct(user, productId, keyWords, catagory, minPrice, maxPrice, productReview);
-                List<Product> returnProducts = products.Select(x => new Product(x)).ToList();
-                return new Response<List<Product>>(returnProducts);
-            }
-            catch (Exception e)
-            {
-                return new Response<List<Product>>(e.Message);
-            }
-        }
-
-        public Response<Product> addToCart(string user, int productId, int storeId, int quantity)
-        {
-            try
-            {
-                Product product = new Product(facade.addToCart(user, productId, storeId, quantity));
-                return new Response<Product>(product);
-            }
-            catch (Exception e)
-            {
-                return new Response<Product>(e.Message);
-            }
-        }
-
-        public Response<ShoppingCart> viewCart(string user)
-        {
-            try
-            {
-                ShoppingCart shoppingCart = new ShoppingCart(facade.viewCart(user));
-                return new Response<ShoppingCart>(shoppingCart);
-            }
-            catch (Exception e)
-            {
-                return new Response<ShoppingCart>(e.Message);
-            }
-        }
-
-        public Response<ShoppingCart> editCart(string user, int productId, int newQuantity)
-        {
-            try
-            {
-                ShoppingCart shoppingCart = new ShoppingCart(facade.editCart(user, productId, newQuantity));
-                return new Response<ShoppingCart>(shoppingCart);
-            }
-            catch (Exception e)
-            {
-                return new Response<ShoppingCart>(e.Message);
-            }
-        }
-
-        public Response BuyCart(string user, string address)
-        {
-            try
-            {
-                facade.BuyCart(user, address);
                 return new Response();
             }
             catch (Exception e)

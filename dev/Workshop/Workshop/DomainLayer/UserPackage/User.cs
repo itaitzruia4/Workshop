@@ -28,11 +28,10 @@ namespace Workshop.DomainLayer.UserPackage
         internal void deleteFromCart(int productId)
         {
             int bagNum = shoppingCart.checkIfHasBag(productId);
-            if (bagNum != -1)
+            if(bagNum != -1)
             {
-                shoppingCart.deleteProduct(productId, bagNum);
+                shoppingCart.deleteProduct(productId,bagNum);
             }
-            else throw new ArgumentException("product doesnt exsist in cart");
         }
         internal void changeQuantityInCart(int productId, int newQuantity)
         {
@@ -41,12 +40,6 @@ namespace Workshop.DomainLayer.UserPackage
             {
                 shoppingCart.changeQuantity(productId, newQuantity,bagNum);
             }
-            else throw new ArgumentException("product doesnt exsist in cart");
-        }
-
-        internal void ClearCart()
-        {
-            shoppingCart.Clear();
         }
     }
 }
