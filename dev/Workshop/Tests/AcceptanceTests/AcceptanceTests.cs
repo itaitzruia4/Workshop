@@ -16,6 +16,7 @@ namespace Tests.AcceptanceTests
         IService service;
         private const string username = "Goodun";
         private const string password = "Goodp";
+        private const string product = "product";
 
         [TestInitialize]
         public void InitSystem()
@@ -165,13 +166,16 @@ namespace Tests.AcceptanceTests
         }
 
         [DataTestMethod]
-        [DataRow(username, password)]
-        public void TestAddProduct_Good(string username, string password)
+        [DataRow(username, password, product)]
+        public Product TestAddProduct_Good(string username, string password, string product)
         {
             int storeId = 0;
             TestLogin_Good(username, password);
             storeId = service.CreateNewStore(username, "RandomStore").Value.StoreId;
-            Assert.IsFalse(service.AddProduct(username, storeId, 0, "TestAddProduct", "Good", 1.0, 1).ErrorOccured);
+            Response <Product> prodResult = service.AddProduct(username, storeId, 0, product, "Good", 1.0, 1);
+            Assert.IsFalse(prodResult.ErrorOccured);
+            Assert.IsInstanceOfType(prodResult.Value, typeof(Product));
+            return prodResult.Value;
         }
 
         [DataTestMethod]
@@ -266,6 +270,45 @@ namespace Tests.AcceptanceTests
             Assert.IsTrue(service.NominateStoreManager(nominator, nominated, storeId).ErrorOccured);
         }
 
+
+        public bool NominateStoreManager_Thread(string nominator, string password, string nominated, int storeId)
+        {
+            IService threadService = new Service();
+            Assert.IsFalse(threadService.EnterMarket().ErrorOccured);
+            Assert.IsFalse(threadService.Login(nominator, password).ErrorOccured);
+
+            return threadService.NominateStoreManager(nominator, nominated, storeId).ErrorOccured;
+        }
+        
+
+        [TestMethod]
+        public void TestNominateStoreManager_BadNominateTwiceAtTheSameTime()
+        {
+            bool res1 = false;
+            bool res2 = false;
+
+            service.EnterMarket();
+            Assert.IsFalse(service.Register("Nominated", "none").ErrorOccured);
+            Assert.IsFalse(service.Register("Nominator1", "1").ErrorOccured);
+            Assert.IsFalse(service.Register("Nominator2", "2").ErrorOccured);
+            Assert.IsFalse(service.Register("Owner", "own").ErrorOccured);
+            Assert.IsFalse(service.Login("Owner", "own").ErrorOccured);
+
+            int storeId = service.CreateNewStore("Owner", "RandomStore").Value.StoreId;
+            Assert.IsFalse(service.NominateStoreOwner("Owner", "Nominator1", storeId).ErrorOccured);
+            Assert.IsFalse(service.NominateStoreOwner("Owner", "Nominator2", storeId).ErrorOccured);
+
+            Thread thr1 = new Thread(() => res1 = NominateStoreManager_Thread("Nominator1", "1", "Nominated", storeId));
+            Thread thr2 = new Thread(() => res2 = NominateStoreManager_Thread("Nominator2", "2", "Nominated", storeId));
+            thr1.Start();
+            //thr2.Start();
+            thr1.Join();
+            //thr2.Join();
+
+            Assert.AreNotEqual(res1, res2);
+        }
+
+
         [DataTestMethod]
         [DataRow(username, password)]
         public void TestGetWorkersInformation_Good(string username, string password)
@@ -335,7 +378,9 @@ namespace Tests.AcceptanceTests
             //Not suppose to pass we need to implement buying a product
             TestLogin_Good(username, password);
             int storeId = service.CreateNewStore(username, "RandomStore").Value.StoreId;
-            service.AddProduct(password, storeId, 0, "TestReviewProduct", "Good", 1, 1);
+            int prodId = service.AddProduct(username, storeId, 0, "TestReviewProduct", "Good", 1, 2).Value.Id;
+            service.addToCart(username, prodId, storeId, 1);
+            service.BuyCart(username, "Ronmi's home");
             Assert.IsFalse(service.ReviewProduct(username, 0, "Blank").ErrorOccured);
         }
 
@@ -360,6 +405,38 @@ namespace Tests.AcceptanceTests
             Assert.IsTrue(service.ReviewProduct(username, 2, "Blank").ErrorOccured);
         }
 
+        /*
+            Response<List<Product>> SearchProduct(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview);
+
+            Response<Product> addToCart(string user, int productId, int storeId, int quantity);
+
+            Response<ShoppingCart> viewCart(string user);
+
+            Response<ShoppingCart> editCart(string user, int productId, int newQuantity);
+
+            Response BuyCart(string user, string address);
+         */
+
+        [DataTestMethod]
+        [DataRow(username, password)]
+        public void TestSearchProduct_Good(string username, string password)
+        {
+            TestLogin_Good(username, password);
+            int storeId = service.CreateNewStore(username, "RandomStore").Value.StoreId;
+            Product prod = TestAddProduct_Good(username, password, product);
+            //Response<List<Product>> searchResult = service.SearchProduct(username, prod.Id, prod.Name, "", prod.BasePrice, prod.BasePrice, "?");
+        }
+
+
+        public void TestBuyProductBad_BuylastAtTheSameTime()
+        {
+            Assert.Fail();
+        }
+
+        public void TestBuyProductBad_BuyAndDeleteAtTheSameTime()
+        {
+            Assert.Fail();
+        }
 
     }
 }
