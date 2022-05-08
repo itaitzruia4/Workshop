@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Workshop.DomainLayer.Loggers
+namespace Workshop.DomainLayer.MarketPackage.Discounts
 {
-    interface ILogger
+    public class MaxComposite: PriceActionComposite
     {
     }
 }

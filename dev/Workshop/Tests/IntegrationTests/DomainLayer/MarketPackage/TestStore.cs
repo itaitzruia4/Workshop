@@ -3,7 +3,7 @@ using Moq;
 using System;
 using Workshop.DomainLayer.MarketPackage;
 
-namespace Tests.UnitTests.DomainLayer.MarketPackage
+namespace Tests.IntegrationTests.DomainLayer.MarketPackage
 {
     [TestClass]
     public class TestStore

@@ -1,4 +1,6 @@
 
+using System;
+
 namespace Workshop.DomainLayer.MarketPackage
 {
     public class ProductDTO
@@ -16,6 +18,10 @@ namespace Workshop.DomainLayer.MarketPackage
             this.Description = description;
             this.Price = price;
             this.Quantity = quantity;
+        }
+        public bool EqualsFields(ProductDTO product)
+        {
+            return (this.Id == product.Id) && (this.Name == product.Name) && (this.Price == product.Price) && (this.Quantity == product.Quantity) && (this.Description == product.Description);
         }
     }
 }

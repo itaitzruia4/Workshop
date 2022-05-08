@@ -5,15 +5,20 @@ using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using Workshop.DomainLayer.MarketPackage;
+using System.Threading;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
     public class Store
     {
-        private bool open;
-        private int id;
-        private string name;
-        private Dictionary<int, Product> products;
+        private bool open { get; set; }
+        private int id { get; set; }
+        private string name { get; set; }
+        private Dictionary<int, Product> products { get; set; }
+        private DiscountPolicy discountPolicy { get; set; }
+        private PurchasePolicy purchasePolicy { get; set; }
+
+        private ReaderWriterLock rwl;
 
         public Store(int id, string name)
         {
@@ -23,15 +28,33 @@ namespace Workshop.DomainLayer.MarketPackage
             this.name = name;
             products = new Dictionary<int, Product>();
             this.open = true; //TODO: check if on init store supposed to be open or closed.
+            this.rwl = new ReaderWriterLock();
+            this.discountPolicy = new DiscountPolicy();
+            this.purchasePolicy = new PurchasePolicy();
         }
-        public int getID()
+
+        public ReaderWriterLock getLock()
+        {
+            return this.rwl;
+        }
+        public int GetId()
         {
             return this.id;
         }
 
-        public bool isOpen()
+        public bool IsOpen()
         {
             return this.open;
+        }
+
+        public IReadOnlyDictionary<int, Product> GetProducts()
+        {
+            return products;
+        }
+
+        public String GetStoreName()
+        {
+            return name;
         }
 
         public void openStore()
@@ -161,7 +184,8 @@ namespace Workshop.DomainLayer.MarketPackage
 
         internal StoreDTO GetStoreDTO()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            return new StoreDTO(id, name, products,open);
         }
     }
 }
