@@ -61,12 +61,12 @@ namespace Workshop.DomainLayer
 
         internal StoreManager NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId)
         {
-            return MarketController.NominateStoreManager(nominatorUsername, nominatedUsername, storeId);
+            return MarketController.NominateStoreManager(nominatedUsername, nominatedUsername, storeId);
         }
 
         internal StoreOwner NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId)
         {
-            return MarketController.NominateStoreOwner(nominatorUsername, nominatedUsername, storeId);
+            return MarketController.NominateStoreOwner(nominatedUsername, nominatedUsername, storeId);
         }
 
         internal List<Member> GetWorkersInformation(string username, int storeId)
@@ -78,7 +78,7 @@ namespace Workshop.DomainLayer
             MarketController.CloseStore(username, storeId);
         }
 
-        internal Store CreateNewStore(string creator, string storeName)
+        internal int CreateNewStore(string creator, string storeName)
         {
             return MarketController.CreateNewStore(creator, storeName);
         }
@@ -107,13 +107,13 @@ namespace Workshop.DomainLayer
         {
             return UserController.viewCart(user);
         }
-        internal ShoppingCartDTO editCart(string user, int productId, int newQuantity)
+        internal void editCart(string user, int productId, int newQuantity)
         {
-            return UserController.editCart(user, productId, newQuantity);
+            UserController.editCart(user, productId, newQuantity);
         }
-        internal void BuyCart(string user,string address)
+        internal void BuyCart(string user)
         {
-            MarketController.BuyCart(user,address);
+            MarketController.BuyCart(user);
         }
         
     }

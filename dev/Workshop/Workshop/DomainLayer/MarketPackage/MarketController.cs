@@ -13,8 +13,9 @@ using Workshop.DomainLayer.UserPackage.Permissions;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using Workshop.DomainLayer.Loggers;
-using System.Threading;
-using System.Collections.Concurrent;
+
+
+
 
 namespace Workshop.DomainLayer.MarketPackage
 {
@@ -22,27 +23,29 @@ namespace Workshop.DomainLayer.MarketPackage
     {
         private IUserController userController;
         private OrderHandler<int> orderHandler;
-        private ConcurrentDictionary<int, Store> stores;
-        private ConcurrentDictionary<int, ReaderWriterLock> storesLocks;
+        private Dictionary<int, Store> stores;
         private IMarketPaymentService paymentService;
         private IMarketSupplyService supplyService;
-        private static int STORE_COUNT = 1;
-
+        private static int STORE_COUNT = 0;
         public MarketController(IUserController userController, IMarketPaymentService paymentService, IMarketSupplyService supplyService)
         {
             this.userController = userController;
             this.orderHandler = new OrderHandler<int>();
             this.paymentService = paymentService;
             this.supplyService = supplyService;
-            this.stores = new ConcurrentDictionary<int, Store>();
-            this.storesLocks = new ConcurrentDictionary<int, ReaderWriterLock>();
-            STORE_COUNT = 1;
+            stores = new Dictionary<int, Store>();
+            STORE_COUNT = 0;
         }
 
         public void InitializeSystem()
         {
             
             Logger.Instance.LogEvent("Started initializing the system - Market Controller");
+            CreateNewStore("User1", "Sport store");
+            CreateNewStore("User2", "Drug store");
+            CreateNewStore("User3", "Supermarket");
+            CreateNewStore("User4", "Electronics store");
+            CreateNewStore("User5", "Convenience store");
             Logger.Instance.LogEvent("Finished initializing the system - Market Controller");
             
         }
@@ -55,219 +58,93 @@ namespace Workshop.DomainLayer.MarketPackage
 
         public StoreOwner NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId)
         {
-            Logger.Instance.LogEvent($"{nominatorUsername} is trying to nominate {nominatedUsername} to be a store owner of store {storeId}");
             userController.AssertCurrentUser(nominatorUsername);
-            StoreOwner storeOwner = null;
-            try
-            {
-                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
-            }
-            catch
-            {
-                throw new ArgumentException("Store ID does not exist");
-            }
-            finally {
-                storeOwner = userController.NominateStoreOwner(nominatorUsername, nominatedUsername, storeId);
-                storesLocks[storeId].ReleaseReaderLock();
-            }
-            return storeOwner;
+            ValidateStoreExists(storeId);
+            return userController.NominateStoreOwner(nominatorUsername, nominatedUsername, storeId);
         }
 
         public StoreManager NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId)
         {
-            Logger.Instance.LogEvent($"{nominatorUsername} is trying to nominate {nominatedUsername} to be a store manager of store {storeId}");
             userController.AssertCurrentUser(nominatorUsername);
-            StoreManager storeManager = null;
-            try
-            {
-                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
-            }
-            catch
-            {
-                throw new ArgumentException("Store ID does not exist");
-            }
-            finally
-            {
-                storeManager = userController.NominateStoreManager(nominatorUsername, nominatedUsername, storeId);
-                storesLocks[storeId].ReleaseReaderLock();
-            }
-            return storeManager;
+            ValidateStoreExists(storeId);
+            return userController.NominateStoreManager(nominatorUsername, nominatedUsername, storeId);
         }
 
         private void ValidateStoreExists(int ID)
         {
             if (!stores.ContainsKey(ID))
-                throw new ArgumentException($"Store ID {ID} does not exist");
+                throw new ArgumentException("Store ID does not exist");
         }
 
         public Product AddProductToStore(string username, int storeId, int productID, string name, string description, double price, int quantity)
         {
-            Logger.Instance.LogEvent($"{username} is trying to add product {name} to store {storeId}:");
             userController.AssertCurrentUser(username);
-            Product product = null;
-            try
-            {
-                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
-            }
-            catch
-            {
-                throw new ArgumentException($"Store ID {storeId} does not exist");
-            }
-            finally
-            {
-                ViewStorePermission(username, storeId);
-                if (!IsAuthorized(username, storeId, Action.AddProduct))
-                    throw new MemberAccessException("This user is not authorized for adding products to the specified store.");
-                ValidateStoreExists(storeId);
-                product = stores[storeId].AddProduct(productID, name, description, price, quantity);
-                storesLocks[storeId].ReleaseReaderLock();
-            }
-            Logger.Instance.LogEvent($"{username} successfuly added product {name} to store {storeId}:");
-            return product;
+            ViewStorePermission(username, storeId);
+            if (!IsAuthorized(username, storeId, Action.AddProduct))
+                throw new MemberAccessException("This user is not authorized for adding products to the specified store.");
+            ValidateStoreExists(storeId);
+            return stores[storeId].AddProduct(productID, name, description, price, quantity);
         }
 
         public void RemoveProductFromStore(string username, int storeId, int productID)
         {
-            Logger.Instance.LogEvent($"{username} is trying to remove product {productID} to store {storeId}:");
             userController.AssertCurrentUser(username);
-            try
-            {
-                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
-            }
-            catch
-            {
-                throw new ArgumentException("Store ID does not exist");
-            }
-            finally
-            {
-                ViewStorePermission(username, storeId);
-                if (!IsAuthorized(username, storeId, Action.RemoveProduct))
-                    throw new MemberAccessException("This user is not authorized for removing products from the specified store.");
-                ValidateStoreExists(storeId);
-                stores[storeId].RemoveProduct(productID);
-                storesLocks[storeId].ReleaseReaderLock();
-            }
-            Logger.Instance.LogEvent($"{username} successfuly removed product {productID} from store {storeId}:");
+            ViewStorePermission(username, storeId);
+            if (!IsAuthorized(username, storeId, Action.RemoveProduct))
+                throw new MemberAccessException("This user is not authorized for removing products from the specified store.");
+            ValidateStoreExists(storeId);
+            stores[storeId].RemoveProduct(productID);
         }
 
         public void ChangeProductDescription(string username, int storeId, int productID, string description)
         {
-            Logger.Instance.LogEvent($"{username} is trying to change the description of product {productID} in store {storeId}:");
             userController.AssertCurrentUser(username);
-            try
-            {
-                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
-            }
-            catch
-            {
-                throw new ArgumentException("Store ID does not exist");
-            }
-            finally
-            {
-                ViewStorePermission(username, storeId);
-                if (!IsAuthorized(username, storeId, Action.ChangeProductDescription))
-                    throw new MemberAccessException("This user is not authorized for changing products descriptions in the specified store.");
-                ValidateStoreExists(storeId);
-                stores[storeId].ChangeProductDescription(productID, description);
-                storesLocks[storeId].ReleaseReaderLock();
-            }
-            Logger.Instance.LogEvent($"{username} successfuly changed the description of product {productID} in store {storeId}:");
+            ViewStorePermission(username, storeId);
+            if (!IsAuthorized(username, storeId, Action.ChangeProductDescription))
+                throw new MemberAccessException("This user is not authorized for changing products descriptions in the specified store.");
+            ValidateStoreExists(storeId);
+            stores[storeId].ChangeProductDescription(productID, description);
         }
 
         public void ChangeProductName(string username, int storeId, int productID, string name)
         {
-            Logger.Instance.LogEvent($"{username} is trying to change the name of product {productID} in store {storeId}:");
             userController.AssertCurrentUser(username);
-            try
-            {
-                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
-            }
-            catch
-            {
-                throw new ArgumentException("Store ID does not exist");
-            }
-            finally
-            {
-                ViewStorePermission(username, storeId);
-                if (!IsAuthorized(username, storeId, Action.ChangeProductName))
-                    throw new MemberAccessException("This user is not authorized for changing products names in the specified store.");
-                ValidateStoreExists(storeId);
-                stores[storeId].ChangeProductName(productID, name);
-                storesLocks[storeId].ReleaseReaderLock();
-            }
-            Logger.Instance.LogEvent($"{username} successfuly changed the name of product {productID} in store {storeId}:");
+            ViewStorePermission(username, storeId);
+            if (!IsAuthorized(username, storeId, Action.ChangeProductName))
+                throw new MemberAccessException("This user is not authorized for changing products names in the specified store.");
+            ValidateStoreExists(storeId);
+            stores[storeId].ChangeProductName(productID, name);
         }
 
         public void ChangeProductPrice(string username, int storeId, int productID, int price)
         {
-            Logger.Instance.LogEvent($"{username} is trying to change the price of product {productID} in store {storeId}:");
             userController.AssertCurrentUser(username);
-            try
-            {
-                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
-            }
-            catch
-            {
-                throw new ArgumentException("Store ID does not exist");
-            }
-            finally
-            {
-                ViewStorePermission(username, storeId);
-                if (!IsAuthorized(username, storeId, Action.ChangeProductPrice))
-                    throw new MemberAccessException("This user is not authorized for changing products prices in the specified store.");
-                ValidateStoreExists(storeId);
-                stores[storeId].ChangeProductPrice(productID, price);
-                storesLocks[storeId].ReleaseReaderLock();
-            }
-            Logger.Instance.LogEvent($"{username} successfuly changed the price of product {productID} in store {storeId}:");
+            ViewStorePermission(username, storeId);
+            if (!IsAuthorized(username, storeId, Action.ChangeProductPrice))
+                throw new MemberAccessException("This user is not authorized for changing products prices in the specified store.");
+            ValidateStoreExists(storeId);
+            stores[storeId].ChangeProductPrice(productID, price);
         }
 
         public void ChangeProductQuantity(string username, int storeId, int productID, int quantity)
         {
-            Logger.Instance.LogEvent($"{username} is trying to change the quantity of product {productID} in store {storeId}:");
             userController.AssertCurrentUser(username);
-            try
-            {
-                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
-            }
-            catch
-            {
-                throw new ArgumentException("Store ID does not exist");
-            }
-            finally
-            {
-                ViewStorePermission(username, storeId);
-                if (!IsAuthorized(username, storeId, Action.ChangeProductName))
-                    throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
-                ValidateStoreExists(storeId);
-                stores[storeId].ChangeProductQuantity(productID, quantity);
-                storesLocks[storeId].ReleaseReaderLock();
-            }
-            Logger.Instance.LogEvent($"{username} successfuly changed the quantity of product {productID} in store {storeId}:");
+            ViewStorePermission(username, storeId);
+            if (!IsAuthorized(username, storeId, Action.ChangeProductName))
+                throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
+            ValidateStoreExists(storeId);
+            stores[storeId].ChangeProductQuantity(productID, quantity);
         }
 
         public List<OrderDTO> GetStoreOrdersList(string username, int storeId)
         {
             userController.AssertCurrentUser(username);
-            List<OrderDTO> orders = null;
-            try
-            {
-                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
-            }
-            catch
-            {
-                throw new ArgumentException("Store ID does not exist");
-            }
-            finally
-            {
-                ViewStorePermission(username, storeId);
-                IsAuthorized(username, storeId, Action.GetStoreOrdersList);
+            ViewStorePermission(username, storeId);
+            IsAuthorized(username, storeId, Action.GetStoreOrdersList);
 
-                orders = this.orderHandler.GetOrders(storeId);
-                if (orders == null)
-                    throw new ArgumentException($"Store {storeId} does not exist or it does not have previous orders.");
-                storesLocks[storeId].ReleaseReaderLock();
-            }
+            List<OrderDTO> orders = this.orderHandler.GetOrders(storeId);
+            if (orders == null)
+                throw new Exception($"Store {storeId} does not exist or it does not have previous orders.");
             return orders;
         }
 
@@ -279,63 +156,34 @@ namespace Workshop.DomainLayer.MarketPackage
         /// <returns>Information about the workers of the store</returns>
         public List<Member> GetWorkersInformation(string username, int storeId)
         {
-            Logger.Instance.LogEvent($"{username} is requesting information about the workers of store {storeId}.");
+            ValidateStoreExists(storeId);
+            // Check that the user is the logged in member
             userController.AssertCurrentUser(username);
-            List<Member> workers = null;
-            try
-            {
-                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
-            }
-            catch
-            {
-                throw new ArgumentException("Store ID does not exist");
-            }
-            finally
-            {
-                ViewStorePermission(username, storeId);
-                if (!userController.IsAuthorized(username, storeId, Action.GetWorkersInformation))
-                    throw new MemberAccessException($"User {username} is not allowed to request information about the workers of store #{storeId}.");
-                workers = userController.GetWorkers(storeId);
-                storesLocks[storeId].ReleaseReaderLock();
-            }
-            Logger.Instance.LogEvent($"{username} has received information about the workers of store {storeId}.");
-            return workers;
+            // Check that the user is authorized to request this information
+            ViewStorePermission(username, storeId);
+            if (!userController.IsAuthorized(username, storeId, Action.GetWorkersInformation))
+                throw new MemberAccessException($"User {username} is not allowed to request information about the workers of store #{storeId}.");
+            return userController.GetWorkers(storeId);
         }
         public void OpenStore(string username, int storeId)
         {
-            Logger.Instance.LogEvent($"{username} is trying to open store {storeId}.");
             /*if (!IsAuthorized(username, storeId, Action.ChangeProductName))
                 throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
             ValidateStoreExists(storeId);
             stores[storeId].openStore();*/
             throw new NotImplementedException();
-            Logger.Instance.LogEvent($"{username} successfuly opened store {storeId}.");
         }
 
         public void CloseStore(string username, int storeId)
         {
-            Logger.Instance.LogEvent($"{username} is trying to close store {storeId}.");
-            try
+            if (!IsAuthorized(username, storeId, Action.CloseStore))
+                throw new MemberAccessException("This user is not authorized to close this specified store.");
+            ValidateStoreExists(storeId);
+            if (IsStoreOpen(username, storeId)) { stores[storeId].closeStore(); }
+            else
             {
-                storesLocks[storeId].AcquireWriterLock(Timeout.Infinite);
+                throw new Exception($"Store {storeId} already closed.");
             }
-            catch
-            {
-                throw new ArgumentException("Store ID does not exist");
-            }
-            finally
-            {
-                if (!IsAuthorized(username, storeId, Action.CloseStore))
-                    throw new MemberAccessException("This user is not authorized to close this specified store.");
-                ValidateStoreExists(storeId);
-                if (IsStoreOpen(username, storeId)) { stores[storeId].closeStore(); }
-                else
-                {
-                    throw new ArgumentException($"Store {storeId} already closed.");
-                }
-                storesLocks[storeId].ReleaseWriterLock();
-            }
-            Logger.Instance.LogEvent($"{username} successfuly closed store {storeId}.");
         }
 
         public void ViewStorePermission(string username, int storeId)
@@ -348,30 +196,26 @@ namespace Workshop.DomainLayer.MarketPackage
             }
         }
 
-        public Store CreateNewStore(string creator, string storeName) {
-            Logger.Instance.LogEvent($"{creator} is trying to create a new store: \"{storeName}\".");
+        public int CreateNewStore(string creator, string storeName) {
             userController.AssertCurrentUser(creator);
             if (String.IsNullOrWhiteSpace(storeName)){
                 throw new ArgumentException($"User {creator} requestted to create a store with an empty name.");
             }
+            Member member = userController.GetMember(creator);
             int storeId = STORE_COUNT;
-            userController.AddStoreFounder(creator, storeId);
-            ReaderWriterLock rwl = new ReaderWriterLock();
-            rwl.AcquireWriterLock(Timeout.Infinite);
-            storesLocks[storeId] = rwl;
             Store store = new Store(storeId, storeName);
+            Role storeFounderRole = new StoreFounder(storeId);
+            member.AddRole(storeFounderRole);
             stores[storeId] = store;
             STORE_COUNT++;
-            rwl.ReleaseWriterLock();
-            Logger.Instance.LogEvent($"{creator} successfuly created store \"{storeName}\", and received a new store ID: {storeId}.");
-            return store;
+            return storeId;
         }
 
         public bool IsStoreOpen(string username, int storeId)
         {
             userController.AssertCurrentUser(username);
             ValidateStoreExists(storeId);
-            return stores[storeId].IsOpen();
+            return stores[storeId].isOpen();
         }
 
         public ProductDTO getProductInfo(string username, int productId)
@@ -383,23 +227,10 @@ namespace Workshop.DomainLayer.MarketPackage
 
         public StoreDTO getStoreInfo(string username, int storeId)
         {
-            StoreDTO storeDTO = null;
             userController.AssertCurrentUser(username);
-            try
-            {
-                storesLocks[storeId].AcquireWriterLock(Timeout.Infinite);
-            }
-            catch
-            {
-                throw new ArgumentException("Store ID does not exist");
-            }
-            finally
-            {
-                Store store = stores[storeId];
-                storeDTO = store.GetStoreDTO();
-                storesLocks[storeId].ReleaseWriterLock();
-            }
-            return storeDTO;
+            ValidateStoreExists(storeId);
+            Store store = stores[storeId];
+            return store.GetStoreDTO();
         }
 
         private Product getProduct(int productId)
@@ -422,14 +253,7 @@ namespace Workshop.DomainLayer.MarketPackage
             userController.AssertCurrentUser(username);
             if(productId != -1)
             {
-                try
-                {
-                    products.Add(getProduct(productId));
-                }
-                catch
-                {
-
-                }
+                products.Add(getProduct(productId));
             }
             else if (keyWords != "")
             {
@@ -444,14 +268,12 @@ namespace Workshop.DomainLayer.MarketPackage
 
         private List<Product> getProductByCatagory(string catagory)
         {
-            return new List<Product>();
-            //throw new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private List<Product> getProductByKeywords(string keyWords)
         {
-            return new List<Product>();
-            //throw new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         //todo move search to user add add a call
@@ -467,11 +289,11 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 goodProducts = filterByMax(goodProducts,getPrices(goodProducts),maxPrice);
             }
-            /*if(productReview != -1)
+            if(productReview != -1)
             {
                 goodProducts = filterByMin(goodProducts,getProductsReviewsGrades(goodProducts),productReview);
             }
-            if(storeReview != -1)
+            /*if(storeReview != -1)
             {
                 goodProducts = filterByMin(goodProducts,getStoresReviewsGrades(goodProducts),storeReview);
             }*/
@@ -530,7 +352,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 try
                 {
                     store.GetProduct(productId);
-                    return store.GetId();
+                    return store.getID();
                 }
                 catch (ArgumentException)
                 {
@@ -578,42 +400,23 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             return goodProducts;
         }
-        public ShoppingBagProduct getProductForSale(int productId, int storeId, int quantity)
+        public ShoppingBagProduct getProductForSale(int productId,int storeId,int quantity)
         {
             ValidateStoreExists(storeId);
-            if(stores[storeId].GetProduct(productId).Quantity >= quantity){
-                return stores[storeId].GetProduct(productId).GetShoppingBagProduct(quantity);
-            }
-            throw new ArgumentException("Store doesn't has enough from the product");
+            return stores[storeId].GetProduct(productId).GetShoppingBagProduct(quantity);
         }
-        public void BuyCart(string userId,string address)
+        public void BuyCart(string userId)
         {
-            Logger.Instance.LogEvent($"User {userId} is trying to buy his cart.");
             ShoppingCartDTO shoppingCart = userController.viewCart(userId);
             Dictionary<int,List<ProductDTO>> productsSoFar = new Dictionary<int, List<ProductDTO>>();
             try
             {
                 foreach (int storeId in shoppingCart.shoppingBags.Keys)
                 {
-                    try
-                    {
-                        storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
-                    }
-                    catch
-                    {
-                        throw new ArgumentException($"Store {storeId} does not exist");
-                    }
-                    finally
-                    {
-                        stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
-                        productsSoFar.Add(storeId, shoppingCart.shoppingBags[storeId].products);
-                        storesLocks[storeId].ReleaseReaderLock();
-                    }
+                    stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
+                    productsSoFar.Add(storeId,shoppingCart.shoppingBags[storeId].products);  
                 }
-                supplyService.supplyToAddress(userId, address);
-                paymentService.PayAmount(userId,shoppingCart.getPrice());
-                userController.ClearUserCart();
-                Logger.Instance.LogEvent($"User {userId} successfuly paid {shoppingCart.getPrice()} and purchased his cart.");
+                paymentService.PayAmount(userId,shoppingCart.getPrice());  
             }
             catch (ArgumentException)
             {
@@ -626,6 +429,8 @@ namespace Workshop.DomainLayer.MarketPackage
                     }
                 }  
             }
+            
+
         }
 
         public ShoppingBagProduct addToBag(string user, int productId, int storeId, int quantity)
