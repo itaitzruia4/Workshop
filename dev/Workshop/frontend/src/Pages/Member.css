@@ -5,46 +5,6 @@ body {
     background-color: #2b2828;
 }
 
-.App {
-    text-align: center;
-}
-
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
-}
-
-.App-header {
-    background-color: #282c34;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
-}
-
-.App-link {
-    color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
 
 .section__stores {
     color: white;
@@ -63,6 +23,7 @@ ul {
 
 .stores {
     max-height: 175px;
+    max-width: 400px;
     display: flex;
     flex-direction: column;
     clear: both;
@@ -83,7 +44,15 @@ ul {
         border-radius: 8px;
     }
 
-.deleteBtn {
+.AddStore {
+    display: flex;
+    flex-direction: row;
+    margin: 10px;
+}
+
+
+
+.Member_Delete_Srore_Btn {
     margin-left: 50px;
     margin-top: 10px;
     color: darkgrey;
@@ -93,19 +62,46 @@ ul {
     border: 0;
 }
 
-    .deleteBtn:hover {
+.Member_Delete_Srore_Btn:hover {
+    color: white;
+}
+
+.Member_Open_Store_Btn {
+    margin-left: 50px;
+    margin-top: 10px;
+    color: darkgrey;
+    background-color: transparent;
+    border-color: #ccc;
+    font-size: 20px;
+    border: 0;
+}
+
+    .Member_Open_Store_Btn:hover {
         color: white;
     }
 
 
-.AddStore {
-    padding: 1rem 2rem;
+.Member_Store_Form {
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
-input {
-    border: 0;
+.Member_Store_textbox {
+    font-size: 20px;
 }
 
-    input:focus {
-        border-bottom-style: solid;
+.Member_Store_Btn {
+    display: block;
+    font-size: 20px;
+    background-color: #1DB954;
+    color: white;
+    border-radius: 8px;
+}
+
+    .Member_Store_Btn:hover {
+        transform: scale(1.1);
     }
+
+
+
+
