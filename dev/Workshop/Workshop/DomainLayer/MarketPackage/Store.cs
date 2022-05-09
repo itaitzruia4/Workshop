@@ -67,7 +67,7 @@ namespace Workshop.DomainLayer.MarketPackage
             this.open = false;
         }
 
-        public Product AddProduct(int productID, string name, string description, double price, int quantity)
+        public Product AddProduct(int productID, string name, string description, double price, int quantity, string category)
         {
             ValidateID(productID);
             if (products.ContainsKey(productID))
@@ -76,7 +76,7 @@ namespace Workshop.DomainLayer.MarketPackage
             ValidatePrice(price);
             ValidateQuantity(quantity);
 
-            Product newProd = new Product(productID, name, description, price, quantity);
+            Product newProd = new Product(productID, name, description, price, quantity, category);
             products.Add(productID, newProd);
             return newProd;
         }
@@ -178,7 +178,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             else
             {
-                products.Add(product.Id,new Product(product.Id,product.Name,product.Description,product.Price,product.Quantity));
+                products.Add(product.Id,new Product(product.Id,product.Name,product.Description,product.Price,product.Quantity, product.Category));
             }
         }
 
