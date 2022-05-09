@@ -21,8 +21,8 @@ function Login() {
                 <input className="login_password_textbox" type="password" />
             </p>
             <p className="login_buttons">
-                <button className="login_login_btn"> Login </button>
-                <button className="login_back_btn" onClick={routeChange('/')}> Back to home page</button>
+                <button className="login_login_btn" onClick={routeChange('/member')} > Login</button>
+                <button className="login_back_btn" onClick={routeChange('/')}> Back to home</button>
             </p>
         </p>
     )

@@ -1,0 +1,16 @@
+body {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: #2b2828;
+}
+
+.App {
+    text-align: center;
+    text-align: center;
+}
+
+.App-logo {
+    @@ -36,3 +43,68 @@ transform: rotate(360deg);
+}
+}

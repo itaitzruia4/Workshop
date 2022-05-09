@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from "react-router-dom";
 import './Member.css';
 
 type IStore = {
@@ -10,7 +11,9 @@ type IStores = {
     stores: IStore[],
 }
 
+
 function Member() {
+ 
     const [stores, setStores] = React.useState<IStores>({ stores: [] });
     const addStores = (title: string) => {
         setStores({
@@ -55,6 +58,12 @@ const StoresComponent: React.FC<{
         }
     }
 
+    let navigate = useNavigate();
+    const routeChange = (path: string) =>
+        () => {
+            navigate(path);
+        } 
+
     return (
         <div className="section__store">
             <h2 className="stores-header">stores</h2>
@@ -63,12 +72,16 @@ const StoresComponent: React.FC<{
                     <li key={store.id}>
                         <span>{store.title}</span>
                         <button
-                            className="deleteBtn"
+                            className="Member_Delete_Srore_Btn"
                             onClick={() => { deleteStore(store.id) }}>X
+                        </button>
+                        <button
+                            className="Member_Open_Store_Btn"
+                            onClick={routeChange('/Store')}>Open store
                         </button>
                     </li>
                 ))}
-            </ul> : <div>No store have been created</div>}
+            </ul> : <div style={{ color: 'white' }} >No store have been created</div>}
         </div>
     );
 
@@ -88,13 +101,13 @@ const AddStoresComponent = ({ addStores }: { addStores: (text: string) => void }
     return (
         <div className="AddStore">
             <form>
+                <button
+                    className="Member_Add_Store_Btn"
+                    onClick={submit}>Add
+                </button>
                 <input
                     value={store}
                     onChange={e => { setStore(e.target.value) }} />
-                <button
-                    className="addStoreBtn"
-                    onClick={submit}>Add
-                </button>
             </form>
         </div>
     );
