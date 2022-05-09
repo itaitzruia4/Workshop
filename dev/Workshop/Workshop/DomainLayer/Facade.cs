@@ -29,92 +29,131 @@ namespace Workshop.DomainLayer
             MarketController = new MarketController(UserController, paymentService, supplyService);
         }
 
-        public User EnterMarket()
+        public User EnterMarket(int userId)
         {
-            return UserController.EnterMarket();
+            return UserController.EnterMarket(userId);
         }
 
-        public void ExitMarket()
+        public void ExitMarket(int userId)
         {
-            UserController.ExitMarket();
+            UserController.ExitMarket(userId);
         }
 
-        public Member Login(string username, string password)
+        public Member Login(int userId, string membername, string password)
         {
-            return UserController.Login(username, password);
+            return UserController.Login(userId, membername, password);
         }
 
-        public void Logout(string username)
+        public void Logout(int userId, string membername)
         {
-            UserController.Logout(username);
+            UserController.Logout(userId, membername);
         }
 
-        public void Register(string username, string password)
+        public void Register(int userId, string membername, string password)
         {
-            UserController.Register(username, password);
+            UserController.Register(userId, membername, password);
         }
 
-        internal Product AddProduct(string username, int storeId, int productId, string productName, string description, double price, int quantity)
+        internal Product AddProduct(int userId, string membername, int storeId, int productId, string productName, string description, double price, int quantity, string category)
         {
-            return MarketController.AddProductToStore(username, storeId, productId, productName, description, price, quantity);
+            return MarketController.AddProductToStore(userId, membername, storeId, productId, productName, description, price, quantity, category);
         }
 
-        internal StoreManager NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId)
+        internal StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId)
         {
-            return MarketController.NominateStoreManager(nominatedUsername, nominatedUsername, storeId);
+            return MarketController.NominateStoreManager(userId, nominatorUsername, nominatedUsername, storeId);
         }
 
-        internal StoreOwner NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId)
+        internal StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId)
         {
-            return MarketController.NominateStoreOwner(nominatedUsername, nominatedUsername, storeId);
+            return MarketController.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId);
         }
 
-        internal List<Member> GetWorkersInformation(string username, int storeId)
+        internal List<Member> GetWorkersInformation(int userId, string membername, int storeId)
         {
-            return MarketController.GetWorkersInformation(username, storeId);
+            return MarketController.GetWorkersInformation(userId, membername, storeId);
         }
-        internal void CloseStore(string username, int storeId)
+        internal void CloseStore(int userId, string username, int storeId)
         {
-            MarketController.CloseStore(username, storeId);
-        }
-
-        internal Store CreateNewStore(string creator, string storeName)
-        {
-            return MarketController.CreateNewStore(creator, storeName);
+            MarketController.CloseStore(userId, username, storeId);
         }
 
-        internal ReviewDTO ReviewProduct(string user, int productId, string review)
+        internal Store CreateNewStore(int userId, string creator, string storeName)
         {
-            return UserController.ReviewProduct(user, productId, review);
+            return MarketController.CreateNewStore(userId, creator, storeName);
         }
-        internal ProductDTO getProductInfo(string user, int productId)
+
+        internal ReviewDTO ReviewProduct(int userId, string user, int productId, string review)
         {
-            return MarketController.getProductInfo(user, productId);
+            return UserController.ReviewProduct(userId, user, productId, review);
         }
-        internal StoreDTO getStoreInfo(string user, int storeId)
+        internal ProductDTO getProductInfo(int userId, string user, int productId)
         {
-            return MarketController.getStoreInfo(user, storeId);
+            return MarketController.getProductInfo(userId, user, productId);
         }
-        internal List<ProductDTO> SearchProduct(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
+        internal StoreDTO getStoreInfo(int userId, string user, int storeId)
         {
-            return MarketController.SearchProduct(user, productId, keyWords,catagory,minPrice,maxPrice,productReview);
+            return MarketController.getStoreInfo(userId, user, storeId);
         }
-        internal ShoppingBagProduct addToCart(string user, int productId, int storeId,int quantity)
+        internal List<ProductDTO> SearchProduct(int userId, string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
         {
-            return MarketController.addToBag(user, productId, storeId, quantity);
+            return MarketController.SearchProduct(userId, user, productId, keyWords,catagory,minPrice,maxPrice,productReview);
         }
-        internal ShoppingCartDTO viewCart(string user)
+        internal ShoppingBagProduct addToCart(int userId, string user, int productId, int storeId,int quantity)
         {
-            return UserController.viewCart(user);
+            return MarketController.addToBag(userId, user, productId, storeId, quantity);
         }
-        internal void editCart(string user, int productId, int newQuantity)
+        internal ShoppingCartDTO viewCart(int userId, string user)
         {
-            UserController.editCart(user, productId, newQuantity);
+            return UserController.viewCart(userId, user);
         }
-        internal void BuyCart(string user)
+        internal ShoppingCartDTO editCart(int userId, string user, int productId, int newQuantity)
         {
-            MarketController.BuyCart(user);
+            return UserController.editCart(userId, user, productId, newQuantity);
         }
-        
+        internal void BuyCart(int userId, string user, string address)
+        {
+            MarketController.BuyCart(userId, user, address);
+        }
+
+        public void AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId)
+        {
+            MarketController.AddProductDiscount(userId, user, storeId,jsonDiscount,productId);
+        }
+
+        public void AddCategoryDiscount(int userId, string user, int storeId, string jsonDiscount, string categoryName)
+        {
+            MarketController.AddCategoryDiscount(userId, user, storeId,jsonDiscount,categoryName);
+        }
+
+        public void AddStoreDiscount(int userId, string user, int storeId, string jsonDiscount)
+        {
+            MarketController.AddStoreDiscount(userId, user, storeId, jsonDiscount);
+        }
+
+        public void RemoveProductFromStore(int userId, string username, int storeId, int productID)
+        {
+            MarketController.RemoveProductFromStore(userId, username, storeId, productID);
+        }
+
+        public void ChangeProductName(int userId, string username, int storeId, int productID, string name)
+        {
+            MarketController.ChangeProductName(userId, username, storeId, productID, name);
+        }
+
+        public void ChangeProductPrice(int userId, string username, int storeId, int productID, int price)
+        {
+            MarketController.ChangeProductPrice(userId, username, storeId, productID, price);
+        }
+
+        public void ChangeProductQuantity(int userId, string username, int storeId, int productID, int quantity)
+        {
+            MarketController.ChangeProductQuantity(userId, username, storeId,productID,quantity);
+        }
+
+        public void ChangeProductCategory(int userId, string username, int storeId, int productID, string category)
+        {
+            MarketController.ChangeProductCategory(userId, username, storeId, productID, category);
+        }
     }
 }
