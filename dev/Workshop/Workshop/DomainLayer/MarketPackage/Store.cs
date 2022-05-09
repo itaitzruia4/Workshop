@@ -75,7 +75,7 @@ namespace Workshop.DomainLayer.MarketPackage
             ValidateName(name);
             ValidatePrice(price);
             ValidateQuantity(quantity);
-
+            ValidateCategory(category);
             Product newProd = new Product(productID, name, description, price, quantity, category);
             products.Add(productID, newProd);
             return newProd;
@@ -118,6 +118,32 @@ namespace Workshop.DomainLayer.MarketPackage
             products[productID].Quantity = quantity;
         }
 
+        public void ChangeProductCategory(int productID, string category)
+        {
+            ValidateID(productID);
+            ValidateProductExist(productID);
+            ValidateCategory(category);
+            products[productID].Category = category;
+        }
+
+        public void AddProductDiscount(string json_discount, int product_id)
+        {
+            if (!products.ContainsKey(product_id))
+                throw new Exception("Product ID: " + product_id + " does not exist in store.");
+            discountPolicy.AddProductDiscount(json_discount, product_id);
+        }
+
+        public void AddCategoryDiscount(string json_discount, string category_name)
+        {
+            ValidateCategory(category_name);
+            discountPolicy.AddCategoryDiscount(json_discount, category_name);
+        }
+
+        public void AddStoreDiscount(string json_discount)
+        {
+            discountPolicy.AddStoreDiscount(json_discount);
+        }
+
         private void ValidateID(int ID)
         {
             if (ID < 0)
@@ -146,6 +172,12 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             if (quantity < 0)
                 throw new ArgumentOutOfRangeException("Quntity must be zero or above.");
+        }
+
+        private void ValidateCategory(string category)
+        {
+            if (category == null || category.Equals(""))
+                throw new ArgumentException("Category must be non-empty.");
         }
 
         public Product GetProduct(int productId)

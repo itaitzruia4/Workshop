@@ -253,5 +253,109 @@ namespace Workshop.ServiceLayer
                 return new Response(e.Message);
             }
         }
+
+        public Response AddProductDiscount(string user, int storeId, string jsonDiscount, int productId)
+        {
+            try
+            {
+                facade.AddProductDiscount(user, storeId, jsonDiscount, productId);
+                return new Response();
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message);
+            }
+        }
+
+        public Response AddCategoryDiscount(string user, int storeId, string jsonDiscount, string categoryName)
+        {
+            try
+            {
+                facade.AddCategoryDiscount(user, storeId, jsonDiscount, categoryName);
+                return new Response();
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message);
+            }
+        }
+
+        public Response AddStoreDiscount(string user, int storeId, string jsonDiscount)
+        {
+            try
+            {
+                facade.AddStoreDiscount(user, storeId, jsonDiscount);
+                return new Response();
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message);
+            }
+        }
+
+        public Response RemoveProductFromStore(string username, int storeId, int productID)
+        {
+            try
+            {
+                facade.RemoveProductFromStore(username, storeId, productID);
+                return new Response();
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message);
+            }
+        }
+
+        public Response ChangeProductName(string username, int storeId, int productID, string name)
+        {
+            try
+            {
+                facade.ChangeProductName(username, storeId, productID, name);
+                return new Response();
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message);
+            }
+        }
+
+        public Response ChangeProductPrice(string username, int storeId, int productID, int price)
+        {
+            try
+            {
+                facade.ChangeProductPrice(username, storeId, productID, price);
+                return new Response();
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message);
+            }
+        }
+
+        public Response ChangeProductQuantity(string username, int storeId, int productID, int quantity)
+        {
+            try
+            {
+                facade.ChangeProductQuantity(username, storeId, productID, quantity);
+                return new Response();
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message);
+            }
+        }
+
+        public Response ChangeProductCategory(string username, int storeId, int productID, string category)
+        {
+            try
+            {
+                facade.ChangeProductCategory(username, storeId, productID, category);
+                return new Response();
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message);
+            }
+        }
     }
 }

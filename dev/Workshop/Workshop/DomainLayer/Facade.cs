@@ -115,6 +115,45 @@ namespace Workshop.DomainLayer
         {
             MarketController.BuyCart(user,address);
         }
-        
+
+        public void AddProductDiscount(string user, int storeId, string jsonDiscount, int productId)
+        {
+            MarketController.AddProductDiscount(user,storeId,jsonDiscount,productId);
+        }
+
+        public void AddCategoryDiscount(string user, int storeId, string jsonDiscount, string categoryName)
+        {
+            MarketController.AddCategoryDiscount(user,storeId,jsonDiscount,categoryName);
+        }
+
+        public void AddStoreDiscount(string user, int storeId, string jsonDiscount)
+        {
+            MarketController.AddStoreDiscount(user,storeId,jsonDiscount);
+        }
+
+        public void RemoveProductFromStore(string username, int storeId, int productID)
+        {
+            MarketController.RemoveProductFromStore(username, storeId, productID);
+        }
+
+        public void ChangeProductName(string username, int storeId, int productID, string name)
+        {
+            MarketController.ChangeProductName(username,storeId,productID,name);
+        }
+
+        public void ChangeProductPrice(string username, int storeId, int productID, int price)
+        {
+            MarketController.ChangeProductPrice(username,storeId,productID,price);
+        }
+
+        public void ChangeProductQuantity(string username, int storeId, int productID, int quantity)
+        {
+            MarketController.ChangeProductQuantity(username,storeId,productID,quantity);
+        }
+
+        public void ChangeProductCategory(string username, int storeId, int productID, string category)
+        {
+            MarketController.ChangeProductCategory(username,storeId,productID,category);
+        }
     }
 }

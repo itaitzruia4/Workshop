@@ -42,5 +42,21 @@ namespace Workshop.ServiceLayer
         Response<ShoppingCart> editCart(string user, int productId, int newQuantity);
 
         Response BuyCart(string user, string address);
+
+        Response AddProductDiscount(string user, int storeId, string jsonDiscount, int productId);
+
+        Response AddCategoryDiscount(string user, int storeId, string jsonDiscount, string categoryName);
+
+        Response AddStoreDiscount(string user, int storeId, string jsonDiscount);
+
+        Response RemoveProductFromStore(string username, int storeId, int productID);
+
+        Response ChangeProductName(string username, int storeId, int productID, string name);
+
+        Response ChangeProductPrice(string username, int storeId, int productID, int price);
+
+        Response ChangeProductQuantity(string username, int storeId, int productID, int quantity);
+
+        Response ChangeProductCategory(string username, int storeId, int productID, string category);
     }
 }
