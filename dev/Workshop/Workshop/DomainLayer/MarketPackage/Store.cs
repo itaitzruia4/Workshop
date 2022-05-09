@@ -184,7 +184,8 @@ namespace Workshop.DomainLayer.MarketPackage
 
         internal StoreDTO GetStoreDTO()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            return new StoreDTO(id, name, products,open);
         }
 
         internal bool ProductExists(int product_id)
