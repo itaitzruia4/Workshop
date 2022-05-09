@@ -22,11 +22,11 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         {
 
             userControllerMock = new Mock<IUserController>();
-            userControllerMock.Setup(x => x.AssertCurrentUser(It.IsAny<string>())).Callback((string user) => {});
+            userControllerMock.Setup(x => x.AssertCurrentUser(It.IsAny<int>(), It.IsAny<string>())).Callback((string user) => {});
             userControllerMock.Setup(x => x.IsAuthorized(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action>())).Returns((string user, int storeId, Action action) => !user.Equals("Notallowed Cohen"));
             userControllerMock.Setup(x => x.GetWorkers(It.IsAny<int>())).Returns(new List<Member>(new Member[] {new Member("Worker1", "pass1")}));
             userControllerMock.Setup(x => x.GetMember(It.IsAny<string>())).Returns(new Member("StoreFounder1", "pass1"));
-            userControllerMock.Setup(x => x.addToCart(It.IsAny<string>(), It.IsAny<ShoppingBagProduct>(), It.IsAny<int>())).Returns(new ShoppingBagProduct(1, "someName", "someDesc", 10.0, 3, "cat1"));
+            userControllerMock.Setup(x => x.addToCart(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<ShoppingBagProduct>(), It.IsAny<int>())).Returns(new ShoppingBagProduct(1, "someName", "someDesc", 10.0, 3, "cat1"));
            
             Mock<IMarketPaymentService> paymentMock = new Mock<IMarketPaymentService>();
             paymentMock.Setup(x => x.PayAmount(It.IsAny<string>(), It.IsAny<double>())).Callback((string username, double amount) => {});
@@ -36,7 +36,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
 
             marketController = new MarketController(userControllerMock.Object, paymentMock.Object, supplyMock.Object);
             marketController.InitializeSystem();
-            Store store1 = marketController.CreateNewStore("StoreFounder1", "shop1");
+            Store store1 = marketController.CreateNewStore(1, "StoreFounder1", "shop1");
 
             // marketController = new MarketController();
             // userController = new UserController(security);
@@ -49,10 +49,10 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
             string username = "StoreFounder1"; int storeId = 1;
 
             // Act
-            marketController.CloseStore(username, storeId);
+            marketController.CloseStore(1, username, storeId);
 
             // Assert
-            Assert.IsFalse(marketController.IsStoreOpen(username, storeId));
+            Assert.IsFalse(marketController.IsStoreOpen(1, username, storeId));
         }
 
         [TestMethod]
@@ -62,27 +62,27 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
             string username = "StoreFounder1"; int storeId = 1;
 
             //act
-            marketController.CloseStore(username, storeId);
+            marketController.CloseStore(1, username, storeId);
 
             // Assert
-            Assert.ThrowsException<ArgumentException>(() => marketController.CloseStore(username, storeId));
+            Assert.ThrowsException<ArgumentException>(() => marketController.CloseStore(1, username, storeId));
         }
 
         [TestMethod]
         public void TestGetWorkersInformation_Success(){
-            CollectionAssert.AreEqual(userControllerMock.Object.GetWorkers(1), marketController.GetWorkersInformation("User1", 1));
+            CollectionAssert.AreEqual(userControllerMock.Object.GetWorkers(1), marketController.GetWorkersInformation(1, "User1", 1));
         }
 
         [TestMethod]
         public void TestGetWorkersInformation_Failure_NoPermission(){
-            Assert.ThrowsException<MemberAccessException>(() => marketController.GetWorkersInformation("Notallowed Cohen", 1));
+            Assert.ThrowsException<MemberAccessException>(() => marketController.GetWorkersInformation(1, "Notallowed Cohen", 1));
         }
 
         [TestMethod]
         public void TestCreateNewStore_Success(){
             string username = "User1";
             string storeName = "Cool store 123";
-            Store result = marketController.CreateNewStore(username, storeName);
+            Store result = marketController.CreateNewStore(1, username, storeName);
             Assert.AreEqual(result.GetStoreName(), storeName);
             Assert.AreEqual(result.GetProducts().Count, 0);
             Assert.AreEqual(result.IsOpen(), true);
@@ -93,7 +93,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         [DataRow(null, null)]
         [DataRow("User1", "")]
         public void TestCreateNewStore_Failure_EmptyOrNullInput(string username, string storeName){
-            Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(username, storeName));
+            Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(1, username, storeName));
         }
 
         [DataTestMethod]
@@ -101,12 +101,12 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         [DataRow("User1", 1, "key", "catagory", 0, 24, 3)]
         public void TestSearchProduct_Success(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
         {
-            marketController.CreateNewStore(user, "store");
-            marketController.AddProductToStore(user, 1, productId, "someName", "someDesc", 10.0, 2, "cat1");
+            marketController.CreateNewStore(1, user, "store");
+            marketController.AddProductToStore(1, user, 1, productId, "someName", "someDesc", 10.0, 2, "cat1");
             Product product = new Product(productId, "someName", "someDesc", 10.0, 2, "cat1");
             List<Product> products = new List<Product>();
             products.Add(product);
-            ProductDTO product2 = marketController.SearchProduct(user, productId, keyWords, catagory, minPrice, maxPrice, productReview)[0];
+            ProductDTO product2 = marketController.SearchProduct(1, user, productId, keyWords, catagory, minPrice, maxPrice, productReview)[0];
             Assert.IsTrue(product.EqualsFields(product2));
         }
 
@@ -118,11 +118,11 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         [DataRow("User1", -1, "", "", 0, 24, 3)] //no products to filter from 
         public void TestSearchProduct_Failure(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
         {
-            marketController.CreateNewStore(user, "store");
-            marketController.AddProductToStore(user, 1, 1, "someName", "someDesc", 10.0, 2, "cat1");
+            marketController.CreateNewStore(1, user, "store");
+            marketController.AddProductToStore(1, user, 1, 1, "someName", "someDesc", 10.0, 2, "cat1");
             Product product = new Product(productId, "someName", "someDesc", 10.0, 2, "cat1");
             List<ProductDTO> empty = new List<ProductDTO>();
-            CollectionAssert.AreEqual(empty,marketController.SearchProduct(user, productId, keyWords, catagory, minPrice, maxPrice, productReview));
+            CollectionAssert.AreEqual(empty,marketController.SearchProduct(1, user, productId, keyWords, catagory, minPrice, maxPrice, productReview));
         }
 
 
@@ -130,10 +130,10 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         [DataRow("User1", 1, 1, 3)]
         public void TestAddToCart_Success(string user, int productId, int storeId, int quantity)
         {
-            marketController.CreateNewStore(user, "store");
+            marketController.CreateNewStore(1, user, "store");
             //Product product = new Product(productId, "someName", "someDesc", 10.0, quantity);
-            Product product = marketController.AddProductToStore(user, 1, 1, "someName", "someDesc", 10.0, 3, "cat1");
-            Assert.IsTrue(product.EqualsFields(marketController.addToBag(user, productId, storeId, quantity).GetProductDTO()));
+            Product product = marketController.AddProductToStore(1, user, 1, 1, "someName", "someDesc", 10.0, 3, "cat1");
+            Assert.IsTrue(product.EqualsFields(marketController.addToBag(1, user, productId, storeId, quantity).GetProductDTO()));
         }
 
         [DataTestMethod]
@@ -142,9 +142,9 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         [DataRow("User1", 1, 1, 4)] //wrong quantity;
         public void TestAddToCart_Failure(string user, int productId, int storeId, int quantity)
         {
-            marketController.CreateNewStore(user, "store");
-            marketController.AddProductToStore(user, 1, 1, "someName", "someDesc", 10.0, 2, "cat1");
-            Assert.ThrowsException<ArgumentException>(() => marketController.addToBag(user, productId, storeId, quantity));
+            marketController.CreateNewStore(1, user, "store");
+            marketController.AddProductToStore(1, user, 1, 1, "someName", "someDesc", 10.0, 2, "cat1");
+            Assert.ThrowsException<ArgumentException>(() => marketController.addToBag(1, user, productId, storeId, quantity));
             Product product = new Product(productId, "someName", "someDesc", 10.0, 2, "cat1");
         }
     }

@@ -15,24 +15,24 @@ namespace Workshop.DomainLayer.UserPackage
     public interface IUserController
     {
         void InitializeSystem();
-        User EnterMarket();
-        void ExitMarket();
-        void Register(string username, string password);
+        User EnterMarket(int userId);
+        void ExitMarket(int userId);
+        void Register(int userId, string username, string password);
         bool IsMember(string username);
         Member GetMember(string username);
-        Member Login(string username, string password);
-        void Logout(string username);
-        StoreOwner NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId);
-        StoreManager NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId);
+        Member Login(int userId, string username, string password);
+        void Logout(int userId, string username);
+        StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId);
+        StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId);
         bool IsAuthorized(string username, int storeId, Action action);
-        void AssertCurrentUser(string username);
+        void AssertCurrentUser(int userId, string username);
         List<Member> GetWorkers(int storeId);
-        ReviewDTO ReviewProduct(string user, int productId, string review);
-        ShoppingBagProduct addToCart(string user, ShoppingBagProduct shoppingBagProduct, int storeId);
-        ShoppingCartDTO viewCart(string user);
+        ReviewDTO ReviewProduct(int userId, string user, int productId, string review);
+        ShoppingBagProduct addToCart(int userId, string user, ShoppingBagProduct shoppingBagProduct, int storeId);
+        ShoppingCartDTO viewCart(int userId, string user);
         void AddStoreFounder(string username, int storeId);
-        void AddOrder(OrderDTO order, string username);
-        ShoppingCartDTO editCart(string user, int productId, int newQuantity);
-        void ClearUserCart();
+        void AddOrder(int userId, OrderDTO order, string username);
+        ShoppingCartDTO editCart(int userId, string user, int productId, int newQuantity);
+        void ClearUserCart(int userId);
     }
 }

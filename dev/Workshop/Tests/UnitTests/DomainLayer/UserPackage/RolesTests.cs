@@ -31,9 +31,9 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             review = reviewMock.Object;
 
             userController = new UserController(security, review);
-            userController.EnterMarket();
-            userController.Register("nirdan", "12345");
-            this.member = userController.Login("nirdan", "12345");
+            userController.EnterMarket(1);
+            userController.Register(1, "nirdan", "12345");
+            this.member = userController.Login(1, "nirdan", "12345");
         }
 
         [TestMethod]

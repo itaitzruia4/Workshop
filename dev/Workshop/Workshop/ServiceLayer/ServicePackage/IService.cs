@@ -9,54 +9,54 @@ namespace Workshop.ServiceLayer
 {
     public interface IService
     {
-        Response<User> EnterMarket();
+        Response<User> EnterMarket(int userId);
 
-        Response ExitMarket();
+        Response ExitMarket(int userId);
 
-        Response Register(string username, string password);
+        Response Register(int userId, string username, string password);
 
-        Response<Member> Login(string username, string password);
+        Response<Member> Login(int userId, string username, string password);
 
-        Response Logout(string username);
+        Response Logout(int userId, string username);
 
-        Response<Product> AddProduct(string username, int storeId, int productId, string productName, string description, double price, int quantity, string category);
+        Response<Product> AddProduct(int userId, string username, int storeId, int productId, string productName, string description, double price, int quantity, string category);
 
-        Response<StoreManager> NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId);
+        Response<StoreManager> NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId);
 
-        Response<StoreOwner> NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId);
+        Response<StoreOwner> NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId);
 
-        Response<List<Member>> GetWorkersInformation(string username, int storeId);
+        Response<List<Member>> GetWorkersInformation(int userId, string username, int storeId);
 
-        Response CloseStore(string username, int storeId);
+        Response CloseStore(int userId, string username, int storeId);
 
-        Response<Store> CreateNewStore(string creator, string storeName);
+        Response<Store> CreateNewStore(int userId, string creator, string storeName);
 
-        Response ReviewProduct(string user, int productId, string review);
+        Response ReviewProduct(int userId, string user, int productId, string review);
 
-        Response<List<Product>> SearchProduct(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview);
+        Response<List<Product>> SearchProduct(int userId, string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview);
 
-        Response<Product> addToCart(string user, int productId, int storeId, int quantity);
+        Response<Product> addToCart(int userId, string user, int productId, int storeId, int quantity);
 
-        Response<ShoppingCart> viewCart(string user);
+        Response<ShoppingCart> viewCart(int userId, string user);
 
-        Response<ShoppingCart> editCart(string user, int productId, int newQuantity);
+        Response<ShoppingCart> editCart(int userId, string user, int productId, int newQuantity);
 
-        Response BuyCart(string user, string address);
+        Response BuyCart(int userId, string user, string address);
 
-        Response AddProductDiscount(string user, int storeId, string jsonDiscount, int productId);
+        Response AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId);
 
-        Response AddCategoryDiscount(string user, int storeId, string jsonDiscount, string categoryName);
+        Response AddCategoryDiscount(int userId, string user, int storeId, string jsonDiscount, string categoryName);
 
-        Response AddStoreDiscount(string user, int storeId, string jsonDiscount);
+        Response AddStoreDiscount(int userId, string user, int storeId, string jsonDiscount);
 
-        Response RemoveProductFromStore(string username, int storeId, int productID);
+        Response RemoveProductFromStore(int userId, string username, int storeId, int productID);
 
-        Response ChangeProductName(string username, int storeId, int productID, string name);
+        Response ChangeProductName(int userId, string username, int storeId, int productID, string name);
 
-        Response ChangeProductPrice(string username, int storeId, int productID, int price);
+        Response ChangeProductPrice(int userId, string username, int storeId, int productID, int price);
 
-        Response ChangeProductQuantity(string username, int storeId, int productID, int quantity);
+        Response ChangeProductQuantity(int userId, string username, int storeId, int productID, int quantity);
 
-        Response ChangeProductCategory(string username, int storeId, int productID, string category);
+        Response ChangeProductCategory(int userId, string username, int storeId, int productID, string category);
     }
 }
