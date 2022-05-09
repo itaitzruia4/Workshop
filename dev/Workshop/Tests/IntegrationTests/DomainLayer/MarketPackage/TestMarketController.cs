@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Workshop.DomainLayer.MarketPackage;
 using Workshop.DomainLayer.MarketPackage.ExternalServices.Payment;
 using Workshop.DomainLayer.MarketPackage.ExternalServices.Supply;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
+using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Security;
 using Workshop.DomainLayer.UserPackage.Shopping;
 
@@ -77,8 +79,9 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [TestMethod]
         public void TestGetWorkersInformation_Failure_NoPermission()
         {
-            userController.Login(1, "Notallowed cohen", "pass");
-            Assert.ThrowsException<MemberAccessException>(() => marketController.GetWorkersInformation(1, "Notallowed cohen", 1));
+            userController.EnterMarket(2);
+            userController.Login(2, "Notallowed cohen", "pass");
+            Assert.ThrowsException<MemberAccessException>(() => marketController.GetWorkersInformation(2, "Notallowed cohen", 1));
         }
 
         [TestMethod]
@@ -122,9 +125,24 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             ShoppingBagProduct product2 = userController.addToCart(1, user, new ShoppingBagProduct(productId, "someName", "someDesc", 10.0, userQuantity, category), storeId);
             int leftovers = marketController.getStoreInfo(1, user, storeId).products[productId].Quantity - userQuantity;
             marketController.BuyCart(1, user, address);
-            Assert.IsTrue(userController.viewCart(1, user).shoppingBags.Count==0);
+            Assert.IsTrue(userController.viewCart(1, user).shoppingBags.Count == 0);
             Assert.IsTrue(marketController.getStoreInfo(1, user, storeId).products[productId].Quantity == leftovers);
         }
+        [TestMethod]
+        public void TestRemoveStoreOwnerNomination_Success()
+        {
+            userController.Register(1, "coolStoreOwner", "pass");
+            marketController.NominateStoreOwner(1, "member1", "coolStoreOwner", 1);
+            List<StoreRole> original_roles = new List<StoreRole>(userController.GetMember("coolStoreOwner").GetStoreRoles(1));
+            Member res = marketController.RemoveStoreOwnerNomination(1, "member1", "coolStoreOwner", 1);
+            Assert.IsTrue(res.Username == "coolStoreOwner");
+            Assert.IsTrue(res.GetStoreRoles(1).Count != original_roles.Count);
+        }
 
+        [TestMethod]
+        public void TestRemoveStoreOwnerNomination_Failure_NoNomination()
+        {
+            Assert.ThrowsException<ArgumentException>(() => marketController.RemoveStoreOwnerNomination(1, "member1", "member2", 1));
+        }
     }
 }

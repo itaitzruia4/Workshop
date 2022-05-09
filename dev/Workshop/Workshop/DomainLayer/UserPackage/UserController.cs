@@ -346,7 +346,7 @@ namespace Workshop.DomainLayer.UserPackage
 
         private void EnsureEnteredMarket(int userId)
         {
-            if (currentUsers[userId] == null)
+            if (!currentUsers.ContainsKey(userId))
                 throw new InvalidOperationException($"User {userId} must enter the market first");
         }
         
