@@ -2,21 +2,24 @@ import React from 'react';
 import { useNavigate } from "react-router-dom";
 import './Member.css';
 
-type IStore = {
+
+// TODO import Store from Store component instead of defining it here
+
+type Store = {
     id: number;
     title: string;
 }
 
-type IStores = {
-    stores: IStore[],
-    filteredStores: IStore[]
+type Stores = {
+    stores: Store[],
+    filteredStores: Store[]
 }
 
 
 function Member() {
 
-    const [stores, setStores] = React.useState<IStores>({ stores: [], filteredStores: [] });
-    const [filteredStore, setFilterStore] = React.useState<IStores>({ stores: [], filteredStores: [] });
+    const [stores, setStores] = React.useState<Stores>({ stores: [], filteredStores: [] });
+    const [filteredStore, setFilterStore] = React.useState<Stores>({ stores: [], filteredStores: [] });
     const addStores = (storeName: string) => {
         setStores({
             stores: [
@@ -54,7 +57,7 @@ function Member() {
 
 
 const StoresComponent: React.FC<{
-    stores: IStores,
+    stores: Stores,
     deleteStores: (id: number) => void
 }> = ({ stores, deleteStores }) => {
     const deleteStore = (id: number) => {
