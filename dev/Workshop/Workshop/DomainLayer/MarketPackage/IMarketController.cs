@@ -14,7 +14,7 @@ namespace Workshop.DomainLayer.MarketPackage
         
         StoreManager NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId);
 
-        Product AddProductToStore(string username, int storeId, int productID, string name, string description, double price, int quantity);
+        Product AddProductToStore(string username, int storeId, int productID, string name, string description, double price, int quantity, string category);
 
         void RemoveProductFromStore(string username, int storeId, int productID);
 

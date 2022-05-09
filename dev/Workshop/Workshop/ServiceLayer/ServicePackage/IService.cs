@@ -19,7 +19,7 @@ namespace Workshop.ServiceLayer
 
         Response Logout(string username);
 
-        Response<Product> AddProduct(string username, int storeId, int productId, string productName, string description, double price, int quantity);
+        Response<Product> AddProduct(string username, int storeId, int productId, string productName, string description, double price, int quantity, string category);
 
         Response<StoreManager> NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId);
 

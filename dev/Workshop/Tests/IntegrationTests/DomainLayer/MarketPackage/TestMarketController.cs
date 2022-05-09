@@ -113,13 +113,13 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
 
         //checks cart is empty and products were taken from stores
         [DataTestMethod]
-        [DataRow("member1", "here", 1, 3)]
-        [DataRow("member1", "here", 1, 4)]
-        public void BuyCart(string user, string address, int productId, int userQuantity)
+        [DataRow("member1", "here", 1, 3, "cat1")]
+        [DataRow("member1", "here", 1, 4, "cat1")]
+        public void BuyCart(string user, string address, int productId, int userQuantity, string category)
         {
             int storeId = marketController.CreateNewStore(user, "store").GetId();
-            marketController.AddProductToStore(user, storeId, productId, "someName", "someDesc", 10.0, 5);
-            ShoppingBagProduct product2 = userController.addToCart(user, new ShoppingBagProduct(productId, "someName", "someDesc", 10.0, userQuantity), storeId);
+            marketController.AddProductToStore(user, storeId, productId, "someName", "someDesc", 10.0, 5, "cat1");
+            ShoppingBagProduct product2 = userController.addToCart(user, new ShoppingBagProduct(productId, "someName", "someDesc", 10.0, userQuantity, category), storeId);
             int leftovers = marketController.getStoreInfo(user, storeId).products[productId].Quantity - userQuantity;
             marketController.BuyCart(user, address);
             Assert.IsTrue(userController.viewCart(user).shoppingBags.Count==0);
