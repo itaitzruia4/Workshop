@@ -44,6 +44,14 @@ ul {
         border-radius: 8px;
     }
 
+.AddStore {
+    display: flex;
+    flex-direction: row;
+    margin: 10px;
+}
+
+
+
 .Member_Delete_Srore_Btn {
     margin-left: 50px;
     margin-top: 10px;
@@ -73,9 +81,16 @@ ul {
     }
 
 
+.Member_Store_Form {
+    margin-left: 5px;
+    margin-right: 5px;
+}
 
+.Member_Store_textbox {
+    font-size: 20px;
+}
 
-.Member_Add_Store_Btn {
+.Member_Store_Btn {
     display: block;
     font-size: 20px;
     background-color: #1DB954;
@@ -83,9 +98,10 @@ ul {
     border-radius: 8px;
 }
 
-.Member_Add_Store_Btn:hover {
-    transform: scale(1.1);
-}
+    .Member_Store_Btn:hover {
+        transform: scale(1.1);
+    }
+
 
 
 
