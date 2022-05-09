@@ -1,5 +1,5 @@
 import React from 'react';
-import './MemberWindow.css';
+import './Member.css';
 
 type IStore = {
     id: number;
@@ -10,7 +10,7 @@ type IStores = {
     stores: IStore[],
 }
 
-function MemberWindow() {
+function Member() {
     const [stores, setStores] = React.useState<IStores>({ stores: [] });
     const addStores = (title: string) => {
         setStores({
@@ -68,7 +68,7 @@ const StoresComponent: React.FC<{
                         </button>
                     </li>
                 ))}
-            </ul> : <div>No store has been created</div>}
+            </ul> : <div>No store have been created</div>}
         </div>
     );
 
@@ -100,4 +100,4 @@ const AddStoresComponent = ({ addStores }: { addStores: (text: string) => void }
     );
 };
 
-export default MemberWindow;
+export default Member;

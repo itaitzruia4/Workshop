@@ -2,51 +2,46 @@ body {
     background-color: #2b2828;
 }
 
-.all{
+.login {
     margin-top: 120px;
 }
 
-.welcome_msg {
-    margin-left: 110px;
+.login_title {
+    margin-left: 300px;
+    font-size: 60px;
 }
 
-.userInput {
+.login_userInput {
     margin-left: 280px;
 }
 
-.buttons {
+.login_buttons {
     margin-left: 280px;
     text-align: center;
     display: block;
     font-size: 20px;
 }
 
-.username_textbox {
+.login_username_textbox {
     width: 34%;
     font-size: 20px;
     display: block;
 }
 
-.password_textbox {
+.login_password_textbox {
     width: 34%;
     font-size: 20px;
     display: block;
 }
 
-.login_btn {
+.login_login_btn {
     width: 35%;
     display: block;
-    font-size: 20px;
+    font-size: 18px;
 }
 
-.register_btn {
+.login_back_btn {
     width: 35%;
     display: block;
-    font-size: 20px;
-}
-
-.cag_btn {
-    width: 35%;
-    display: block;
-    font-size: 20px;
+    font-size: 18px;
 }
