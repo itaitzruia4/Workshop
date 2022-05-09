@@ -24,6 +24,8 @@ namespace Workshop.DomainLayer.MarketPackage
 
         void ChangeProductQuantity(string username, int storeId, int productID, int quantity);
 
+        void ChangeProductCategory(string username, int storeId, int productID, string category);
+
         List<Member> GetWorkersInformation(string username, int storeId);
 
         void CloseStore(string username, int storeId);
@@ -45,5 +47,11 @@ namespace Workshop.DomainLayer.MarketPackage
         ShoppingBagProduct getProductForSale(int productId, int storeId, int quantity);
 
         ShoppingBagProduct addToBag(string user, int productId, int storeId, int quantity);
+
+        void AddProductDiscount(string user, int storeId ,string jsonDiscount, int productId);
+
+        void AddCategoryDiscount(string user, int storeId, string jsonDiscount, string categoryName);
+
+        void AddStoreDiscount(string user, int storeId, string jsonDiscount);
     }
 }

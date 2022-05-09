@@ -246,6 +246,30 @@ namespace Workshop.DomainLayer.MarketPackage
             Logger.Instance.LogEvent($"{username} successfuly changed the quantity of product {productID} in store {storeId}:");
         }
 
+        public void ChangeProductCategory(string username, int storeId, int productID, string category)
+        {
+            Logger.Instance.LogEvent($"{username} is trying to change the quantity of product {productID} in store {storeId}:");
+            userController.AssertCurrentUser(username);
+            try
+            {
+                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
+            }
+            catch
+            {
+                throw new ArgumentException("Store ID does not exist");
+            }
+            finally
+            {
+                ViewStorePermission(username, storeId);
+                if (!IsAuthorized(username, storeId, Action.ChangeProductName))
+                    throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
+                ValidateStoreExists(storeId);
+                stores[storeId].ChangeProductCategory(productID, category);
+                storesLocks[storeId].ReleaseReaderLock();
+            }
+            Logger.Instance.LogEvent($"{username} successfuly changed the quantity of product {productID} in store {storeId}:");
+        }
+
         public List<OrderDTO> GetStoreOrdersList(string username, int storeId)
         {
             userController.AssertCurrentUser(username);
@@ -631,6 +655,34 @@ namespace Workshop.DomainLayer.MarketPackage
         public ShoppingBagProduct addToBag(string user, int productId, int storeId, int quantity)
         {
             return userController.addToCart(user, getProductForSale(productId, storeId, quantity), storeId);
+        }
+
+        // TODO: add concurrency
+        public void AddProductDiscount(string user, int storeId, string jsonDiscount, int productId)
+        {
+            userController.AssertCurrentUser(user);
+            ValidateStoreExists(storeId);
+            if (!IsAuthorized(user, storeId, Action.AddDiscount))
+                throw new MemberAccessException("User " + user + " is not allowed to add discounts in store " + storeId);
+            stores[storeId].AddProductDiscount(jsonDiscount, productId);
+        }
+        // TODO: add concurrency
+        public void AddCategoryDiscount(string user, int storeId, string jsonDiscount, string categoryName)
+        {
+            userController.AssertCurrentUser(user);
+            ValidateStoreExists(storeId);
+            if (!IsAuthorized(user, storeId, Action.AddDiscount))
+                throw new MemberAccessException("User " + user + " is not allowed to add discounts in store " + storeId);
+            stores[storeId].AddCategoryDiscount(jsonDiscount, categoryName);
+        }
+        // TODO: add concurrency
+        public void AddStoreDiscount(string user, int storeId, string jsonDiscount)
+        {
+            userController.AssertCurrentUser(user);
+            ValidateStoreExists(storeId);
+            if (!IsAuthorized(user, storeId, Action.AddDiscount))
+                throw new MemberAccessException("User " + user + " is not allowed to add discounts in store " + storeId);
+            stores[storeId].AddStoreDiscount(jsonDiscount);
         }
     }
 }

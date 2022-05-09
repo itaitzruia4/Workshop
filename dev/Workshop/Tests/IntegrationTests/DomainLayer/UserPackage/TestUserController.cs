@@ -29,10 +29,10 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
             userController.Register("member1", "pass1");
             userController.Login("member1", "pass1");
-            userController.addToCart("member1", new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1), 1);
+            userController.addToCart("member1", new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1, "cat1"), 1);
 
             List<ShoppingBagProduct> member1prods = new List<ShoppingBagProduct>();
-            member1prods.Add(new ShoppingBagProduct(1, "prod1", "desc1", 11.90, 3));
+            member1prods.Add(new ShoppingBagProduct(1, "prod1", "desc1", 11.90, 3, "cat1"));
             userController.AddOrder(new OrderDTO(1, "member1", "whatever", "blasToysRus", member1prods, 12.30), "member1");
             userController.Logout("member1");
 
