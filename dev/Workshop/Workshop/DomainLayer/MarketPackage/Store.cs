@@ -29,7 +29,7 @@ namespace Workshop.DomainLayer.MarketPackage
             products = new Dictionary<int, Product>();
             this.open = true; //TODO: check if on init store supposed to be open or closed.
             this.rwl = new ReaderWriterLock();
-            this.discountPolicy = new DiscountPolicy();
+            this.discountPolicy = new DiscountPolicy(this);
             this.purchasePolicy = new PurchasePolicy();
         }
 
@@ -185,6 +185,11 @@ namespace Workshop.DomainLayer.MarketPackage
         internal StoreDTO GetStoreDTO()
         {
             throw new NotImplementedException();
+        }
+
+        internal bool ProductExists(int product_id)
+        {
+            return products.ContainsKey(product_id);
         }
     }
 }

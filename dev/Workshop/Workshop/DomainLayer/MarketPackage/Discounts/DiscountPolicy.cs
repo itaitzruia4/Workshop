@@ -15,6 +15,7 @@ namespace Workshop.DomainLayer.MarketPackage
         private Dictionary<int, Discount> products_discounts;
         private Dictionary<string, Discount> category_discounts;
         private Discount store_discount;
+        private Store store;
 
         private const string AND_DISCOUNT_TAG = "AndDiscount";
         private const string OR_DISCOUNT_TAG = "OrDiscount";
@@ -29,11 +30,12 @@ namespace Workshop.DomainLayer.MarketPackage
         private const string CATEGORY_SIMPLE_TERM_TAG = "CategoryDiscountSimpleTerm";
         private const string BAG_SIMPLE_TERM_TAG = "BagDiscountSimpleTerm";
 
-        public DiscountPolicy()
+        public DiscountPolicy(Store store)
         {
             products_discounts = new Dictionary<int, Discount>();
             category_discounts = new Dictionary<string, Discount>();
             store_discount = null;
+            this.store = store;
         }
 
         public void AddProductDiscount(string json_discount, int product_id)
@@ -139,12 +141,12 @@ namespace Workshop.DomainLayer.MarketPackage
                 double percentage = double.Parse(data.percentage);
                 try
                 {
-                    double product_id = double.Parse(data.key);
+                    int product_id = double.Parse(data.key);
                     if (percentage <= 0 || percentage > 100)
                         throw new Exception("Discount percentage must be between 0 and 100");
 
-                    // TODO: check if product id exists in store!!!!
-
+                    if (!store.ProductExists(product_id))
+                        throw new Exception("Product id: " + product_id + "does not exist in store: " + store.GetId());
                     return new PriceActionSimple(percentage, (ProductDTO product) => { return product.Id == product_id; });
                 }
                 catch (Exception)
@@ -213,12 +215,12 @@ namespace Workshop.DomainLayer.MarketPackage
                 string type = data.type;
                 try
                 {
-                    double product_id = double.Parse(data.key);
+                    int product_id = double.Parse(data.key);
                     if (value <= 0)
                         throw new Exception("Discount term value must be above 0.");
 
-                    // TODO: check if product id exists in store!!!!
-                    
+                    if (!store.ProductExists(product_id))
+                        throw new Exception("Product id: " + product_id + "does not exist in store: " + store.GetId());
                     // The term is related to price of the product
                     if (type.Equals("p"))
                     {
