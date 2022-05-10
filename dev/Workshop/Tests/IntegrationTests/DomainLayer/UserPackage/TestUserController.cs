@@ -422,7 +422,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [DataRow(null)]
         public void TestReviewProduct_Failure_EmptyOrNullReview(string review)
         {
-            Assert.ThrowsException<ArgumentException>(() => userController.ReviewProduct(1, "User1", 1, review));
+            Assert.ThrowsException<KeyNotFoundException>(() => userController.ReviewProduct(1, "User1", 1, review));
         }
     }
 }
