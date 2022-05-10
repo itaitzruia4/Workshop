@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DomainProduct = Workshop.DomainLayer.MarketPackage.Product;
+using DomainProductDTO = Workshop.DomainLayer.MarketPackage.ProductDTO;
+using DomainShoppingBagProduct = Workshop.DomainLayer.MarketPackage.ShoppingBagProduct;
 
 namespace Workshop.ServiceLayer.ServiceObjects
 {
@@ -25,6 +27,24 @@ namespace Workshop.ServiceLayer.ServiceObjects
         }
 
         internal Product(DomainProduct domainProduct)
+        {
+            Id = domainProduct.Id;
+            Name = domainProduct.Name;
+            BasePrice = domainProduct.Price;
+            Description = domainProduct.Description;
+            Quantity = domainProduct.Quantity;
+        }
+
+        internal Product(DomainProductDTO domainProduct)
+        {
+            Id = domainProduct.Id;
+            Name = domainProduct.Name;
+            BasePrice = domainProduct.Price;
+            Description = domainProduct.Description;
+            Quantity = domainProduct.Quantity;
+        }
+
+        internal Product(DomainShoppingBagProduct domainProduct)
         {
             Id = domainProduct.Id;
             Name = domainProduct.Name;

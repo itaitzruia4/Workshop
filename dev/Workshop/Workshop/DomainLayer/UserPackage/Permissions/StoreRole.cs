@@ -37,6 +37,11 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             this.nominees.Add(nominee);
         }
 
+        public void RemoveNominee(StoreRole nominee)
+        {
+            this.nominees.Remove(nominee);
+        }
+
         /// <summary>
         /// Check for circularity in Store Role nominees
         /// </summary>

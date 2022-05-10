@@ -27,6 +27,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             actions.Add(Action.ViewClosedStore);
             actions.Add(Action.NominateStoreOwner);
             actions.Add(Action.NominateStoreManager);
+            actions.Add(Action.AddDiscount);
         }
     }
 }

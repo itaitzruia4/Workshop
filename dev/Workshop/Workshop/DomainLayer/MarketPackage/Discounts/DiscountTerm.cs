@@ -7,9 +7,8 @@ using Workshop.DomainLayer.UserPackage.Shopping;
 
 namespace Workshop.DomainLayer.MarketPackage.Discounts
 {
-    public interface Discount
+    public interface DiscountTerm
     {
-        double CalculateDiscountValue(ShoppingBagDTO shoppingBag);
         bool IsEligible(ShoppingBagDTO shoppingBag);
     }
 }

@@ -29,7 +29,7 @@ namespace Workshop.DomainLayer.MarketPackage
             products = new Dictionary<int, Product>();
             this.open = true; //TODO: check if on init store supposed to be open or closed.
             this.rwl = new ReaderWriterLock();
-            this.discountPolicy = new DiscountPolicy();
+            this.discountPolicy = new DiscountPolicy(this);
             this.purchasePolicy = new PurchasePolicy();
         }
 
@@ -67,7 +67,7 @@ namespace Workshop.DomainLayer.MarketPackage
             this.open = false;
         }
 
-        public Product AddProduct(int productID, string name, string description, double price, int quantity)
+        public Product AddProduct(int productID, string name, string description, double price, int quantity, string category)
         {
             ValidateID(productID);
             if (products.ContainsKey(productID))
@@ -75,8 +75,8 @@ namespace Workshop.DomainLayer.MarketPackage
             ValidateName(name);
             ValidatePrice(price);
             ValidateQuantity(quantity);
-
-            Product newProd = new Product(productID, name, description, price, quantity);
+            ValidateCategory(category);
+            Product newProd = new Product(productID, name, description, price, quantity, category);
             products.Add(productID, newProd);
             return newProd;
         }
@@ -118,6 +118,32 @@ namespace Workshop.DomainLayer.MarketPackage
             products[productID].Quantity = quantity;
         }
 
+        public void ChangeProductCategory(int productID, string category)
+        {
+            ValidateID(productID);
+            ValidateProductExist(productID);
+            ValidateCategory(category);
+            products[productID].Category = category;
+        }
+
+        public void AddProductDiscount(string json_discount, int product_id)
+        {
+            if (!products.ContainsKey(product_id))
+                throw new Exception("Product ID: " + product_id + " does not exist in store.");
+            discountPolicy.AddProductDiscount(json_discount, product_id);
+        }
+
+        public void AddCategoryDiscount(string json_discount, string category_name)
+        {
+            ValidateCategory(category_name);
+            discountPolicy.AddCategoryDiscount(json_discount, category_name);
+        }
+
+        public void AddStoreDiscount(string json_discount)
+        {
+            discountPolicy.AddStoreDiscount(json_discount);
+        }
+
         private void ValidateID(int ID)
         {
             if (ID < 0)
@@ -146,6 +172,12 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             if (quantity < 0)
                 throw new ArgumentOutOfRangeException("Quntity must be zero or above.");
+        }
+
+        private void ValidateCategory(string category)
+        {
+            if (category == null || category.Equals(""))
+                throw new ArgumentException("Category must be non-empty.");
         }
 
         public Product GetProduct(int productId)
@@ -178,13 +210,19 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             else
             {
-                products.Add(product.Id,new Product(product.Id,product.Name,product.Description,product.Price,product.Quantity));
+                products.Add(product.Id,new Product(product.Id,product.Name,product.Description,product.Price,product.Quantity, product.Category));
             }
         }
 
         internal StoreDTO GetStoreDTO()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            return new StoreDTO(id, name, products,open);
+        }
+
+        internal bool ProductExists(int product_id)
+        {
+            return products.ContainsKey(product_id);
         }
     }
 }
