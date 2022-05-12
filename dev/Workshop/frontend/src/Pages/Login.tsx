@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import './Login.css';
-import { HubConnectionBuilder, HubConnection } from '@microsoft/signalr';
 
 function Login() {
     const textStyle = { color: 'white' }
@@ -15,10 +14,36 @@ function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleUserDetails = (): void => {
+    const handleUserDetails = () => {
         if (username === "" || password === "") {
-            // TODO show error message
+            alert('User details must not be empty');
+            return;
         }
+
+        let config = {
+            method: 'POST',
+            headers: { 'Content-type': 'application/json' },
+            body: JSON.stringify({ username: username, password: password })
+        }
+
+        let url = 'http://localhost:3000/login';
+
+        return fetch(url, config)
+            .then(
+               async (response) =>
+                   await response
+                       .json()
+                       .then((responsePayload) => ({responsePayload, response}))
+            )
+            .then(({ responsePayload, response }) => {
+                if (response.ok) {
+                    routeChange('/users/' + responsePayload.userId);
+                }
+                else {
+                    alert(responsePayload.error);
+                }
+        });
+        
     }
 
     return (
