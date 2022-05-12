@@ -61,11 +61,13 @@ namespace Workshop.DomainLayer.UserPackage
         public User EnterMarket(int userId)
         {
             Logger.Instance.LogEvent($"User {userId} is trying to enter the market");
-            if (currentUsers.ContainsKey(userId))
-                throw new InvalidOperationException($"User {userId} has already entered the market");
-            currentUsers[userId] = new User();
-            Logger.Instance.LogEvent($"User {userId} has entered the market successfuly");
-            return currentUsers[userId];
+            User user = new User();
+            if (currentUsers.TryAdd(userId, user)) 
+            {
+                Logger.Instance.LogEvent($"User {userId} has entered the market successfuly");
+                return user; 
+            }
+            throw new InvalidOperationException($"User {userId} has already entered the market");
         }
 
         /// <summary>
@@ -74,11 +76,11 @@ namespace Workshop.DomainLayer.UserPackage
         public void ExitMarket(int userId)
         {
             Logger.Instance.LogEvent($"User {userId} is trying to exit the market");
-            if (currentUsers[userId] == null)
+            User user;
+            if (!currentUsers.TryRemove(userId, out user))
             {
                 throw new ArgumentException($"User {userId} has not entered the market");
             }
-            currentUsers[userId] = null;
             Logger.Instance.LogEvent($"User {userId} has exited the market successfuly");
         }
 
@@ -149,7 +151,7 @@ namespace Workshop.DomainLayer.UserPackage
         public void Logout(int userId, string username)
         {
             Logger.Instance.LogEvent($"User {userId} is trying to log out member {username}");
-            if (currentUsers[userId] == null)
+            if (!currentUsers.ContainsKey(userId))
             {
                 throw new ArgumentException($"User {userId} has not entered the market");
             }
@@ -346,7 +348,7 @@ namespace Workshop.DomainLayer.UserPackage
 
         private void EnsureEnteredMarket(int userId)
         {
-            if (currentUsers[userId] == null)
+            if (!currentUsers.ContainsKey(userId))
                 throw new InvalidOperationException($"User {userId} must enter the market first");
         }
         

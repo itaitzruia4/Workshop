@@ -69,6 +69,11 @@ namespace Workshop.DomainLayer
             return MarketController.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId);
         }
 
+        internal Member RemoveStoreOwnerNomination(int userId, string nominatorMembername, string nominatedMembername, int storeId)
+        {
+            return MarketController.RemoveStoreOwnerNomination(userId, nominatorMembername, nominatedMembername, storeId);
+        }
+
         internal List<Member> GetWorkersInformation(int userId, string membername, int storeId)
         {
             return MarketController.GetWorkersInformation(userId, membername, storeId);

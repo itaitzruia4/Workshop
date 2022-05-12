@@ -134,6 +134,22 @@ namespace Workshop.ServiceLayer
             }
         }
 
+        public Response<Member> RemoveStoreOwnerNomination(int userId, string nominatorMembername, string nominatedMembername, int storeId)
+        {
+            try
+            {
+                DomainMember domainMember = facade.RemoveStoreOwnerNomination(userId, nominatorMembername, nominatedMembername, storeId);
+                Member serviceMember = new Member(domainMember);
+                return new Response<Member>(serviceMember);
+            }
+            catch (Exception e)
+            {
+                return new Response<Member>(e.Message);
+            }
+
+        }
+
+
         public Response<List<Member>> GetWorkersInformation(int userId, string username, int storeId)
         {
             try

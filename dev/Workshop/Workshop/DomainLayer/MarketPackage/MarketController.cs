@@ -94,6 +94,28 @@ namespace Workshop.DomainLayer.MarketPackage
             return storeManager;
         }
 
+        public Member RemoveStoreOwnerNomination(int userId, string nominatorMembername, string nominatedMembername, int storeId)
+        {
+            Logger.Instance.LogEvent($"User {userId} with member {nominatorMembername} is trying to remove store owner nomination from {nominatedMembername} in store {storeId}");
+            userController.AssertCurrentUser(userId, nominatorMembername);
+            Member nominatorMember = userController.GetMember(nominatorMembername);
+            Member nominatedMember = userController.GetMember(nominatedMembername);
+            foreach (StoreRole nominatedRole in nominatedMember.GetStoreRoles(storeId))
+            {
+                foreach (StoreRole nominatorRole in nominatorMember.GetStoreRoles(storeId))
+                {
+                    if (nominatedRole is StoreOwner && (nominatorRole is StoreManager || nominatorRole is StoreOwner) && nominatorRole.ContainsNominee(nominatedRole))
+                    {
+                        nominatedMember.RemoveRole(nominatedRole);
+                        nominatorRole.RemoveNominee(nominatedRole);
+                        Logger.Instance.LogEvent($"User {userId} with member {nominatorMembername} successfuly removed store owner nomination from {nominatedMembername} in store {storeId}");
+                        return nominatedMember;
+                    }
+                }
+            }
+            throw new ArgumentException($"User {userId} with member {nominatorMembername} FAILED to remove store owner nomination from {nominatedMembername} in store {storeId}");
+        }
+
         private void ValidateStoreExists(int ID)
         {
             if (!stores.ContainsKey(ID))

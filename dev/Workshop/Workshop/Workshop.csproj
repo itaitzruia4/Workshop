@@ -100,7 +100,7 @@
     <Compile Include="DomainLayer\MarketPackage\MarketController.cs" />
     <Compile Include="DomainLayer\MarketPackage\Product.cs" />
     <Compile Include="DomainLayer\MarketPackage\ProductDTO.cs" />
-    <Compile Include="DomainLayer\MarketPackage\PurchasePolicy.cs" />
+    <Compile Include="DomainLayer\MarketPackage\PurchasePolicy\PurchasePolicy.cs" />
     <Compile Include="DomainLayer\MarketPackage\ShoppingBagProduct.cs" />
     <Compile Include="DomainLayer\MarketPackage\Store.cs" />
     <Compile Include="DomainLayer\MarketPackage\StoreDTO.cs" />
