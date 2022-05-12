@@ -379,7 +379,7 @@ namespace Tests.AcceptanceTests
             int prodId = service.AddProduct(1, username, storeId, 0, "TestReviewProduct", "Good", 1, 2, "cat1").Value.Id;
             service.addToCart(1, username, prodId, storeId, 1);
             service.BuyCart(1, username, "Ronmi's home");
-            Assert.IsFalse(service.ReviewProduct(1, username, 0, "Blank").ErrorOccured);
+            Assert.IsFalse(service.ReviewProduct(1, username, 0, "Blank", 6).ErrorOccured);
         }
 
         [DataTestMethod]
@@ -390,7 +390,7 @@ namespace Tests.AcceptanceTests
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             service.AddProduct(1, password, storeId, 0, "TestReviewProduct", "Good", 1, 1, "cat1");
             service.Logout(1, username);
-            Assert.IsTrue(service.ReviewProduct(1, username, 0, "Blank").ErrorOccured);
+            Assert.IsTrue(service.ReviewProduct(1, username, 0, "Blank", 6).ErrorOccured);
         }
 
         [DataTestMethod]
@@ -400,7 +400,7 @@ namespace Tests.AcceptanceTests
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             service.AddProduct(1, password, storeId, 0, "TestReviewProduct", "Good", 1, 1, "cat1");
-            Assert.IsTrue(service.ReviewProduct(1, username, 2, "Blank").ErrorOccured);
+            Assert.IsTrue(service.ReviewProduct(1, username, 2, "Blank", 6).ErrorOccured);
         }
 
         /*

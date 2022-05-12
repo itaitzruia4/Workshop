@@ -411,7 +411,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             int id = 1;
             string review = "Honest review123";
             userController.Login(1, username, "pass1");
-            ReviewDTO dto = userController.ReviewProduct(1, username, id, review);
+            ReviewDTO dto = userController.ReviewProduct(1, username, id, review, 4);
             Assert.AreEqual(review, dto.Review);
             Assert.AreEqual(dto.Reviewer, username);
             Assert.AreEqual(dto.ProductId, id);
@@ -422,7 +422,15 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [DataRow(null)]
         public void TestReviewProduct_Failure_EmptyOrNullReview(string review)
         {
-            Assert.ThrowsException<KeyNotFoundException>(() => userController.ReviewProduct(1, "User1", 1, review));
+            Assert.ThrowsException<KeyNotFoundException>(() => userController.ReviewProduct(1, "User1", 1, review, 4));
+        }
+
+        [DataTestMethod]
+        [DataRow(0)]
+        [DataRow(11)]
+        public void TestReviewProduct_Failure_OutOfRangeRating(int rating)
+        {
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => userController.ReviewProduct(1, "User1", 1, "TestReview", rating));
         }
     }
 }

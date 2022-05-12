@@ -88,9 +88,9 @@ namespace Workshop.DomainLayer
             return MarketController.CreateNewStore(userId, creator, storeName);
         }
 
-        internal ReviewDTO ReviewProduct(int userId, string user, int productId, string review)
+        internal ReviewDTO ReviewProduct(int userId, string user, int productId, string review, int rating)
         {
-            return UserController.ReviewProduct(userId, user, productId, review);
+            return UserController.ReviewProduct(userId, user, productId, review, rating);
         }
         internal ProductDTO getProductInfo(int userId, string user, int productId)
         {

@@ -191,11 +191,11 @@ namespace Workshop.ServiceLayer
 
         }
 
-        public Response ReviewProduct(int userId, string user, int productId, string review)
+        public Response ReviewProduct(int userId, string user, int productId, string review, int rating)
         {
             try
             {
-                facade.ReviewProduct(userId, user, productId, review);
+                facade.ReviewProduct(userId, user, productId, review, rating);
                 return new Response();
             }
             catch (Exception e)

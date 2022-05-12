@@ -404,7 +404,7 @@ namespace Workshop.DomainLayer.UserPackage
             throw new ArgumentException($"Username {username} is not a member");
         }
 
-        public ReviewDTO ReviewProduct(int userId, string user, int productId, string review)
+        public ReviewDTO ReviewProduct(int userId, string user, int productId, string review, int rating)
         {
             Logger.Instance.LogEvent("User " + user + " is trying to review product " + productId);
             AssertCurrentUser(userId, user);
@@ -424,7 +424,7 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new ArgumentException($"Username {user} did not purchase product {productId}");
             }
             Logger.Instance.LogEvent("User " + user + " successfuly reviewed product " + productId);
-            return reviewHandler.AddReview(user, productId, review);
+            return reviewHandler.AddReview(user, productId, review, rating);
         }
 
 

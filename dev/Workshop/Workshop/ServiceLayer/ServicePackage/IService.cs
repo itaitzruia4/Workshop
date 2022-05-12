@@ -33,7 +33,7 @@ namespace Workshop.ServiceLayer
 
         Response<Store> CreateNewStore(int userId, string creator, string storeName);
 
-        Response ReviewProduct(int userId, string user, int productId, string review);
+        Response ReviewProduct(int userId, string user, int productId, string review, int rating);
 
         Response<List<Product>> SearchProduct(int userId, string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview);
 

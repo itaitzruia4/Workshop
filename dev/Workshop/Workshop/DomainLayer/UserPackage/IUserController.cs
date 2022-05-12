@@ -27,7 +27,7 @@ namespace Workshop.DomainLayer.UserPackage
         bool IsAuthorized(string username, int storeId, Action action);
         void AssertCurrentUser(int userId, string username);
         List<Member> GetWorkers(int storeId);
-        ReviewDTO ReviewProduct(int userId, string user, int productId, string review);
+        ReviewDTO ReviewProduct(int userId, string user, int productId, string review, int rating);
         ShoppingBagProduct addToCart(int userId, string user, ShoppingBagProduct shoppingBagProduct, int storeId);
         ShoppingCartDTO viewCart(int userId, string user);
         void AddStoreFounder(string username, int storeId);

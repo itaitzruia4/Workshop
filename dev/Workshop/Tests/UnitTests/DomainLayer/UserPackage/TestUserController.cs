@@ -25,8 +25,8 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             securityMock.Setup(x => x.Encrypt(It.IsAny<string>())).Returns((string s) => s);
 
             var reviewMock = new Mock<IReviewHandler>();
-            reviewMock.Setup(x => x.AddReview(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>()))
-                                   .Returns((string u, int pid, string r) => new ReviewDTO(u, pid, r));
+            reviewMock.Setup(x => x.AddReview(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>()))
+                                   .Returns((string u, int pid, string r, int i) => new ReviewDTO(u, pid, r, i));
 
             userController = new UserController(securityMock.Object, reviewMock.Object);
             userController.InitializeSystem();
@@ -414,19 +414,29 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             userController.EnterMarket(1);
             string username = "member1";
             int id = 1;
+            int rating = 4;
             string review = "Honest review123";
             userController.Login(1, username, "pass1");
-            ReviewDTO dto = userController.ReviewProduct(1, username, id, review);
+            ReviewDTO dto = userController.ReviewProduct(1, username, id, review, rating);
             Assert.AreEqual(review, dto.Review);
             Assert.AreEqual(dto.Reviewer, username);
             Assert.AreEqual(dto.ProductId, id);
+            Assert.AreEqual(dto.Rating, rating);
         }
 
         [DataTestMethod]
         [DataRow("")]
         [DataRow(null)]
         public void TestReviewProduct_Failure_EmptyOrNullReview(string review){
-            Assert.ThrowsException<KeyNotFoundException>(() => userController.ReviewProduct(1, "User1", 1, review));
+            Assert.ThrowsException<KeyNotFoundException>(() => userController.ReviewProduct(1, "User1", 1, review, 4));
+        }
+
+        [DataTestMethod]
+        [DataRow(0)]
+        [DataRow(11)]
+        public void TestReviewProduct_Failure_OutOfRangeRating(int rating)
+        {
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => userController.ReviewProduct(1, "User1", 1, "TestReview", rating));
         }
 
         [DataTestMethod]

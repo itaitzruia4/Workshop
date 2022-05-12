@@ -27,7 +27,7 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             security = securityMock.Object;
 
             var reviewMock = new Mock<IReviewHandler>();
-            reviewMock.Setup(x => x.AddReview(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>()));
+            reviewMock.Setup(x => x.AddReview(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>()));
             review = reviewMock.Object;
 
             userController = new UserController(security, review);
