@@ -1,13 +1,15 @@
-body {
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-color: #2b2828;
+.member_page {
+    border-radius: 8px;
+    border: solid 2px #86BB71;
+}
+.member_page_body{
+    margin: 5px;
 }
 
 
 .section__stores {
     color: white;
+    
 }
 
 .stores-header {
@@ -102,6 +104,28 @@ ul {
         transform: scale(1.1);
     }
 
+.member_logout_btn {
+    display: block;
+    font-size: 20px;
+    background-color: #1DB954;
+    color: white;
+    border-radius: 8px;
+}
 
+    .member_logout_btn:hover {
+        transform: scale(1.1);
+    }
+
+.member_exit_btn {
+    display: block;
+    font-size: 20px;
+    background-color: #1DB954;
+    color: white;
+    border-radius: 8px;
+}
+
+    .member_exit_btn:hover {
+        transform: scale(1.1);
+    }
 
 

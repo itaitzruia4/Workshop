@@ -12,45 +12,45 @@ type Store = {
 
 type Stores = {
     stores: Store[],
-    filteredStores: Store[]
 }
 
 
 function Member() {
 
-    const [stores, setStores] = React.useState<Stores>({ stores: [], filteredStores: [] });
-    const [filteredStore, setFilterStore] = React.useState<Stores>({ stores: [], filteredStores: [] });
+    let navigate = useNavigate();
+    const routeChange = (path: string) =>
+        () => {
+            navigate(path);
+        } 
+
+    const [stores, setStores] = React.useState<Stores>({ stores: []});
     const addStores = (storeName: string) => {
         setStores({
             stores: [
                 { title: storeName, id: stores.stores.length + 1 },
                 ...stores.stores
-            ],
-            filteredStores: filteredStore.filteredStores
+            ]
         });
     };
 
-    const filterStores = (storeName: string) => {
-        setFilterStore({
-            stores: stores.stores,
-            filteredStores:
-                stores.stores.filter(({ title }) =>
-                    title.toLowerCase().includes(storeName))
-        });
-    };
     const deleteStores = (id: number) => {
         setStores({
             stores: stores.stores.filter(t => t.id !== id),
-            filteredStores: stores.stores.filter(t => t.id !== id)
         });
     };
     return (
-        <div className="App">
-            <AddStoresComponent addStores={addStores}/>
-            <hr />
-            <StoresComponent
-                stores={stores}
-                deleteStores={deleteStores} />
+        <div className="member_page">
+            <div className="member_page_body">
+                <AddStoresComponent addStores={addStores} />
+                <hr />
+                <StoresComponent
+                    stores={stores}
+                    deleteStores={deleteStores} />
+                <p className="member_control_btns">
+                    <button className="member_logout_btn" onClick={routeChange('/guest')}> Logout </button>
+                    <button className="member_exit_btn" onClick={routeChange('/')}> Exit Market </button>
+                </p>
+            </div>
         </div>
     );
 }
@@ -74,30 +74,29 @@ const StoresComponent: React.FC<{
 
     return (
         <div className="section__store">
-            <h2 className="stores-header">stores</h2>
-            {stores.filteredStores.length ? <ul className="stores">
-                {stores.filteredStores.map(store => (
+            <h2 className="stores-header">Stores</h2>
+            {stores.stores.length ? <ul className="stores">
+                {stores.stores.map(store => (
                     <li key={store.id}>
                         <span>{store.title}</span>
-                        <button
-                            className="Member_Delete_Srore_Btn"
-                            onClick={() => { deleteStore(store.id) }}>X
-                        </button>
                         <button
                             className="Member_Open_Store_Btn"
                             onClick={routeChange('/Store')}>Open store
                         </button>
+                        <button
+                            className="Member_Delete_Srore_Btn"
+                            onClick={() => { deleteStore(store.id) }}>X
+                        </button>
                     </li>
                 ))}
-            </ul> : <div style={{ color: 'white' }} >No store have been created</div>}
+            </ul> : <div style={{ color: 'white' }} >No store have been found</div>}
         </div>
     );
 
 };
 
-const AddStoresComponent = ({ addStores }: { addStores: (text: string) => void }, { filterStores }: { filterStores : (text: string) => void}) => {
+const AddStoresComponent = ({ addStores}: { addStores : (text: string) => void}) => {
     const [store, setStore] = React.useState<string>("");
-    const [filteredStore, setFilterStore] = React.useState<string>("");
     const add = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
         if (!store) {
@@ -106,11 +105,6 @@ const AddStoresComponent = ({ addStores }: { addStores: (text: string) => void }
             addStores(store);
             setStore("");
         }
-    };
-    const filterStore = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        e.preventDefault();
-        filterStores(filteredStore);
-        setFilterStore("");
     };
     return (
         <div className="AddStore">
@@ -126,11 +120,11 @@ const AddStoresComponent = ({ addStores }: { addStores: (text: string) => void }
             <form className="Member_Store_Form">
                 <button
                     className="Member_Store_Btn"
-                    onClick={filterStore}>Search store
+                    onClick={add}>Search store
                 </button>
                 <input className="Member_Store_textbox"
-                    value={filteredStore}
-                    onChange={e => { setFilterStore(e.target.value) }} />
+                    value={store}
+                    onChange={e => { setStore(e.target.value) }} />
             </form>
             <form className="Member_Store_Form">
                 <button
