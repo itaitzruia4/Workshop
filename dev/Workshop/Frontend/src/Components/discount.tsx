@@ -45,11 +45,12 @@ export const makeDiscountCompositeTerm = (value: "and" | "or" | "xor", lhs: Disc
 
 
 export type DiscountSimpleTerm = ProductDiscountSimpleTerm | CategoryDiscountSimpleTerm | BagDiscountSimpleTerm;
-export interface ProductDiscountSimpleTerm { tag: "ProductDiscountSimpleTerm", action: "<" | ">" | "=" | ">=" | "<=", value: number, productId: number };
-export const makeProductDiscountSimpleTerm = (action: "<" | ">" | "=" | ">=" | "<=", value: number, productId: number): ProductDiscountSimpleTerm => ({ tag: "ProductDiscountSimpleTerm", action: action, value: value, productId: productId });
+// type means purchase by Price/Quantity
+export interface ProductDiscountSimpleTerm { tag: "ProductDiscountSimpleTerm", type: "p" | "q", action: "<" | ">" | "=" | ">=" | "<=", value: number, productId: number };
+export const makeProductDiscountSimpleTerm = (type: "p" | "q", action: "<" | ">" | "=" | ">=" | "<=", value: number, productId: number): ProductDiscountSimpleTerm => ({ tag: "ProductDiscountSimpleTerm", type: type, action: action, value: value, productId: productId });
 
-export interface CategoryDiscountSimpleTerm { tag: "CategoryDiscountSimpleTerm", action: "<" | ">" | "=" | ">=" | "<=", value: number, category: string };
-export const makeCategoryDiscountSimpleTerm = (action: "<" | ">" | "=" | ">=" | "<=", value: number, category: string): CategoryDiscountSimpleTerm => ({ tag: "CategoryDiscountSimpleTerm", action: action, value: value, category: category });
+export interface CategoryDiscountSimpleTerm { tag: "CategoryDiscountSimpleTerm", type: "p" | "q", action: "<" | ">" | "=" | ">=" | "<=", value: number, category: string };
+export const makeCategoryDiscountSimpleTerm = (type: "p" | "q", action: "<" | ">" | "=" | ">=" | "<=", value: number, category: string): CategoryDiscountSimpleTerm => ({ tag: "CategoryDiscountSimpleTerm", type: type, action: action, value: value, category: category });
 
-export interface BagDiscountSimpleTerm { tag: "BagDiscountSimpleTerm", action: "<" | ">" | "=" | ">=" | "<=", value: number };
-export const makeBagDiscountSimpleTerm = (action: "<" | ">" | "=" | ">=" | "<=", value: number): BagDiscountSimpleTerm => ({ tag: "BagDiscountSimpleTerm", action: action, value: value });
+export interface BagDiscountSimpleTerm { tag: "BagDiscountSimpleTerm", type: "p" | "q", action: "<" | ">" | "=" | ">=" | "<=", value: number };
+export const makeBagDiscountSimpleTerm = (type: "p" | "q", action: "<" | ">" | "=" | ">=" | "<=", value: number): BagDiscountSimpleTerm => ({ tag: "BagDiscountSimpleTerm", type: type, action: action, value: value });
