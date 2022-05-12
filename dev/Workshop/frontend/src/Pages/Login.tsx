@@ -26,23 +26,24 @@ function Login() {
             body: JSON.stringify({ username: username, password: password })
         }
 
-        let url = 'http://localhost:3000/login';
+        let url = 'http://localhost:3000/authentication';
+
 
         return fetch(url, config)
             .then(
-               async (response) =>
-                   await response
-                       .json()
-                       .then((responsePayload) => ({responsePayload, response}))
+                async (response) =>
+                    await response
+                        .json()
+                        .then((responsePayload) => ({ responsePayload, response }))
             )
             .then(({ responsePayload, response }) => {
                 if (response.ok) {
-                    routeChange('/users/' + responsePayload.userId);
+                    routeChange('/users/' + responsePayload.UserId);
                 }
                 else {
-                    alert(responsePayload.error);
+                    alert(responsePayload.Error);
                 }
-        });
+            });
         
     }
 

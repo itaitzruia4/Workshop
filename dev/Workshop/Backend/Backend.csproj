@@ -11,10 +11,6 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
   </ItemGroup>
 
-	<ItemGroup>
-		<Compile Include="Properties\AssemblyInfo.cs" />
-	</ItemGroup>
-
 
 	<ItemGroup>
 	  <Folder Include="ServiceLayer\ServiceObjects\" />
