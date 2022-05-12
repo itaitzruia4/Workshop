@@ -355,7 +355,7 @@ namespace Workshop.DomainLayer.MarketPackage
             ValidateStoreExists(storeId);
             stores[storeId].openStore();*/
             throw new NotImplementedException();
-            Logger.Instance.LogEvent($"{username} successfuly opened store {storeId}.");
+            // Logger.Instance.LogEvent($"{username} successfuly opened store {storeId}.");
         }
 
         public void CloseStore(int userId, string username, int storeId)
