@@ -11,6 +11,9 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         public MarketManager()
         {
             actions.Add(Action.ViewClosedStore);
+            actions.Add(Action.CancelMember);
+            actions.Add(Action.GetMarketStatistics);
+            actions.Add(Action.GetMembersOnlineStats); 
         }
         public override bool Equals(object obj)
         {

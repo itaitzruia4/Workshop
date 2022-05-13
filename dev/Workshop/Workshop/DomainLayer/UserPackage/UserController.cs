@@ -477,5 +477,50 @@ namespace Workshop.DomainLayer.UserPackage
             orderHandler.addOrder(order, username);
             Logger.Instance.LogEvent($"User {userId} with member {username} added new order with ID {order.id}");
         }
+
+        public void CancelMember(int userId, string actingUsername, string canceledUsername)
+        {
+            Logger.Instance.LogEvent($"User {userId} with member {actingUsername} is trying to cancel member {canceledUsername}");
+            // Check that nominator is the logged in member
+            AssertCurrentUser(userId, actingUsername);
+
+            // Check that the nominated member is indeed a member
+            EnsureMemberExists(canceledUsername);
+
+
+            Member actor = members[actingUsername], canceled = members[canceledUsername];
+
+            // Check that the canceled member has a role
+            if (canceled.HasRoles())
+                throw new MemberAccessException($"User {canceledUsername} has roles so he cannot be canceled.");
+
+            // Check that the nominator is authorized to nominate a store owner
+            if (!actor.IsAuthorized(Action.CancelMember))
+                throw new MemberAccessException($"User {actingUsername} is not allowed to cancel members.");
+
+            //cancel member
+            members.TryRemove(canceledUsername,out canceled);
+        }
+
+        public void GetMembersOnlineStats(int userId, string actingUsername)
+        {
+            Logger.Instance.LogEvent($"User {userId} with member {actingUsername} is trying to get members online stats");
+            // Check that nominator is the logged in member
+            AssertCurrentUser(userId, actingUsername);
+
+            Member actor = members[actingUsername];
+
+            // Check that the nominator is authorized to nominate a store owner
+            if (!actor.IsAuthorized(Action.GetMembersOnlineStats))
+                throw new MemberAccessException($"User {actingUsername} is not allowed to get members online stats.");
+
+            //get online members stats
+            Dictionary<MemberDTO, bool> OnlineStats = new Dictionary<MemberDTO, bool>();
+            foreach( Member member in members.Values)
+            {
+                OnlineStats.Add(member.GetMemberDTO(), currentUsers.ContainsKey(member.Id));
+            }
+            return OnlineStats;
+        }
     }
 }

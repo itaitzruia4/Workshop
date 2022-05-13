@@ -81,6 +81,7 @@
     <Compile Include="DomainLayer\MarketPackage\Discounts\SimpleDiscount.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\SumComposite.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\XorDiscount.cs" />
+    <Compile Include="DomainLayer\UserPackage\Permissions\MemberDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DomainLayer\Facade.cs" />
     <Compile Include="DomainLayer\Loggers\Logger.cs" />
