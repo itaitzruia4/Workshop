@@ -7,22 +7,24 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Communication.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class AuthenticationController : ControllerBase
     {
-        [HttpPost]
-        public void Post([FromBody] LoginRequest request)
+        [HttpPost("login")]
+        public ActionResult<AuthenticationResponse> Post([FromBody] LoginRequest request)
         {
-            Console.WriteLine("Reached post method!!!!!!!!!!!!!");
-            /*
+            throw new MemberAccessException();
             if (request.Username == "itai")
                 return Ok(new AuthenticationResponse
                 {
-                    UserId = 1
+                    UserId = 8
                 });
             else
-                return BadRequest("Username must be itai");
-            */
+                return BadRequest(new AuthenticationResponse {
+                    UserId = -1,
+                    Error = "Username must be itai"
+                    }
+                );
         }
     }
 }
