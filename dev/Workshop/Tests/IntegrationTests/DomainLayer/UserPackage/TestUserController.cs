@@ -27,7 +27,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
             userController.EnterMarket(1);
 
-            userController.Register(1, "member1", "pass1");
+            userController.Register(1, "member1", "pass1", 40);
             userController.Login(1, "member1", "pass1");
             userController.addToCart(1, "member1", new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1, "cat1"), 1);
 
@@ -36,10 +36,10 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             userController.AddOrder(1, new OrderDTO(1, "member1", "whatever", "blasToysRus", member1prods, 12.30), "member1");
             userController.Logout(1, "member1");
 
-            userController.Register(1, "member3", "pass3");
-            userController.Register(1, "member4", "pass4");
+            userController.Register(1, "member3", "pass3", 40);
+            userController.Register(1, "member4", "pass4", 40);
 
-            userController.Register(1, "member2", "pass2");
+            userController.Register(1, "member2", "pass2", 40);
             userController.Login(1, "member2", "pass2");
             userController.AddStoreFounder("member2", member2StoreId);
 
@@ -51,7 +51,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
             userController.Logout(1, "member2");
 
-            userController.Register(1, "member5", "pass5");
+            userController.Register(1, "member5", "pass5", 40);
 
             userController.ExitMarket(1);
         }
@@ -64,7 +64,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             userController.EnterMarket(1);
 
             // Act
-            userController.Register(1, username, password);
+            userController.Register(1, username, password, 40);
 
             // Assert
             Assert.IsTrue(userController.IsMember(username));
@@ -77,7 +77,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [ExpectedException(typeof(ArgumentException), "Username or password cannot be empty")]
         public void TestRegister_EmptyDetails(string username, string password)
         {
-            userController.Register(1, username, password);
+            userController.Register(1, username, password, 40);
             Assert.IsFalse(userController.IsMember(username));
         }
 
@@ -88,7 +88,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [ExpectedException(typeof(ArgumentException), "Username or password cannot be empty")]
         public void TestRegister_NullDetails(string username, string password)
         {
-            userController.Register(1, username, password);
+            userController.Register(1, username, password, 40);
             Assert.IsFalse(userController.IsMember(username));
         }
 
@@ -100,9 +100,9 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             Assert.IsFalse(userController.IsMember(username));
             userController.EnterMarket(1);
 
-            userController.Register(1, username, password);
+            userController.Register(1, username, password, 40);
             Assert.IsTrue(userController.IsMember(username));
-            userController.Register(1, username, password);
+            userController.Register(1, username, password, 40);
         }
 
         [DataTestMethod]
@@ -113,7 +113,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             Assert.IsTrue(userController.IsMember(username));
 
             userController.EnterMarket(1);
-            userController.Register(1, username, password);
+            userController.Register(1, username, password, 40);
         }
 
         [TestMethod]

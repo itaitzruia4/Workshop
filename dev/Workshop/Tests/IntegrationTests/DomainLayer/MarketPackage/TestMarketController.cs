@@ -36,9 +36,9 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
 
             userController.EnterMarket(1);
 
-            userController.Register(1, "member1", "pass1");
-            userController.Register(1, "member2", "pass2");
-            userController.Register(1, "Notallowed cohen", "pass");
+            userController.Register(1, "member1", "pass1", 40);
+            userController.Register(1, "member2", "pass2", 40);
+            userController.Register(1, "Notallowed cohen", "pass", 40);
             userController.Login(1, "member1", "pass1");
             Store store1 = marketController.CreateNewStore(1, "member1", "shop1");
             userController.NominateStoreManager(1, "member1", "member2", store1.GetId());
@@ -99,7 +99,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         {
             string username = "CompletelyRandomNameNoChanceAnyoneWouldEverWriteIt";
             userController.Logout(1, "member1");
-            userController.Register(1, username, "pass");
+            userController.Register(1, username, "pass", 40);
             Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(1, username, "Store123"));
         }
 
@@ -131,7 +131,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [TestMethod]
         public void TestRemoveStoreOwnerNomination_Success()
         {
-            userController.Register(1, "coolStoreOwner", "pass");
+            userController.Register(1, "coolStoreOwner", "pass", 40);
             marketController.NominateStoreOwner(1, "member1", "coolStoreOwner", 1);
             List<StoreRole> original_roles = new List<StoreRole>(userController.GetMember("coolStoreOwner").GetStoreRoles(1));
             Member res = marketController.RemoveStoreOwnerNomination(1, "member1", "coolStoreOwner", 1);

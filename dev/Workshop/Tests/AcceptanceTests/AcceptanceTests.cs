@@ -74,7 +74,7 @@ namespace Tests.AcceptanceTests
         public void TestRegister_Good(int userId, string username, string password)
         {
             service.EnterMarket(userId);
-            Assert.IsFalse(service.Register(userId, username, password).ErrorOccured);
+            Assert.IsFalse(service.Register(userId, username, password, 40).ErrorOccured);
         }
 
         [DataTestMethod]
@@ -83,8 +83,8 @@ namespace Tests.AcceptanceTests
         [DataRow(username, "TestRegister_Bad")]
         public void TestRegister_Bad(string username, string password)
         {
-            service.Register(1, username, password);
-            Assert.IsTrue(service.Register(1, username, password).ErrorOccured);
+            service.Register(1, username, password, 40);
+            Assert.IsTrue(service.Register(1, username, password, 40).ErrorOccured);
         }
 
 
@@ -93,7 +93,7 @@ namespace Tests.AcceptanceTests
         public void TestLogin_Good(int userId, string username, string password)
         {
             service.EnterMarket(userId);
-            service.Register(userId, username, password);
+            service.Register(userId, username, password, 40);
             Response<Member> rMember = service.Login(userId, username, password);
             Assert.IsFalse(rMember.ErrorOccured);
             Assert.IsNotNull(rMember.Value);
@@ -116,7 +116,7 @@ namespace Tests.AcceptanceTests
         [DataRow(username, password, null)]
         public void TestLogin_Bad_WrongPassword(string username, string password, string wrongPassword)
         {
-            service.Register(1, username, password);
+            service.Register(1, username, password, 40);
             Assert.IsTrue(service.Login(1, username, wrongPassword).ErrorOccured);
         }
 
@@ -127,7 +127,7 @@ namespace Tests.AcceptanceTests
         [DataRow(username, password, null)]
         public void TestLogin_Bad_WrongUsername(string username, string password, string wrongUsername)
         {
-            service.Register(1, username, password);
+            service.Register(1, username, password, 40);
             Assert.IsTrue(service.Login(1, wrongUsername, password).ErrorOccured);
         }
 
@@ -302,10 +302,10 @@ namespace Tests.AcceptanceTests
             service.EnterMarket(2);
             service.EnterMarket(3);
             service.EnterMarket(4);
-            Assert.IsFalse(service.Register(1, "Nominated", "none").ErrorOccured);
-            Assert.IsFalse(service.Register(2, "Nominator1", "1").ErrorOccured);
-            Assert.IsFalse(service.Register(3, "Nominator2", "2").ErrorOccured);
-            Assert.IsFalse(service.Register(4, "Owner", "own").ErrorOccured);
+            Assert.IsFalse(service.Register(1, "Nominated", "none", 40).ErrorOccured);
+            Assert.IsFalse(service.Register(2, "Nominator1", "1", 40).ErrorOccured);
+            Assert.IsFalse(service.Register(3, "Nominator2", "2", 40).ErrorOccured);
+            Assert.IsFalse(service.Register(4, "Owner", "own", 40).ErrorOccured);
             Assert.IsFalse(service.Login(4, "Owner", "own").ErrorOccured);
 
             int storeId = service.CreateNewStore(4, "Owner", "RandomStore").Value.StoreId;
@@ -750,9 +750,9 @@ namespace Tests.AcceptanceTests
             service.EnterMarket(1);
             service.EnterMarket(2);
             service.EnterMarket(3);
-            Assert.IsFalse(service.Register(1, "buyer1", "1").ErrorOccured);
-            Assert.IsFalse(service.Register(2, "buyer2", "2").ErrorOccured);
-            Assert.IsFalse(service.Register(3, "Owner", "own").ErrorOccured);
+            Assert.IsFalse(service.Register(1, "buyer1", "1", 40).ErrorOccured);
+            Assert.IsFalse(service.Register(2, "buyer2", "2", 40).ErrorOccured);
+            Assert.IsFalse(service.Register(3, "Owner", "own", 40).ErrorOccured);
             Assert.IsFalse(service.Login(3, "Owner", "own").ErrorOccured);
 
             int storeId = service.CreateNewStore(3, "Owner", "RandomStore").Value.StoreId;

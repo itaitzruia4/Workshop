@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.UserPackage.Shopping;
 
-namespace Workshop.DomainLayer.MarketPackage.Discounts
+namespace Workshop.DomainLayer.MarketPackage.Terms
 {
-    public interface DiscountTerm
+    public interface Term
     {
         bool IsEligible(ShoppingBagDTO shoppingBag);
+        bool IsEligible(ShoppingBagDTO shoppingBag, int age);
     }
 }

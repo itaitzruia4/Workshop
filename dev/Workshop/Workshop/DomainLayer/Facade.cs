@@ -49,9 +49,9 @@ namespace Workshop.DomainLayer
             UserController.Logout(userId, membername);
         }
 
-        public void Register(int userId, string membername, string password)
+        public void Register(int userId, string membername, string password, int age)
         {
-            UserController.Register(userId, membername, password);
+            UserController.Register(userId, membername, password, age);
         }
 
         internal Product AddProduct(int userId, string membername, int storeId, int productId, string productName, string description, double price, int quantity, string category)

@@ -12,13 +12,19 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         public string Username { get; }
         internal string Password { get; }
 
+        public int Age { get; }
+
         private List<Role> roles;
+
         private ReaderWriterLock rwl;
 
-        public Member(string username, string password)
+        public Member(string username, string password, int age)
         {
             Username = username;
             Password = password;
+            if (age <= 0)
+                throw new ArgumentException($"Age can't be a non-positive value for member {username}");
+            Age = age;
             roles = new List<Role>();
             this.rwl = new ReaderWriterLock();
         }

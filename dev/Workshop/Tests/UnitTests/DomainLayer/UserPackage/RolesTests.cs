@@ -32,7 +32,7 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
 
             userController = new UserController(security, review);
             userController.EnterMarket(1);
-            userController.Register(1, "nirdan", "12345");
+            userController.Register(1, "nirdan", "12345", 40);
             this.member = userController.Login(1, "nirdan", "12345");
         }
 
