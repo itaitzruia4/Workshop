@@ -114,6 +114,8 @@ namespace Workshop.DomainLayer.MarketPackage
                 return new AndTerm(ParseTerm(data.lhs), ParseTerm(data.rhs));
             if (value.Equals("or"))
                 return new OrTerm(ParseTerm(data.lhs), ParseTerm(data.rhs));
+            if (value.Equals("if"))
+                return new ConditionedTerm(ParseTerm(data.lhs), ParseTerm(data.rhs));
             throw new Exception("Unknown composite purchase term type: " + value);
         }
 
