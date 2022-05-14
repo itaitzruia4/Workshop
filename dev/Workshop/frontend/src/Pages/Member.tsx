@@ -1,18 +1,11 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
 import './Member.css';
+import { Store , Stores} from "../Components/store"
 
 
 // TODO import Store from Store component instead of defining it here
 
-type Store = {
-    id: number;
-    title: string;
-}
-
-type Stores = {
-    stores: Store[],
-}
 
 
 function Member() {
