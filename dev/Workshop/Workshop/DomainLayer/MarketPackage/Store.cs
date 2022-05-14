@@ -191,7 +191,7 @@ namespace Workshop.DomainLayer.MarketPackage
             
             foreach (ProductDTO product in shoppingBag.products)
             {
-                if(products.ContainsKey(product.Id)&products[product.Id].Quantity>product.Quantity)
+                if(products.ContainsKey(product.Id) && products[product.Id].Quantity >= product.Quantity)
                 {
                     products[product.Id].Quantity -= product.Quantity;
                 }
