@@ -40,7 +40,7 @@ export const makeCategoryPriceActionSimple = (percentage: number, category: stri
 
 
 export type DiscountTerm = DiscountCompositeTerm | DiscountSimpleTerm;
-export interface DiscountCompositeTerm { tag: "DiscountCompositeTerm", value: "and" | "or" | "xor", lhs: DiscountTerm, rhs: DiscountTerm };
+export interface DiscountCompositeTerm { tag: "DiscountCompositeTerm", value: "and" | "or" | "xor" | "if", lhs: DiscountTerm, rhs: DiscountTerm };
 export const makeDiscountCompositeTerm = (value: "and" | "or" | "xor" | "if", lhs: DiscountTerm, rhs: DiscountTerm): DiscountCompositeTerm => ({ tag: "DiscountCompositeTerm", value: value, lhs: lhs, rhs: rhs });
 
 

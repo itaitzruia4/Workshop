@@ -11,7 +11,6 @@ namespace Backend.Communication.Controllers
     [Route("api/[controller]")]
     public class AuthenticationController : ControllerBase
     {
-        [EnableCors("LiberalPolicy")]
         [HttpPost("login")]
         public ActionResult<AuthenticationResponse> Post([FromBody] LoginRequest request)
         {

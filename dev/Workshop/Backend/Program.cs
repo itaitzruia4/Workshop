@@ -6,28 +6,26 @@ namespace Backend.Communication
     {
         public static void Main(string[] args)
         {
-
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            // Add builder.Services to the container.
 
+            builder.Services.AddControllers();
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("LiberalPolicy",
+                options.AddDefaultPolicy(
                     policy =>
                     {
-                        policy.WithOrigins("http://localhost:3000/")
-                                            .AllowAnyHeader()
-                                            .AllowAnyMethod();
+                        policy
+                            .AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
                     });
             });
 
-            builder.Services.AddControllers();
-
             var app = builder.Build();
-
-            app.UseHttpsRedirection();
-
+            //app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseRouting();
 
             app.UseCors();
