@@ -70,6 +70,24 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             rwl.ReleaseReaderLock();
         }
 
+        public void RemoveRole(Role role)
+        {
+            rwl.AcquireReaderLock(Timeout.Infinite);
+            foreach (Role role2 in roles)
+            {
+                if (role.Equals(role2))
+                {
+                    LockCookie lc = rwl.UpgradeToWriterLock(Timeout.Infinite);
+                    roles.Remove(role2);
+                    rwl.DowngradeFromWriterLock(ref lc);
+                    rwl.ReleaseReaderLock();
+                    return;
+                }
+            }
+            rwl.ReleaseReaderLock();
+            throw new InvalidOperationException($"Member {this.Username} does not have the requested role.");
+        }
+
         public List<StoreRole> GetStoreRoles(int storeId)
         {
             rwl.AcquireReaderLock(Timeout.Infinite);

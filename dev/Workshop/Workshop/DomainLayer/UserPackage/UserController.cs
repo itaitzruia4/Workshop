@@ -23,11 +23,11 @@ namespace Workshop.DomainLayer.UserPackage
         // TODO should user key be member ID or username?
         private OrderHandler<string> orderHandler;
         private ConcurrentDictionary<string, Member> members;
-        private User currentUser;
+        private ConcurrentDictionary<int, User> currentUsers;
         public UserController(ISecurityHandler securityHandler, IReviewHandler reviewHandler)
         {
             this.securityHandler = securityHandler;
-            currentUser = null;
+            currentUsers = new ConcurrentDictionary<int, User>();
             this.reviewHandler = reviewHandler;
             members = new ConcurrentDictionary<string, Member>();
             this.orderHandler = new OrderHandler<string>();
@@ -58,25 +58,30 @@ namespace Workshop.DomainLayer.UserPackage
         /// <returns>
         /// A <c>User</c> instance representing the guest who entered the market
         /// </returns>
-        public User EnterMarket()
+        public User EnterMarket(int userId)
         {
-            Logger.Instance.LogEvent("User trying to enter the market");
-            if (currentUser != null)
-                throw new InvalidOperationException("You have already entered the market");
-
-            currentUser = new User();
-            Logger.Instance.LogEvent("User entered the market successfuly");
-            return currentUser;
+            Logger.Instance.LogEvent($"User {userId} is trying to enter the market");
+            User user = new User();
+            if (currentUsers.TryAdd(userId, user)) 
+            {
+                Logger.Instance.LogEvent($"User {userId} has entered the market successfuly");
+                return user; 
+            }
+            throw new InvalidOperationException($"User {userId} has already entered the market");
         }
 
         /// <summary>
         /// User exits the market
         /// </summary>
-        public void ExitMarket()
+        public void ExitMarket(int userId)
         {
-            Logger.Instance.LogEvent("User trying to exit the market");
-            currentUser = null;
-            Logger.Instance.LogEvent("User exited the market successfuly");
+            Logger.Instance.LogEvent($"User {userId} is trying to exit the market");
+            User user;
+            if (!currentUsers.TryRemove(userId, out user))
+            {
+                throw new ArgumentException($"User {userId} has not entered the market");
+            }
+            Logger.Instance.LogEvent($"User {userId} has exited the market successfuly");
         }
 
         /// <summary>
@@ -84,11 +89,11 @@ namespace Workshop.DomainLayer.UserPackage
         /// </summary>
         /// <param name="username">Username to be registered</param>
         /// <param name="password">Password of the user that registers to the system</param>
-        public void Register(string username, string password)
+        public void Register(int userId, string username, string password)
         {
-            Logger.Instance.LogEvent("Trying to register user " + username);
+            Logger.Instance.LogEvent($"User {userId} is trying to register user {username}");
             EnsureNonEmptyUserDetails(username, password);
-            EnsureEnteredMarket();
+            EnsureEnteredMarket(userId);
 
             if (IsMember(username))
                 throw new ArgumentException($"Username {username} already exists");
@@ -96,7 +101,7 @@ namespace Workshop.DomainLayer.UserPackage
             string encryptedPassword = securityHandler.Encrypt(password);
             Member newMember = new Member(username, encryptedPassword);
             if (members.TryAdd(username, newMember))
-                Logger.Instance.LogEvent("Successfuly registered user " + username);
+                Logger.Instance.LogEvent($"User {userId} has successfuly registered user {username}");
             else
                 throw new ArgumentException($"Username {username} already exists");
             
@@ -114,17 +119,17 @@ namespace Workshop.DomainLayer.UserPackage
         /// <returns>
         /// The logged in member
         /// </returns>
-        public Member Login(string username, string password)
+        public Member Login(int userId, string username, string password)
         {
-            Logger.Instance.LogEvent("Trying to login user " + username);
+            Logger.Instance.LogEvent($"User {userId} is trying to login member {username}");
             EnsureNonEmptyUserDetails(username, password);
-            EnsureEnteredMarket();
+            EnsureEnteredMarket(userId);
 
             if (!IsMember(username))
                 throw new ArgumentException($"Username {username} does not exist");
 
-            if (currentUser is Member)
-                throw new InvalidOperationException("User is already logged in");
+            if (currentUsers[userId] is Member)
+                throw new InvalidOperationException($"User {userId} is already logged in");
 
             Member member = members[username];
 
@@ -132,11 +137,10 @@ namespace Workshop.DomainLayer.UserPackage
                    encryptedPasswordInput = securityHandler.Encrypt(password);
 
             if (!encryptedPasswordInput.Equals(encryptedTruePassword))
-                throw new ArgumentException("Wrong password");
+                throw new ArgumentException($"User {userId} has entered wrong password for member {username}");
 
-            // TODO figure out how to support multiple logged in users at once
-            currentUser = member;
-            Logger.Instance.LogEvent("Successfuly logged in user " + username);
+            currentUsers[userId] = member;
+            Logger.Instance.LogEvent($"Successfuly logged in user {userId} as member {username}");
             return member;
         }
 
@@ -144,15 +148,21 @@ namespace Workshop.DomainLayer.UserPackage
         /// Perform a logout attempt. If successfull, the current member returns to be a visitor.
         /// </summary>
         /// <param name="username">Username of the user that requests to log out</param>
-        public void Logout(string username)
+        public void Logout(int userId, string username)
         {
-            Logger.Instance.LogEvent("Trying to log out user " + username);
-            if (!IsMember(username))
-                throw new ArgumentException($"Username {username} does not exist");
-            AssertCurrentUser(username);
+            Logger.Instance.LogEvent($"User {userId} is trying to log out member {username}");
+            if (!currentUsers.ContainsKey(userId))
+            {
+                throw new ArgumentException($"User {userId} has not entered the market");
+            }
+            if (!(currentUsers[userId] is Member))
+            {
+                throw new ArgumentException($"User {userId} is not logged in as a member");
+            }
+            AssertCurrentUser(userId, username);
 
-            currentUser = new User();
-            Logger.Instance.LogEvent("Successfuly logged out user " + username);
+            currentUsers[userId] = new User();
+            Logger.Instance.LogEvent($"Successfuly logged out user {userId} from member {username}");
         }
 
         /// <summary>
@@ -179,11 +189,11 @@ namespace Workshop.DomainLayer.UserPackage
         }
 
         // Being called only from MarketController
-        public StoreOwner NominateStoreOwner(string nominatorUsername, string nominatedUsername, int storeId)
+        public StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId)
         {
-            Logger.Instance.LogEvent($"User {nominatedUsername} is trying to nominate {nominatedUsername} as a store owner of store {storeId}");
+            Logger.Instance.LogEvent($"User {userId} with member {nominatedUsername} is trying to nominate {nominatedUsername} as a store owner of store {storeId}");
             // Check that nominator is the logged in member
-            AssertCurrentUser(nominatorUsername);
+            AssertCurrentUser(userId, nominatorUsername);
 
             // Check that the nominated member is indeed a member
             EnsureMemberExists(nominatedUsername);
@@ -221,15 +231,16 @@ namespace Workshop.DomainLayer.UserPackage
             // Add the new manager to the nominator's nominees list
             StoreRole nominatorStoreOwner = nominatorStoreRoles.Last();
             nominatorStoreOwner.AddNominee(newRole);
-            Logger.Instance.LogEvent("User " + nominatorUsername + " successfuly nominated " + nominatedUsername + " as a store owner of store " + storeId);
+            Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} successfuly nominated member {nominatedUsername} as a store owner of store {storeId}");
             return newRole;
         }
 
         // Being called only from MarketController
-        public StoreManager NominateStoreManager(string nominatorUsername, string nominatedUsername, int storeId)
+        public StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId)
         {
+            Logger.Instance.LogEvent($"User {userId} with member {nominatedUsername} is trying to nominate {nominatedUsername} as a store manager of store {storeId}");
             // Check that nominator is the logged in member
-            AssertCurrentUser(nominatorUsername);
+            AssertCurrentUser(userId, nominatorUsername);
 
             // Check that the nominated member is indeed a member
             EnsureMemberExists(nominatedUsername);
@@ -258,7 +269,7 @@ namespace Workshop.DomainLayer.UserPackage
             // Add the new manager to the nominator's nominees list
             StoreRole nominatorStoreRole = nominatorStoreRoles.Last();
             nominatorStoreRole.AddNominee(newRole);
-            Logger.Instance.LogEvent("User " + nominatorUsername + " successfuly nominated " + nominatedUsername + " as a store manager of store " + storeId);
+            Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} successfuly nominated member {nominatedUsername} as a store manager of store {storeId}");
             return newRole;
         }
 
@@ -268,11 +279,11 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new ArgumentException($"Username {username} does not exist");
         }
 
-        public void AddPermissionToStoreManager(string ownerUsername, string managerUsername, int storeId, Action permission)
+        public void AddPermissionToStoreManager(int userId, string ownerUsername, string managerUsername, int storeId, Action permission)
         {
-            Logger.Instance.LogEvent("User " + ownerUsername + " is trying to add permission to " + managerUsername + " in store " + storeId);
+            Logger.Instance.LogEvent($"User {userId} with member {ownerUsername} is trying to add a permission to {managerUsername} in store {storeId}");
             // Check that owner is the logged in member
-            AssertCurrentUser(ownerUsername);
+            AssertCurrentUser(userId, ownerUsername);
 
             // Check that the manager is indeed a member
             EnsureMemberExists(managerUsername);
@@ -289,20 +300,20 @@ namespace Workshop.DomainLayer.UserPackage
                 {
                     // Add the permission to the manager
                     storeRole.AddAction(permission);
-                    Logger.Instance.LogEvent("User " + ownerUsername + " successfuly added permission to " + managerUsername + " in store " + storeId);
+                    Logger.Instance.LogEvent($"User {userId} with member {ownerUsername} successfuly to add a permission to {managerUsername} in store {storeId}");
                     return;
                 }
             }
             // If not found manager role in roles list throw an exception.
-            Logger.Instance.LogEvent("User " + ownerUsername + " FAILED to add permission to " + managerUsername + " in store " + storeId);
-            throw new ArgumentException($"User {managerUsername} is not a store manager of store {storeId}");
+            Logger.Instance.LogEvent($"User {userId} with member {ownerUsername} FAILED to add a permission to {managerUsername} in store {storeId}");
+            throw new ArgumentException($"Member {managerUsername} is not a store manager of store {storeId}");
         }
 
-        public void RemovePermissionFromStoreManager(string ownerUsername, string managerUsername, int storeId, Action permission)
+        public void RemovePermissionFromStoreManager(int userId, string ownerUsername, string managerUsername, int storeId, Action permission)
         {
-            Logger.Instance.LogEvent("User " + ownerUsername + " trying to remove permission from " + managerUsername + " in store " + storeId);
+            Logger.Instance.LogEvent($"User {userId} with member {ownerUsername} is trying to remove a permission from {managerUsername} in store {storeId}");
             // Check that owner is the logged in member
-            AssertCurrentUser(ownerUsername);
+            AssertCurrentUser(userId, ownerUsername);
 
             // Check that the manager is indeed a member
             EnsureMemberExists(managerUsername);
@@ -319,12 +330,12 @@ namespace Workshop.DomainLayer.UserPackage
                 {
                     // Add the permission to the manager
                     storeRole.RemoveAction(permission);
-                    Logger.Instance.LogEvent("User " + ownerUsername + " successfuly removed permission from " + managerUsername + " in store " + storeId);
+                    Logger.Instance.LogEvent($"User {userId} with member {ownerUsername} successfuly removed a permission from {managerUsername} in store {storeId}");
                     return;
                 }
             }
             // If not found manager role in roles list throw an exception.
-            Logger.Instance.LogEvent("User " + ownerUsername + " FAILED to removed permission from " + managerUsername + " in store " + storeId);
+            Logger.Instance.LogEvent($"User {userId} with member {ownerUsername} FAILED to remove a permission from {managerUsername} in store {storeId}");
             throw new ArgumentException($"User {managerUsername} is not a store manager of store {storeId}");
         }
 
@@ -335,10 +346,10 @@ namespace Workshop.DomainLayer.UserPackage
             return members[username].IsAuthorized(storeId, action);
         }
 
-        private void EnsureEnteredMarket()
+        private void EnsureEnteredMarket(int userId)
         {
-            if (currentUser == null)
-                throw new InvalidOperationException("You must enter the market first");
+            if (!currentUsers.ContainsKey(userId))
+                throw new InvalidOperationException($"User {userId} must enter the market first");
         }
         
 
@@ -346,10 +357,20 @@ namespace Workshop.DomainLayer.UserPackage
         /// Assert that current user is the user that 
         /// </summary>
         /// <param name="username"></param>
-        public void AssertCurrentUser(string username)
+        public void AssertCurrentUser(int userId, string username)
         {
-            if ((!(currentUser is Member)) || !((Member)currentUser).Username.Equals(username))
-                throw new ArgumentException($"Username {username} is not logged in");
+            if (currentUsers[userId] == null)
+            {
+                throw new ArgumentException($"User {userId} has not entered the market");
+            }
+            if (!(currentUsers[userId] is Member))
+            {
+                throw new ArgumentException($"User {userId} is not logged in as a member");
+            }
+            if (!((Member)currentUsers[userId]).Username.Equals(username))
+            {
+                throw new ArgumentException($"User {userId} is not logged in as member {username}");
+            }
         }
 
         /// <summary>
@@ -383,10 +404,10 @@ namespace Workshop.DomainLayer.UserPackage
             throw new ArgumentException($"Username {username} is not a member");
         }
 
-        public ReviewDTO ReviewProduct(string user, int productId, string review)
+        public ReviewDTO ReviewProduct(int userId, string user, int productId, string review, int rating)
         {
             Logger.Instance.LogEvent("User " + user + " is trying to review product " + productId);
-            AssertCurrentUser(user);
+            AssertCurrentUser(userId, user);
             List<OrderDTO> orders = orderHandler.GetOrders(user);
             bool purchasedProduct = false;
             foreach (OrderDTO order in orders)
@@ -403,28 +424,28 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new ArgumentException($"Username {user} did not purchase product {productId}");
             }
             Logger.Instance.LogEvent("User " + user + " successfuly reviewed product " + productId);
-            return reviewHandler.AddReview(user, productId, review);
+            return reviewHandler.AddReview(user, productId, review, rating);
         }
 
 
-        public ShoppingBagProduct addToCart(string username, ShoppingBagProduct product, int storeId)
+        public ShoppingBagProduct addToCart(int userId, string username, ShoppingBagProduct product, int storeId)
         {
             //ShoppingBagProduct 
             Logger.Instance.LogEvent("User " + username + " is trying to add a product to his cart from store " + storeId);
-            AssertCurrentUser(username);
-            return this.currentUser.addToCart(product,storeId);
+            AssertCurrentUser(userId, username);
+            return this.currentUsers[userId].addToCart(product,storeId);
         }
 
-        public ShoppingCartDTO viewCart(string user)
+        public ShoppingCartDTO viewCart(int userId, string user)
         {
             Logger.Instance.LogEvent("User " + user + " is trying to view his cart");
-            AssertCurrentUser(user);
-            return currentUser.viewShopingCart();
+            AssertCurrentUser(userId, user);
+            return currentUsers[userId].viewShopingCart();
         }
-        public ShoppingCartDTO editCart(string user, int productId, int newQuantity)
+        public ShoppingCartDTO editCart(int userId, string user, int productId, int newQuantity)
         {
             Logger.Instance.LogEvent("User " + user + " is trying to edit the quantity of " + productId + " in his cart");
-            AssertCurrentUser(user);
+            AssertCurrentUser(userId, user);
             if(newQuantity < 0)
             {
                 Logger.Instance.LogEvent("User " + user + " failed to edit the quantity of " + productId + " in his cart");
@@ -432,27 +453,31 @@ namespace Workshop.DomainLayer.UserPackage
             }
             if(newQuantity == 0)
             {
-                currentUser.deleteFromCart(productId);
+                currentUsers[userId].deleteFromCart(productId);
             }
             else
             {
-                currentUser.changeQuantityInCart(productId,newQuantity);
+                currentUsers[userId].changeQuantityInCart(productId,newQuantity);
             }
             Logger.Instance.LogEvent("User " + user + " successfuly edited the quantity of " + productId + " in his cart");
-            return currentUser.viewShopingCart();
+            return currentUsers[userId].viewShopingCart();
         }
 
-        public void ClearUserCart()
+        public void ClearUserCart(int userId)
         {
-            currentUser.ClearCart();
+            if (!currentUsers.ContainsKey(userId))
+            {
+                throw new ArgumentException($"User {userId} does not exist");
+            }
+            currentUsers[userId].ClearCart();
         }
 
-        public void AddOrder(OrderDTO order, string username)
+        public void AddOrder(int userId, OrderDTO order, string username)
         {
-            Logger.Instance.LogEvent("User " + username + " is trying to add new order with ID " + order.id);
-            AssertCurrentUser(username);
+            Logger.Instance.LogEvent($"User {userId} with member {username} is trying to add new order with ID {order.id}");
+            AssertCurrentUser(userId, username);
             orderHandler.addOrder(order, username);
-            Logger.Instance.LogEvent("User " + username + " added new order with ID " + order.id + " successfuly");
+            Logger.Instance.LogEvent($"User {userId} with member {username} added new order with ID {order.id}");
         }
     }
 }
