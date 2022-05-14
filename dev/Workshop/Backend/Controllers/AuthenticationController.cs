@@ -1,6 +1,7 @@
 ﻿using Backend.Communication.DTO;
 using Backend.Communication.Requests;
 using Backend.Communication.Responses;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -10,10 +11,10 @@ namespace Backend.Communication.Controllers
     [Route("api/[controller]")]
     public class AuthenticationController : ControllerBase
     {
+        [EnableCors("LiberalPolicy")]
         [HttpPost("login")]
         public ActionResult<AuthenticationResponse> Post([FromBody] LoginRequest request)
         {
-            throw new MemberAccessException();
             if (request.Username == "itai")
                 return Ok(new AuthenticationResponse
                 {

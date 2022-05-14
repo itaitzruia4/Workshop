@@ -14,7 +14,7 @@ function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    async function handleUserDetails(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    function handleUserDetails(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         if (username === "" || password === "") {
             alert('User details must not be empty');
             return;
@@ -22,7 +22,7 @@ function Login() {
 
         let config = {
             method: "POST",
-            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
+            headers: { "Content-Type": "application/json", "Accept": "application/json", "Access-Control-Allow-Origin": "*" },
             body: JSON.stringify({
                 username: username,
                 password: password
@@ -31,7 +31,15 @@ function Login() {
 
         let url = "http://localhost:5165/api/authentication/login";
 
-        let res = await fetch(url);
+        fetch(url, { 
+            method: 'POST',
+            mode: 'cors',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        });
 
         
         
