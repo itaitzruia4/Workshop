@@ -236,10 +236,10 @@ namespace Workshop.DomainLayer.MarketPackage
             return price - discount;
         }
 
-        internal void CheckPurchasePolicy(ShoppingBagDTO shoppingBag)
+        internal void CheckPurchasePolicy(ShoppingBagDTO shoppingBag, int age)
         {
             double price = CalaculatePrice(shoppingBag);
-            if (!purchasePolicy.CanPurchase(shoppingBag))
+            if (!purchasePolicy.CanPurchase(shoppingBag, age))
                 throw new Exception("Cannot purchase shopping bag because it violates our purchase policy.");
         }
     }

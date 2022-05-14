@@ -26,6 +26,8 @@ namespace Workshop.DomainLayer.MarketPackage
         public PurchasePolicy(Store store)
         {
             this.store = store;
+            this.products_terms = new Dictionary<int, Term>();
+            this.category_terms = new Dictionary<string, Term>();
         }
 
         public bool CanPurchase(ShoppingBagDTO shoppingBag, int age)

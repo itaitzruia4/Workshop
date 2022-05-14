@@ -13,7 +13,7 @@ namespace Workshop.ServiceLayer
 
         Response ExitMarket(int userId);
 
-        Response Register(int userId, string username, string password);
+        Response Register(int userId, string username, string password, int age);
 
         Response<Member> Login(int userId, string username, string password);
 

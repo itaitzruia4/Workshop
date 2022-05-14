@@ -23,8 +23,8 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
             userControllerMock = new Mock<IUserController>();
             userControllerMock.Setup(x => x.AssertCurrentUser(It.IsAny<int>(), It.IsAny<string>())).Callback((int x, string user) => {});
             userControllerMock.Setup(x => x.IsAuthorized(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action>())).Returns((string user, int storeId, Action action) => !user.Equals("Notallowed Cohen"));
-            userControllerMock.Setup(x => x.GetWorkers(It.IsAny<int>())).Returns(new List<Member>(new Member[] {new Member("Worker1", "pass1")}));
-            userControllerMock.Setup(x => x.GetMember(It.IsAny<string>())).Returns(new Member("StoreFounder1", "pass1"));
+            userControllerMock.Setup(x => x.GetWorkers(It.IsAny<int>())).Returns(new List<Member>(new Member[] {new Member("Worker1", "pass1", 40)}));
+            userControllerMock.Setup(x => x.GetMember(It.IsAny<string>())).Returns(new Member("StoreFounder1", "pass1", 40));
             userControllerMock.Setup(x => x.addToCart(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<ShoppingBagProduct>(), It.IsAny<int>())).Returns(new ShoppingBagProduct(1, "someName", "someDesc", 10.0, 3, "cat1"));
            
             Mock<IMarketPaymentService> paymentMock = new Mock<IMarketPaymentService>();

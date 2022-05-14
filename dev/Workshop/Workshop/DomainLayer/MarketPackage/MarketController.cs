@@ -651,7 +651,8 @@ namespace Workshop.DomainLayer.MarketPackage
                     }
                     finally
                     {
-                        stores[storeId].CheckPurchasePolicy(shoppingCart.shoppingBags[storeId]);
+                        int age = userController.GetAge(userId, username);
+                        stores[storeId].CheckPurchasePolicy(shoppingCart.shoppingBags[storeId], age);
                         stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
                         productsSoFar.Add(storeId, shoppingCart.shoppingBags[storeId].products);
                         storesLocks[storeId].ReleaseReaderLock();

@@ -43,7 +43,7 @@ namespace Workshop.DomainLayer.UserPackage
         public void InitializeSystem()
         {
             Logger.Instance.LogEvent("Starting initializing the system - User Controller");
-            Member admin = new Member("admin", securityHandler.Encrypt("admin"));
+            Member admin = new Member("admin", securityHandler.Encrypt("admin"), 40);
             admin.AddRole(new MarketManager());
             Logger.Instance.LogEvent("Finished initializing the system - User Controller");
         }
@@ -89,7 +89,7 @@ namespace Workshop.DomainLayer.UserPackage
         /// </summary>
         /// <param name="username">Username to be registered</param>
         /// <param name="password">Password of the user that registers to the system</param>
-        public void Register(int userId, string username, string password)
+        public void Register(int userId, string username, string password, int age)
         {
             Logger.Instance.LogEvent($"User {userId} is trying to register user {username}");
             EnsureNonEmptyUserDetails(username, password);
@@ -99,7 +99,7 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new ArgumentException($"Username {username} already exists");
 
             string encryptedPassword = securityHandler.Encrypt(password);
-            Member newMember = new Member(username, encryptedPassword);
+            Member newMember = new Member(username, encryptedPassword, age);
             if (members.TryAdd(username, newMember))
                 Logger.Instance.LogEvent($"User {userId} has successfuly registered user {username}");
             else
@@ -402,6 +402,19 @@ namespace Workshop.DomainLayer.UserPackage
                 return members[username];
             }
             throw new ArgumentException($"Username {username} is not a member");
+        }
+
+        public int GetAge(int userId, string membername)
+        {
+            if (IsMember(membername))
+            {
+                return GetMember(membername).Age;
+            }
+            if (currentUsers.ContainsKey(userId))
+            {
+                return -1;
+            }
+            throw new ArgumentException($"No such user: {userId} or member: {membername}");
         }
 
         public ReviewDTO ReviewProduct(int userId, string user, int productId, string review, int rating)

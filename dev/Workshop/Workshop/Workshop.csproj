@@ -68,6 +68,7 @@
     <Compile Include="DomainLayer\MarketPackage\Discounts\ConcreteDiscount.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\ConditionalDiscount.cs" />
     <Compile Include="DomainLayer\MarketPackage\Terms\AndTerm.cs" />
+    <Compile Include="DomainLayer\MarketPackage\Terms\ConditionedTerm.cs" />
     <Compile Include="DomainLayer\MarketPackage\Terms\OrTerm.cs" />
     <Compile Include="DomainLayer\MarketPackage\Terms\Term.cs" />
     <Compile Include="DomainLayer\MarketPackage\Terms\CompositeTerm.cs" />
