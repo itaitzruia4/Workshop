@@ -14,15 +14,15 @@ namespace Workshop.DomainLayer.MarketPackage.Terms
 
         public override bool IsEligible(ShoppingBagDTO shoppingBag)
         {
-            if (firstTerm.IsEligible(shoppingBag))
-                return secondTerm.IsEligible(shoppingBag);
+            if (secondTerm.IsEligible(shoppingBag))
+                return firstTerm.IsEligible(shoppingBag);
             return false;
         }
 
         public override bool IsEligible(ShoppingBagDTO shoppingBag, int age)
         {
-            if (firstTerm.IsEligible(shoppingBag, age))
-                return secondTerm.IsEligible(shoppingBag, age);
+            if (secondTerm.IsEligible(shoppingBag, age))
+                return firstTerm.IsEligible(shoppingBag, age);
             return false;
         }
     }
