@@ -651,13 +651,14 @@ namespace Workshop.DomainLayer.MarketPackage
                     }
                     finally
                     {
+                        stores[storeId].CheckPurchasePolicy(shoppingCart.shoppingBags[storeId]);
                         stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
                         productsSoFar.Add(storeId, shoppingCart.shoppingBags[storeId].products);
                         storesLocks[storeId].ReleaseReaderLock();
                     }
                 }
                 supplyService.supplyToAddress(username, address);
-                paymentService.PayAmount(username, shoppingCart.getPrice());
+                paymentService.PayAmount(username,GetCartPrice(shoppingCart));
                 userController.ClearUserCart(userId);
                 Logger.Instance.LogEvent($"User {userId} successfuly paid {shoppingCart.getPrice()} and purchased his cart.");
             }
@@ -672,6 +673,16 @@ namespace Workshop.DomainLayer.MarketPackage
                     }
                 }  
             }
+        }
+
+        public double GetCartPrice(ShoppingCartDTO shoppingCart)
+        {
+            double price = 0;
+            foreach (ShoppingBagDTO shoppingBag in shoppingCart.shoppingBags.Values)
+            {
+                price += stores[shoppingBag.storeId].CalaculatePrice(shoppingBag);
+            }
+            return price;
         }
 
         public ShoppingBagProduct addToBag(int userId, string user, int productId, int storeId, int quantity)

@@ -5,8 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.MarketPackage.Discounts;
+using Workshop.DomainLayer.MarketPackage.Terms;
 using Workshop.DomainLayer.UserPackage.Shopping;
-using static Workshop.DomainLayer.MarketPackage.Discounts.DiscountSimpleTerm;
+using static Workshop.DomainLayer.MarketPackage.Terms.Term;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
@@ -179,7 +180,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
         }
 
-        private DiscountTerm ParseDiscountTerm(dynamic data)
+        private Term ParseDiscountTerm(dynamic data)
         {
             string tag = data.tag;
             if (tag.Equals(DISCOUNT_COMP_TERM_TAG))
@@ -193,23 +194,28 @@ namespace Workshop.DomainLayer.MarketPackage
             throw new Exception("Unknown discount term tag: " + tag);
         }
 
-        private DiscountTerm ParseDiscountCompositeTerm(dynamic data)
+        internal int CalculateDiscount(ShoppingBagDTO shoppingBag)
+        {
+            throw new NotImplementedException();
+        }
+
+        private Term ParseDiscountCompositeTerm(dynamic data)
         {
             string term = data.value;
             if (term.Equals("and"))
-                return new DiscountAndTerm(ParseDiscountTerm(data.left), ParseDiscountTerm(data.right));
+                return new AndTerm(ParseDiscountTerm(data.left), ParseDiscountTerm(data.right));
             if (term.Equals("or"))
-                return new DiscountOrTerm(ParseDiscountTerm(data.left), ParseDiscountTerm(data.right));
+                return new OrTerm(ParseDiscountTerm(data.left), ParseDiscountTerm(data.right));
             if (term.Equals("xor"))
-                return new DiscountXorTerm(ParseDiscountTerm(data.left), ParseDiscountTerm(data.right));
+                return new XorTerm(ParseDiscountTerm(data.left), ParseDiscountTerm(data.right));
             throw new Exception("Unknown discount term action: " + term);
         }
 
-        private DiscountTerm ParseProductDiscountSimpleTerm(dynamic data)
+        private Term ParseProductDiscountSimpleTerm(dynamic data)
         {
             try
             {
-                SimpleTerm filter;
+                SimpleTerm.TermSimple filter;
                 string action = data.action;
                 double value = double.Parse(data.value);
                 string type = data.type;
@@ -225,7 +231,7 @@ namespace Workshop.DomainLayer.MarketPackage
                     if (type.Equals("p"))
                     {
                         if (action.Equals("<"))
-                            filter = (ShoppingBagDTO shopping_bag) => {
+                            filter = (ShoppingBagDTO shopping_bag, int age) => {
                                 double total_price = 0;
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
@@ -235,7 +241,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 return total_price < value;
                             };
                         else if (action.Equals(">"))
-                            filter = (ShoppingBagDTO shopping_bag) => {
+                            filter = (ShoppingBagDTO shopping_bag, int age) => {
                                 double total_price = 0;
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
@@ -245,7 +251,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 return total_price > value;
                             };
                         else if (action.Equals("="))
-                            filter = (ShoppingBagDTO shopping_bag) => {
+                            filter = (ShoppingBagDTO shopping_bag, int age) => {
                                 double total_price = 0;
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
@@ -255,7 +261,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 return total_price == value;
                             };
                         else if (action.Equals(">="))
-                            filter = (ShoppingBagDTO shopping_bag) => {
+                            filter = (ShoppingBagDTO shopping_bag, int age) => {
                                 double total_price = 0;
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
@@ -265,7 +271,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 return total_price >= value;
                             };
                         else if (action.Equals("<="))
-                            filter = (ShoppingBagDTO shopping_bag) => {
+                            filter = (ShoppingBagDTO shopping_bag, int age) => {
                                 double total_price = 0;
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
@@ -281,7 +287,7 @@ namespace Workshop.DomainLayer.MarketPackage
                     else if (type.Equals("q"))
                     {
                         if (action.Equals("<"))
-                            filter = (ShoppingBagDTO shopping_bag) => {
+                            filter = (ShoppingBagDTO shopping_bag, int age) => {
                                 double quantity = 0;
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
@@ -291,7 +297,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 return quantity < value;
                             };
                         else if (action.Equals(">"))
-                            filter = (ShoppingBagDTO shopping_bag) => {
+                            filter = (ShoppingBagDTO shopping_bag, int age) => {
                                 double quantity = 0;
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
@@ -301,7 +307,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 return quantity > value;
                             };
                         else if (action.Equals("="))
-                            filter = (ShoppingBagDTO shopping_bag) => {
+                            filter = (ShoppingBagDTO shopping_bag, int age) => {
                                 double quantity = 0;
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
@@ -311,7 +317,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 return quantity == value;
                             };
                         else if (action.Equals(">="))
-                            filter = (ShoppingBagDTO shopping_bag) => {
+                            filter = (ShoppingBagDTO shopping_bag, int age) => {
                                 double quantity = 0;
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
@@ -321,7 +327,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 return quantity >= value;
                             };
                         else if (action.Equals("<="))
-                            filter = (ShoppingBagDTO shopping_bag) => {
+                            filter = (ShoppingBagDTO shopping_bag, int age) => {
                                 double quantity = 0;
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
@@ -336,7 +342,7 @@ namespace Workshop.DomainLayer.MarketPackage
                     else
                         throw new Exception("Unknown term type: " + type);
 
-                    return new DiscountSimpleTerm(filter);
+                    return new Terms.SimpleTerm(filter);
                 }
                 catch (Exception)
                 {
@@ -349,11 +355,11 @@ namespace Workshop.DomainLayer.MarketPackage
             }
         }
 
-        private DiscountTerm ParseCategoryDiscountSimpleTerm(dynamic data)
+        private Term ParseCategoryDiscountSimpleTerm(dynamic data)
         {
             try
             {
-                SimpleTerm filter;
+                SimpleTerm.TermSimple filter;
                 string action = data.action;
                 double value = double.Parse(data.value);
                 string type = data.type;
@@ -368,7 +374,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 if (type.Equals("p"))
                 {
                     if (action.Equals("<"))
-                        filter = (ShoppingBagDTO shopping_bag) => {
+                        filter = (ShoppingBagDTO shopping_bag, int age) => {
                             double total_price = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
@@ -378,7 +384,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             return total_price < value;
                         };
                     else if (action.Equals(">"))
-                        filter = (ShoppingBagDTO shopping_bag) => {
+                        filter = (ShoppingBagDTO shopping_bag, int age) => {
                             double total_price = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
@@ -388,7 +394,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             return total_price > value;
                         };
                     else if (action.Equals("="))
-                        filter = (ShoppingBagDTO shopping_bag) => {
+                        filter = (ShoppingBagDTO shopping_bag, int age) => {
                             double total_price = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
@@ -398,7 +404,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             return total_price == value;
                         };
                     else if (action.Equals(">="))
-                        filter = (ShoppingBagDTO shopping_bag) => {
+                        filter = (ShoppingBagDTO shopping_bag, int age) => {
                             double total_price = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
@@ -408,7 +414,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             return total_price >= value;
                         };
                     else if (action.Equals("<="))
-                        filter = (ShoppingBagDTO shopping_bag) => {
+                        filter = (ShoppingBagDTO shopping_bag, int age) => {
                             double total_price = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
@@ -424,7 +430,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 else if (type.Equals("q"))
                 {
                     if (action.Equals("<"))
-                        filter = (ShoppingBagDTO shopping_bag) => {
+                        filter = (ShoppingBagDTO shopping_bag, int age) => {
                             double quantity = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
@@ -434,7 +440,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             return quantity < value;
                         };
                     else if (action.Equals(">"))
-                        filter = (ShoppingBagDTO shopping_bag) => {
+                        filter = (ShoppingBagDTO shopping_bag, int age) => {
                             double quantity = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
@@ -444,7 +450,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             return quantity > value;
                         };
                     else if (action.Equals("="))
-                        filter = (ShoppingBagDTO shopping_bag) => {
+                        filter = (ShoppingBagDTO shopping_bag, int age) => {
                             double quantity = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
@@ -454,7 +460,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             return quantity == value;
                         };
                     else if (action.Equals(">="))
-                        filter = (ShoppingBagDTO shopping_bag) => {
+                        filter = (ShoppingBagDTO shopping_bag, int age) => {
                             double quantity = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
@@ -464,7 +470,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             return quantity >= value;
                         };
                     else if (action.Equals("<="))
-                        filter = (ShoppingBagDTO shopping_bag) => {
+                        filter = (ShoppingBagDTO shopping_bag, int age) => {
                             double quantity = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
@@ -479,7 +485,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 else
                     throw new Exception("Unknown term type: " + type);
 
-                return new DiscountSimpleTerm(filter);
+                return new Terms.SimpleTerm(filter);
             }
             catch (Exception)
             {
@@ -487,11 +493,11 @@ namespace Workshop.DomainLayer.MarketPackage
             }
         }
 
-        private DiscountTerm ParseBagDiscountSimpleTerm(dynamic data)
+        private Term ParseBagDiscountSimpleTerm(dynamic data)
         {
             try
             {
-                SimpleTerm filter;
+                SimpleTerm.TermSimple filter;
                 string action = data.action;
                 double value = double.Parse(data.value);
                 string type = data.type;
@@ -502,7 +508,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 if (type.Equals("p"))
                 {
                     if (action.Equals("<"))
-                        filter = (ShoppingBagDTO shopping_bag) => {
+                        filter = (ShoppingBagDTO shopping_bag, int age) => {
                             double total_price = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
@@ -511,7 +517,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             return total_price < value;
                         };
                     else if (action.Equals(">"))
-                        filter = (ShoppingBagDTO shopping_bag) => {
+                        filter = (ShoppingBagDTO shopping_bag, int age) => {
                             double total_price = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
@@ -520,7 +526,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             return total_price > value;
                         };
                     else if (action.Equals("="))
-                        filter = (ShoppingBagDTO shopping_bag) => {
+                        filter = (ShoppingBagDTO shopping_bag, int age) => {
                             double total_price = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
@@ -529,7 +535,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             return total_price == value;
                         };
                     else if (action.Equals(">="))
-                        filter = (ShoppingBagDTO shopping_bag) => {
+                        filter = (ShoppingBagDTO shopping_bag, int age) => {
                             double total_price = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
@@ -538,7 +544,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             return total_price >= value;
                         };
                     else if (action.Equals("<="))
-                        filter = (ShoppingBagDTO shopping_bag) => {
+                        filter = (ShoppingBagDTO shopping_bag, int age) => {
                             double total_price = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
@@ -553,23 +559,23 @@ namespace Workshop.DomainLayer.MarketPackage
                 else if (type.Equals("q"))
                 {
                     if (action.Equals("<"))
-                        filter = (ShoppingBagDTO shopping_bag) => {
+                        filter = (ShoppingBagDTO shopping_bag, int age) => {
                             return shopping_bag.products.Count() < value;
                         };
                     else if (action.Equals(">"))
-                        filter = (ShoppingBagDTO shopping_bag) => {
+                        filter = (ShoppingBagDTO shopping_bag, int age) => {
                             return shopping_bag.products.Count() > value;
                         };
                     else if (action.Equals("="))
-                        filter = (ShoppingBagDTO shopping_bag) => {
+                        filter = (ShoppingBagDTO shopping_bag, int age) => {
                             return shopping_bag.products.Count() == value;
                         };
                     else if (action.Equals(">="))
-                        filter = (ShoppingBagDTO shopping_bag) => {
+                        filter = (ShoppingBagDTO shopping_bag, int age) => {
                             return shopping_bag.products.Count() >= value;
                         };
                     else if (action.Equals("<="))
-                        filter = (ShoppingBagDTO shopping_bag) => {
+                        filter = (ShoppingBagDTO shopping_bag, int age) => {
                             return shopping_bag.products.Count() <= value;
                         };
                     else
@@ -578,7 +584,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 else
                     throw new Exception("Unknown term type: " + type);
 
-                return new DiscountSimpleTerm(filter);
+                return new Terms.SimpleTerm(filter);
             }
             catch (Exception)
             {

@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DomainLayer.MarketPackage.Terms;
 using Workshop.DomainLayer.UserPackage.Shopping;
 
 namespace Workshop.DomainLayer.MarketPackage.Discounts
 {
     public class XorDiscount: CompositeDiscount
     {
-        private DiscountTerm DiscountTerm;
-        public XorDiscount(Discount firstDiscount, Discount secondDiscount, DiscountTerm discountTerm) : base(firstDiscount, secondDiscount)
+        private Term DiscountTerm;
+        public XorDiscount(Discount firstDiscount, Discount secondDiscount, Term discountTerm) : base(firstDiscount, secondDiscount)
         {
             this.DiscountTerm = discountTerm;
         }
