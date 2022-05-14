@@ -53,7 +53,7 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         }
 
         [TestMethod]
-        public void GetStoreOrdersListFail()
+        public void GetStoreOrdersListFail_NoAuthorization()
         {
             int storeId = 1;
             member.AddRole(new StoreManager(storeId));
