@@ -58,7 +58,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         }
 
         [TestMethod]
-        public void TestCloseStore_Failure()
+        public void TestCloseStore_Failure_StoreAlreadyClosed()
         {
             // Arrange
             string username = "member1"; int storeId = 1;
@@ -118,7 +118,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [DataTestMethod]
         [DataRow("member1", "here", 1, 3, "cat1")]
         [DataRow("member1", "here", 1, 4, "cat1")]
-        public void BuyCart(string user, string address, int productId, int userQuantity, string category)
+        public void TestBuyCart_Success(string user, string address, int productId, int userQuantity, string category)
         {
             int storeId = marketController.CreateNewStore(1, user, "store").GetId();
             marketController.AddProductToStore(1, user, storeId, productId, "someName", "someDesc", 10.0, 5, "cat1");

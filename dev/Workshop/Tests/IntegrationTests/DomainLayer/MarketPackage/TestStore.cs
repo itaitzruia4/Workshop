@@ -109,7 +109,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         }
 
         [TestMethod]
-        public void RemoveProductFail()
+        public void RemoveProduct_Failure_NoSuchId()
         {
             int id = 1;
             Assert.ThrowsException<Exception>(() => store.RemoveProduct(id));
@@ -124,7 +124,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         }
 
         [TestMethod]
-        public void ChangeProductNameFail()
+        public void ChangeProductNameFail_EmptyName()
         {
             string name = "";
             string previousName = this.product.Name;
@@ -141,7 +141,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         }
 
         [TestMethod]
-        public void ChangeProductDescriptionFail()
+        public void ChangeProductDescriptionFail_BadId()
         {
             string description = "newDesc2";
             string previousDescription = this.product.Description;
@@ -158,7 +158,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         }
 
         [TestMethod]
-        public void ChangeProductPriceFail()
+        public void ChangeProductPriceFail_NegativePrice()
         {
             double price = -3.0;
             double previousPrice = this.product.Price;
@@ -175,7 +175,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         }
 
         [TestMethod]
-        public void ChangeProductQuantityFail()
+        public void ChangeProductQuantityFail_NegativeQuantity()
         {
             int quantity = -5;
             double previousQuantity = this.product.Quantity;

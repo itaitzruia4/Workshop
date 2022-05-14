@@ -75,7 +75,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [DataRow("", "pass")]
         [DataRow("", "")]
         [ExpectedException(typeof(ArgumentException), "Username or password cannot be empty")]
-        public void TestRegister_EmptyDetails(string username, string password)
+        public void TestRegister_Failure_EmptyDetails(string username, string password)
         {
             userController.Register(1, username, password, 40);
             Assert.IsFalse(userController.IsMember(username));
@@ -86,7 +86,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [DataRow(null, "pass")]
         [DataRow(null, null)]
         [ExpectedException(typeof(ArgumentException), "Username or password cannot be empty")]
-        public void TestRegister_NullDetails(string username, string password)
+        public void TestRegister_Failure_NullDetails(string username, string password)
         {
             userController.Register(1, username, password, 40);
             Assert.IsFalse(userController.IsMember(username));
@@ -94,7 +94,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
         [DataTestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void TestRegister_RegisterTwice()
+        public void TestRegister_Failure_RegisterTwice()
         {
             string username = "user4", password = "pass4";
             Assert.IsFalse(userController.IsMember(username));
@@ -107,7 +107,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
         [DataTestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void TestRegister_UserExists()
+        public void TestRegister_Failure_UserExists()
         {
             string username = "member1", password = "pass12";
             Assert.IsTrue(userController.IsMember(username));
@@ -123,7 +123,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         }
 
         [TestMethod]
-        public void TestEnterMarket_AlreadyEntered()
+        public void TestEnterMarket_Failure_AlreadyEntered()
         {
             userController.EnterMarket(1);
             Assert.ThrowsException<InvalidOperationException>(() => userController.EnterMarket(1));
@@ -144,7 +144,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException), "Username does not exist")]
-        public void TestLogin_NoSuchUser()
+        public void TestLogin_Failure_NoSuchUser()
         {
             // Arrange
             string username = "user0", password = "password0";
@@ -159,7 +159,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [DataRow("", "pass")]
         [DataRow("", "")]
         [ExpectedException(typeof(ArgumentException), "Username or password cannot be empty")]
-        public void TestLogin_EmptyDetails(string username, string password)
+        public void TestLogin_Failure_EmptyDetails(string username, string password)
         {
             userController.EnterMarket(1);
             userController.Login(1, username, password);
@@ -170,7 +170,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [DataRow(null, "pass")]
         [DataRow(null, null)]
         [ExpectedException(typeof(ArgumentException), "Username or password cannot be null")]
-        public void TestLogin_NullDetails(string username, string password)
+        public void TestLogin_Failure_NullDetails(string username, string password)
         {
             userController.EnterMarket(1);
             userController.Login(1, username, password);
@@ -180,7 +180,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [DataRow("member1", "PASS1")]
         [DataRow("member2", "PASS2")]
         [ExpectedException(typeof(ArgumentException), "Wrong password")]
-        public void TestLogin_WrongPassword(string username, string password)
+        public void TestLogin_Failure_WrongPassword(string username, string password)
         {
             // Arrange
             userController.EnterMarket(1);
@@ -191,7 +191,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException), "Current user already logged in")]
-        public void TestLogin_ThisUserAlreadyLoggedIn()
+        public void TestLogin_Failure_ThisUserAlreadyLoggedIn()
         {
             string username = "member1", password = "pass1";
             userController.EnterMarket(1);
@@ -202,7 +202,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException), "Other user already logged in")]
-        public void TestLogin_OtherUserAlreadyLoggedIn()
+        public void TestLogin_Failure_OtherUserAlreadyLoggedIn()
         {
             string username1 = "member1", password1 = "pass1", username2 = "member2", password2 = "pass2";
             userController.EnterMarket(1);
@@ -223,14 +223,14 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException), "No such user")]
-        public void TestLogout_NoSuchUser()
+        public void TestLogout_Failure_NoSuchUser()
         {
             userController.Logout(1, "imaginary_user");
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException), "No user logged in")]
-        public void TestLogout_NoUserLoggedIn()
+        public void TestLogout_Failure_NoUserLoggedIn()
         {
             string username = "member1";
             userController.EnterMarket(1);
@@ -240,7 +240,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException), "Username not equal to logged in user name")]
-        public void TestLogout_OtherUserLoggedIn()
+        public void TestLogout_Failure_OtherUserLoggedIn()
         {
             string username1 = "member1", password1 = "pass1", username2 = "member2";
             userController.EnterMarket(1);
@@ -264,7 +264,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [DataRow("member2")]
         [DataRow("member3")]
         [DataRow("member4")]
-        public void TestNominateStoreOwner_NominatorNotLoggedIn(string nominator)
+        public void TestNominateStoreOwner_Failure_NominatorNotLoggedIn(string nominator)
         {
             userController.EnterMarket(1);
             Assert.ThrowsException<ArgumentException>(() => userController.NominateStoreOwner(1, nominator, "member1", member2StoreId));
@@ -274,7 +274,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [DataRow("member2", "pass2")]
         [DataRow("member3", "pass3")]
         [DataRow("member4", "pass4")]
-        public void TestNominateStoreOwner_NoSuchNominated(string nominator, string nominatorPassword)
+        public void TestNominateStoreOwner_Failure_NoSuchNominated(string nominator, string nominatorPassword)
         {
             userController.EnterMarket(1);
             userController.Login(1, nominator, nominatorPassword);
@@ -282,7 +282,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         }
 
         [TestMethod]
-        public void TestNominateStoreOwner_NoPermission()
+        public void TestNominateStoreOwner_Failure_NoPermission()
         {
             userController.EnterMarket(1);
             string nominator = "member1";
@@ -293,7 +293,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [TestMethod]
         [DataRow("member2", "pass2")]
         [DataRow("member3", "pass3")]
-        public void TestNominateStoreOwner_NominatedAlreadyStoreOwner(string nominator, string nominatorPassword)
+        public void TestNominateStoreOwner_Failure_NominatedAlreadyStoreOwner(string nominator, string nominatorPassword)
         {
             userController.EnterMarket(1);
             userController.Login(1, nominator, nominatorPassword);
@@ -304,7 +304,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [DataRow("member2", "pass2")]
         [DataRow("member3", "pass3")]
         [DataRow("member4", "pass4")]
-        public void TestNominateStoreOwner_SelfNomination(string nominator, string nominatorPassword)
+        public void TestNominateStoreOwner_Failure_SelfNomination(string nominator, string nominatorPassword)
         {
             userController.EnterMarket(1);
             userController.Login(1, nominator, nominatorPassword);
@@ -314,7 +314,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [TestMethod]
         [DataRow("member3", "pass3")]
         [DataRow("member4", "pass4")]
-        public void TestNominateStoreOwner_CircularNomination(string nominator, string nominatorPassword)
+        public void TestNominateStoreOwner_Failure_CircularNomination(string nominator, string nominatorPassword)
         {
             userController.EnterMarket(1);
             userController.Login(1, nominator, nominatorPassword);
@@ -336,7 +336,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [DataRow("member2")]
         [DataRow("member3")]
         [DataRow("member4")]
-        public void TestNominateStoreManager_NominatorNotLoggedIn(string nominator)
+        public void TestNominateStoreManager_Failure_NominatorNotLoggedIn(string nominator)
         {
             userController.EnterMarket(1);
             Assert.ThrowsException<ArgumentException>(() => userController.NominateStoreManager(1, nominator, "member1", member2StoreId));
@@ -346,7 +346,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [DataRow("member2", "pass2")]
         [DataRow("member3", "pass3")]
         [DataRow("member4", "pass4")]
-        public void TestNominateStoreManager_NoSuchNominated(string nominator, string nominatorPassword)
+        public void TestNominateStoreManager_Failure_NoSuchNominated(string nominator, string nominatorPassword)
         {
             userController.EnterMarket(1);
             userController.Login(1, nominator, nominatorPassword);
@@ -354,7 +354,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         }
 
         [TestMethod]
-        public void TestNominateStoreManager_NoPermission()
+        public void TestNominateStoreManager_Failure_NoPermission()
         {
             userController.EnterMarket(1);
             string nominator = "member1";
@@ -365,7 +365,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [TestMethod]
         [DataRow("member2", "pass2")]
         [DataRow("member3", "pass3")]
-        public void TestNominateStoreManager_NominatedAlreadyStoreOwner(string nominator, string nominatorPassword)
+        public void TestNominateStoreManager_Failure_NominatedAlreadyStoreOwner(string nominator, string nominatorPassword)
         {
             userController.EnterMarket(1);
             userController.Login(1, nominator, nominatorPassword);
@@ -375,7 +375,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [TestMethod]
         [DataRow("member2", "pass2")]
         [DataRow("member4", "pass4")]
-        public void TestNominateStoreManager_NominatedAlreadyStoreManager(string nominator, string nominatorPassword)
+        public void TestNominateStoreManager_Failure_NominatedAlreadyStoreManager(string nominator, string nominatorPassword)
         {
             userController.EnterMarket(1);
             userController.Login(1, nominator, nominatorPassword);
@@ -386,7 +386,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [DataRow("member2", "pass2")]
         [DataRow("member3", "pass3")]
         [DataRow("member4", "pass4")]
-        public void TestNominateStoreManager_SelfNomination(string nominator, string nominatorPassword)
+        public void TestNominateStoreManager_Failure_SelfNomination(string nominator, string nominatorPassword)
         {
             userController.EnterMarket(1);
             userController.Login(1, nominator, nominatorPassword);
@@ -396,7 +396,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [TestMethod]
         [DataRow("member3", "pass3")]
         [DataRow("member4", "pass4")]
-        public void TestNominateStoreManager_CircularNomination(string nominator, string nominatorPassword)
+        public void TestNominateStoreManager_Failure_CircularNomination(string nominator, string nominatorPassword)
         {
             userController.EnterMarket(1);
             userController.Login(1, nominator, nominatorPassword);
