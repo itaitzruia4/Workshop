@@ -1,5 +1,4 @@
-﻿using API.DTO;
-using API.Requests;
+﻿using API.Requests;
 using API.Responses;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -70,7 +69,6 @@ namespace API.Controllers
             }
             return Ok(new AuthenticationResponse { UserId = request.UserId });
         }
-
 
         [HttpPost("register")]
         public ActionResult<AuthenticationResponse> Post([FromBody] RegisterRequest request)

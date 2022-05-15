@@ -1,5 +1,4 @@
-﻿using API.DTO;
-using API.Requests;
+﻿using API.Requests;
 using API.Responses;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -45,6 +44,16 @@ namespace API.Controllers
             return Ok(new StoresResponse { Stores = result });
         }
 
+        [HttpPost("addproduct")]
+        public ActionResult<ProductResponse> Post([FromBody] AddProductRequest request)
+        {
+            Response<Product> response = Service.AddProduct(request.UserId, request.Membername, request.StoreId, request.ProductName, request.Description, request.Price, request.Quantity, request.Category);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new ProductResponse(response.ErrorMessage));
+            }
+            return Ok(new ProductResponse(response.Value));
+        }
     }
 }
 

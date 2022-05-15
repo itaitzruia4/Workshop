@@ -16,7 +16,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
         Member RemoveStoreOwnerNomination(int userId, string nominatorMembername, string nominatedMembername, int storeId);
 
-        Product AddProductToStore(int userId, string username, int storeId, int productID, string name, string description, double price, int quantity, string category);
+        Product AddProductToStore(int userId, string username, int storeId, string name, string description, double price, int quantity, string category);
 
         void RemoveProductFromStore(int userId, string username, int storeId, int productID);
 

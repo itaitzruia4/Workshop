@@ -92,11 +92,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<Product> AddProduct(int userId, string membername, int storeId, int productId, string productName, string description, double price, int quantity, string category)
+        public Response<Product> AddProduct(int userId, string membername, int storeId, string productName, string description, double price, int quantity, string category)
         {
             try
             {
-                DomainProduct domainProduct = facade.AddProduct(userId, membername, storeId, productId, productName, description, price, quantity, category);
+                DomainProduct domainProduct = facade.AddProduct(userId, membername, storeId, productName, description, price, quantity, category);
                 Product serviceProduct = new Product(domainProduct);
                 return new Response<Product>(serviceProduct, userId);
             }
