@@ -12,16 +12,16 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class AuthenticationController : ControllerBase
     {
-        IService service;
-        AuthenticationController()
+        IService Service;
+        AuthenticationController(IService service)
         {
-            service = new Service();
+            Service = service;
         }
 
         [HttpPost("login")]
         public ActionResult<AuthenticationResponse> Post([FromBody] LoginRequest request)
         {
-            Response<Member> response = service.Login(request.UserId, request.Membername, request.Password);
+            Response<Member> response = Service.Login(request.UserId, request.Membername, request.Password);
             if (response.ErrorOccured)
             {
                 return BadRequest(new AuthenticationResponse
@@ -42,7 +42,7 @@ namespace API.Controllers
         {
             try
             {
-                Response response = service.Register(request.UserId, request.Membername, request.Password, DateTime.Parse(request.Birthdate));
+                Response response = Service.Register(request.UserId, request.Membername, request.Password, DateTime.Parse(request.Birthdate));
                 if (response.ErrorOccured)
                 {
                     return BadRequest(new AuthenticationResponse
@@ -64,9 +64,8 @@ namespace API.Controllers
                         UserId = request.UserId,
                         Error = "Bad date format in register request"
                     });
-                }
             }
         }
-
     }
+
 }
