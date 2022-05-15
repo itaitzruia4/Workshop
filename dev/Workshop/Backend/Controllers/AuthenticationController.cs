@@ -13,9 +13,22 @@ namespace API.Controllers
     public class AuthenticationController : ControllerBase
     {
         IService Service;
+        int userId;
         public AuthenticationController(IService service)
         {
             Service = service;
+            userId = 0;
+        }
+
+        [HttpGet("entermarket")]
+        public ActionResult<AuthenticationResponse> Get()
+        {
+            Response<User> response = Service.EnterMarket(userId);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new AuthenticationResponse { Error = response.ErrorMessage });
+            }
+            return Ok(new AuthenticationResponse { UserId = userId++ });
         }
 
         [HttpPost("login")]
@@ -33,7 +46,6 @@ namespace API.Controllers
             return Ok(new AuthenticationResponse
             {
                 UserId = response.UserId,
-                Error = ""
             });
         }
 
@@ -54,7 +66,6 @@ namespace API.Controllers
                 return Ok(new AuthenticationResponse
                 {
                     UserId = response.UserId,
-                    Error = ""
                 });
             }
             catch (Exception _)
