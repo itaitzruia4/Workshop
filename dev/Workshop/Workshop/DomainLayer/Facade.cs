@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Workshop.DomainLayer.MarketPackage;
 using Workshop.DomainLayer.MarketPackage.ExternalServices.Payment;
 using Workshop.DomainLayer.MarketPackage.ExternalServices.Supply;
@@ -49,9 +50,9 @@ namespace Workshop.DomainLayer
             UserController.Logout(userId, membername);
         }
 
-        public void Register(int userId, string membername, string password, int age)
+        public void Register(int userId, string membername, string password, DateTime birthdate)
         {
-            UserController.Register(userId, membername, password, age);
+            UserController.Register(userId, membername, password, birthdate);
         }
 
         internal Product AddProduct(int userId, string membername, int storeId, int productId, string productName, string description, double price, int quantity, string category)

@@ -233,7 +233,7 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 price += productDTO.Price;
             }
-            return price - discount;
+            return Math.Max(price - discount, 0);
         }
 
         internal void CheckPurchasePolicy(ShoppingBagDTO shoppingBag, int age)
