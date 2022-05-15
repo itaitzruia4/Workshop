@@ -20,15 +20,6 @@ function Login() {
             return;
         }
 
-        let config = {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Accept": "application/json", "Access-Control-Allow-Origin": "*" },
-            body: JSON.stringify({
-                username: username,
-                password: password
-            })
-        };
-
         let url = "http://localhost:5165/api/authentication/login";
 
         fetch(url, { 
