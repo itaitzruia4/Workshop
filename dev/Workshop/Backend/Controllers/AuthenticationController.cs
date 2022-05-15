@@ -12,25 +12,34 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class AuthenticationController : ControllerBase
     {
-        IService Service = new Service();
-        int nextUserId = 1;
+        IService Service;
+        int userId;
+        public AuthenticationController(IService service)
+        {
+            Service = service;
+            userId = 0;
+        }
 
-        [HttpGet]
+        [HttpGet("entermarket")]
         public ActionResult<AuthenticationResponse> Get()
         {
-            Response<User> response = Service.EnterMarket(nextUserId++);
+            Response<User> response = Service.EnterMarket(userId);
             if (response.ErrorOccured)
             {
-                return BadRequest(new AuthenticationResponse
-                {
-                    UserId = response.UserId,
-                    Error = response.ErrorMessage
-                });
+                return BadRequest(new AuthenticationResponse { Error = response.ErrorMessage });
             }
-            return Ok(new AuthenticationResponse
+            return Ok(new AuthenticationResponse { UserId = userId++ });
+        }
+
+        [HttpPost("exitmarket")]
+        public ActionResult<AuthenticationResponse> Post([FromBody] ExitMarketRequest request)
+        {
+            Response response = Service.ExitMarket(request.UserId);
+            if (response.ErrorOccured)
             {
-                UserId = response.UserId
-            });
+                return BadRequest(new AuthenticationResponse { Error = response.ErrorMessage });
+            }
+            return Ok(new AuthenticationResponse { UserId = request.UserId });
         }
 
         [HttpPost("login")]
@@ -50,6 +59,18 @@ namespace API.Controllers
                 UserId = response.UserId
             });
         }
+
+        [HttpPost("logout")]
+        public ActionResult<AuthenticationResponse> Post([FromBody] LogoutRequest request)
+        {
+            Response response = Service.Logout(request.UserId, request.Membername);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new AuthenticationResponse { Error = response.ErrorMessage });
+            }
+            return Ok(new AuthenticationResponse { UserId = request.UserId });
+        }
+
 
         [HttpPost("register")]
         public ActionResult<AuthenticationResponse> Post([FromBody] RegisterRequest request)

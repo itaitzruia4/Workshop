@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import Login from './Pages/Login'
 import Register from './Pages/Register'
@@ -8,14 +8,25 @@ import Home from './Pages/Home'
 
 function App() {
 
+    const [userId, setUserId] = useState(-1);
+
     // Send "EnterMarket" request to server
-    let url = "http://localhost:5165/api/authentication";
+    let url = "http://localhost:5165/api/authentication/entermarket";
+
+    // TODO fix the bug in which client sends requests before server goes up
 
     fetch(url, {
         method: 'GET',
         mode: 'cors',
         headers: { "Content-Type": "application/json" }
-    }).then((response) => alert(response.text));
+    }).then((res) => res.json())
+        .then((data) => setUserId(data.userId))
+        .catch();
+
+    // storing user id in local storage
+    useEffect(() => {
+        localStorage.setItem("userId", JSON.stringify(userId));
+    }, [userId]);
 
     return (
         <Router>

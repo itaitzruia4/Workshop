@@ -6,11 +6,10 @@ namespace API.Controllers
     {
         public static void Main(string[] args)
         {
-            IService service = new Service();
-
             var builder = WebApplication.CreateBuilder(args);
 
             // Add builder.Services to the container.
+            builder.Services.AddSingleton<IService, Service>();
             builder.Services.AddControllers();
             builder.Services.AddCors(options =>
             {

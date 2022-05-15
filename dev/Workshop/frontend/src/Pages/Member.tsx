@@ -2,13 +2,16 @@ import React from 'react';
 import { useNavigate } from "react-router-dom";
 import './Member.css';
 import { Store, Stores } from "../Components/store"
-import { Product, Products } from "../Components/product"
+import { Product } from "../Components/product"
 
 
+// TODO import Store from Store component instead of defining it here
 
+type Products = {
+    products: Product[],
+}
 
 function Member() {
-
     let navigate = useNavigate();
     const routeChange = (path: string) =>
         () => {
@@ -30,21 +33,30 @@ function Member() {
             stores: stores.stores.filter(t => t.id !== id),
         });
     };
+
+    const [products, setProducts] = React.useState<Products>({ products: [{ tag: 'Product', id: 1, name: "cocaine", basePrice: 1000, description: "cool drug", quantity: 3 }] });
+    const deleteProducts = (id: number) => {
+        setProducts({
+            products: products.products.filter(t => t.id !== id),
+        });
+    };
     return (
         <div className="member_page">
-            <div className= "member_page_components">
-                <div className="member_page_stores">
-                    <StoresConfigComponent addStores={addStores} />
-                    <hr />
+            <div className="member_page_body">
+                <ConfigStoresComponent addStores={addStores} />
+                <hr />
+                <div className="lists_section">
                     <StoresComponent
                         stores={stores}
                         deleteStores={deleteStores} />
-                    <p className="member_control_btns">
-                        <button className="member_logout_btn" onClick={routeChange('/guest')}> Logout </button>
-                        <button className="member_exit_btn" onClick={routeChange('/')}> Exit Market </button>
-                    </p>
+                    <CartComponent
+                        products={products}
+                        deleteProducts={deleteProducts} />
                 </div>
-                
+                <p className="member_control_btns">
+                    <button className="member_logout_btn" onClick={routeChange('/guest')}> Logout </button>
+                    <button className="member_exit_btn" onClick={routeChange('/')}> Exit Market </button>
+                </p>
             </div>
         </div>
     );
@@ -90,9 +102,7 @@ const StoresComponent: React.FC<{
 
 };
 
-
-
-const StoresConfigComponent = ({ addStores}: { addStores : (text: string) => void}) => {
+const ConfigStoresComponent = ({ addStores}: { addStores : (text: string) => void}) => {
     const [store, setStore] = React.useState<string>("");
     const add = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
@@ -104,20 +114,11 @@ const StoresConfigComponent = ({ addStores}: { addStores : (text: string) => voi
         }
     };
     return (
-        <div className="AddStore">
+        <div className="Config_Store_Btns">
             <form className="Member_Store_Form">
                 <button
                     className="Member_Store_Btn"
                     onClick={add}>Add store
-                </button>
-                <input className="Member_Store_textbox"
-                    value={store}
-                    onChange={e => { setStore(e.target.value) }} />
-            </form>
-            <form className="Member_Store_Form">
-                <button
-                    className="Member_Store_Btn"
-                    onClick={add}>Search store
                 </button>
                 <input className="Member_Store_textbox"
                     value={store}
@@ -135,5 +136,40 @@ const StoresConfigComponent = ({ addStores}: { addStores : (text: string) => voi
         </div>
     );
 };
+
+
+const CartComponent: React.FC<{
+    products: Products,
+    deleteProducts: (id: number) => void
+}> = ({ products, deleteProducts }) => {
+    const deleteProduct = (id: number) => {
+        if (window.confirm(`Are you sure you want to remove this product from your shopping cart?`)) {
+            deleteProducts(id);
+        }
+    }
+
+    return (
+        <div className="section__store">
+            <h2 className="stores-header">Shopping cart</h2>
+            {products.products.length ? <ul className="products">
+                {products.products.map(product => (
+                    <li key={product.id}>
+                        <span>{product.name}</span>
+                        <button
+                            className="Member_Delete_Srore_Btn"
+                            onClick={() => { deleteProduct(product.id) }}>X
+                        </button>
+                    </li>
+                ))}
+            </ul> : <div style={{ color: 'white' }} >Your shopping cart is empty</div>}
+            <button
+                className="Member_Buy_Btn"
+                >Buy cart
+            </button>
+        </div>
+    );
+
+};
+
 
 export default Member;

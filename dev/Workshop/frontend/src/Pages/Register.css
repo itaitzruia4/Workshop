@@ -22,18 +22,13 @@ body {
     font-size: 20px;
 }
 
-.register_username_textbox {
+.register_membername_textbox {
     width: 34%;
     font-size: 20px;
     display: block;
 }
 
 .register_password_textbox {
-    width: 34%;
-    font-size: 20px;
-    display: block;
-}
-.register_name_textbox {
     width: 34%;
     font-size: 20px;
     display: block;
@@ -54,7 +49,7 @@ body {
     border-radius: 8px;
 }
 
-    .register_register_btn:hover {
-        transform: scale(1.1);
-    }
+.register_register_btn:hover {
+    transform: scale(1.1);
+}
 

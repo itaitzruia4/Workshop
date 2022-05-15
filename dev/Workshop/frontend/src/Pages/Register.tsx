@@ -13,13 +13,12 @@ function Register() {
             navigate(path);
         }
 
-    const [username, setUsername] = useState("");
+    const [membername, setMembername] = useState("");
     const [password, setPassword] = useState("");
-    const [name, setName] = useState("");
     const [birthDate, setBirthDate] = useState("");
 
     function handleRegister(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        if (username === "" || password === "" || name === "" || birthDate == "") {
+        if (membername === "" || password === "" ||  birthDate == "") {
             alert('User details must not be empty');
             return;
         }
@@ -37,9 +36,9 @@ function Register() {
             mode: 'cors',
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                username: username,
+                userId: localStorage.getItem("userId"),
+                membername: membername,
                 password: password,
-                name: name,
                 birthDate: birthDate
             })
         });
@@ -51,11 +50,9 @@ function Register() {
             <div className="register_title" style={textStyle}> Register </div>
             <p className="register_userInput">
                 <div style={textStyle}> Username: </div>
-                <input className="register_username_textbox" type="text" onChange={e => setUsername(e.target.value)} />
+                <input className="register_membername_textbox" type="text" onChange={e => setMembername(e.target.value)} />
                 <div style={textStyle}> Password: </div>
                 <input className="register_password_textbox" type="password" onChange={e => setPassword(e.target.value)} />
-                <div style={textStyle}> Name: </div>
-                <input className="register_name_textbox" type="text" onChange={e => setName(e.target.value)} />
                 <div style={textStyle}> Birth Date: </div>
                 <input className="register_date_textbox" type="text" placeholder="dd/mm/yyyy" onChange={e => setBirthDate(e.target.value)} />
             </p>

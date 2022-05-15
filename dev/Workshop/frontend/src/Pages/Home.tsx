@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from "react-router-dom";
 import './Home.css';
 
-function Login() {
+function Home() {
     const textStyle = { color: 'white' }
 
     let navigate = useNavigate();
@@ -24,4 +24,4 @@ function Login() {
 }
 
 
-export default Login;
+export default Home;

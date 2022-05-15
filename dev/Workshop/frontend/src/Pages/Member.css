@@ -15,10 +15,11 @@
     margin: 5px;
 }
 
-
+.lists_section {
+    justify-Content: space-between;
+}
 .section__stores {
     color: white;
-    
 }
 
 .stores-header {
@@ -32,7 +33,24 @@ ul {
     color: white;
 }
 
+.products {
+    min-height: 175px;
+    min-width: 300px;
+    max-height: 175px;
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    clear: both;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 2px;
+    font-family: Helvetica, Arial, sans-serif;
+    border: solid 2px #86BB71;
+}
+
 .stores {
+    min-height: 175px;
+    min-width: 400px;
     max-height: 175px;
     max-width: 400px;
     display: flex;
@@ -55,12 +73,19 @@ ul {
         border-radius: 8px;
     }
 
-.AddStore {
+.Config_Store_Btns {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+}
+
+.lists_section {
     display: flex;
     flex-direction: row;
     margin: 10px;
 }
-
 
 
 .Member_Delete_Srore_Btn {
@@ -138,3 +163,14 @@ ul {
     }
 
 
+.Member_Buy_Btn {
+    display: block;
+    font-size: 20px;
+    background-color: #1DB954;
+    color: white;
+    border-radius: 8px;
+}
+
+.Member_Buy_Btn:hover {
+    transform: scale(1.1);
+}
