@@ -373,5 +373,23 @@ namespace Workshop.ServiceLayer
                 return new Response(e.Message, userId);
             }
         }
+
+        public Response<List<Store>> GetAllStores(int userId)
+        {
+            try
+            {
+                List<DomainStore> storeList = facade.GetAllStores();
+                List<Store> retList = new List<Store>();
+                foreach (DomainStore ds in storeList)
+                {
+                    retList.Add(new Store(ds));
+                }
+                return new Response<List<Store>>(retList, userId);
+            }
+            catch (Exception e)
+            {
+                return new Response<List<Store>>(e.Message, userId);
+            }
+        }
     }
 }

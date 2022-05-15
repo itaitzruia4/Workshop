@@ -718,5 +718,10 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new MemberAccessException("User " + user + " is not allowed to add discounts in store " + storeId);
             stores[storeId].AddStoreDiscount(jsonDiscount);
         }
+
+        public List<Store> GetAllStores()
+        {
+            return new List<Store>(stores.Values);
+        }
     }
 }

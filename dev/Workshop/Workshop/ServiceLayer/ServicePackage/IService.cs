@@ -60,5 +60,7 @@ namespace Workshop.ServiceLayer
         Response ChangeProductQuantity(int userId, string username, int storeId, int productID, int quantity);
 
         Response ChangeProductCategory(int userId, string username, int storeId, int productID, string category);
+
+        Response<List<Store>> GetAllStores(int userId);
     }
 }

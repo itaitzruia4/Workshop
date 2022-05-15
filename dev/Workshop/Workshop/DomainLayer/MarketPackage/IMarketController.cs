@@ -55,5 +55,6 @@ namespace Workshop.DomainLayer.MarketPackage
         void AddCategoryDiscount(int userId, string user, int storeId, string jsonDiscount, string categoryName);
 
         void AddStoreDiscount(int userId, string user, int storeId, string jsonDiscount);
+        List<Store> GetAllStores();
     }
 }
