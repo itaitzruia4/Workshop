@@ -130,9 +130,11 @@
     <Compile Include="DomainLayer\UserPackage\UserController.cs" />
     <Compile Include="ServiceLayer\Response.cs" />
     <Compile Include="ServiceLayer\ResponseT.cs" />
+    <Compile Include="ServiceLayer\ServiceObjects\MarketManager.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Member.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Product.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Role.cs" />
+    <Compile Include="ServiceLayer\ServiceObjects\StoreRole.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\ShoppingBag.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\ShoppingCart.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Store.cs" />

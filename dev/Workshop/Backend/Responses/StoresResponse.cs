@@ -2,8 +2,16 @@
 {
     public class StoresResponse
     {
-        public List<StoreResponse> Stores { get; set; }
-        public string Error { get; set; }
+        public List<StoreResponse> Stores;
+        public string Error;
         
+        public StoresResponse(List<StoreResponse> stores)
+        {
+            Stores = stores;
+        }
+        public StoresResponse(string error)
+        {
+            Error = error;
+        }
     }
 }

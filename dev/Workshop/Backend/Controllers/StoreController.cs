@@ -34,14 +34,14 @@ namespace API.Controllers
             Response<List<Store>> response = Service.GetAllStores(request.UserId);
             if (response.ErrorOccured)
             {
-                return BadRequest(new StoresResponse { Error = response.ErrorMessage });
+                return BadRequest(new StoresResponse(response.ErrorMessage));
             }
             List<StoreResponse> result = new List<StoreResponse>();
             foreach (Store st in response.Value)
             {
                 result.Add(new StoreResponse(st));
             }
-            return Ok(new StoresResponse { Stores = result });
+            return Ok(new StoresResponse(result));
         }
 
         [HttpPost("addproduct")]
@@ -53,6 +53,17 @@ namespace API.Controllers
                 return BadRequest(new ProductResponse(response.ErrorMessage));
             }
             return Ok(new ProductResponse(response.Value));
+        }
+
+        [HttpPost("nominatemanager")]
+        public ActionResult<StoreManagerResponse> Post([FromBody] NominationRequest request)
+        {
+            Response<StoreManager> response = Service.NominateStoreManager(request.UserId, request.Nominator, request.Nominated, request.StoreId);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new StoreManagerResponse(response.ErrorMessage));
+            }
+            return Ok(new StoreManagerResponse(response.Value));
         }
     }
 }

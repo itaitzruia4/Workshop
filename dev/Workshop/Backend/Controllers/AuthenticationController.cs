@@ -25,9 +25,9 @@ namespace API.Controllers
             Response<User> response = Service.EnterMarket(userId);
             if (response.ErrorOccured)
             {
-                return BadRequest(new AuthenticationResponse { Error = response.ErrorMessage });
+                return BadRequest(new AuthenticationResponse(response.ErrorMessage));
             }
-            return Ok(new AuthenticationResponse { UserId = userId++ });
+            return Ok(new AuthenticationResponse(userId++));
         }
 
         [HttpPost("exitmarket")]
@@ -36,9 +36,9 @@ namespace API.Controllers
             Response response = Service.ExitMarket(request.UserId);
             if (response.ErrorOccured)
             {
-                return BadRequest(new AuthenticationResponse { Error = response.ErrorMessage });
+                return BadRequest(new AuthenticationResponse(response.ErrorMessage));
             }
-            return Ok(new AuthenticationResponse { UserId = request.UserId });
+            return Ok(new AuthenticationResponse(request.UserId));
         }
 
         [HttpPost("login")]
@@ -47,16 +47,9 @@ namespace API.Controllers
             Response<Member> response = Service.Login(request.UserId, request.Membername, request.Password);
             if (response.ErrorOccured)
             {
-                return BadRequest(new AuthenticationResponse
-                {
-                    UserId = response.UserId,
-                    Error = response.ErrorMessage
-                });
+                return BadRequest(new AuthenticationResponse(response.ErrorMessage));
             }
-            return Ok(new AuthenticationResponse
-            {
-                UserId = response.UserId,
-            });
+            return Ok(new AuthenticationResponse(response.UserId));
         }
 
         [HttpPost("logout")]
@@ -65,9 +58,9 @@ namespace API.Controllers
             Response response = Service.Logout(request.UserId, request.Membername);
             if (response.ErrorOccured)
             {
-                return BadRequest(new AuthenticationResponse { Error = response.ErrorMessage });
+                return BadRequest(new AuthenticationResponse(response.ErrorMessage));
             }
-            return Ok(new AuthenticationResponse { UserId = request.UserId });
+            return Ok(new AuthenticationResponse(request.UserId));
         }
 
         [HttpPost("register")]
@@ -78,26 +71,14 @@ namespace API.Controllers
                 Response response = Service.Register(request.UserId, request.Membername, request.Password, DateTime.Parse(request.Birthdate));
                 if (response.ErrorOccured)
                 {
-                    return BadRequest(new AuthenticationResponse
-                    {
-                        UserId = response.UserId,
-                        Error = response.ErrorMessage
-                    });
+                    return BadRequest(new AuthenticationResponse(response.ErrorMessage));
                 }
-                return Ok(new AuthenticationResponse
-                {
-                    UserId = response.UserId,
-                });
+                return Ok(new AuthenticationResponse(response.UserId));
             }
             catch (Exception _)
             {
-                return BadRequest(new AuthenticationResponse
-                    {
-                        UserId = request.UserId,
-                        Error = "Bad date format in register request"
-                    });
+                return BadRequest(new AuthenticationResponse("Bad date format in register request"));
             }
         }
     }
-
 }

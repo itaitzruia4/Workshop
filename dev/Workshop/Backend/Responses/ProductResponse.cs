@@ -4,13 +4,13 @@ namespace API.Responses
 {
     public class ProductResponse
     {
-        public int ProductId { get; set; }
-        public string Name { get; set; }
-        public double BasePrice { get; set; }
-        public string Description { get; set; }
-        public int Quantity { get; set; }
-        public string Category { get; set; }
-        public string Error { get; set; }
+        public int ProductId;
+        public string Name;
+        public double BasePrice;
+        public string Description;
+        public int Quantity;
+        public string Category;
+        public string Error;
 
         public ProductResponse(Product p)
         {

@@ -11,7 +11,6 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
     {
         public string Username { get; }
         internal string Password { get; }
-
         public DateTime Birthdate { get; }
 
         private List<Role> roles;
@@ -27,6 +26,11 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             Birthdate = birthdate;
             roles = new List<Role>();
             this.rwl = new ReaderWriterLock();
+        }
+
+        public IReadOnlyList<Role> GetAllRoles()
+        {
+            return new List<Role>(roles);
         }
 
         public bool IsAuthorized(Action action)
