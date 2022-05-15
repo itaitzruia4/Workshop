@@ -1,4 +1,4 @@
-﻿namespace Backend.Communication.DTO
+﻿namespace API.DTO
 {
     public class AuthenticationResult
     {

@@ -1,4 +1,4 @@
-﻿namespace Backend.Communication.Requests
+﻿namespace API.Requests
 {
     public class LoginRequest
     {
