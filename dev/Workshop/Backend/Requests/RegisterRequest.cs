@@ -1,6 +1,6 @@
 ﻿namespace API.Requests
 {
-    public class LoginRequest
+    public class RegisterRequest
     {
         public string Membername { get; set; }
         public string Password { get; set; }

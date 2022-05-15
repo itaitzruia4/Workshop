@@ -17,7 +17,7 @@ namespace Workshop.DomainLayer.UserPackage
         void InitializeSystem();
         User EnterMarket(int userId);
         void ExitMarket(int userId);
-        void Register(int userId, string username, string password, int age);
+        void Register(int userId, string username, string password, DateTime birthdate);
         bool IsMember(string username);
         Member GetMember(string username);
         int GetAge(int userId, string membername);

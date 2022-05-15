@@ -52,11 +52,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response Register(int userId, string username, string password, int age)
+        public Response Register(int userId, string username, string password, DateTime birthdate)
         {
             try
             {
-                facade.Register(userId, username, password, age);
+                facade.Register(userId, username, password, birthdate);
                 return new Response();
             }
             catch (Exception e)
