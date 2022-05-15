@@ -23,8 +23,8 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
             userControllerMock = new Mock<IUserController>();
             userControllerMock.Setup(x => x.AssertCurrentUser(It.IsAny<int>(), It.IsAny<string>())).Callback((int x, string user) => {});
             userControllerMock.Setup(x => x.IsAuthorized(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action>())).Returns((string user, int storeId, Action action) => !user.Equals("Notallowed Cohen"));
-            userControllerMock.Setup(x => x.GetWorkers(It.IsAny<int>())).Returns(new List<Member>(new Member[] {new Member("Worker1", "pass1")}));
-            userControllerMock.Setup(x => x.GetMember(It.IsAny<string>())).Returns(new Member("StoreFounder1", "pass1"));
+            userControllerMock.Setup(x => x.GetWorkers(It.IsAny<int>())).Returns(new List<Member>(new Member[] {new Member("Worker1", "pass1", 40)}));
+            userControllerMock.Setup(x => x.GetMember(It.IsAny<string>())).Returns(new Member("StoreFounder1", "pass1", 40));
             userControllerMock.Setup(x => x.addToCart(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<ShoppingBagProduct>(), It.IsAny<int>())).Returns(new ShoppingBagProduct(1, "someName", "someDesc", 10.0, 3, "cat1"));
            
             Mock<IMarketPaymentService> paymentMock = new Mock<IMarketPaymentService>();
@@ -55,7 +55,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         }
 
         [TestMethod]
-        public void TestCloseStore_Failure()
+        public void TestCloseStore_Failure_NoSuchStore()
         {
             // Arrange
             string username = "StoreFounder1"; int storeId = 1;
@@ -115,7 +115,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         [DataRow("User1", -1, "key", "catagory", 0, 24, 3)] //not the right keyword
         [DataRow("User1", -1, "", "catagory", 0, 24, 3)] //not the right catagory
         [DataRow("User1", -1, "", "", 0, 24, 3)] //no products to filter from 
-        public void TestSearchProduct_Failure(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
+        public void TestSearchProduct_Failure_WrongArguments(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
         {
             marketController.CreateNewStore(1, user, "store");
             marketController.AddProductToStore(1, user, 1, 1, "someName", "someDesc", 10.0, 2, "cat1");
@@ -139,7 +139,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         [DataRow("User1", 2, 1, 3)] //wrong id;
         [DataRow("User1", 1, 0, 3)] //wrong store;
         [DataRow("User1", 1, 1, 4)] //wrong quantity;
-        public void TestAddToCart_Failure(string user, int productId, int storeId, int quantity)
+        public void TestAddToCart_Failure_WrongArguments(string user, int productId, int storeId, int quantity)
         {
             marketController.CreateNewStore(1, user, "store");
             marketController.AddProductToStore(1, user, 1, 1, "someName", "someDesc", 10.0, 2, "cat1");

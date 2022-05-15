@@ -36,9 +36,9 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
 
             userController.EnterMarket(1);
 
-            userController.Register(1, "member1", "pass1");
-            userController.Register(1, "member2", "pass2");
-            userController.Register(1, "Notallowed cohen", "pass");
+            userController.Register(1, "member1", "pass1", 40);
+            userController.Register(1, "member2", "pass2", 40);
+            userController.Register(1, "Notallowed cohen", "pass", 40);
             userController.Login(1, "member1", "pass1");
             Store store1 = marketController.CreateNewStore(1, "member1", "shop1");
             userController.NominateStoreManager(1, "member1", "member2", store1.GetId());
@@ -58,7 +58,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         }
 
         [TestMethod]
-        public void TestCloseStore_Failure()
+        public void TestCloseStore_Failure_StoreAlreadyClosed()
         {
             // Arrange
             string username = "member1"; int storeId = 1;
@@ -99,7 +99,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         {
             string username = "CompletelyRandomNameNoChanceAnyoneWouldEverWriteIt";
             userController.Logout(1, "member1");
-            userController.Register(1, username, "pass");
+            userController.Register(1, username, "pass", 40);
             Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(1, username, "Store123"));
         }
 
@@ -118,7 +118,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [DataTestMethod]
         [DataRow("member1", "here", 1, 3, "cat1")]
         [DataRow("member1", "here", 1, 4, "cat1")]
-        public void BuyCart(string user, string address, int productId, int userQuantity, string category)
+        public void TestBuyCart_Success(string user, string address, int productId, int userQuantity, string category)
         {
             int storeId = marketController.CreateNewStore(1, user, "store").GetId();
             marketController.AddProductToStore(1, user, storeId, productId, "someName", "someDesc", 10.0, 5, "cat1");
@@ -131,7 +131,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [TestMethod]
         public void TestRemoveStoreOwnerNomination_Success()
         {
-            userController.Register(1, "coolStoreOwner", "pass");
+            userController.Register(1, "coolStoreOwner", "pass", 40);
             marketController.NominateStoreOwner(1, "member1", "coolStoreOwner", 1);
             List<StoreRole> original_roles = new List<StoreRole>(userController.GetMember("coolStoreOwner").GetStoreRoles(1));
             Member res = marketController.RemoveStoreOwnerNomination(1, "member1", "coolStoreOwner", 1);

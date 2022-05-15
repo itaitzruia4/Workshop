@@ -8,6 +8,6 @@ namespace Workshop.DomainLayer.Reviews
 {
     public interface IReviewHandler
     {
-        ReviewDTO AddReview(string user, int productId, string review);
+        ReviewDTO AddReview(string user, int productId, string review, int rating);
     }
 }

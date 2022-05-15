@@ -5,16 +5,21 @@ using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.UserPackage.Shopping;
 
-namespace Workshop.DomainLayer.MarketPackage.Discounts
+namespace Workshop.DomainLayer.MarketPackage.Terms
 {
-    public class DiscountAndTerm: DiscountCompositeTerm
+    public class AndTerm: CompositeTerm
     {
-        public DiscountAndTerm(DiscountTerm firstTerm, DiscountTerm secondTerm): base(firstTerm, secondTerm) 
+        public AndTerm(Term firstTerm, Term secondTerm): base(firstTerm, secondTerm) 
         { }
 
         public override bool IsEligible(ShoppingBagDTO shoppingBag)
         {
             return firstTerm.IsEligible(shoppingBag) && secondTerm.IsEligible(shoppingBag);
+        }
+
+        public override bool IsEligible(ShoppingBagDTO shoppingBag, int age)
+        {
+            return firstTerm.IsEligible(shoppingBag, age) && secondTerm.IsEligible(shoppingBag, age);
         }
     }
 }

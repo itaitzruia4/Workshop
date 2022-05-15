@@ -30,7 +30,7 @@ namespace Workshop.DomainLayer.MarketPackage
             this.open = true; //TODO: check if on init store supposed to be open or closed.
             this.rwl = new ReaderWriterLock();
             this.discountPolicy = new DiscountPolicy(this);
-            this.purchasePolicy = new PurchasePolicy();
+            this.purchasePolicy = new PurchasePolicy(this);
         }
 
         public ReaderWriterLock getLock()
@@ -191,7 +191,7 @@ namespace Workshop.DomainLayer.MarketPackage
             
             foreach (ProductDTO product in shoppingBag.products)
             {
-                if(products.ContainsKey(product.Id)&products[product.Id].Quantity>product.Quantity)
+                if(products.ContainsKey(product.Id) && products[product.Id].Quantity >= product.Quantity)
                 {
                     products[product.Id].Quantity -= product.Quantity;
                 }
@@ -223,6 +223,24 @@ namespace Workshop.DomainLayer.MarketPackage
         internal bool ProductExists(int product_id)
         {
             return products.ContainsKey(product_id);
+        }
+
+        internal double CalaculatePrice(ShoppingBagDTO shoppingBag)
+        {
+            double discount = discountPolicy.CalculateDiscount(shoppingBag);
+            double price = 0;
+            foreach (ProductDTO productDTO in shoppingBag.products)
+            {
+                price += productDTO.Price;
+            }
+            return price - discount;
+        }
+
+        internal void CheckPurchasePolicy(ShoppingBagDTO shoppingBag, int age)
+        {
+            double price = CalaculatePrice(shoppingBag);
+            if (!purchasePolicy.CanPurchase(shoppingBag, age))
+                throw new Exception("Cannot purchase shopping bag because it violates our purchase policy.");
         }
     }
 }
