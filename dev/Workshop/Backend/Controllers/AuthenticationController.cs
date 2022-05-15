@@ -31,6 +31,17 @@ namespace API.Controllers
             return Ok(new AuthenticationResponse { UserId = userId++ });
         }
 
+        [HttpPost("exitmarket")]
+        public ActionResult<AuthenticationResponse> Post([FromBody] ExitMarketRequest request)
+        {
+            Response response = Service.ExitMarket(request.UserId);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new AuthenticationResponse { Error = response.ErrorMessage });
+            }
+            return Ok(new AuthenticationResponse { UserId = request.UserId });
+        }
+
         [HttpPost("login")]
         public ActionResult<AuthenticationResponse> Post([FromBody] LoginRequest request)
         {
@@ -48,6 +59,18 @@ namespace API.Controllers
                 UserId = response.UserId,
             });
         }
+
+        [HttpPost("logout")]
+        public ActionResult<AuthenticationResponse> Post([FromBody] LogoutRequest request)
+        {
+            Response response = Service.Logout(request.UserId, request.Membername);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new AuthenticationResponse { Error = response.ErrorMessage });
+            }
+            return Ok(new AuthenticationResponse { UserId = request.UserId });
+        }
+
 
         [HttpPost("register")]
         public ActionResult<AuthenticationResponse> Post([FromBody] RegisterRequest request)
