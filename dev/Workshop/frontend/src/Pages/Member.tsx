@@ -1,10 +1,9 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
 import './Member.css';
-import { Store , Stores} from "../Components/store"
+import { Store, Stores } from "../Components/store"
+import { Product, Products } from "../Components/product"
 
-
-// TODO import Store from Store component instead of defining it here
 
 
 
@@ -33,16 +32,19 @@ function Member() {
     };
     return (
         <div className="member_page">
-            <div className="member_page_body">
-                <AddStoresComponent addStores={addStores} />
-                <hr />
-                <StoresComponent
-                    stores={stores}
-                    deleteStores={deleteStores} />
-                <p className="member_control_btns">
-                    <button className="member_logout_btn" onClick={routeChange('/guest')}> Logout </button>
-                    <button className="member_exit_btn" onClick={routeChange('/')}> Exit Market </button>
-                </p>
+            <div className= "member_page_components">
+                <div className="member_page_stores">
+                    <StoresConfigComponent addStores={addStores} />
+                    <hr />
+                    <StoresComponent
+                        stores={stores}
+                        deleteStores={deleteStores} />
+                    <p className="member_control_btns">
+                        <button className="member_logout_btn" onClick={routeChange('/guest')}> Logout </button>
+                        <button className="member_exit_btn" onClick={routeChange('/')}> Exit Market </button>
+                    </p>
+                </div>
+                
             </div>
         </div>
     );
@@ -88,7 +90,9 @@ const StoresComponent: React.FC<{
 
 };
 
-const AddStoresComponent = ({ addStores}: { addStores : (text: string) => void}) => {
+
+
+const StoresConfigComponent = ({ addStores}: { addStores : (text: string) => void}) => {
     const [store, setStore] = React.useState<string>("");
     const add = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
