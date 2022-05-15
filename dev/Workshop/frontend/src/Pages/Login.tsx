@@ -29,7 +29,7 @@ function Login() {
             body: JSON.stringify({
                 Membername: username,
                 Password: password,
-                UserId:1 
+                UserId:0 
             })
         });
 

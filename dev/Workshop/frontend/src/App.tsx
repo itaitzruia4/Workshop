@@ -8,6 +8,15 @@ import Home from './Pages/Home'
 import Store from './Pages/Store'
 
 function App() {
+
+    let url = "http://localhost:5165/api/authentication/entermarket";
+
+    fetch(url, {
+        method: 'GET',
+        mode: 'cors',
+        headers: { "Content-Type": "application/json" },
+    }).then((response) => alert(response.text));
+
     return (
         <Router>
             <Routes>
