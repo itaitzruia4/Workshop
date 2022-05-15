@@ -22,30 +22,50 @@ namespace API.Controllers
         public ActionResult<AuthenticationResponse> Post([FromBody] LoginRequest request)
         {
             Response<Member> response = service.Login(request.UserId, request.Membername, request.Password);
-            return BadRequest(new AuthenticationResponse
+            if (response.ErrorOccured)
             {
-                UserId = -1,
-                Error = "Username must be itai"
+                return BadRequest(new AuthenticationResponse
+                {
+                    UserId = response.UserId,
+                    Error = response.ErrorMessage
+                });
             }
-);
+            return Ok(new AuthenticationResponse
+            {
+                UserId = response.UserId,
+                Error = ""
+            });
         }
 
         [HttpPost("register")]
         public ActionResult<AuthenticationResponse> Post([FromBody] RegisterRequest request)
         {
-
-            if (request.Membername == "itai")
+            try
+            {
+                Response response = service.Register(request.UserId, request.Membername, request.Password, DateTime.Parse(request.Birthdate));
+                if (response.ErrorOccured)
+                {
+                    return BadRequest(new AuthenticationResponse
+                    {
+                        UserId = response.UserId,
+                        Error = response.ErrorMessage
+                    });
+                }
                 return Ok(new AuthenticationResponse
                 {
-                    UserId = 8
+                    UserId = response.UserId,
+                    Error = ""
                 });
-            else
+            }
+            catch (Exception _)
+            {
                 return BadRequest(new AuthenticationResponse
-                {
-                    UserId = -1,
-                    Error = "Username must be itai"
+                    {
+                        UserId = request.UserId,
+                        Error = "Bad date format in register request"
+                    });
                 }
-                );
+            }
         }
 
     }

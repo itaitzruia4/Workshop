@@ -10,10 +10,12 @@ namespace Workshop.ServiceLayer
     {
         public readonly string ErrorMessage;
         public bool ErrorOccured { get => ErrorMessage != null; }
-        internal Response() { }
-        internal Response(string msg)
+        public int UserId;
+        internal Response(int userId) { UserId = userId; }
+        internal Response(string msg, int userId)
         {
             ErrorMessage = msg;
+            UserId = userId;
         }
     }
 }
