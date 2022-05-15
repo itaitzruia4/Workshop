@@ -13,7 +13,7 @@ namespace API.Controllers
     public class StoreController : ControllerBase
     {
         IService Service;
-        StoreController(IService service)
+        public StoreController(IService service)
         {
             Service = service;
         }
