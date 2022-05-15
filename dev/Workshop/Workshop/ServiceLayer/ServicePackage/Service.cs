@@ -31,11 +31,11 @@ namespace Workshop.ServiceLayer
             {
                 DomainUser domainUser = facade.EnterMarket(userId);
                 User serviceUser = new User(domainUser);
-                return new Response<User>(serviceUser);
+                return new Response<User>(userId, serviceUser);
             }
             catch (Exception e)
             {
-                return new Response<User>(e.Message);
+                return new Response<User>(userId, null, e.Message);
             }
         }
 
@@ -44,11 +44,11 @@ namespace Workshop.ServiceLayer
             try
             {
                 facade.ExitMarket(userId);
-                return new Response();
+                return new Response(userId);
             }
             catch (Exception e)
             {
-                return new Response(e.Message);
+                return new Response(userId, e.Message);
             }
         }
 
@@ -57,11 +57,11 @@ namespace Workshop.ServiceLayer
             try
             {
                 facade.Register(userId, username, password, birthdate);
-                return new Response();
+                return new Response(userId);
             }
             catch (Exception e)
             {
-                return new Response(e.Message);
+                return new Response(userId, e.Message);
             }
         }
 
@@ -71,11 +71,11 @@ namespace Workshop.ServiceLayer
             {
                 DomainMember domainMember = facade.Login(userId, username, password);
                 Member serviceMember = new Member(domainMember);
-                return new Response<Member>(serviceMember);
+                return new Response<Member>(userId, serviceMember);
             }
             catch (Exception e)
             {
-                return new Response<Member>(e.Message);
+                return new Response<Member>(userId, e.Message);
             }
         }
 
@@ -84,11 +84,11 @@ namespace Workshop.ServiceLayer
             try
             {
                 facade.Logout(userId, membername);
-                return new Response();
+                return new Response(userId);
             }
             catch (Exception e)
             {
-                return new Response(e.Message);
+                return new Response(userId, e.Message);
             }
         }
 
@@ -98,11 +98,11 @@ namespace Workshop.ServiceLayer
             {
                 DomainProduct domainProduct = facade.AddProduct(userId, membername, storeId, productId, productName, description, price, quantity, category);
                 Product serviceProduct = new Product(domainProduct);
-                return new Response<Product>(serviceProduct);
+                return new Response<Product>(userId, serviceProduct);
             }
             catch (Exception e)
             {
-                return new Response<Product>(e.Message);
+                return new Response<Product>(userId, e.Message);
             }
         }
 
@@ -112,7 +112,7 @@ namespace Workshop.ServiceLayer
             {
                 DomainStoreOwner domainOwner = facade.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId);
                 StoreOwner serviceOwner = new StoreOwner(domainOwner);
-                return new Response<StoreOwner>(serviceOwner);
+                return new Response<StoreOwner>(userId, serviceOwner);
             }
             catch (Exception e)
             {

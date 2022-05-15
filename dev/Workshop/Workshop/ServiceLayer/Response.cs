@@ -12,7 +12,7 @@ namespace Workshop.ServiceLayer
         public bool ErrorOccured { get => ErrorMessage != null; }
         public int UserId;
         internal Response(int userId) { UserId = userId; }
-        internal Response(string msg, int userId)
+        internal Response(int userId, string msg)
         {
             ErrorMessage = msg;
             UserId = userId;

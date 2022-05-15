@@ -64,7 +64,6 @@ namespace API.Controllers
                         UserId = request.UserId,
                         Error = "Bad date format in register request"
                     });
-                }
             }
         }
 
