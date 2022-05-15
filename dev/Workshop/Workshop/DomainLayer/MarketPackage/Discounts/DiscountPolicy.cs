@@ -194,9 +194,22 @@ namespace Workshop.DomainLayer.MarketPackage
             throw new Exception("Unknown discount term tag: " + tag);
         }
 
-        internal int CalculateDiscount(ShoppingBagDTO shoppingBag)
+        internal double CalculateDiscount(ShoppingBagDTO shoppingBag)
         {
-            throw new NotImplementedException();
+            double totalDiscount = 0.0;
+            foreach (ProductDTO prod in shoppingBag.products)
+            {
+                if (products_discounts.ContainsKey(prod.Id))
+                {
+                    totalDiscount += products_discounts[prod.Id].CalculateDiscountValue(shoppingBag);
+                }
+            }
+            foreach (string category in category_discounts.Keys)
+            {
+                totalDiscount += category_discounts[category].CalculateDiscountValue(shoppingBag);
+            }
+            totalDiscount += store_discount.CalculateDiscountValue(shoppingBag);
+            return totalDiscount;
         }
 
         private Term ParseDiscountCompositeTerm(dynamic data)
