@@ -27,8 +27,9 @@ function Login() {
             mode: 'cors',
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                username: username,
-                password: password
+                Membername: username,
+                Password: password,
+                UserId:1 
             })
         });
 
