@@ -1,4 +1,4 @@
-﻿namespace Backend.Communication.Responses
+﻿namespace API.Responses
 {
     public class AuthenticationResponse
     {

@@ -1,11 +1,11 @@
-﻿using Backend.Communication.DTO;
-using Backend.Communication.Requests;
-using Backend.Communication.Responses;
+﻿using API.DTO;
+using API.Requests;
+using API.Responses;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Workshop.ServiceLayer;
 
-
-namespace Backend.Communication.Controllers
+namespace API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -14,6 +14,7 @@ namespace Backend.Communication.Controllers
         [HttpPost("login")]
         public ActionResult<AuthenticationResponse> Post([FromBody] LoginRequest request)
         {
+            
             if (request.Username == "itai")
                 return Ok(new AuthenticationResponse
                 {

@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "Backend": {
+    "API": {
       "commandName": "Project",
       "launchUrl": "swagger",
       "environmentVariables": {

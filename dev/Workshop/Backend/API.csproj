@@ -14,7 +14,7 @@
 
 
 	<ItemGroup>
-	  <Folder Include="ServiceLayer\ServiceObjects\" />
+	  <ProjectReference Include="..\Workshop\Workshop.csproj" />
 	</ItemGroup>
 
 </Project>

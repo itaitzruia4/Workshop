@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace Backend.Communication
+﻿namespace API.Controllers
 {
     public class Program
     {
