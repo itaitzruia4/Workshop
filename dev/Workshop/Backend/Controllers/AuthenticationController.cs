@@ -12,16 +12,13 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class AuthenticationController : ControllerBase
     {
-        IService service;
-        AuthenticationController()
-        {
-            service = new Service();
-        }
+        IService Service = new Service();
+        int nextUserId = 1;
 
-        [HttpPost("login")]
-        public ActionResult<AuthenticationResponse> Post([FromBody] LoginRequest request)
+        [HttpGet]
+        public ActionResult<AuthenticationResponse> Get()
         {
-            Response<Member> response = service.Login(request.UserId, request.Membername, request.Password);
+            Response<User> response = Service.EnterMarket(nextUserId++);
             if (response.ErrorOccured)
             {
                 return BadRequest(new AuthenticationResponse
@@ -32,8 +29,25 @@ namespace API.Controllers
             }
             return Ok(new AuthenticationResponse
             {
-                UserId = response.UserId,
-                Error = ""
+                UserId = response.UserId
+            });
+        }
+
+        [HttpPost("login")]
+        public ActionResult<AuthenticationResponse> Post([FromBody] LoginRequest request)
+        {
+            Response<Member> response = Service.Login(request.UserId, request.Membername, request.Password);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new AuthenticationResponse
+                {
+                    UserId = response.UserId,
+                    Error = response.ErrorMessage
+                });
+            }
+            return Ok(new AuthenticationResponse
+            {
+                UserId = response.UserId
             });
         }
 
@@ -42,7 +56,7 @@ namespace API.Controllers
         {
             try
             {
-                Response response = service.Register(request.UserId, request.Membername, request.Password, DateTime.Parse(request.Birthdate));
+                Response response = Service.Register(request.UserId, request.Membername, request.Password, DateTime.Parse(request.Birthdate));
                 if (response.ErrorOccured)
                 {
                     return BadRequest(new AuthenticationResponse
@@ -53,8 +67,7 @@ namespace API.Controllers
                 }
                 return Ok(new AuthenticationResponse
                 {
-                    UserId = response.UserId,
-                    Error = ""
+                    UserId = response.UserId
                 });
             }
             catch (Exception _)
@@ -66,6 +79,6 @@ namespace API.Controllers
                     });
             }
         }
-
     }
+
 }

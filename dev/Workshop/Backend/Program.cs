@@ -1,13 +1,16 @@
-﻿namespace API.Controllers
+﻿using Workshop.ServiceLayer;
+
+namespace API.Controllers
 {
     public class Program
     {
         public static void Main(string[] args)
         {
+            IService service = new Service();
+
             var builder = WebApplication.CreateBuilder(args);
 
             // Add builder.Services to the container.
-
             builder.Services.AddControllers();
             builder.Services.AddCors(options =>
             {

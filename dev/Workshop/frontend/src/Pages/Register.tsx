@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { isValidDate } from '../Utils/utils';
 import './Register.css';
 
 const DATE_FORMAT = 'MM/DD/YYYY';

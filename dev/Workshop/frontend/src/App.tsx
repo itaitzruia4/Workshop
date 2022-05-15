@@ -7,6 +7,16 @@ import Guest from './Pages/Guest'
 import Home from './Pages/Home'
 
 function App() {
+
+    // Send "EnterMarket" request to server
+    let url = "http://localhost:5165/api/authentication";
+
+    fetch(url, {
+        method: 'GET',
+        mode: 'cors',
+        headers: { "Content-Type": "application/json" }
+    }).then((response) => alert(response.text));
+
     return (
         <Router>
             <Routes>
@@ -19,6 +29,5 @@ function App() {
         </Router>
     )
 }
-
 
 export default App;

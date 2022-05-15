@@ -31,11 +31,11 @@ namespace Workshop.ServiceLayer
             {
                 DomainUser domainUser = facade.EnterMarket(userId);
                 User serviceUser = new User(domainUser);
-                return new Response<User>(userId, serviceUser);
+                return new Response<User>(serviceUser, userId);
             }
             catch (Exception e)
             {
-                return new Response<User>(userId, null, e.Message);
+                return new Response<User>(e.Message, userId);
             }
         }
 
@@ -48,7 +48,7 @@ namespace Workshop.ServiceLayer
             }
             catch (Exception e)
             {
-                return new Response(userId, e.Message);
+                return new Response(e.Message, userId);
             }
         }
 
@@ -61,7 +61,7 @@ namespace Workshop.ServiceLayer
             }
             catch (Exception e)
             {
-                return new Response(userId, e.Message);
+                return new Response(e.Message, userId);
             }
         }
 
@@ -71,11 +71,11 @@ namespace Workshop.ServiceLayer
             {
                 DomainMember domainMember = facade.Login(userId, username, password);
                 Member serviceMember = new Member(domainMember);
-                return new Response<Member>(userId, serviceMember);
+                return new Response<Member>(serviceMember, userId);
             }
             catch (Exception e)
             {
-                return new Response<Member>(userId, e.Message);
+                return new Response<Member>(e.Message, userId);
             }
         }
 
@@ -88,7 +88,7 @@ namespace Workshop.ServiceLayer
             }
             catch (Exception e)
             {
-                return new Response(userId, e.Message);
+                return new Response(e.Message, userId);
             }
         }
 
@@ -98,11 +98,11 @@ namespace Workshop.ServiceLayer
             {
                 DomainProduct domainProduct = facade.AddProduct(userId, membername, storeId, productId, productName, description, price, quantity, category);
                 Product serviceProduct = new Product(domainProduct);
-                return new Response<Product>(userId, serviceProduct);
+                return new Response<Product>(serviceProduct, userId);
             }
             catch (Exception e)
             {
-                return new Response<Product>(userId, e.Message);
+                return new Response<Product>(e.Message, userId);
             }
         }
 
@@ -112,11 +112,11 @@ namespace Workshop.ServiceLayer
             {
                 DomainStoreOwner domainOwner = facade.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId);
                 StoreOwner serviceOwner = new StoreOwner(domainOwner);
-                return new Response<StoreOwner>(userId, serviceOwner);
+                return new Response<StoreOwner>(serviceOwner, userId);
             }
             catch (Exception e)
             {
-                return new Response<StoreOwner>(e.Message);
+                return new Response<StoreOwner>(e.Message, userId);
             }
         }
 
@@ -126,11 +126,11 @@ namespace Workshop.ServiceLayer
             {
                 DomainStoreManager domainManager = facade.NominateStoreManager(userId, nominatorUsername, nominatedUsername, storeId);
                 StoreManager serviceManager = new StoreManager(domainManager);
-                return new Response<StoreManager>(serviceManager);
+                return new Response<StoreManager>(serviceManager, userId);
             }
             catch (Exception e)
             {
-                return new Response<StoreManager>(e.Message);
+                return new Response<StoreManager>(e.Message, userId);
             }
         }
 
@@ -140,11 +140,11 @@ namespace Workshop.ServiceLayer
             {
                 DomainMember domainMember = facade.RemoveStoreOwnerNomination(userId, nominatorMembername, nominatedMembername, storeId);
                 Member serviceMember = new Member(domainMember);
-                return new Response<Member>(serviceMember);
+                return new Response<Member>(serviceMember, userId);
             }
             catch (Exception e)
             {
-                return new Response<Member>(e.Message);
+                return new Response<Member>(e.Message, userId);
             }
 
         }
@@ -156,11 +156,11 @@ namespace Workshop.ServiceLayer
             {
                 List<DomainMember> members = facade.GetWorkersInformation(userId, username, storeId);
                 List<Member> returnMembers = members.Select(x => new Member(x)).ToList();
-                return new Response<List<Member>>(returnMembers);
+                return new Response<List<Member>>(returnMembers, userId);
             }
             catch (Exception e)
             {
-                return new Response<List<Member>>(e.Message);
+                return new Response<List<Member>>(e.Message, userId);
             }
         }
         public Response CloseStore(int userId, string username, int storeId)
@@ -168,11 +168,11 @@ namespace Workshop.ServiceLayer
             try
             {
                 facade.CloseStore(userId, username, storeId);
-                return new Response();
+                return new Response(userId);
             }
             catch (Exception e)
             {
-                return new Response(e.Message);
+                return new Response(e.Message, userId);
             }
         }
 
@@ -182,11 +182,11 @@ namespace Workshop.ServiceLayer
             {
                 DomainStore domainStore = facade.CreateNewStore(userId, creator, storeName);
                 Store store = new Store(domainStore);
-                return new Response<Store>(store);
+                return new Response<Store>(store, userId);
             }
             catch (Exception e)
             {
-                return new Response<Store>(e.Message);
+                return new Response<Store>(e.Message, userId);
             }
 
         }
@@ -196,11 +196,11 @@ namespace Workshop.ServiceLayer
             try
             {
                 facade.ReviewProduct(userId, user, productId, review, rating);
-                return new Response();
+                return new Response(userId);
             }
             catch (Exception e)
             {
-                return new Response(e.Message);
+                return new Response(e.Message, userId);
             }
         }
 
@@ -210,11 +210,11 @@ namespace Workshop.ServiceLayer
             {
                 List<DomainProductDTO> products = facade.SearchProduct(userId, user, productId, keyWords, catagory, minPrice, maxPrice, productReview);
                 List<Product> returnProducts = products.Select(x => new Product(x)).ToList();
-                return new Response<List<Product>>(returnProducts);
+                return new Response<List<Product>>(returnProducts, userId);
             }
             catch (Exception e)
             {
-                return new Response<List<Product>>(e.Message);
+                return new Response<List<Product>>(e.Message, userId);
             }
         }
 
@@ -223,11 +223,11 @@ namespace Workshop.ServiceLayer
             try
             {
                 Product product = new Product(facade.addToCart(userId, user, productId, storeId, quantity));
-                return new Response<Product>(product);
+                return new Response<Product>(product, userId);
             }
             catch (Exception e)
             {
-                return new Response<Product>(e.Message);
+                return new Response<Product>(e.Message, userId);
             }
         }
 
@@ -236,11 +236,11 @@ namespace Workshop.ServiceLayer
             try
             {
                 ShoppingCart shoppingCart = new ShoppingCart(facade.viewCart(userId, user));
-                return new Response<ShoppingCart>(shoppingCart);
+                return new Response<ShoppingCart>(shoppingCart, userId);
             }
             catch (Exception e)
             {
-                return new Response<ShoppingCart>(e.Message);
+                return new Response<ShoppingCart>(e.Message, userId);
             }
         }
 
@@ -249,11 +249,11 @@ namespace Workshop.ServiceLayer
             try
             {
                 ShoppingCart shoppingCart = new ShoppingCart(facade.editCart(userId, user, productId, newQuantity));
-                return new Response<ShoppingCart>(shoppingCart);
+                return new Response<ShoppingCart>(shoppingCart, userId);
             }
             catch (Exception e)
             {
-                return new Response<ShoppingCart>(e.Message);
+                return new Response<ShoppingCart>(e.Message, userId);
             }
         }
 
@@ -262,11 +262,11 @@ namespace Workshop.ServiceLayer
             try
             {
                 facade.BuyCart(userId, user, address);
-                return new Response();
+                return new Response(userId);
             }
             catch (Exception e)
             {
-                return new Response(e.Message);
+                return new Response(e.Message, userId);
             }
         }
 
@@ -275,11 +275,11 @@ namespace Workshop.ServiceLayer
             try
             {
                 facade.AddProductDiscount(userId, user, storeId, jsonDiscount, productId);
-                return new Response();
+                return new Response(userId);
             }
             catch (Exception e)
             {
-                return new Response(e.Message);
+                return new Response(e.Message, userId);
             }
         }
 
@@ -288,11 +288,11 @@ namespace Workshop.ServiceLayer
             try
             {
                 facade.AddCategoryDiscount(userId, user, storeId, jsonDiscount, categoryName);
-                return new Response();
+                return new Response(userId);
             }
             catch (Exception e)
             {
-                return new Response(e.Message);
+                return new Response(e.Message, userId);
             }
         }
 
@@ -301,11 +301,11 @@ namespace Workshop.ServiceLayer
             try
             {
                 facade.AddStoreDiscount(userId, user, storeId, jsonDiscount);
-                return new Response();
+                return new Response(userId);
             }
             catch (Exception e)
             {
-                return new Response(e.Message);
+                return new Response(e.Message, userId);
             }
         }
 
@@ -314,11 +314,11 @@ namespace Workshop.ServiceLayer
             try
             {
                 facade.RemoveProductFromStore(userId, username, storeId, productID);
-                return new Response();
+                return new Response(userId);
             }
             catch (Exception e)
             {
-                return new Response(e.Message);
+                return new Response(e.Message, userId);
             }
         }
 
@@ -327,11 +327,11 @@ namespace Workshop.ServiceLayer
             try
             {
                 facade.ChangeProductName(userId, username, storeId, productID, name);
-                return new Response();
+                return new Response(userId);
             }
             catch (Exception e)
             {
-                return new Response(e.Message);
+                return new Response(e.Message, userId);
             }
         }
 
@@ -340,11 +340,11 @@ namespace Workshop.ServiceLayer
             try
             {
                 facade.ChangeProductPrice(userId, username, storeId, productID, price);
-                return new Response();
+                return new Response(userId);
             }
             catch (Exception e)
             {
-                return new Response(e.Message);
+                return new Response(e.Message, userId);
             }
         }
 
@@ -353,11 +353,11 @@ namespace Workshop.ServiceLayer
             try
             {
                 facade.ChangeProductQuantity(userId, username, storeId, productID, quantity);
-                return new Response();
+                return new Response(userId);
             }
             catch (Exception e)
             {
-                return new Response(e.Message);
+                return new Response(e.Message, userId);
             }
         }
 
@@ -366,11 +366,11 @@ namespace Workshop.ServiceLayer
             try
             {
                 facade.ChangeProductCategory(userId, username, storeId, productID, category);
-                return new Response();
+                return new Response(userId);
             }
             catch (Exception e)
             {
-                return new Response(e.Message);
+                return new Response(e.Message, userId);
             }
         }
     }
