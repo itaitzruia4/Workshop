@@ -33,7 +33,12 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
             List<ShoppingBagProduct> member1prods = new List<ShoppingBagProduct>();
             member1prods.Add(new ShoppingBagProduct(1, "prod1", "desc1", 11.90, 3, "cat1"));
-            userController.AddOrder(1, new OrderDTO(1, "member1", "whatever", "blasToysRus", member1prods, 12.30), "member1");
+            List<ProductDTO> pdtos1 = new List<ProductDTO>();
+            foreach (ShoppingBagProduct sbp in member1prods)
+            {
+                pdtos1.Add(sbp.GetProductDTO());
+            }
+            userController.AddOrder(1, new OrderDTO(1, "member1", "whatever", "blasToysRus", pdtos1), "member1");
             userController.Logout(1, "member1");
 
             userController.Register(1, "member3", "pass3", DateTime.Parse("Aug 22, 1972"));

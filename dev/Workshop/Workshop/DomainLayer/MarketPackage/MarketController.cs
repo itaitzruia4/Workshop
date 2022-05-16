@@ -655,6 +655,9 @@ namespace Workshop.DomainLayer.MarketPackage
                         stores[storeId].CheckPurchasePolicy(shoppingCart.shoppingBags[storeId], age);
                         stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
                         productsSoFar.Add(storeId, shoppingCart.shoppingBags[storeId].products);
+                        OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetStoreName(), shoppingCart.shoppingBags[storeId].products);
+                        orderHandler.addOrder(order, storeId);
+                        userController.AddOrder(userId, order, username);
                         storesLocks[storeId].ReleaseReaderLock();
                     }
                 }

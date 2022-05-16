@@ -179,16 +179,6 @@ namespace Tests.AcceptanceTests
         }
 
         [DataTestMethod]
-        [DataRow(username, password)]
-        public void TestAddProduct_Bad_AddTwice(string username, string password)
-        {
-            TestLogin_Good(1, username, password);
-            int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Assert.IsFalse(service.AddProduct(1, username, storeId, "TestAddProduct", "Bad", 1, 1, "cat1").ErrorOccured);
-            Assert.IsTrue(service.AddProduct(1, username, storeId, "TestAddProduct", "Bad", 1, 1, "cat1").ErrorOccured);
-        }
-
-        [DataTestMethod]
         [DataRow(username, password, "no", "perm")]
         public void TestAddProduct_Bad_NoPermission(string username, string password, string noPermU, string noPermP)
         {
@@ -432,10 +422,10 @@ namespace Tests.AcceptanceTests
 
         public void AssertProductsEqual(Product prodA, Product prodB)
         {
-            Assert.Equals(prodA.Id, prodB.Id);
-            Assert.Equals(prodA.Name, prodB.Name);
-            Assert.Equals(prodA.BasePrice, prodB.BasePrice);
-            Assert.Equals(prodA.Description, prodB.Description);
+            Assert.AreEqual(prodA.Id, prodB.Id);
+            Assert.AreEqual(prodA.Name, prodB.Name);
+            Assert.AreEqual(prodA.BasePrice, prodB.BasePrice);
+            Assert.AreEqual(prodA.Description, prodB.Description);
         }
 
         public void AssertProductsNotEqual(Product prodA, Product prodB)
@@ -542,7 +532,7 @@ namespace Tests.AcceptanceTests
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             Response<ShoppingCart> resSC = service.viewCart(1, username);
             Assert.IsFalse(resSC.ErrorOccured);
-            Assert.AreEqual(resSC.Value.shoppingBags, null);
+            Assert.AreEqual(resSC.Value.shoppingBags.Count, 0);
         }
 
         [DataTestMethod]
@@ -709,8 +699,7 @@ namespace Tests.AcceptanceTests
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
-            Assert.IsFalse(service.ChangeProductPrice(1, username, storeId, prod.Id, price).ErrorOccured);
-
+            Assert.IsTrue(service.ChangeProductPrice(1, username, storeId, prod.Id, price).ErrorOccured);
         }
 
         [DataTestMethod]
@@ -721,8 +710,7 @@ namespace Tests.AcceptanceTests
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsFalse(service.ChangeProductQuantity(1, username, storeId, prod.Id, 1711).ErrorOccured);
-            prod = service.addToCart(1, username, prod.Id, storeId, 1).Value;
-            Assert.AreEqual(prod.Quantity, 1711);
+            Assert.IsFalse(service.addToCart(1, username, prod.Id, storeId, 1711).ErrorOccured);
         }
 
         [DataTestMethod]
@@ -735,7 +723,6 @@ namespace Tests.AcceptanceTests
         }
 
         [DataTestMethod]
-        [DataRow(username, password, 0)]
         [DataRow(username, password, -1)]
         public void TestChangeProductQuantity_Bad_InvalidQuantity(string username, string password, int quantity)
         {

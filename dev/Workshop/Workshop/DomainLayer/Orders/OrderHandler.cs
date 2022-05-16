@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DomainLayer.MarketPackage;
 
 namespace Workshop.DomainLayer.Orders
 {
     class OrderHandler<T>
     {
         private Dictionary<T, List<OrderDTO>> orders;
-
+        private static int CURR_ID = 0;
         public OrderHandler()
         {
             this.orders = new Dictionary<T, List<OrderDTO>>();
@@ -23,6 +24,13 @@ namespace Workshop.DomainLayer.Orders
             }
 
             orders[key].Add(order);
+        }
+
+        public OrderDTO CreateOrder(string membername, string address, string storeName, List<ProductDTO> items)
+        {
+            OrderDTO temp = new OrderDTO(CURR_ID, membername, address, storeName, items);
+            CURR_ID++;
+            return temp;
         }
 
         public OrderDTO findOrder(int orderID, T key)
