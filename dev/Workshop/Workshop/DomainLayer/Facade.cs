@@ -167,7 +167,7 @@ namespace Workshop.DomainLayer
             MarketController.ChangeProductName(userId, username, storeId, productID, name);
         }
 
-        public void ChangeProductPrice(int userId, string username, int storeId, int productID, int price)
+        public void ChangeProductPrice(int userId, string username, int storeId, int productID, double price)
         {
             MarketController.ChangeProductPrice(userId, username, storeId, productID, price);
         }

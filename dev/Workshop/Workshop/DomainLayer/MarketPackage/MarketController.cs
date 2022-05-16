@@ -212,7 +212,7 @@ namespace Workshop.DomainLayer.MarketPackage
             Logger.Instance.LogEvent($"{username} successfuly changed the name of product {productID} in store {storeId}.");
         }
 
-        public void ChangeProductPrice(int userId, string username, int storeId, int productID, int price)
+        public void ChangeProductPrice(int userId, string username, int storeId, int productID, double price)
         {
             Logger.Instance.LogEvent($"{username} is trying to change the price of product {productID} in store {storeId}.");
             userController.AssertCurrentUser(userId, username);

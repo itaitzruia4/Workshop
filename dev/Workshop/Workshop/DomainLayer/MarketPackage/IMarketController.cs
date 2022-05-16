@@ -22,7 +22,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
         void ChangeProductName(int userId, string username, int storeId, int productID, string name);
 
-        void ChangeProductPrice(int userId, string username, int storeId, int productID, int price);
+        void ChangeProductPrice(int userId, string username, int storeId, int productID, double price);
 
         void ChangeProductQuantity(int userId, string username, int storeId, int productID, int quantity);
 
