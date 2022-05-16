@@ -112,5 +112,18 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             rwl.ReleaseReaderLock();
             return result;
         }
+
+        public bool HasRoles()
+        {
+            rwl.AcquireReaderLock(Timeout.Infinite);
+            int count = roles.Count;
+            rwl.ReleaseReaderLock();
+            return count != 0;
+        }
+
+        public MemberDTO GetMemberDTO()
+        {
+            return new MemberDTO(Username, Password, roles);
+        }
     }
 }
