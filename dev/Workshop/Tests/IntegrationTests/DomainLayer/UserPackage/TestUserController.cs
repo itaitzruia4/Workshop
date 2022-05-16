@@ -61,6 +61,11 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             userController.ExitMarket(1);
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// Tests for UserController.Register method
+        /// <see cref="UserController.Register(int, string, string, DateTime)"/>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         [TestMethod]
         public void TestRegister_Success()
         {
@@ -121,6 +126,11 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             userController.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// Tests for UserController.EnterMarket method
+        /// <see cref="UserController.EnterMarket(int)"/>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         [TestMethod]
         public void TestEnterMarket_Success()
         {
@@ -133,6 +143,11 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             userController.EnterMarket(1);
             Assert.ThrowsException<InvalidOperationException>(() => userController.EnterMarket(1));
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// Tests for UserController.Login method
+        /// <see cref="UserController.Login(int, string, string)"/>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [TestMethod]
         [DataRow("member1", "pass1")]
@@ -216,6 +231,11 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             userController.Login(1, username2, password2);
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// Tests for UserController.Logout method
+        /// <see cref="UserController.Logout(int, string)"/>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         [TestMethod]
         public void TestLogout_Success()
         {
@@ -253,6 +273,11 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
             userController.Logout(1, username2);
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// Tests for UserController.NominateStoreOwner method
+        /// <see cref="UserController.NominateStoreOwner(int, string, string, int)"/>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [TestMethod]
         [DataRow("member2", "pass2")]
@@ -325,6 +350,11 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             userController.Login(1, nominator, nominatorPassword);
             Assert.ThrowsException<InvalidOperationException>(() => userController.NominateStoreOwner(1, nominator, "member2", member2StoreId));
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// Tests for UserController.NominateStoreManager method
+        /// <see cref="UserController.NominateStoreManager(int, string, string, int)"/>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [TestMethod]
         [DataRow("member2", "pass2")]
@@ -407,6 +437,11 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             userController.Login(1, nominator, nominatorPassword);
             Assert.ThrowsException<InvalidOperationException>(() => userController.NominateStoreManager(1, nominator, "member2", member2StoreId));
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// Tests for UserController.ReviewProduct method
+        /// <see cref="UserController.ReviewProduct(int, string, int, string, int)"/>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [TestMethod]
         public void TestReviewProduct_Success()
