@@ -4,8 +4,8 @@ namespace API.Responses
 {
     public class ReviewResponse
     {
-        public ReviewDTO Review;
-        public string Error;
+        public ReviewDTO Review { get; set; }
+        public string Error { get; set; }
 
         public ReviewResponse(ReviewDTO rev)
         {

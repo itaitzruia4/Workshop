@@ -4,8 +4,8 @@ namespace API.Responses
 {
     public class MemberResponse
     {
-        public Member Member;
-        public string Error;
+        public Member Member { get; set; }
+        public string Error { get; set; }
 
         public MemberResponse(Member m)
         {

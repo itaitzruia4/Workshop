@@ -72,5 +72,16 @@ namespace API.Controllers
             return Ok(new ShoppingCartResponse(response.Value));
         }
 
+        [HttpPost("buycart")]
+        public ActionResult<ShoppingCartResponse> BuyCart([FromBody] BuyCartRequest request)
+        {
+            Response<ShoppingCart> response = Service.BuyCart(request.UserId, request.Membername, request.ProductId, request.Quantity);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new ShoppingCartResponse(response.ErrorMessage));
+            }
+            return Ok(new ShoppingCartResponse(response.Value));
+        }
+
     }
 }
