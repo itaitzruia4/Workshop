@@ -454,115 +454,36 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             throw new ArgumentException($"Product with ID {productId} does not exist in the market.");
         }
-        public List<ProductDTO> SearchProduct(int userId, string username, string keyWords, string category, int minPrice, int maxPrice, int productReview)
+        public List<ProductDTO> SearchProduct(int userId, string username, string keyWords, string category, double minPrice, double maxPrice, int productReview)
         {
             userController.AssertCurrentUser(userId, username);
-            List<Product> products = new List<Product>();
+            IEnumerable<IEnumerable<Product>> allProducts = stores.Values.Select(s => s.GetProducts().Values);
+            IEnumerable<Product> products = allProducts.SelectMany(lp => lp);
             if (keyWords != "")
             {
-                products = getProductByKeywords(keyWords);
+                products = products.Where(p => p.Name.Contains(keyWords));
             }
-            else if (category != "")
+            if (category != "")
             {
-                products = getProductByCategory(category);
+                products = products.Where(p => p.Category == category);
             }
-            return filterProducts(products, minPrice, maxPrice, productReview);
-        }
-
-        private List<Product> getProductByCategory(string category)
-        {
-            throw new NotImplementedException();
-        }
-
-        private List<Product> getProductByKeywords(string keyWords)
-        {
-            throw new NotImplementedException();
-        }
-
-        //todo move search to user add add a call
-        public List<ProductDTO> filterProducts(List<Product> products, int minPrice, int maxPrice, int productReview)
-        {
-            if(minPrice != -1)
+            if (minPrice != -1)
             {
-                products = products.Where(p => p.Price >= minPrice).ToList();
+                products = products.Where(p => p.Price >= minPrice);
             }
 
-            if(maxPrice != -1)
+            if (maxPrice != -1)
             {
-                products = products.Where(p => p.Price <= maxPrice).ToList();
+                products = products.Where(p => p.Price <= maxPrice);
             }
 
+            if (productReview != -1)
+            {
+                products = products.Where(p => userController.GetProductRating(p.Id) >= productReview);
+            }
             return products.Select(p => p.GetProductDTO()).ToList();
         }
-
-        private List<double> getPrices(List<Product> products)
-        {
-            List<double> productsPrices = new List<double>();
-            foreach(Product product in products)
-            {
-                productsPrices.Add(product.Price);
-            }
-            return productsPrices;
-        }
-
-        private List<double> getProductsReviewsGrades(List<Product> products)
-        {
-            List<double> productsReviewsGrades = new List<double>();
-            foreach(Product product in products)
-            {
-                //todo add when we add stars, convert to double to compare ez
-                //productsReviewsGrades.Add(userController.getAvgProductStars(product));
-            }
-            return productsReviewsGrades;
-        }
-
-        private List<int> getStoresReviewsGrades(List<Product> products)
-        {
-            HashSet<int> storesIds = new HashSet<int>();
-            foreach(Product product in products)
-            {
-                int storeId = getStoreIdByProduct(product.Id);
-                if(storeId != -1)
-                {
-                    storesIds.Add(storeId);
-                }
-            }
-            List<int> storesReviewsGrades = new List<int>();
-            foreach(int store in storesIds)
-            {
-                //todo add when we add stars
-                //storesPrices.add(userController.getAvgStoreStars(store));
-            }
-            return storesReviewsGrades;
-        }
-        private int getStoreIdByProduct(int productId)
-        {
-            foreach(Store store in stores.Values)
-            {
-                try
-                {
-                    store.GetProduct(productId);
-                    return store.GetId();
-                }
-                catch (ArgumentException)
-                {
-                }
-            }
-            return -1;
-        }
         
-        private List<Product> filterByEq(List<Product> products,List<int> filterByList, int key)
-        {
-            List<Product> goodProducts = new List<Product>();
-            for(int i=0;i<products.Count;i++)
-            {
-                if(filterByList[i] == key)
-                {
-                    goodProducts.Add(products[i]);
-                }
-            }
-            return goodProducts;
-        }
         public ShoppingBagProduct getProductForSale(int productId, int storeId, int quantity)
         {
             ValidateStoreExists(storeId);
@@ -641,7 +562,6 @@ namespace Workshop.DomainLayer.MarketPackage
             return userController.addToCart(userId, user, getProductForSale(productId, storeId, quantity), storeId);
         }
 
-        // TODO: add concurrency
         public void AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId)
         {
             userController.AssertCurrentUser(userId, user);
@@ -661,7 +581,6 @@ namespace Workshop.DomainLayer.MarketPackage
                 storesLocks[storeId].ReleaseWriterLock();
             }
         }
-        // TODO: add concurrency
         public void AddCategoryDiscount(int userId, string user, int storeId, string jsonDiscount, string categoryName)
         {
             userController.AssertCurrentUser(userId, user);
@@ -681,7 +600,6 @@ namespace Workshop.DomainLayer.MarketPackage
                 storesLocks[storeId].ReleaseWriterLock();
             }
         }
-        // TODO: add concurrency
         public void AddStoreDiscount(int userId, string user, int storeId, string jsonDiscount)
         {
             userController.AssertCurrentUser(userId, user);

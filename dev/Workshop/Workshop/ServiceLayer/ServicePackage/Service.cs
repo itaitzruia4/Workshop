@@ -204,7 +204,7 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<List<Product>> SearchProduct(int userId, string user, string keyWords, string category, int minPrice, int maxPrice, int productReview)
+        public Response<List<Product>> SearchProduct(int userId, string user, string keyWords, string category, double minPrice, double maxPrice, int productReview)
         {
             try
             {

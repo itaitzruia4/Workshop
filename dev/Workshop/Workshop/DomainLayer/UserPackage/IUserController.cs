@@ -35,5 +35,6 @@ namespace Workshop.DomainLayer.UserPackage
         void AddOrder(int userId, OrderDTO order, string username);
         ShoppingCartDTO editCart(int userId, string user, int productId, int newQuantity);
         void ClearUserCart(int userId);
+        double GetProductRating(int productId);
     }
 }

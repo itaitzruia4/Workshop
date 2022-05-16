@@ -36,7 +36,7 @@ namespace Workshop.ServiceLayer
 
         Response<ReviewDTO> ReviewProduct(int userId, string user, int productId, string review, int rating);
 
-        Response<List<Product>> SearchProduct(int userId, string user, string keyWords, string catagory, int minPrice, int maxPrice, int productReview);
+        Response<List<Product>> SearchProduct(int userId, string user, string keyWords, string catagory, double minPrice, double maxPrice, int productReview);
 
         Response<List<Store>> GetAllStores(int userId);
 

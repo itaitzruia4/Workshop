@@ -128,7 +128,7 @@ namespace API.Controllers
         }
 
         [HttpPost("addtocart")]
-        public ActionResult<ProductResponse> AddToCart([FromBody] ProductSearchRequest request)
+        public ActionResult<ProductResponse> AddToCart([FromBody] AddToCartRequest request)
         {
             Response<Product> response = Service.addToCart(request.UserId, request.Membername, request.ProductId, request.StoreId, request.Quantity);
             if (response.ErrorOccured)

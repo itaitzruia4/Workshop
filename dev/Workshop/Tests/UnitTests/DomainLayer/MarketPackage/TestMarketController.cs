@@ -95,18 +95,16 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
             Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(1, username, storeName));
         }
 
-        [DataTestMethod]
-        [DataRow("User1", 1, "key", "catagory", 2, 11, 3)]
-        [DataRow("User1", 1, "key", "catagory", 0, 24, 3)]
-        public void TestSearchProduct_Success(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
+        [TestMethod]
+        public void TestSearchProduct_Success()
         {
-            marketController.CreateNewStore(1, user, "store");
-            marketController.AddProductToStore(1, user, 1, "someName", "someDesc", 10.0, 2, "cat1");
-            Product product = new Product(productId, "someName", "someDesc", 10.0, 2, "cat1");
-            List<Product> products = new List<Product>();
-            products.Add(product);
-            ProductDTO product2 = marketController.SearchProduct(1, user, keyWords, catagory, minPrice, maxPrice, productReview)[0];
-            Assert.AreEqual(product, product2);
+            marketController.CreateNewStore(1, "User1", "store");
+            Product p1 = marketController.AddProductToStore(1, "User1", 1, "prod1", "desc1", 10.0, 2, "cat1");
+            Product p2 = marketController.AddProductToStore(1, "User1", 1, "prod2", "desc2", 9.6, 2, "cat2");
+            List<ProductDTO> searchedProducts = marketController.SearchProduct(1, "User1", "", "", 8.7, 10.0, -1);
+            Assert.IsTrue(searchedProducts.Count == 2);
+            Assert.IsTrue(p1.GetProductDTO().Equals(searchedProducts[0]) || p1.GetProductDTO().Equals(searchedProducts[1]));
+            Assert.IsTrue(p2.GetProductDTO().Equals(searchedProducts[0]) || p2.GetProductDTO().Equals(searchedProducts[1]));
         }
 
         [DataTestMethod]
@@ -119,9 +117,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         {
             marketController.CreateNewStore(1, user, "store");
             marketController.AddProductToStore(1, user, 1, "someName", "someDesc", 10.0, 2, "cat1");
-            Product product = new Product(productId, "someName", "someDesc", 10.0, 2, "cat1");
-            List<ProductDTO> empty = new List<ProductDTO>();
-            CollectionAssert.AreEqual(empty,marketController.SearchProduct(1, user, keyWords, catagory, minPrice, maxPrice, productReview));
+            Assert.AreEqual(marketController.SearchProduct(1, user, keyWords, catagory, minPrice, maxPrice, productReview).Count, 0);
         }
 
 

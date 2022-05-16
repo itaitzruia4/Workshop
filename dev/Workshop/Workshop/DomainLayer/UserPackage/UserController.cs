@@ -492,5 +492,10 @@ namespace Workshop.DomainLayer.UserPackage
             orderHandler.addOrder(order, username);
             Logger.Instance.LogEvent($"User {userId} with member {username} added new order with ID {order.id}");
         }
+
+        public double GetProductRating(int productId)
+        {
+            return reviewHandler.GetProductRating(productId);
+        }
     }
 }
