@@ -4,8 +4,8 @@ namespace API.Responses
 {
     public class ShoppingCartResponse
     {
-        ShoppingCart ShoppingCart;
-        string Error;
+        ShoppingCart ShoppingCart { get; set; }
+        string Error { get; set; }
         public ShoppingCartResponse(ShoppingCart sc)
         {
             ShoppingCart = sc;

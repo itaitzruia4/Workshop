@@ -4,8 +4,8 @@ namespace API.Responses
 {
     public class ProductResponse
     {
-        public Product Product;
-        public string Error;
+        public Product Product { get; set; }
+        public string Error { get; set; }
 
         public ProductResponse(Product p)
         {

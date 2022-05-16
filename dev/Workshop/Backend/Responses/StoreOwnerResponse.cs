@@ -4,8 +4,8 @@ namespace API.Responses
 {
     public class StoreOwnerResponse
     {
-        public StoreOwner StoreOwner;
-        public string Error;
+        public StoreOwner StoreOwner { get; set; }
+        public string Error { get; set; }
 
         public StoreOwnerResponse(StoreOwner so)
         {

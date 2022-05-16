@@ -4,8 +4,8 @@ namespace API.Responses
 {
     public class StoresResponse
     {
-        public List<Store> Stores;
-        public string Error;
+        public List<Store> Stores { get; set; }
+        public string Error { get; set; }
         
         public StoresResponse(List<Store> stores)
         {

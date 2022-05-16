@@ -9,7 +9,7 @@ namespace Workshop.ServiceLayer.ServiceObjects
 {
     public class StoreOwner : StoreRole
     {
-        public List<StoreRole> Nominees;
+        public List<StoreRole> Nominees { get; set; }
         public StoreOwner(DomainStoreOwner domainOwner) : base(domainOwner)
         {
         }
