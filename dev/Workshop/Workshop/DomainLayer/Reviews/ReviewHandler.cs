@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,13 +13,13 @@ namespace Workshop.DomainLayer.Reviews
 {
     public class ReviewHandler : IReviewHandler
     {
-        Dictionary<int, Dictionary<string, ReviewDTO>> productReviews;
-        Dictionary<string, Dictionary<int, ReviewDTO>> userReviews;
+        ConcurrentDictionary<int, ConcurrentDictionary<string, ReviewDTO>> productReviews;
+        ConcurrentDictionary<string, ConcurrentDictionary<int, ReviewDTO>> userReviews;
 
         public ReviewHandler()
         {
-            productReviews = new Dictionary<int, Dictionary<string, ReviewDTO>>();
-            userReviews = new Dictionary<string, Dictionary<int, ReviewDTO>>();
+            productReviews = new ConcurrentDictionary<int, ConcurrentDictionary<string, ReviewDTO>>();
+            userReviews = new ConcurrentDictionary<string, ConcurrentDictionary<int, ReviewDTO>>();
         }
 
         public ReviewDTO AddReview(string user, int productId, string review, int rating)
@@ -31,35 +32,37 @@ namespace Workshop.DomainLayer.Reviews
 
         private void AddToProductReviews(int productId, string user, ReviewDTO review)
         {
-            if (!productReviews.ContainsKey(productId))
+            productReviews.TryAdd(productId, new ConcurrentDictionary<string, ReviewDTO>());
+            ConcurrentDictionary<string, ReviewDTO> temp;
+            productReviews.TryGetValue(productId, out temp);
+            if (!temp.TryAdd(user, review))
             {
-                productReviews.Add(productId, new Dictionary<string, ReviewDTO>());
-            }
-            Dictionary<string, ReviewDTO> temp = productReviews[productId];
-            if (!temp.ContainsKey(user))
-            {
-                temp.Add(user, review);
-            }
-            else
-            {
-                temp[user] = review;
+                ReviewDTO oldReview;
+                temp.TryGetValue(user, out oldReview);
+                temp.TryUpdate(user, review, oldReview);
             }
         }
         private void AddToUserReviews(string user, int productId, ReviewDTO review)
         {
-            if (!userReviews.ContainsKey(user))
+            userReviews.TryAdd(user, new ConcurrentDictionary<int, ReviewDTO>());
+            ConcurrentDictionary<int, ReviewDTO> temp;
+            userReviews.TryGetValue(user, out temp);
+            if (!temp.TryAdd(productId, review))
             {
-                userReviews.Add(user, new Dictionary<int, ReviewDTO>());
+                ReviewDTO oldReview;
+                temp.TryGetValue(productId, out oldReview);
+                temp.TryUpdate(productId, review, oldReview);
             }
-            Dictionary<int, ReviewDTO> temp = userReviews[user];
-            if (!temp.ContainsKey(productId))
+        }
+
+        public double GetProductRating(int productId)
+        {
+            ConcurrentDictionary<string, ReviewDTO> reviews;
+            if (productReviews.TryGetValue(productId, out reviews))
             {
-                temp.Add(productId, review);
+                return Queryable.Average(reviews.Values.Select(r => r.Rating).AsQueryable());
             }
-            else
-            {
-                temp[productId] = review;
-            }
+            return -1;
         }
     }
 }
