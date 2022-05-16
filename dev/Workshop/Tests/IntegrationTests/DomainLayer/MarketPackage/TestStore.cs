@@ -42,19 +42,6 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         }
 
         [TestMethod]
-        public void AddProductBadId()
-        {
-            int id = -1;
-            string name = "Product1";
-            string description = "Product1";
-            double price = 9.99;
-            int quantity = 10;
-            string category = "cat1";
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => store.AddProduct(name, description, price, quantity, category));
-            Assert.ThrowsException<ArgumentException>(() => store.GetProduct(id));
-        }
-
-        [TestMethod]
         public void AddProductBadName()
         {
             int id = 1;

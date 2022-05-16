@@ -433,7 +433,9 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         [DataRow("")]
         [DataRow(null)]
         public void TestReviewProduct_Failure_EmptyOrNullReview(string review){
-            Assert.ThrowsException<KeyNotFoundException>(() => userController.ReviewProduct(1, "User1", 1, review, 4));
+            userController.EnterMarket(1);
+            userController.Login(1, "member1", "pass1");
+            Assert.ThrowsException<ArgumentException>(() => userController.ReviewProduct(1, "member1", 1, review, 4));
         }
 
         [DataTestMethod]
@@ -441,7 +443,9 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         [DataRow(11)]
         public void TestReviewProduct_Failure_OutOfRangeRating(int rating)
         {
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => userController.ReviewProduct(1, "User1", 1, "TestReview", rating));
+            userController.EnterMarket(1);
+            userController.Login(1, "member1", "pass1");
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => userController.ReviewProduct(1, "member1", 1, "TestReview", rating));
         }
 
         [DataTestMethod]
@@ -455,7 +459,7 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             ShoppingBagProduct product2 = userController.addToCart(1, user, new ShoppingBagProduct(prodId, prodName, desc, price, quantity, category), storeId);
             ShoppingCartDTO shoppingCart = userController.viewCart(1, user);
             //Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(preInsertedProduct.GetProductDTO()));
-            Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(product2.GetProductDTO()));
+            Assert.AreEqual(shoppingCart.shoppingBags[1].products[0], product2.GetProductDTO());
         }
 
         [DataTestMethod]
@@ -484,7 +488,7 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             //Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(preInsertedProduct.GetProductDTO()));
             ProductDTO product = product2.GetProductDTO();
             product.Quantity = newQuantity;
-            Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(product));
+            Assert.AreEqual(shoppingCart.shoppingBags[1].products[0], product);
         }
 
         [DataTestMethod]

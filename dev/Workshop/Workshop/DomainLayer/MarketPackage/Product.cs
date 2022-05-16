@@ -35,9 +35,15 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             return new ShoppingBagProduct(Id,Name,Description,Price,quantity,Category);
         }
-        public bool EqualsFields(ProductDTO product)
+        public override bool Equals(Object product)
         {
-            return (this.Id == product.Id) && (this.Name == product.Name) && (this.Price == product.Price) && (this.Quantity == product.Quantity) && (this.Description == product.Description);
+            if (product == null || !(product is Product)) return false;
+            return (this.Id == ((Product)product).Id) &&
+                (this.Name == ((Product)product).Name) &&
+                (this.Price == ((Product)product).Price) &&
+                (this.Quantity == ((Product)product).Quantity) &&
+                (this.Description == ((Product)product).Description) &&
+                (this.Category == ((Product)product).Category);
         }
     }
 }
