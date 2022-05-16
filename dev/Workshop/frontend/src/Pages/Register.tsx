@@ -41,7 +41,11 @@ function Register() {
                 password: password,
                 birthDate: birthDate
             })
-        });
+        }).then((response) =>
+            response.json()
+                .then((data) => response.ok ? routeChange("/member") :
+                    alert(data.error))
+        );
     }
     
 

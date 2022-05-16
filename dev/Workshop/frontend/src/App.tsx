@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { delay } from './Utils/utils';
 import Login from './Pages/Login'
 import Register from './Pages/Register'
 import Member from './Pages/Member'
@@ -13,14 +14,16 @@ function App() {
     // Send "EnterMarket" request to server
     let url = "http://localhost:5165/api/authentication/entermarket";
 
-    // TODO fix the bug in which client sends requests before server goes up
+    (async () => {
+        await delay(1000);
+    })();
 
     fetch(url, {
         method: 'GET',
         mode: 'cors',
         headers: { "Content-Type": "application/json" }
     }).then((res) => res.json())
-        .then((data) => setUserId(data.userId))
+        .then((data) => setUserId(data.value))
         .catch();
 
     // storing user id in local storage
