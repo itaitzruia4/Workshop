@@ -15,9 +15,9 @@ namespace Workshop.ServiceLayer.ServiceObjects
 {
     public class Member : User
     {
-        public string Username;
-        public DateTime Birthdate;
-        private List<Role> Roles;
+        public string Username { get; set; }
+        public DateTime Birthdate { get; set; }
+        private List<Role> Roles { get; set; }
 
         public Member(DomainMember domainMember): base(domainMember)
         {

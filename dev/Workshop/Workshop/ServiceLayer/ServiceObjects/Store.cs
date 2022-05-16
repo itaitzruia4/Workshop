@@ -10,10 +10,10 @@ namespace Workshop.ServiceLayer.ServiceObjects
 {
     public class Store
     {
-        public readonly IReadOnlyDictionary<int, Product> Products;
-        public readonly string Name;
-        public readonly int StoreId;
-        public readonly bool Open;
+        public IReadOnlyDictionary<int, Product> Products { get; set; }
+        public string Name { get; set; }
+        public int StoreId { get; set; }
+        public bool Open { get; set; }
 
         internal Store(IReadOnlyDictionary<int, Product> products, string name)
         {

@@ -11,12 +11,12 @@ namespace Workshop.ServiceLayer.ServiceObjects
 {
     public class Product
     {
-        public readonly int Id;
-        public readonly string Name;
-        public readonly double BasePrice;
-        public readonly string Description;
-        public readonly int Quantity;
-        public readonly string Category;
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public double BasePrice { get; set; }
+        public string Description { get; set; }
+        public int Quantity { get; set; }
+        public string Category { get; set; }
         internal Product(int id, string name, string description, double basePrice, int quantity, string category)
         {
             Id = id;
