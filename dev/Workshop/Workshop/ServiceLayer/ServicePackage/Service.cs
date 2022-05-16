@@ -257,16 +257,15 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response BuyCart(int userId, string user, string address)
+        public Response<double> BuyCart(int userId, string user, string address)
         {
             try
             {
-                facade.BuyCart(userId, user, address);
-                return new Response(userId);
+                return new Response<double>(facade.BuyCart(userId, user, address), userId);
             }
             catch (Exception e)
             {
-                return new Response(e.Message, userId);
+                return new Response<double>(e.Message, userId);
             }
         }
 

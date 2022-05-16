@@ -46,7 +46,7 @@ namespace Workshop.ServiceLayer
 
         Response<ShoppingCart> editCart(int userId, string user, int productId, int newQuantity);
 
-        Response BuyCart(int userId, string user, string address);
+        Response<double> BuyCart(int userId, string user, string address);
 
         Response AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId);
 

@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Workshop.DomainLayer.MarketPackage.ExternalServices.Payment;
 using Workshop.DomainLayer.MarketPackage.ExternalServices.Supply;
-using Workshop.DomainLayer.MarketPackage.ExternalServices;
-using Workshop.DomainLayer.MarketPackage;
 using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Permissions;
@@ -496,7 +492,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             throw new ArgumentException("Store doesn't has enough from the product");
         }
-        public void BuyCart(int userId, string username, string address)
+        public double BuyCart(int userId, string username, string address)
         {
             Logger.Instance.LogEvent($"User {username} is trying to buy his cart.");
             ShoppingCartDTO shoppingCart = userController.viewCart(userId, username);
@@ -530,9 +526,11 @@ namespace Workshop.DomainLayer.MarketPackage
                     }
                 }
                 supplyService.supplyToAddress(username, address);
-                paymentService.PayAmount(username,GetCartPrice(shoppingCart));
+                double cartPrice = GetCartPrice(shoppingCart);
+                paymentService.PayAmount(username, cartPrice);
                 userController.ClearUserCart(userId);
                 Logger.Instance.LogEvent($"User {userId} successfuly paid {shoppingCart.getPrice()} and purchased his cart.");
+                return cartPrice;
             }
             catch (ArgumentException)
             {
@@ -543,7 +541,8 @@ namespace Workshop.DomainLayer.MarketPackage
                     {
                        stores[storeId].restoreProduct(item);   
                     }
-                }  
+                }
+                throw new OperationCanceledException($"User {username} was not able to purchase his cart.");
             }
         }
 

@@ -117,9 +117,9 @@ namespace Workshop.DomainLayer
         {
             return UserController.editCart(userId, user, productId, newQuantity);
         }
-        internal void BuyCart(int userId, string user, string address)
+        internal double BuyCart(int userId, string user, string address)
         {
-            MarketController.BuyCart(userId, user, address);
+            return MarketController.BuyCart(userId, user, address);
         }
 
         public void AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId)
