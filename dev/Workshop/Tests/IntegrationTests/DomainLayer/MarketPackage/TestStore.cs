@@ -20,7 +20,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             double price = 102.5;
             int quantity = 5;
             string category = "cat1";
-            product = store.AddProduct(name, description, price, quantity, category);
+            product = store.AddProduct(name, id, description, price, quantity, category);
         }
 
         [TestMethod]
@@ -32,7 +32,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             double price = 9.99;
             int quantity = 10;
             string category = "cat1";
-            Product p = store.AddProduct(name, description, price, quantity, category);
+            Product p = store.AddProduct(name, id, description, price, quantity, category);
             Assert.IsNotNull(p);
             Assert.AreEqual(p.Name, name);
             Assert.AreEqual(p.Description, description);
@@ -50,7 +50,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             double price = 9.99;
             int quantity = 10;
             string category = "cat1";
-            Assert.ThrowsException<ArgumentException>(() => store.AddProduct(name, description, price, quantity, category));
+            Assert.ThrowsException<ArgumentException>(() => store.AddProduct(name, id, description, price, quantity, category));
             Assert.ThrowsException<ArgumentException>(() => store.GetProduct(id));
         }
 
@@ -63,7 +63,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             double price = -0.9;
             int quantity = 10;
             string category = "cat1";
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => store.AddProduct(name, description, price, quantity, category));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => store.AddProduct(name, id, description, price, quantity, category));
             Assert.ThrowsException<ArgumentException>(() => store.GetProduct(id));
         }
 
@@ -76,7 +76,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             double price = 9.99;
             int quantity = -1;
             string category = "cat1";
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => store.AddProduct(name, description, price, quantity, category));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => store.AddProduct(name, id, description, price, quantity, category));
             Assert.ThrowsException<ArgumentException>(() => store.GetProduct(id));
         }
         
@@ -89,7 +89,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             double price = 9.99;
             int quantity = 10;
             string category = "cat1";
-            Product p = store.AddProduct(name, description, price, quantity, category);
+            Product p = store.AddProduct(name, id, description, price, quantity, category);
             store.GetProduct(id);
             store.RemoveProduct(id);
             Assert.ThrowsException<ArgumentException>(() => store.GetProduct(id));

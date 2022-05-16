@@ -26,8 +26,8 @@ namespace Workshop.DomainLayer.MarketPackage
         private ConcurrentDictionary<int, ReaderWriterLock> storesLocks;
         private IMarketPaymentService paymentService;
         private IMarketSupplyService supplyService;
-        private static int STORE_COUNT = 1;
-
+        private static int STORE_COUNT = 0;
+        private static int PRODUCT_COUNT = 0;
         public MarketController(IUserController userController, IMarketPaymentService paymentService, IMarketSupplyService supplyService)
         {
             this.userController = userController;
@@ -36,7 +36,6 @@ namespace Workshop.DomainLayer.MarketPackage
             this.supplyService = supplyService;
             this.stores = new ConcurrentDictionary<int, Store>();
             this.storesLocks = new ConcurrentDictionary<int, ReaderWriterLock>();
-            STORE_COUNT = 1;
         }
 
         public void InitializeSystem()
@@ -140,8 +139,9 @@ namespace Workshop.DomainLayer.MarketPackage
                 ViewStorePermission(userId, username, storeId);
                 if (!IsAuthorized(userId, username, storeId, Action.AddProduct))
                     throw new MemberAccessException("This user is not authorized for adding products to the specified store.");
-                product = stores[storeId].AddProduct(name, description, price, quantity, category);
+                product = stores[storeId].AddProduct(name, PRODUCT_COUNT, description, price, quantity, category);
                 storesLocks[storeId].ReleaseWriterLock();
+                PRODUCT_COUNT++;
             }
             Logger.Instance.LogEvent($"{username} successfuly added product {name} to store {storeId}.");
             return product;

@@ -5,7 +5,7 @@ namespace API.Responses
     public class StoreResponse
     {
         public Store Store;
-        public string Error { get; set; }
+        public string Error;
 
         public StoreResponse(Store st)
         {
