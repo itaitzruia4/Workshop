@@ -464,7 +464,7 @@ namespace Tests.AcceptanceTests
         public void TestSearchProduct_Good_SpecificProduct(string username, string password)
         {
             Product prod = TestAddProduct_Good(username, password, product);
-            Response<List<Product>> searchResult = service.SearchProduct(1, username, prod.Id, prod.Name, "", -1, -1, -1);
+            Response<List<Product>> searchResult = service.SearchProduct(1, username, prod.Name, "", -1, -1, -1);
             Assert.IsFalse(searchResult.ErrorOccured);
             AssertProductsEqual(prod, searchResult.Value.First());
         }
@@ -474,7 +474,7 @@ namespace Tests.AcceptanceTests
         public void TestSearchProduct_Good_SearchForEveryProduct(string username, string password, string product)
         {
             Product prod = TestAddProduct_Good(username, password, product);
-            Response<List<Product>> searchResult = service.SearchProduct(1, username, -1, "", "", -1, -1, -1);
+            Response<List<Product>> searchResult = service.SearchProduct(1, username, "", "", -1, -1, -1);
             Assert.IsFalse(searchResult.ErrorOccured);
             Assert.IsTrue(searchResult.Value.Count() > 0);
         }
@@ -485,7 +485,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Response<List<Product>> searchResult = service.SearchProduct(1, username, -1, "", "", -1, -1, -1);
+            Response<List<Product>> searchResult = service.SearchProduct(1, username, "", "", -1, -1, -1);
             Assert.IsFalse(searchResult.ErrorOccured);
             Assert.AreEqual(searchResult.Value.Count(), 0);
         }
@@ -497,7 +497,7 @@ namespace Tests.AcceptanceTests
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
-            Response<List<Product>> searchResult = service.SearchProduct(1, username, -1, "Worong", "", -1, -1, -1);
+            Response<List<Product>> searchResult = service.SearchProduct(1, username, "Worong", "", -1, -1, -1);
             Assert.IsFalse(searchResult.ErrorOccured);
             if(searchResult.Value.Count > 0)
                 AssertProductsNotEqual(prod, searchResult.Value.First());

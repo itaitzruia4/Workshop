@@ -454,71 +454,45 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             throw new ArgumentException($"Product with ID {productId} does not exist in the market.");
         }
-        public List<ProductDTO> SearchProduct(int userId, string username, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
+        public List<ProductDTO> SearchProduct(int userId, string username, string keyWords, string category, int minPrice, int maxPrice, int productReview)
         {
-            List<Product> products = new List<Product>();
             userController.AssertCurrentUser(userId, username);
-            if(productId != -1)
-            {
-                try
-                {
-                    products.Add(getProduct(productId));
-                }
-                catch
-                {
-
-                }
-            }
-            else if (keyWords != "")
+            List<Product> products = new List<Product>();
+            if (keyWords != "")
             {
                 products = getProductByKeywords(keyWords);
             }
-            else if (catagory != "")
+            else if (category != "")
             {
-                products = getProductByCatagory(catagory);
+                products = getProductByCategory(category);
             }
             return filterProducts(products, minPrice, maxPrice, productReview);
         }
 
-        private List<Product> getProductByCatagory(string catagory)
+        private List<Product> getProductByCategory(string category)
         {
-            return new List<Product>();
-            //throw new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private List<Product> getProductByKeywords(string keyWords)
         {
-            return new List<Product>();
-            //throw new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         //todo move search to user add add a call
         public List<ProductDTO> filterProducts(List<Product> products, int minPrice, int maxPrice, int productReview)
         {
-            //List<Product> products = SearchAllProduct(productName,keyWords,catagory);
-            List<Product> goodProducts = new List<Product>();
             if(minPrice != -1)
             {
-                goodProducts = filterByMin(products,getPrices(products),minPrice);
+                products = products.Where(p => p.Price >= minPrice).ToList();
             }
+
             if(maxPrice != -1)
             {
-                goodProducts = filterByMax(goodProducts,getPrices(goodProducts),maxPrice);
+                products = products.Where(p => p.Price <= maxPrice).ToList();
             }
-            /*if(productReview != -1)
-            {
-                goodProducts = filterByMin(goodProducts,getProductsReviewsGrades(goodProducts),productReview);
-            }
-            if(storeReview != -1)
-            {
-                goodProducts = filterByMin(goodProducts,getStoresReviewsGrades(goodProducts),storeReview);
-            }*/
-            List<ProductDTO> productsDTOs = new List<ProductDTO>();
-            foreach(Product product in goodProducts)
-            {
-                productsDTOs.Add(product.GetProductDTO());
-            }
-            return productsDTOs;
+
+            return products.Select(p => p.GetProductDTO()).ToList();
         }
 
         private List<double> getPrices(List<Product> products)
@@ -577,33 +551,6 @@ namespace Workshop.DomainLayer.MarketPackage
             return -1;
         }
         
-
-        private List<Product> filterByMin(List<Product> products,List<double> filterByList, double key)
-        {
-            List<Product> goodProducts = new List<Product>();
-            for(int i=0;i<products.Count;i++)
-            {
-                if(filterByList[i] > key)
-                {
-                    goodProducts.Add(products[i]);
-                }
-            }
-            return goodProducts;
-        }
-
-        private List<Product> filterByMax(List<Product> products,List<double> filterByList, double key)
-        {
-            List<Product> goodProducts = new List<Product>();
-            for(int i=0;i<products.Count;i++)
-            {
-                if(filterByList[i] < key)
-                {
-                    goodProducts.Add(products[i]);
-                }
-            }
-            return goodProducts;
-        }
-
         private List<Product> filterByEq(List<Product> products,List<int> filterByList, int key)
         {
             List<Product> goodProducts = new List<Product>();

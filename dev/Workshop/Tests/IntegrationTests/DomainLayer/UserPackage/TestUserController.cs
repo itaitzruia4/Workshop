@@ -427,7 +427,9 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [DataRow(null)]
         public void TestReviewProduct_Failure_EmptyOrNullReview(string review)
         {
-            Assert.ThrowsException<KeyNotFoundException>(() => userController.ReviewProduct(1, "User1", 1, review, 4));
+            userController.EnterMarket(1);
+            userController.Login(1, "member1", "pass1");
+            Assert.ThrowsException<ArgumentException>(() => userController.ReviewProduct(1, "member1", 1, review, 4));
         }
 
         [DataTestMethod]
@@ -435,7 +437,9 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [DataRow(11)]
         public void TestReviewProduct_Failure_OutOfRangeRating(int rating)
         {
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => userController.ReviewProduct(1, "User1", 1, "TestReview", rating));
+            userController.EnterMarket(1);
+            userController.Login(1, "member1", "pass1");
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => userController.ReviewProduct(1, "member1", 1, "TestReview", rating));
         }
     }
 }

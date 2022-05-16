@@ -116,17 +116,17 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
 
         //checks cart is empty and products were taken from stores
         [DataTestMethod]
-        [DataRow("member1", "here", 1, 3, "cat1")]
-        [DataRow("member1", "here", 1, 4, "cat1")]
-        public void TestBuyCart_Success(string user, string address, int productId, int userQuantity, string category)
+        [DataRow("member1", "here", 3, "cat1")]
+        [DataRow("member1", "here", 4, "cat1")]
+        public void TestBuyCart_Success(string user, string address, int userQuantity, string category)
         {
             int storeId = marketController.CreateNewStore(1, user, "store").GetId();
-            marketController.AddProductToStore(1, user, storeId, "someName", "someDesc", 10.0, 5, "cat1");
-            ShoppingBagProduct product2 = userController.addToCart(1, user, new ShoppingBagProduct(productId, "someName", "someDesc", 10.0, userQuantity, category), storeId);
-            int leftovers = marketController.getStoreInfo(1, user, storeId).products[productId].Quantity - userQuantity;
+            Product prod1 = marketController.AddProductToStore(1, user, storeId, "someName", "someDesc", 10.0, 5, category);
+            ShoppingBagProduct product2 = userController.addToCart(1, user, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, userQuantity, prod1.Category), storeId);
+            int leftovers = marketController.getStoreInfo(1, user, storeId).products[prod1.Id].Quantity - userQuantity;
             marketController.BuyCart(1, user, address);
-            Assert.IsTrue(userController.viewCart(1, user).shoppingBags.Count == 0);
-            Assert.IsTrue(marketController.getStoreInfo(1, user, storeId).products[productId].Quantity == leftovers);
+            Assert.AreEqual(userController.viewCart(1, user).shoppingBags.Count, 0);
+            Assert.IsTrue(marketController.getStoreInfo(1, user, storeId).products[prod1.Id].Quantity == leftovers);
         }
         [TestMethod]
         public void TestRemoveStoreOwnerNomination_Success()
