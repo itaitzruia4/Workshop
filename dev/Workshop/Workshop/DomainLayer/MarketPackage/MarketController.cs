@@ -75,7 +75,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
         public StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId)
         {
-            Logger.Instance.LogEvent($"{nominatorUsername} is trying to nominate {nominatedUsername} to be a store manager of store {storeId}");
+            Logger.Instance.LogEvent($"{nominatorUsername} is trying to nominate {nominatedUsername} to be a store manager of store {storeId}.");
             userController.AssertCurrentUser(userId, nominatorUsername);
             StoreManager storeManager = null;
             try
@@ -96,7 +96,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
         public Member RemoveStoreOwnerNomination(int userId, string nominatorMembername, string nominatedMembername, int storeId)
         {
-            Logger.Instance.LogEvent($"User {userId} with member {nominatorMembername} is trying to remove store owner nomination from {nominatedMembername} in store {storeId}");
+            Logger.Instance.LogEvent($"User {userId} with member {nominatorMembername} is trying to remove store owner nomination from {nominatedMembername} in store {storeId}.");
             userController.AssertCurrentUser(userId, nominatorMembername);
             Member nominatorMember = userController.GetMember(nominatorMembername);
             Member nominatedMember = userController.GetMember(nominatedMembername);
@@ -108,12 +108,12 @@ namespace Workshop.DomainLayer.MarketPackage
                     {
                         nominatedMember.RemoveRole(nominatedRole);
                         nominatorRole.RemoveNominee(nominatedRole);
-                        Logger.Instance.LogEvent($"User {userId} with member {nominatorMembername} successfuly removed store owner nomination from {nominatedMembername} in store {storeId}");
+                        Logger.Instance.LogEvent($"User {userId} with member {nominatorMembername} successfuly removed store owner nomination from {nominatedMembername} in store {storeId}.");
                         return nominatedMember;
                     }
                 }
             }
-            throw new ArgumentException($"User {userId} with member {nominatorMembername} FAILED to remove store owner nomination from {nominatedMembername} in store {storeId}");
+            throw new ArgumentException($"User {userId} with member {nominatorMembername} FAILED to remove store owner nomination from {nominatedMembername} in store {storeId}.");
         }
 
         private void ValidateStoreExists(int ID)
@@ -124,7 +124,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
         public Product AddProductToStore(int userId, string username, int storeId, string name, string description, double price, int quantity, string category)
         {
-            Logger.Instance.LogEvent($"{username} is trying to add product {name} to store {storeId}:");
+            Logger.Instance.LogEvent($"{username} is trying to add product {name} to store {storeId}.");
             userController.AssertCurrentUser(userId, username);
             Product product = null;
             try
@@ -140,17 +140,16 @@ namespace Workshop.DomainLayer.MarketPackage
                 ViewStorePermission(userId, username, storeId);
                 if (!IsAuthorized(userId, username, storeId, Action.AddProduct))
                     throw new MemberAccessException("This user is not authorized for adding products to the specified store.");
-                ValidateStoreExists(storeId);
                 product = stores[storeId].AddProduct(name, description, price, quantity, category);
                 storesLocks[storeId].ReleaseReaderLock();
             }
-            Logger.Instance.LogEvent($"{username} successfuly added product {name} to store {storeId}:");
+            Logger.Instance.LogEvent($"{username} successfuly added product {name} to store {storeId}.");
             return product;
         }
 
         public void RemoveProductFromStore(int userId, string username, int storeId, int productID)
         {
-            Logger.Instance.LogEvent($"{username} is trying to remove product {productID} to store {storeId}:");
+            Logger.Instance.LogEvent($"{username} is trying to remove product {productID} to store {storeId}.");
             userController.AssertCurrentUser(userId, username);
             try
             {
@@ -165,16 +164,15 @@ namespace Workshop.DomainLayer.MarketPackage
                 ViewStorePermission(userId, username, storeId);
                 if (!IsAuthorized(userId, username, storeId, Action.RemoveProduct))
                     throw new MemberAccessException("This user is not authorized for removing products from the specified store.");
-                ValidateStoreExists(storeId);
                 stores[storeId].RemoveProduct(productID);
                 storesLocks[storeId].ReleaseReaderLock();
             }
-            Logger.Instance.LogEvent($"{username} successfuly removed product {productID} from store {storeId}:");
+            Logger.Instance.LogEvent($"{username} successfuly removed product {productID} from store {storeId}.");
         }
 
         public void ChangeProductDescription(int userId, string username, int storeId, int productID, string description)
         {
-            Logger.Instance.LogEvent($"{username} is trying to change the description of product {productID} in store {storeId}:");
+            Logger.Instance.LogEvent($"{username} is trying to change the description of product {productID} in store {storeId}.");
             userController.AssertCurrentUser(userId, username);
             try
             {
@@ -189,16 +187,15 @@ namespace Workshop.DomainLayer.MarketPackage
                 ViewStorePermission(userId, username, storeId);
                 if (!IsAuthorized(userId, username, storeId, Action.ChangeProductDescription))
                     throw new MemberAccessException("This user is not authorized for changing products descriptions in the specified store.");
-                ValidateStoreExists(storeId);
                 stores[storeId].ChangeProductDescription(productID, description);
                 storesLocks[storeId].ReleaseReaderLock();
             }
-            Logger.Instance.LogEvent($"{username} successfuly changed the description of product {productID} in store {storeId}:");
+            Logger.Instance.LogEvent($"{username} successfuly changed the description of product {productID} in store {storeId}.");
         }
 
         public void ChangeProductName(int userId, string username, int storeId, int productID, string name)
         {
-            Logger.Instance.LogEvent($"{username} is trying to change the name of product {productID} in store {storeId}:");
+            Logger.Instance.LogEvent($"{username} is trying to change the name of product {productID} in store {storeId}.");
             userController.AssertCurrentUser(userId, username);
             try
             {
@@ -213,16 +210,15 @@ namespace Workshop.DomainLayer.MarketPackage
                 ViewStorePermission(userId, username, storeId);
                 if (!IsAuthorized(userId, username, storeId, Action.ChangeProductName))
                     throw new MemberAccessException("This user is not authorized for changing products names in the specified store.");
-                ValidateStoreExists(storeId);
                 stores[storeId].ChangeProductName(productID, name);
                 storesLocks[storeId].ReleaseReaderLock();
             }
-            Logger.Instance.LogEvent($"{username} successfuly changed the name of product {productID} in store {storeId}:");
+            Logger.Instance.LogEvent($"{username} successfuly changed the name of product {productID} in store {storeId}.");
         }
 
         public void ChangeProductPrice(int userId, string username, int storeId, int productID, int price)
         {
-            Logger.Instance.LogEvent($"{username} is trying to change the price of product {productID} in store {storeId}:");
+            Logger.Instance.LogEvent($"{username} is trying to change the price of product {productID} in store {storeId}.");
             userController.AssertCurrentUser(userId, username);
             try
             {
@@ -237,16 +233,15 @@ namespace Workshop.DomainLayer.MarketPackage
                 ViewStorePermission(userId, username, storeId);
                 if (!IsAuthorized(userId, username, storeId, Action.ChangeProductPrice))
                     throw new MemberAccessException("This user is not authorized for changing products prices in the specified store.");
-                ValidateStoreExists(storeId);
                 stores[storeId].ChangeProductPrice(productID, price);
                 storesLocks[storeId].ReleaseReaderLock();
             }
-            Logger.Instance.LogEvent($"{username} successfuly changed the price of product {productID} in store {storeId}:");
+            Logger.Instance.LogEvent($"{username} successfuly changed the price of product {productID} in store {storeId}.");
         }
 
         public void ChangeProductQuantity(int userId, string username, int storeId, int productID, int quantity)
         {
-            Logger.Instance.LogEvent($"{username} is trying to change the quantity of product {productID} in store {storeId}:");
+            Logger.Instance.LogEvent($"{username} is trying to change the quantity of product {productID} in store {storeId}.");
             userController.AssertCurrentUser(userId, username);
             try
             {
@@ -261,16 +256,15 @@ namespace Workshop.DomainLayer.MarketPackage
                 ViewStorePermission(userId, username, storeId);
                 if (!IsAuthorized(userId, username, storeId, Action.ChangeProductName))
                     throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
-                ValidateStoreExists(storeId);
                 stores[storeId].ChangeProductQuantity(productID, quantity);
                 storesLocks[storeId].ReleaseReaderLock();
             }
-            Logger.Instance.LogEvent($"{username} successfuly changed the quantity of product {productID} in store {storeId}:");
+            Logger.Instance.LogEvent($"{username} successfuly changed the quantity of product {productID} in store {storeId}.");
         }
 
         public void ChangeProductCategory(int userId, string username, int storeId, int productID, string category)
         {
-            Logger.Instance.LogEvent($"{username} is trying to change the quantity of product {productID} in store {storeId}:");
+            Logger.Instance.LogEvent($"{username} is trying to change the quantity of product {productID} in store {storeId}.");
             userController.AssertCurrentUser(userId, username);
             try
             {
@@ -285,11 +279,10 @@ namespace Workshop.DomainLayer.MarketPackage
                 ViewStorePermission(userId, username, storeId);
                 if (!IsAuthorized(userId, username, storeId, Action.ChangeProductName))
                     throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
-                ValidateStoreExists(storeId);
                 stores[storeId].ChangeProductCategory(productID, category);
                 storesLocks[storeId].ReleaseReaderLock();
             }
-            Logger.Instance.LogEvent($"{username} successfuly changed the quantity of product {productID} in store {storeId}:");
+            Logger.Instance.LogEvent($"{username} successfuly changed the quantity of product {productID} in store {storeId}.");
         }
 
         public List<OrderDTO> GetStoreOrdersList(int userId, string username, int storeId)
@@ -373,7 +366,6 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 if (!IsAuthorized(userId, username, storeId, Action.CloseStore))
                     throw new MemberAccessException("This user is not authorized to close this specified store.");
-                ValidateStoreExists(storeId);
                 if (IsStoreOpen(userId, username, storeId)) { stores[storeId].closeStore(); }
                 else
                 {
