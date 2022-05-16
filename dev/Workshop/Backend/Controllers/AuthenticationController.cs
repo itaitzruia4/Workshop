@@ -1,6 +1,5 @@
 ﻿using API.Requests;
 using API.Responses;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Workshop.ServiceLayer;
 using Workshop.ServiceLayer.ServiceObjects;
@@ -31,7 +30,7 @@ namespace API.Controllers
         }
 
         [HttpPost("exitmarket")]
-        public ActionResult<AuthenticationResponse> Post([FromBody] ExitMarketRequest request)
+        public ActionResult<AuthenticationResponse> Post([FromBody] GuestRequest request)
         {
             Response response = Service.ExitMarket(request.UserId);
             if (response.ErrorOccured)
@@ -42,14 +41,14 @@ namespace API.Controllers
         }
 
         [HttpPost("login")]
-        public ActionResult<AuthenticationResponse> Post([FromBody] LoginRequest request)
+        public ActionResult<MemberResponse> Post([FromBody] LoginRequest request)
         {
             Response<Member> response = Service.Login(request.UserId, request.Membername, request.Password);
             if (response.ErrorOccured)
             {
-                return BadRequest(new AuthenticationResponse(response.ErrorMessage));
+                return BadRequest(new MemberResponse(response.ErrorMessage));
             }
-            return Ok(new AuthenticationResponse(response.UserId));
+            return Ok(new MemberResponse(response.Value));
         }
 
         [HttpPost("logout")]
