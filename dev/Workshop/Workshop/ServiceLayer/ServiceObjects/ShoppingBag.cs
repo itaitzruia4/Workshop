@@ -21,6 +21,7 @@ namespace Workshop.ServiceLayer.ServiceObjects
         public ShoppingBag(DomainShoppingBag shoppingBag)
         {
             this.storeId = shoppingBag.storeId;
+            this.products = new List<Product>();
             foreach(DomainProduct product in shoppingBag.products)
             {
                 this.products.Add(new Product(product));

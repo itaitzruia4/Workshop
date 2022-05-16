@@ -1,7 +1,6 @@
 ﻿using API.Requests;
 using API.Responses;
 using Microsoft.AspNetCore.Mvc;
-using Workshop.DomainLayer.Reviews;
 using Workshop.ServiceLayer;
 using Workshop.ServiceLayer.ServiceObjects;
 
@@ -104,40 +103,6 @@ namespace API.Controllers
             }
             return Ok(new AuthenticationResponse(request.UserId));
         }
-
-        [HttpPost("reviewproduct")]
-        public ActionResult<ReviewResponse> ReviewProduct([FromBody] ProductReviewRequest request)
-        {
-            Response<ReviewDTO> response = Service.ReviewProduct(request.UserId, request.Membername, request.ProductId, request.Review, request.Rating);
-            if (response.ErrorOccured)
-            {
-                return BadRequest(new ReviewResponse(response.ErrorMessage));
-            }
-            return Ok(new ReviewResponse(response.Value));
-        }
-
-        [HttpPost("searchproduct")]
-        public ActionResult<ProductsResponse> SearchProduct([FromBody] ProductSearchRequest request)
-        {
-            Response<List<Product>> response = Service.SearchProduct(request.UserId, request.Membername, request.ProductId, request.KeyWords, request.Category, request.MinPrice, request.MaxPrice, request.ProductReview);
-            if (response.ErrorOccured)
-            {
-                return BadRequest(new ProductsResponse(response.ErrorMessage));
-            }
-            return Ok(new ProductsResponse(response.Value));
-        }
-
-        [HttpPost("addtocart")]
-        public ActionResult<ProductResponse> AddToCart([FromBody] ProductSearchRequest request)
-        {
-            Response<Product> response = Service.addToCart(request.UserId, request.Membername, request.ProductId, request.StoreId, request.Quantity);
-            if (response.ErrorOccured)
-            {
-                return BadRequest(new ProductResponse(response.ErrorMessage));
-            }
-            return Ok(new ProductResponse(response.Value));
-        }
-
     }
 }
 

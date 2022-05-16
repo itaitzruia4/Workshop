@@ -19,9 +19,6 @@ namespace Workshop.DomainLayer.MarketPackage
         private PurchasePolicy purchasePolicy { get; set; }
 
         private ReaderWriterLock rwl;
-
-        private int CURR_PRODUCT_ID;
-
         public Store(int id, string name)
         {
             this.id = id;
@@ -33,7 +30,6 @@ namespace Workshop.DomainLayer.MarketPackage
             this.rwl = new ReaderWriterLock();
             this.discountPolicy = new DiscountPolicy(this);
             this.purchasePolicy = new PurchasePolicy(this);
-            this.CURR_PRODUCT_ID = 0;
         }
 
         public ReaderWriterLock getLock()
@@ -70,14 +66,14 @@ namespace Workshop.DomainLayer.MarketPackage
             this.open = false;
         }
 
-        public Product AddProduct(string name, string description, double price, int quantity, string category)
+        public Product AddProduct(string name, int productId, string description, double price, int quantity, string category)
         {
             ValidateName(name);
             ValidatePrice(price);
             ValidateQuantity(quantity);
             ValidateCategory(category);
-            Product newProd = new Product(CURR_PRODUCT_ID, name, description, price, quantity, category);
-            products.Add(CURR_PRODUCT_ID++, newProd);
+            Product newProd = new Product(productId, name, description, price, quantity, category);
+            products.Add(productId, newProd);
             return newProd;
         }
 

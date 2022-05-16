@@ -17,6 +17,7 @@ namespace Workshop.ServiceLayer.ServiceObjects
         }
         public ShoppingCart(DomainShoppingCart shoppingCart)
         {
+            this.shoppingBags = new Dictionary<int, ShoppingBag>();
             foreach (int key in shoppingCart.shoppingBags.Keys)
             {
                 this.shoppingBags.Add(key,new ShoppingBag(shoppingCart.shoppingBags[key]));

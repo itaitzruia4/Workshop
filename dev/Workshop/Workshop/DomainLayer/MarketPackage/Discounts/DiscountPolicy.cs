@@ -208,7 +208,8 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 totalDiscount += category_discounts[category].CalculateDiscountValue(shoppingBag);
             }
-            totalDiscount += store_discount.CalculateDiscountValue(shoppingBag);
+            if (store_discount != null)
+                totalDiscount += store_discount.CalculateDiscountValue(shoppingBag);
             return totalDiscount;
         }
 

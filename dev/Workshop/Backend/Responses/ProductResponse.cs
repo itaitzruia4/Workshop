@@ -4,22 +4,12 @@ namespace API.Responses
 {
     public class ProductResponse
     {
-        public int ProductId;
-        public string Name;
-        public double BasePrice;
-        public string Description;
-        public int Quantity;
-        public string Category;
+        public Product Product;
         public string Error;
 
         public ProductResponse(Product p)
         {
-            ProductId = p.Id;
-            Name = p.Name;
-            BasePrice = p.BasePrice;
-            Description = p.Description;
-            Quantity = p.Quantity;
-            Category = p.Category;
+            Product = p;
         }
 
         public ProductResponse(string error)

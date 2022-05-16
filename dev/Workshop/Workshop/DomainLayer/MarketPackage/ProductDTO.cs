@@ -21,9 +21,15 @@ namespace Workshop.DomainLayer.MarketPackage
             this.Quantity = quantity;
             this.Category = category;
         }
-        public bool EqualsFields(ProductDTO product)
+        public override bool Equals(Object product)
         {
-            return (this.Id == product.Id) && (this.Name == product.Name) && (this.Price == product.Price) && (this.Quantity == product.Quantity) && (this.Description == product.Description);
+            if (product == null || !(product is ProductDTO)) return false;
+            return (this.Id == ((ProductDTO)product).Id) &&
+                (this.Name == ((ProductDTO)product).Name) &&
+                (this.Price == ((ProductDTO)product).Price) &&
+                (this.Quantity == ((ProductDTO)product).Quantity) &&
+                (this.Description == ((ProductDTO)product).Description) &&
+                (this.Category == ((ProductDTO)product).Category);
         }
     }
 }

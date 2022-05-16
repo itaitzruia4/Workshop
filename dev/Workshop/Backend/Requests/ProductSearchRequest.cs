@@ -4,7 +4,6 @@
     {
         public int UserId { get; set; }
         public string Membername { get; set; }
-        public int ProductId { get; set; }
         public string KeyWords { get; set; }
         public string Category { get; set; }
         public int MinPrice { get; set; }

@@ -204,11 +204,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<List<Product>> SearchProduct(int userId, string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
+        public Response<List<Product>> SearchProduct(int userId, string user, string keyWords, string category, double minPrice, double maxPrice, int productReview)
         {
             try
             {
-                List<DomainProductDTO> products = facade.SearchProduct(userId, user, productId, keyWords, catagory, minPrice, maxPrice, productReview);
+                List<DomainProductDTO> products = facade.SearchProduct(userId, user, keyWords, category, minPrice, maxPrice, productReview);
                 List<Product> returnProducts = products.Select(x => new Product(x)).ToList();
                 return new Response<List<Product>>(returnProducts, userId);
             }
