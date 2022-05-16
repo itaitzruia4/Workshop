@@ -144,7 +144,7 @@ namespace Tests.AcceptanceTests
             bool res2 = false;
 
             service.EnterMarket(1);
-            Assert.IsFalse(service.Register(1, "user1", "1", 40).ErrorOccured);
+            Assert.IsFalse(service.Register(1, "user1", "1", new DateTime(2001, 11, 17)).ErrorOccured);
 
             Thread thr1 = new Thread(() => res1 = Login_Thread(1, "user1", "1"));
             Thread thr2 = new Thread(() => res2 = Login_Thread(1, "user1", "1"));
@@ -793,8 +793,7 @@ namespace Tests.AcceptanceTests
         public bool BuyProduct_Thread(int userId, string user, string password, int productId, int storeId, int quantity)
         {
             Assert.IsFalse(service.Login(userId, user, password).ErrorOccured);
-            service.addToCart(userId, user, productId, storeId, quantity);
-            return service.BuyCart(userId, user, "Ronmi's home").ErrorOccured;
+            return service.addToCart(userId, user, productId, storeId, quantity).ErrorOccured;
         }
 
         [TestMethod]
