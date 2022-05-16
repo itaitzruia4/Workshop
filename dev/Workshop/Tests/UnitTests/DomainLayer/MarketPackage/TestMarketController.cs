@@ -35,46 +35,42 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
 
             marketController = new MarketController(userControllerMock.Object, paymentMock.Object, supplyMock.Object);
             marketController.InitializeSystem();
-            Store store1 = marketController.CreateNewStore(1, "StoreFounder1", "shop1");
-
-            // marketController = new MarketController();
-            // userController = new UserController(security);
         }
 
         [TestMethod]
         public void TestCloseStore_Success()
         {
-            // Arrange
-            string username = "StoreFounder1"; int storeId = 1;
-
-            // Act
-            marketController.CloseStore(1, username, storeId);
-
-            // Assert
-            Assert.IsFalse(marketController.IsStoreOpen(1, username, storeId));
+            string member = "StoreFounder1";
+            Store store1 = marketController.CreateNewStore(1, member, "shop1");
+            int storeId = store1.GetId();
+            marketController.CloseStore(1, member, storeId);
+            Assert.IsFalse(marketController.IsStoreOpen(1, member, storeId));
         }
 
         [TestMethod]
         public void TestCloseStore_Failure_NoSuchStore()
         {
-            // Arrange
-            string username = "StoreFounder1"; int storeId = 1;
-
-            //act
-            marketController.CloseStore(1, username, storeId);
-
-            // Assert
-            Assert.ThrowsException<ArgumentException>(() => marketController.CloseStore(1, username, storeId));
+            string member = "StoreFounder1";
+            Store store1 = marketController.CreateNewStore(1, member, "shop1");
+            int storeId = store1.GetId();
+            marketController.CloseStore(1, member, storeId);
+            Assert.ThrowsException<ArgumentException>(() => marketController.CloseStore(1, member, storeId));
         }
 
         [TestMethod]
         public void TestGetWorkersInformation_Success(){
-            CollectionAssert.AreEqual(userControllerMock.Object.GetWorkers(1), marketController.GetWorkersInformation(1, "User1", 1));
+            string member = "StoreFounder1";
+            Store store1 = marketController.CreateNewStore(1, member, "shop1");
+            int storeId = store1.GetId();
+            CollectionAssert.AreEqual(userControllerMock.Object.GetWorkers(storeId), marketController.GetWorkersInformation(1, "User1", storeId));
         }
 
         [TestMethod]
         public void TestGetWorkersInformation_Failure_NoPermission(){
-            Assert.ThrowsException<MemberAccessException>(() => marketController.GetWorkersInformation(1, "Notallowed Cohen", 1));
+            string member = "StoreFounder1";
+            Store store1 = marketController.CreateNewStore(1, member, "shop1");
+            int storeId = store1.GetId();
+            Assert.ThrowsException<MemberAccessException>(() => marketController.GetWorkersInformation(1, "Notallowed Cohen", storeId));
         }
 
         [TestMethod]
@@ -98,9 +94,10 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         [TestMethod]
         public void TestSearchProduct_Success()
         {
-            marketController.CreateNewStore(1, "User1", "store");
-            Product p1 = marketController.AddProductToStore(1, "User1", 1, "prod1", "desc1", 10.0, 2, "cat1");
-            Product p2 = marketController.AddProductToStore(1, "User1", 1, "prod2", "desc2", 9.6, 2, "cat2");
+            Store st = marketController.CreateNewStore(1, "User1", "store");
+            int storeId = st.GetId();
+            Product p1 = marketController.AddProductToStore(1, "User1", storeId, "prod1", "desc1", 10.0, 2, "cat1");
+            Product p2 = marketController.AddProductToStore(1, "User1", storeId, "prod2", "desc2", 9.6, 2, "cat2");
             List<ProductDTO> searchedProducts = marketController.SearchProduct(1, "User1", "", "", 8.7, 10.0, -1);
             Assert.IsTrue(searchedProducts.Count == 2);
             Assert.IsTrue(p1.GetProductDTO().Equals(searchedProducts[0]) || p1.GetProductDTO().Equals(searchedProducts[1]));
@@ -108,15 +105,13 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         }
 
         [DataTestMethod]
-        [DataRow("User1", "key", "catagory", 2, 9, 3)] //wrong price
-        [DataRow("User1", "key", "catagory", 2, 9, 3)] //wrong Id
-        [DataRow("User1", -1, "key", "catagory", 0, 24, 3)] //not the right keyword
-        [DataRow("User1", -1, "", "catagory", 0, 24, 3)] //not the right catagory
-        [DataRow("User1", -1, "", "", 0, 24, 3)] //no products to filter from 
+        [DataRow("member1", "", "", 2, 9, -1)] //wrong price
+        [DataRow("member1", "keyword", "", -1, -1, -1)] //not the right keyword
+        [DataRow("member1", "", "differentCateogry", -1, -1, -1)] //not the right catagory
         public void TestSearchProduct_Failure_WrongArguments(string user, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
         {
             Store st = marketController.CreateNewStore(1, user, "store");
-            marketController.AddProductToStore(1, user, 1, "someName", "someDesc", 10.0, 2, "cat1");
+            marketController.AddProductToStore(1, user, st.GetId(), "someName", "someDesc", 10.0, 2, "cat1");
             Assert.AreEqual(marketController.SearchProduct(1, user, keyWords, catagory, minPrice, maxPrice, productReview).Count, 0);
         }
 
