@@ -101,7 +101,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         public void TestSearchProduct_Success(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
         {
             marketController.CreateNewStore(1, user, "store");
-            marketController.AddProductToStore(1, user, 1, productId, "someName", "someDesc", 10.0, 2, "cat1");
+            marketController.AddProductToStore(1, user, 1, "someName", "someDesc", 10.0, 2, "cat1");
             Product product = new Product(productId, "someName", "someDesc", 10.0, 2, "cat1");
             List<Product> products = new List<Product>();
             products.Add(product);
@@ -118,7 +118,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         public void TestSearchProduct_Failure_WrongArguments(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
         {
             marketController.CreateNewStore(1, user, "store");
-            marketController.AddProductToStore(1, user, 1, 1, "someName", "someDesc", 10.0, 2, "cat1");
+            marketController.AddProductToStore(1, user, 1, "someName", "someDesc", 10.0, 2, "cat1");
             Product product = new Product(productId, "someName", "someDesc", 10.0, 2, "cat1");
             List<ProductDTO> empty = new List<ProductDTO>();
             CollectionAssert.AreEqual(empty,marketController.SearchProduct(1, user, productId, keyWords, catagory, minPrice, maxPrice, productReview));
@@ -131,7 +131,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         {
             marketController.CreateNewStore(1, user, "store");
             //Product product = new Product(productId, "someName", "someDesc", 10.0, quantity);
-            Product product = marketController.AddProductToStore(1, user, 1, 1, "someName", "someDesc", 10.0, 3, "cat1");
+            Product product = marketController.AddProductToStore(1, user, 1, "someName", "someDesc", 10.0, 3, "cat1");
             Assert.IsTrue(product.EqualsFields(marketController.addToBag(1, user, productId, storeId, quantity).GetProductDTO()));
         }
 
@@ -142,7 +142,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         public void TestAddToCart_Failure_WrongArguments(string user, int productId, int storeId, int quantity)
         {
             marketController.CreateNewStore(1, user, "store");
-            marketController.AddProductToStore(1, user, 1, 1, "someName", "someDesc", 10.0, 2, "cat1");
+            marketController.AddProductToStore(1, user, 1, "someName", "someDesc", 10.0, 2, "cat1");
             Assert.ThrowsException<ArgumentException>(() => marketController.addToBag(1, user, productId, storeId, quantity));
             Product product = new Product(productId, "someName", "someDesc", 10.0, 2, "cat1");
         }
