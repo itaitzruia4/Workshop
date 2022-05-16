@@ -562,7 +562,6 @@ namespace Workshop.DomainLayer.MarketPackage
             return userController.addToCart(userId, user, getProductForSale(productId, storeId, quantity), storeId);
         }
 
-        // TODO: add concurrency
         public void AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId)
         {
             userController.AssertCurrentUser(userId, user);
@@ -582,7 +581,6 @@ namespace Workshop.DomainLayer.MarketPackage
                 storesLocks[storeId].ReleaseWriterLock();
             }
         }
-        // TODO: add concurrency
         public void AddCategoryDiscount(int userId, string user, int storeId, string jsonDiscount, string categoryName)
         {
             userController.AssertCurrentUser(userId, user);
@@ -602,7 +600,6 @@ namespace Workshop.DomainLayer.MarketPackage
                 storesLocks[storeId].ReleaseWriterLock();
             }
         }
-        // TODO: add concurrency
         public void AddStoreDiscount(int userId, string user, int storeId, string jsonDiscount)
         {
             userController.AssertCurrentUser(userId, user);
