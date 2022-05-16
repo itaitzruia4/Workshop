@@ -52,36 +52,36 @@ namespace Workshop.DomainLayer.MarketPackage
             return true;
         }
 
-        public void AddProductTerm(string json_discount, int product_id)
+        public void AddProductTerm(string json_term, int product_id)
         {
-            Term term = ParseTerm(json_discount);
+            Term term = ParseTerm(json_term);
             if (!products_terms.ContainsKey(product_id))
                 products_terms.Add(product_id, term);
             else
                 products_terms[product_id] = new OrTerm(products_terms[product_id], term);
         }
 
-        public void AddCategoryTerm(string json_discount, string category_name)
+        public void AddCategoryTerm(string json_term, string category_name)
         {
-            Term term = ParseTerm(json_discount);
+            Term term = ParseTerm(json_term);
             if (!category_terms.ContainsKey(category_name))
                 category_terms.Add(category_name, term);
             else
                 category_terms[category_name] = new OrTerm(category_terms[category_name], term);
         }
 
-        public void AddStoreTerm(string json_discount)
+        public void AddStoreTerm(string json_term)
         {
-            Term term = ParseTerm(json_discount);
+            Term term = ParseTerm(json_term);
             if (store_terms == null)
                 store_terms = term;
             else
                 store_terms = new OrTerm(store_terms, term);
         }
 
-        public void AddUserTerm(string json_discount)
+        public void AddUserTerm(string json_term)
         {
-            Term term = ParseTerm(json_discount);
+            Term term = ParseTerm(json_term);
             if (user_terms == null)
                 user_terms = term;
             else

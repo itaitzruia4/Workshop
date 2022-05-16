@@ -308,6 +308,58 @@ namespace Workshop.ServiceLayer
             }
         }
 
+        Response AddProductPurchaseTerm(int userId, string user, int storeId, string jsonTerm, int product_id)
+        {
+            try
+            {
+                facade.AddProducPurchaseTerm(userId, user, storeId, jsonTerm, product_id);
+                return new Response(userId);
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message, userId);
+            }
+        }
+
+        Response AddCategoryPurchaseTerm(int userId, string user, int storeId, string jsonTerm, string category_name)
+        {
+            try
+            {
+                facade.AddCategoryPurchaseTerm(userId, user, storeId, jsonTerm, category_name);
+                return new Response(userId);
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message, userId);
+            }
+        }
+
+        Response AddStorePurchaseTerm(int userId, string user, int storeId, string jsonTerm)
+        {
+            try
+            {
+                facade.AddStorePurchaseTerm(userId, user, storeId, jsonTerm);
+                return new Response(userId);
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message, userId);
+            }
+        }
+
+        Response AddUserPurchaseTerm(int userId, string user, int storeId, string jsonTerm)
+        {
+            try
+            {
+                facade.AddUserPurchaseTerm(userId, user, storeId, jsonTerm);
+                return new Response(userId);
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message, userId);
+            }
+        }
+
         public Response RemoveProductFromStore(int userId, string username, int storeId, int productID)
         {
             try

@@ -619,6 +619,86 @@ namespace Workshop.DomainLayer.MarketPackage
             }
         }
 
+        public void AddProductPurchaseTerm(int userId, string user, int storeId, string json_term, int product_id)
+        {
+            userController.AssertCurrentUser(userId, user);
+            try
+            {
+                storesLocks[storeId].AcquireWriterLock(Timeout.Infinite);
+            }
+            catch
+            {
+                throw new ArgumentException("Store ID does not exist");
+            }
+            finally
+            {
+                if (!IsAuthorized(userId, user, storeId, Action.AddPurchaseTerm))
+                    throw new MemberAccessException("User " + user + " is not allowed to add purchase terms in store " + storeId);
+                stores[storeId].AddProductTerm(json_term, product_id);
+                storesLocks[storeId].ReleaseWriterLock();
+            }
+        }
+
+        public void AddCategoryPurchaseTerm(int userId, string user, int storeId, string json_term, string category_name)
+        {
+            userController.AssertCurrentUser(userId, user);
+            try
+            {
+                storesLocks[storeId].AcquireWriterLock(Timeout.Infinite);
+            }
+            catch
+            {
+                throw new ArgumentException("Store ID does not exist");
+            }
+            finally
+            {
+                if (!IsAuthorized(userId, user, storeId, Action.AddPurchaseTerm))
+                    throw new MemberAccessException("User " + user + " is not allowed to add purchase terms in store " + storeId);
+                stores[storeId].AddCategoryTerm(json_term, category_name);
+                storesLocks[storeId].ReleaseWriterLock();
+            }
+        }
+
+        public void AddStorePurchaseTerm(int userId, string user, int storeId, string json_term)
+        {
+            userController.AssertCurrentUser(userId, user);
+            try
+            {
+                storesLocks[storeId].AcquireWriterLock(Timeout.Infinite);
+            }
+            catch
+            {
+                throw new ArgumentException("Store ID does not exist");
+            }
+            finally
+            {
+                if (!IsAuthorized(userId, user, storeId, Action.AddPurchaseTerm))
+                    throw new MemberAccessException("User " + user + " is not allowed to add purchase terms in store " + storeId);
+                stores[storeId].AddStoreTerm(json_term);
+                storesLocks[storeId].ReleaseWriterLock();
+            }
+        }
+
+        public void AddUserPurchaseTerm(int userId, string user, int storeId, string json_term)
+        {
+            userController.AssertCurrentUser(userId, user);
+            try
+            {
+                storesLocks[storeId].AcquireWriterLock(Timeout.Infinite);
+            }
+            catch
+            {
+                throw new ArgumentException("Store ID does not exist");
+            }
+            finally
+            {
+                if (!IsAuthorized(userId, user, storeId, Action.AddPurchaseTerm))
+                    throw new MemberAccessException("User " + user + " is not allowed to add purchase terms in store " + storeId);
+                stores[storeId].AddUserTerm(json_term);
+                storesLocks[storeId].ReleaseWriterLock();
+            }
+        }
+
         public List<Store> GetAllStores()
         {
             return new List<Store>(stores.Values);

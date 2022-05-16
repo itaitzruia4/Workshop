@@ -63,5 +63,13 @@ namespace Workshop.ServiceLayer
         Response ChangeProductQuantity(int userId, string username, int storeId, int productID, int quantity);
 
         Response ChangeProductCategory(int userId, string username, int storeId, int productID, string category);
+
+        Response AddProductPurchaseTerm(int userId, string user, int storeId, string jsonTerm, int product_id);
+
+        Response AddCategoryPurchaseTerm(int userId, string user, int storeId, string jsonTerm, string category_name);
+
+        Response AddStorePurchaseTerm(int userId, string user, int storeId, string jsonTerm);
+
+        Response AddUserPurchaseTerm(int userId, string user, int storeId, string jsonTerm);
     }
 }
