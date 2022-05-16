@@ -18,69 +18,69 @@ namespace API.Controllers
         }
 
         [HttpPost("reviewproduct")]
-        public ActionResult<ReviewResponse> ReviewProduct([FromBody] ProductReviewRequest request)
+        public ActionResult<FrontResponse<ReviewDTO>> ReviewProduct([FromBody] ProductReviewRequest request)
         {
             Response<ReviewDTO> response = Service.ReviewProduct(request.UserId, request.Membername, request.ProductId, request.Review, request.Rating);
             if (response.ErrorOccured)
             {
-                return BadRequest(new ReviewResponse(response.ErrorMessage));
+                return BadRequest(new FrontResponse<ReviewDTO>(response.ErrorMessage));
             }
-            return Ok(new ReviewResponse(response.Value));
+            return Ok(new FrontResponse<ReviewDTO>(response.Value));
         }
 
         [HttpPost("searchproduct")]
-        public ActionResult<ProductsResponse> SearchProduct([FromBody] ProductSearchRequest request)
+        public ActionResult<FrontResponse<List<Product>>> SearchProduct([FromBody] ProductSearchRequest request)
         {
             Response<List<Product>> response = Service.SearchProduct(request.UserId, request.Membername, request.KeyWords, request.Category, request.MinPrice, request.MaxPrice, request.ProductReview);
             if (response.ErrorOccured)
             {
-                return BadRequest(new ProductsResponse(response.ErrorMessage));
+                return BadRequest(new FrontResponse<List<Product>>(response.ErrorMessage));
             }
-            return Ok(new ProductsResponse(response.Value));
+            return Ok(new FrontResponse<List<Product>>(response.Value));
         }
 
         [HttpPost("addtocart")]
-        public ActionResult<ProductResponse> AddToCart([FromBody] AddToCartRequest request)
+        public ActionResult<FrontResponse<Product>> AddToCart([FromBody] AddToCartRequest request)
         {
             Response<Product> response = Service.addToCart(request.UserId, request.Membername, request.ProductId, request.StoreId, request.Quantity);
             if (response.ErrorOccured)
             {
-                return BadRequest(new ProductResponse(response.ErrorMessage));
+                return BadRequest(new FrontResponse<Product>(response.ErrorMessage));
             }
-            return Ok(new ProductResponse(response.Value));
+            return Ok(new FrontResponse<Product>(response.Value));
         }
 
         [HttpPost("viewcart")]
-        public ActionResult<ShoppingCartResponse> ViewCart([FromBody] LogoutRequest request)
+        public ActionResult<FrontResponse<ShoppingCart>> ViewCart([FromBody] LogoutRequest request)
         {
             Response<ShoppingCart> response = Service.viewCart(request.UserId, request.Membername);
             if (response.ErrorOccured)
             {
-                return BadRequest(new ShoppingCartResponse(response.ErrorMessage));
+                return BadRequest(new FrontResponse<ShoppingCart>(response.ErrorMessage));
             }
-            return Ok(new ShoppingCartResponse(response.Value));
+            return Ok(new FrontResponse<ShoppingCart>(response.Value));
         }
 
         [HttpPost("editcart")]
-        public ActionResult<ShoppingCartResponse> EditCart([FromBody] EditCartRequest request)
+        public ActionResult<FrontResponse<ShoppingCart>> EditCart([FromBody] EditCartRequest request)
         {
             Response<ShoppingCart> response = Service.editCart(request.UserId, request.Membername, request.ProductId, request.Quantity);
             if (response.ErrorOccured)
             {
-                return BadRequest(new ShoppingCartResponse(response.ErrorMessage));
+                return BadRequest(new FrontResponse<ShoppingCart>(response.ErrorMessage));
             }
-            return Ok(new ShoppingCartResponse(response.Value));
+            return Ok(new FrontResponse<ShoppingCart>(response.Value));
         }
 
         [HttpPost("buycart")]
-        public ActionResult<PriceResponse> BuyCart([FromBody] BuyCartRequest request)
+        public ActionResult<FrontResponse<double>> BuyCart([FromBody] BuyCartRequest request)
         {
             Response<double> response = Service.BuyCart(request.UserId, request.Membername, request.Address);
             if (response.ErrorOccured)
             {
-                return BadRequest(new PriceResponse(response.ErrorMessage));
+                return BadRequest(new FrontResponse<double>(response.ErrorMessage));
             }
-            return Ok(new PriceResponse(response.Value));
+            return Ok(new FrontResponse<double>(response.Value));
         }
 
     }
