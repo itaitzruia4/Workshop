@@ -17,9 +17,9 @@ namespace API.Controllers
         }
 
         [HttpPost("newstore")]
-        public ActionResult<FrontResponse<Store>> CreateNewStore([FromBody] CreateNewStoreRequest request)
+        public ActionResult<FrontResponse<Store>> CreateNewStore([FromBody] StoreCreationRequest request)
         {
-            Response<Store> response = Service.CreateNewStore(request.UserId, request.Creator, request.StoreName);
+            Response<Store> response = Service.CreateNewStore(request.UserId, request.Membername, request.StoreName);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<Store>(response.ErrorMessage));
@@ -28,7 +28,7 @@ namespace API.Controllers
         }
 
         [HttpPost("getstores")]
-        public ActionResult<FrontResponse<List<Store>>> GetAllStores([FromBody] GuestRequest request)
+        public ActionResult<FrontResponse<List<Store>>> GetAllStores([FromBody] BaseRequest request)
         {
             Response<List<Store>> response = Service.GetAllStores(request.UserId);
             if (response.ErrorOccured)
@@ -52,7 +52,7 @@ namespace API.Controllers
         [HttpPost("nominatemanager")]
         public ActionResult<FrontResponse<StoreManager>> NominateStoreManager([FromBody] NominationRequest request)
         {
-            Response<StoreManager> response = Service.NominateStoreManager(request.UserId, request.Nominator, request.Nominated, request.StoreId);
+            Response<StoreManager> response = Service.NominateStoreManager(request.UserId, request.Membername, request.Nominee, request.StoreId);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<StoreManager>(response.ErrorMessage));
@@ -63,7 +63,7 @@ namespace API.Controllers
         [HttpPost("nominateowner")]
         public ActionResult<FrontResponse<StoreOwner>> NominateStoreOwner([FromBody] NominationRequest request)
         {
-            Response<StoreOwner> response = Service.NominateStoreOwner(request.UserId, request.Nominator, request.Nominated, request.StoreId);
+            Response<StoreOwner> response = Service.NominateStoreOwner(request.UserId, request.Membername, request.Nominee, request.StoreId);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<StoreOwner>(response.ErrorMessage));
@@ -74,7 +74,7 @@ namespace API.Controllers
         [HttpPost("removeownernomination")]
         public ActionResult<FrontResponse<Member>> RemoveStoreOwnerNomination([FromBody] NominationRequest request)
         {
-            Response<Member> response = Service.RemoveStoreOwnerNomination(request.UserId, request.Nominator, request.Nominated, request.StoreId);
+            Response<Member> response = Service.RemoveStoreOwnerNomination(request.UserId, request.Membername, request.Nominee, request.StoreId);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<Member>(response.ErrorMessage));
@@ -83,7 +83,7 @@ namespace API.Controllers
         }
 
         [HttpPost("getworkersinformation")]
-        public ActionResult<FrontResponse<List<Member>>> GetWorkersInformation([FromBody] UserStoreRequest request)
+        public ActionResult<FrontResponse<List<Member>>> GetWorkersInformation([FromBody] StoreRequest request)
         {
             Response<List<Member>> response = Service.GetWorkersInformation(request.UserId, request.Membername, request.StoreId);
             if (response.ErrorOccured)
@@ -94,7 +94,7 @@ namespace API.Controllers
         }
 
         [HttpPost("closestore")]
-        public ActionResult<FrontResponse<int>> CloseStore([FromBody] UserStoreRequest request)
+        public ActionResult<FrontResponse<int>> CloseStore([FromBody] StoreRequest request)
         {
             Response response = Service.CloseStore(request.UserId, request.Membername, request.StoreId);
             if (response.ErrorOccured)

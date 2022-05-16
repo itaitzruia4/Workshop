@@ -30,7 +30,7 @@ namespace API.Controllers
         }
 
         [HttpPost("exitmarket")]
-        public ActionResult<FrontResponse<int>> Post([FromBody] GuestRequest request)
+        public ActionResult<FrontResponse<int>> Post([FromBody] BaseRequest request)
         {
             Response response = Service.ExitMarket(request.UserId);
             if (response.ErrorOccured)
@@ -41,7 +41,7 @@ namespace API.Controllers
         }
 
         [HttpPost("login")]
-        public ActionResult<FrontResponse<Member>> Post([FromBody] LoginRequest request)
+        public ActionResult<FrontResponse<Member>> Post([FromBody] AuthenticationRequest request)
         {
             Response<Member> response = Service.Login(request.UserId, request.Membername, request.Password);
             if (response.ErrorOccured)
@@ -52,7 +52,7 @@ namespace API.Controllers
         }
 
         [HttpPost("logout")]
-        public ActionResult<FrontResponse<int>> Post([FromBody] LogoutRequest request)
+        public ActionResult<FrontResponse<int>> Post([FromBody] MemberRequest request)
         {
             Response response = Service.Logout(request.UserId, request.Membername);
             if (response.ErrorOccured)

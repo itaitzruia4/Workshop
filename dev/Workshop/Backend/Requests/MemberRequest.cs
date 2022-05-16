@@ -1,8 +1,7 @@
 ﻿namespace API.Requests
 {
-    public class LogoutRequest
+    public class MemberRequest : BaseRequest
     {
-        public int UserId  { get; set; }
         public string Membername { get; set; }
     }
 }

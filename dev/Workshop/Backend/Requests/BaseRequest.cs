@@ -1,6 +1,6 @@
 ﻿namespace API.Requests
 {
-    public class GuestRequest
+    public class BaseRequest
     {
         public int UserId { get; set; }
     }

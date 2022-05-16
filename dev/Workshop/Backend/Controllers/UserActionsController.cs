@@ -31,7 +31,7 @@ namespace API.Controllers
         [HttpPost("searchproduct")]
         public ActionResult<FrontResponse<List<Product>>> SearchProduct([FromBody] ProductSearchRequest request)
         {
-            Response<List<Product>> response = Service.SearchProduct(request.UserId, request.Membername, request.KeyWords, request.Category, request.MinPrice, request.MaxPrice, request.ProductReview);
+            Response<List<Product>> response = Service.SearchProduct(request.UserId, request.Membername, request.Keywords, request.Category, request.MinPrice, request.MaxPrice, request.ProductReview);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<List<Product>>(response.ErrorMessage));
@@ -51,7 +51,7 @@ namespace API.Controllers
         }
 
         [HttpPost("viewcart")]
-        public ActionResult<FrontResponse<ShoppingCart>> ViewCart([FromBody] LogoutRequest request)
+        public ActionResult<FrontResponse<ShoppingCart>> ViewCart([FromBody] MemberRequest request)
         {
             Response<ShoppingCart> response = Service.viewCart(request.UserId, request.Membername);
             if (response.ErrorOccured)

@@ -101,7 +101,7 @@ namespace Workshop.DomainLayer
         {
             return MarketController.getStoreInfo(userId, user, storeId);
         }
-        internal List<ProductDTO> SearchProduct(int userId, string user, string keyWords, string category, double minPrice, double maxPrice, int productReview)
+        internal List<ProductDTO> SearchProduct(int userId, string user, string keyWords, string category, double minPrice, double maxPrice, double productReview)
         {
             return MarketController.SearchProduct(userId, user, keyWords, category, minPrice, maxPrice, productReview);
         }
