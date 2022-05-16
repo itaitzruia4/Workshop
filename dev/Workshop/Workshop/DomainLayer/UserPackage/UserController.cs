@@ -502,7 +502,7 @@ namespace Workshop.DomainLayer.UserPackage
             members.TryRemove(canceledUsername,out canceled);
         }
 
-        public void GetMembersOnlineStats(int userId, string actingUsername)
+        public Dictionary<MemberDTO, bool> GetMembersOnlineStats(int userId, string actingUsername)
         {
             Logger.Instance.LogEvent($"User {userId} with member {actingUsername} is trying to get members online stats");
             // Check that nominator is the logged in member
@@ -518,9 +518,17 @@ namespace Workshop.DomainLayer.UserPackage
             Dictionary<MemberDTO, bool> OnlineStats = new Dictionary<MemberDTO, bool>();
             foreach( Member member in members.Values)
             {
-                OnlineStats.Add(member.GetMemberDTO(), currentUsers.ContainsKey(member.Id));
+                OnlineStats.Add(member.GetMemberDTO(), currentUsers.ContainsKey(userId));
             }
             return OnlineStats;
+        }
+
+        public bool CheckOnlineStatus(User user)
+        {
+            Logger.Instance.LogEvent($"Checking if user {user} is online");
+
+            //get online members stats
+            return currentUsers.Values.Contains(user);
         }
     }
 }

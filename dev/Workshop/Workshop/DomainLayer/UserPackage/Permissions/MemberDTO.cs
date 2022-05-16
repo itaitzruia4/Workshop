@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
-    class MemberDTO
+    public class MemberDTO
     {
         public string Username { get; }
         public string Password { get; }
