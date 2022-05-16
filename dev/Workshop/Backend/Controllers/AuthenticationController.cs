@@ -1,7 +1,5 @@
-﻿using API.DTO;
-using API.Requests;
+﻿using API.Requests;
 using API.Responses;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Workshop.ServiceLayer;
 using Workshop.ServiceLayer.ServiceObjects;
@@ -26,38 +24,31 @@ namespace API.Controllers
             Response<User> response = Service.EnterMarket(userId);
             if (response.ErrorOccured)
             {
-                return BadRequest(new AuthenticationResponse { Error = response.ErrorMessage });
+                return BadRequest(new AuthenticationResponse(response.ErrorMessage));
             }
-            return Ok(new AuthenticationResponse { UserId = userId++ });
+            return Ok(new AuthenticationResponse(userId++));
         }
 
         [HttpPost("exitmarket")]
-        public ActionResult<AuthenticationResponse> Post([FromBody] ExitMarketRequest request)
+        public ActionResult<AuthenticationResponse> Post([FromBody] GuestRequest request)
         {
             Response response = Service.ExitMarket(request.UserId);
             if (response.ErrorOccured)
             {
-                return BadRequest(new AuthenticationResponse { Error = response.ErrorMessage });
+                return BadRequest(new AuthenticationResponse(response.ErrorMessage));
             }
-            return Ok(new AuthenticationResponse { UserId = request.UserId });
+            return Ok(new AuthenticationResponse(request.UserId));
         }
 
         [HttpPost("login")]
-        public ActionResult<AuthenticationResponse> Post([FromBody] LoginRequest request)
+        public ActionResult<MemberResponse> Post([FromBody] LoginRequest request)
         {
             Response<Member> response = Service.Login(request.UserId, request.Membername, request.Password);
             if (response.ErrorOccured)
             {
-                return BadRequest(new AuthenticationResponse
-                {
-                    UserId = response.UserId,
-                    Error = response.ErrorMessage
-                });
+                return BadRequest(new MemberResponse(response.ErrorMessage));
             }
-            return Ok(new AuthenticationResponse
-            {
-                UserId = response.UserId
-            });
+            return Ok(new MemberResponse(response.Value));
         }
 
         [HttpPost("logout")]
@@ -66,11 +57,10 @@ namespace API.Controllers
             Response response = Service.Logout(request.UserId, request.Membername);
             if (response.ErrorOccured)
             {
-                return BadRequest(new AuthenticationResponse { Error = response.ErrorMessage });
+                return BadRequest(new AuthenticationResponse(response.ErrorMessage));
             }
-            return Ok(new AuthenticationResponse { UserId = request.UserId });
+            return Ok(new AuthenticationResponse(request.UserId));
         }
-
 
         [HttpPost("register")]
         public ActionResult<AuthenticationResponse> Post([FromBody] RegisterRequest request)
@@ -80,26 +70,14 @@ namespace API.Controllers
                 Response response = Service.Register(request.UserId, request.Membername, request.Password, DateTime.Parse(request.Birthdate));
                 if (response.ErrorOccured)
                 {
-                    return BadRequest(new AuthenticationResponse
-                    {
-                        UserId = response.UserId,
-                        Error = response.ErrorMessage
-                    });
+                    return BadRequest(new AuthenticationResponse(response.ErrorMessage));
                 }
-                return Ok(new AuthenticationResponse
-                {
-                    UserId = response.UserId
-                });
+                return Ok(new AuthenticationResponse(response.UserId));
             }
             catch (Exception _)
             {
-                return BadRequest(new AuthenticationResponse
-                    {
-                        UserId = request.UserId,
-                        Error = "Bad date format in register request"
-                    });
+                return BadRequest(new AuthenticationResponse("Bad date format in register request"));
             }
         }
     }
-
 }

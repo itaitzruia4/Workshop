@@ -18,6 +18,11 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             this.StoreId = storeId;
             this.nominees = new List<StoreRole>();
         }
+        
+        public IReadOnlyList<StoreRole> GetAllNominees()
+        {
+            return new List<StoreRole>(nominees);
+        }
 
         public override bool IsAuthorized(int storeID, Action action)
         {

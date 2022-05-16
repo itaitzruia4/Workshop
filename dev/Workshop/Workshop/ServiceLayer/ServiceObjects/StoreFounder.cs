@@ -7,13 +7,10 @@ using DomainStoreFounder = Workshop.DomainLayer.UserPackage.Permissions.StoreFou
 
 namespace Workshop.ServiceLayer.ServiceObjects
 {
-    public class StoreFounder
+    public class StoreFounder : StoreOwner
     {
-        public readonly int StoreId;
-
-        public StoreFounder(DomainStoreFounder domainFounder)
+        public StoreFounder(DomainStoreFounder domainFounder): base(domainFounder)
         {
-            this.StoreId = domainFounder.StoreId;
         }
     }
 }

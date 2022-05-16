@@ -2,7 +2,15 @@
 {
     public class AuthenticationResponse
     {
-        public int UserId { get; set; }
-        public string Error { get; set; }
+        public int UserId;
+        public string Error;
+        public AuthenticationResponse(int userId)
+        {
+            UserId = userId;
+        }
+        public AuthenticationResponse(string error)
+        {
+            Error = error;
+        }
     }
 }

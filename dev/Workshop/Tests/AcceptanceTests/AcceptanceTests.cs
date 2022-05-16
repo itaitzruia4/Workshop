@@ -172,7 +172,7 @@ namespace Tests.AcceptanceTests
             int storeId = 0;
             TestLogin_Good(1, username, password);
             storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Response<Product> prodResult = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 1, "cat1");
+            Response<Product> prodResult = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1");
             Assert.IsFalse(prodResult.ErrorOccured);
             Assert.IsInstanceOfType(prodResult.Value, typeof(Product));
             return prodResult.Value;
@@ -184,8 +184,8 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Assert.IsFalse(service.AddProduct(1, username, storeId, 0, "TestAddProduct", "Bad", 1, 1, "cat1").ErrorOccured);
-            Assert.IsTrue(service.AddProduct(1, username, storeId, 0, "TestAddProduct", "Bad", 1, 1, "cat1").ErrorOccured);
+            Assert.IsFalse(service.AddProduct(1, username, storeId, "TestAddProduct", "Bad", 1, 1, "cat1").ErrorOccured);
+            Assert.IsTrue(service.AddProduct(1, username, storeId, "TestAddProduct", "Bad", 1, 1, "cat1").ErrorOccured);
         }
 
         [DataTestMethod]
@@ -195,9 +195,9 @@ namespace Tests.AcceptanceTests
             TestLogin_Good(1, username, password);
             TestLogin_Good(2, noPermU, noPermP);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Assert.IsTrue(service.AddProduct(2, noPermU, storeId, 0, "TestAddProduct", "Bad", 1, 1, "cat1").ErrorOccured);
-            Assert.IsTrue(service.AddProduct(2, username, storeId, 0, "TestAddProduct", "Bad", 1, 1, "cat1").ErrorOccured);
-            Assert.IsTrue(service.AddProduct(1, noPermU, storeId, 0, "TestAddProduct", "Bad", 1, 1, "cat1").ErrorOccured);
+            Assert.IsTrue(service.AddProduct(2, noPermU, storeId, "TestAddProduct", "Bad", 1, 1, "cat1").ErrorOccured);
+            Assert.IsTrue(service.AddProduct(2, username, storeId, "TestAddProduct", "Bad", 1, 1, "cat1").ErrorOccured);
+            Assert.IsTrue(service.AddProduct(1, noPermU, storeId, "TestAddProduct", "Bad", 1, 1, "cat1").ErrorOccured);
         }
 
         [DataTestMethod]
@@ -391,7 +391,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            int prodId = service.AddProduct(1, username, storeId, 0, "TestReviewProduct", "Good", 1, 2, "cat1").Value.Id;
+            int prodId = service.AddProduct(1, username, storeId, "TestReviewProduct", "Good", 1, 2, "cat1").Value.Id;
             service.addToCart(1, username, prodId, storeId, 1);
             service.BuyCart(1, username, "Ronmi's home");
             Assert.IsFalse(service.ReviewProduct(1, username, 0, "Blank", 6).ErrorOccured);
@@ -403,7 +403,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            service.AddProduct(1, password, storeId, 0, "TestReviewProduct", "Good", 1, 1, "cat1");
+            service.AddProduct(1, password, storeId, "TestReviewProduct", "Good", 1, 1, "cat1");
             service.Logout(1, username);
             Assert.IsTrue(service.ReviewProduct(1, username, 0, "Blank", 6).ErrorOccured);
         }
@@ -414,7 +414,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            service.AddProduct(1, password, storeId, 0, "TestReviewProduct", "Good", 1, 1, "cat1");
+            service.AddProduct(1, password, storeId, "TestReviewProduct", "Good", 1, 1, "cat1");
             Assert.IsTrue(service.ReviewProduct(1, username, 2, "Blank", 6).ErrorOccured);
         }
 
@@ -481,7 +481,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 1, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             Response<List<Product>> searchResult = service.SearchProduct(1, username, -1, "Worong", "", -1, -1, -1);
             Assert.IsFalse(searchResult.ErrorOccured);
             if(searchResult.Value.Count > 0)
@@ -494,7 +494,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 1, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             Response<Product> resProd = service.addToCart(1, username, prod.Id, storeId, 1);
             Assert.IsFalse(resProd.ErrorOccured);
             Assert.IsNotNull(resProd.Value);
@@ -506,7 +506,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 1, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             Response<Product> resProd = service.addToCart(1, username, 20, storeId, 1);
             Assert.IsTrue(resProd.ErrorOccured);
         }
@@ -517,7 +517,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 1, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             Response<Product> resProd = service.addToCart(1, username, prod.Id, storeId, 100);
             Assert.IsTrue(resProd.ErrorOccured);
         }
@@ -528,7 +528,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 1, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             Response<Product> resProd = service.addToCart(1, username, prod.Id, storeId, 0);
             Assert.IsTrue(resProd.ErrorOccured);
         }
@@ -539,7 +539,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 1, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             Response<ShoppingCart> resSC = service.viewCart(1, username);
             Assert.IsFalse(resSC.ErrorOccured);
             Assert.AreEqual(resSC.Value.shoppingBags, null);
@@ -551,7 +551,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 1, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             service.addToCart(1, username, prod.Id, storeId, 1);
             Response<ShoppingCart> resSC = service.viewCart(1, username);
             Assert.IsFalse(resSC.ErrorOccured);
@@ -566,7 +566,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 1, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             service.addToCart(1, username, prod.Id, storeId, 1);
             service.Logout(1, username);
             Response<ShoppingCart> resSC = service.viewCart(1, username);
@@ -579,7 +579,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 10, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             service.addToCart(1, username, prod.Id, storeId, 1);
             Response<ShoppingCart> resSC = service.editCart(1, username, prod.Id, 5);
             Assert.IsFalse(resSC.ErrorOccured);
@@ -596,7 +596,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 2, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 2, "cat1").Value;
             service.addToCart(1, username, prod.Id, storeId, 1);
             Assert.IsFalse(service.BuyCart(1, username, "Ronmi's home").ErrorOccured);
             service.addToCart(1, username, prod.Id, storeId, 10);
@@ -609,7 +609,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 1, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             service.addToCart(1, username, prod.Id, storeId, 1);
             Assert.IsFalse(service.BuyCart(1, username, "Ronmi's home").ErrorOccured);
             service.addToCart(1, username, prod.Id, storeId, 10);
@@ -622,7 +622,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 10, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsTrue(service.BuyCart(1, username, "Ronmi's home").ErrorOccured);
         }
 
@@ -633,7 +633,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 10, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsFalse(service.RemoveProductFromStore(1, username, storeId, prod.Id).ErrorOccured);
             Assert.IsTrue(service.addToCart(1, username, prod.Id, storeId, 1).ErrorOccured);
         }
@@ -655,7 +655,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 10, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsFalse(service.ChangeProductName(1, username, storeId, prod.Id, "newName").ErrorOccured);
             prod = service.addToCart(1, username, prod.Id, storeId, 1).Value;
             Assert.AreEqual(prod.Name, "newName");
@@ -678,7 +678,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 10, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsTrue(service.ChangeProductName(1, username, storeId, prod.Id, newName).ErrorOccured);
         }
 
@@ -688,7 +688,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 10, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsFalse(service.ChangeProductPrice(1, username, storeId, prod.Id, 1711).ErrorOccured);
             prod = service.addToCart(1, username, prod.Id, storeId, 1).Value;
             Assert.AreEqual(prod.BasePrice, 1711);
@@ -710,7 +710,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 10, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsFalse(service.ChangeProductPrice(1, username, storeId, prod.Id, price).ErrorOccured);
 
         }
@@ -721,7 +721,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 10, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsFalse(service.ChangeProductQuantity(1, username, storeId, prod.Id, 1711).ErrorOccured);
             prod = service.addToCart(1, username, prod.Id, storeId, 1).Value;
             Assert.AreEqual(prod.Quantity, 1711);
@@ -743,7 +743,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 10, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsTrue(service.ChangeProductQuantity(1, username, storeId, prod.Id, quantity).ErrorOccured);
         }
 
@@ -753,7 +753,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 10, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsFalse(service.ChangeProductCategory(1, username, storeId, prod.Id, "newName").ErrorOccured);
             prod = service.addToCart(1, username, prod.Id, storeId, 1).Value;
             //Assert.AreEqual(prod.category, "newName");
@@ -775,7 +775,7 @@ namespace Tests.AcceptanceTests
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, 0, product, "Good", 1.0, 10, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsTrue(service.ChangeProductCategory(1, username, storeId, prod.Id, cat).ErrorOccured);
         }
 
@@ -802,7 +802,7 @@ namespace Tests.AcceptanceTests
             Assert.IsFalse(service.Login(3, "Owner", "own").ErrorOccured);
 
             int storeId = service.CreateNewStore(3, "Owner", "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(3, "Owner", storeId, 0, product, "Good", 1.0, 1, "cat1").Value;
+            Product prod = service.AddProduct(3, "Owner", storeId, product, "Good", 1.0, 1, "cat1").Value;
 
             Thread thr1 = new Thread(() => res1 = BuyProduct_Thread(1, "buyer1", "1", prod.Id, storeId, 1));
             Thread thr2 = new Thread(() => res2 = BuyProduct_Thread(2, "buyer2", "2", prod.Id, storeId, 1));

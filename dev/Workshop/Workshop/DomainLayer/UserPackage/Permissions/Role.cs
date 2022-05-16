@@ -14,6 +14,11 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             actions = new HashSet<Action>();
         }
 
+        public IReadOnlyCollection<Action> GetAllActions()
+        {
+            return new HashSet<Action>(actions);
+        }
+
         public bool IsAuthorized(Action action)
         {
             return actions.Contains(action);

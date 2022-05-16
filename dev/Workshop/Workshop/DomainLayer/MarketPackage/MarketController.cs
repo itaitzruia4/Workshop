@@ -122,7 +122,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new ArgumentException($"Store ID {ID} does not exist");
         }
 
-        public Product AddProductToStore(int userId, string username, int storeId, int productID, string name, string description, double price, int quantity, string category)
+        public Product AddProductToStore(int userId, string username, int storeId, string name, string description, double price, int quantity, string category)
         {
             Logger.Instance.LogEvent($"{username} is trying to add product {name} to store {storeId}:");
             userController.AssertCurrentUser(userId, username);
@@ -141,7 +141,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 if (!IsAuthorized(userId, username, storeId, Action.AddProduct))
                     throw new MemberAccessException("This user is not authorized for adding products to the specified store.");
                 ValidateStoreExists(storeId);
-                product = stores[storeId].AddProduct(productID, name, description, price, quantity, category);
+                product = stores[storeId].AddProduct(name, description, price, quantity, category);
                 storesLocks[storeId].ReleaseReaderLock();
             }
             Logger.Instance.LogEvent($"{username} successfuly added product {name} to store {storeId}:");

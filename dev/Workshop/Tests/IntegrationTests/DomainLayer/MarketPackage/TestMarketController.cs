@@ -121,7 +121,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         public void TestBuyCart_Success(string user, string address, int productId, int userQuantity, string category)
         {
             int storeId = marketController.CreateNewStore(1, user, "store").GetId();
-            marketController.AddProductToStore(1, user, storeId, productId, "someName", "someDesc", 10.0, 5, "cat1");
+            marketController.AddProductToStore(1, user, storeId, "someName", "someDesc", 10.0, 5, "cat1");
             ShoppingBagProduct product2 = userController.addToCart(1, user, new ShoppingBagProduct(productId, "someName", "someDesc", 10.0, userQuantity, category), storeId);
             int leftovers = marketController.getStoreInfo(1, user, storeId).products[productId].Quantity - userQuantity;
             marketController.BuyCart(1, user, address);

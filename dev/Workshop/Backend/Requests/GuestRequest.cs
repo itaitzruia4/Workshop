@@ -1,6 +1,6 @@
 ﻿namespace API.Requests
 {
-    public class GetAllStoresRequest
+    public class GuestRequest
     {
         public int UserId { get; set; }
     }

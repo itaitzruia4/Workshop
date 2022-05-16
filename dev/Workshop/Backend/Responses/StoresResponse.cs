@@ -1,9 +1,19 @@
-﻿namespace API.Responses
+﻿using Workshop.ServiceLayer.ServiceObjects;
+
+namespace API.Responses
 {
     public class StoresResponse
     {
-        public List<StoreResponse> Stores { get; set; }
-        public string Error { get; set; }
+        public List<Store> Stores;
+        public string Error;
         
+        public StoresResponse(List<Store> stores)
+        {
+            Stores = stores;
+        }
+        public StoresResponse(string error)
+        {
+            Error = error;
+        }
     }
 }

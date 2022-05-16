@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ServiceLayer\**" />
+    <Content Remove="ServiceLayer\**" />
+    <EmbeddedResource Remove="ServiceLayer\**" />
+    <None Remove="ServiceLayer\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="log4net" Version="2.0.14" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.8" />
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
@@ -16,7 +23,6 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Workshop\Workshop.csproj" />
-	  <Folder Include="ServiceLayer\ServiceObjects\" />
 	</ItemGroup>
 
 </Project>

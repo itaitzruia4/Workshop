@@ -55,9 +55,9 @@ namespace Workshop.DomainLayer
             UserController.Register(userId, membername, password, birthdate);
         }
 
-        internal Product AddProduct(int userId, string membername, int storeId, int productId, string productName, string description, double price, int quantity, string category)
+        internal Product AddProduct(int userId, string membername, int storeId, string productName, string description, double price, int quantity, string category)
         {
-            return MarketController.AddProductToStore(userId, membername, storeId, productId, productName, description, price, quantity, category);
+            return MarketController.AddProductToStore(userId, membername, storeId, productName, description, price, quantity, category);
         }
 
         internal StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId)

@@ -13,6 +13,7 @@ using DomainStoreManager = Workshop.DomainLayer.UserPackage.Permissions.StoreMan
 using DomainStoreOwner = Workshop.DomainLayer.UserPackage.Permissions.StoreOwner;
 using DomainStoreFounder = Workshop.DomainLayer.UserPackage.Permissions.StoreFounder;
 using DomainStore = Workshop.DomainLayer.MarketPackage.Store;
+using Workshop.DomainLayer.Reviews;
 
 namespace Workshop.ServiceLayer
 {
@@ -92,11 +93,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<Product> AddProduct(int userId, string membername, int storeId, int productId, string productName, string description, double price, int quantity, string category)
+        public Response<Product> AddProduct(int userId, string membername, int storeId, string productName, string description, double price, int quantity, string category)
         {
             try
             {
-                DomainProduct domainProduct = facade.AddProduct(userId, membername, storeId, productId, productName, description, price, quantity, category);
+                DomainProduct domainProduct = facade.AddProduct(userId, membername, storeId, productName, description, price, quantity, category);
                 Product serviceProduct = new Product(domainProduct);
                 return new Response<Product>(serviceProduct, userId);
             }
@@ -191,16 +192,15 @@ namespace Workshop.ServiceLayer
 
         }
 
-        public Response ReviewProduct(int userId, string user, int productId, string review, int rating)
+        public Response<ReviewDTO> ReviewProduct(int userId, string user, int productId, string review, int rating)
         {
             try
             {
-                facade.ReviewProduct(userId, user, productId, review, rating);
-                return new Response(userId);
+                return new Response<ReviewDTO>(facade.ReviewProduct(userId, user, productId, review, rating), userId);
             }
             catch (Exception e)
             {
-                return new Response(e.Message, userId);
+                return new Response<ReviewDTO>(e.Message, userId);
             }
         }
 

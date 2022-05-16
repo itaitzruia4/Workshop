@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DomainLayer.Reviews;
 using Workshop.ServiceLayer.ServiceObjects;
 
 namespace Workshop.ServiceLayer
@@ -19,7 +20,7 @@ namespace Workshop.ServiceLayer
 
         Response Logout(int userId, string username);
 
-        Response<Product> AddProduct(int userId, string username, int storeId, int productId, string productName, string description, double price, int quantity, string category);
+        Response<Product> AddProduct(int userId, string username, int storeId, string productName, string description, double price, int quantity, string category);
 
         Response<StoreManager> NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId);
 
@@ -33,9 +34,11 @@ namespace Workshop.ServiceLayer
 
         Response<Store> CreateNewStore(int userId, string creator, string storeName);
 
-        Response ReviewProduct(int userId, string user, int productId, string review, int rating);
+        Response<ReviewDTO> ReviewProduct(int userId, string user, int productId, string review, int rating);
 
         Response<List<Product>> SearchProduct(int userId, string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview);
+
+        Response<List<Store>> GetAllStores(int userId);
 
         Response<Product> addToCart(int userId, string user, int productId, int storeId, int quantity);
 
@@ -60,7 +63,5 @@ namespace Workshop.ServiceLayer
         Response ChangeProductQuantity(int userId, string username, int storeId, int productID, int quantity);
 
         Response ChangeProductCategory(int userId, string username, int storeId, int productID, string category);
-
-        Response<List<Store>> GetAllStores(int userId);
     }
 }

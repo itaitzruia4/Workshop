@@ -7,13 +7,10 @@ using DomainStoreManager = Workshop.DomainLayer.UserPackage.Permissions.StoreMan
 
 namespace Workshop.ServiceLayer.ServiceObjects
 {
-    public class StoreManager
+    public class StoreManager : StoreRole
     {
-        public readonly int StoreId;
-
-        public StoreManager(DomainStoreManager domainManager)
+        public StoreManager(DomainStoreManager domainManager) : base(domainManager)
         {
-            this.StoreId = domainManager.StoreId;
         }
     }
 }
