@@ -14,7 +14,9 @@ namespace Workshop.DomainLayer.MarketPackage
         
         StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId);
 
-        Product AddProductToStore(int userId, string username, int storeId, int productID, string name, string description, double price, int quantity, string category);
+        Member RemoveStoreOwnerNomination(int userId, string nominatorMembername, string nominatedMembername, int storeId);
+
+        Product AddProductToStore(int userId, string username, int storeId, string name, string description, double price, int quantity, string category);
 
         void RemoveProductFromStore(int userId, string username, int storeId, int productID);
 
@@ -40,7 +42,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
         StoreDTO getStoreInfo(int userId, string user, int storeId);
 
-        List<ProductDTO> SearchProduct(int userId, string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview);
+        List<ProductDTO> SearchProduct(int userId, string user, string keyWords, string catagory, double minPrice, double maxPrice, int productReview);
 
         void BuyCart(int userId, string user,string address);
 
@@ -53,5 +55,6 @@ namespace Workshop.DomainLayer.MarketPackage
         void AddCategoryDiscount(int userId, string user, int storeId, string jsonDiscount, string categoryName);
 
         void AddStoreDiscount(int userId, string user, int storeId, string jsonDiscount);
+        List<Store> GetAllStores();
     }
 }

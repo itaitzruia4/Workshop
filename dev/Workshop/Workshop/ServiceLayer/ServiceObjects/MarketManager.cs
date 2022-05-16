@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DomainMarketManager = Workshop.DomainLayer.UserPackage.Permissions.MarketManager;
 
 namespace Workshop.ServiceLayer.ServiceObjects
 {
-    class MarketManager: Role
+    public class MarketManager : Role
     {
+        public MarketManager(DomainMarketManager dmm) : base(dmm)
+        {
+        }
     }
 }

@@ -43,7 +43,7 @@ namespace Workshop.DomainLayer.UserPackage
         public void InitializeSystem()
         {
             Logger.Instance.LogEvent("Starting initializing the system - User Controller");
-            Member admin = new Member("admin", securityHandler.Encrypt("admin"));
+            Member admin = new Member("admin", securityHandler.Encrypt("admin"), DateTime.Parse("Aug 22, 1972"));
             admin.AddRole(new MarketManager());
             Logger.Instance.LogEvent("Finished initializing the system - User Controller");
         }
@@ -61,11 +61,13 @@ namespace Workshop.DomainLayer.UserPackage
         public User EnterMarket(int userId)
         {
             Logger.Instance.LogEvent($"User {userId} is trying to enter the market");
-            if (currentUsers.ContainsKey(userId))
-                throw new InvalidOperationException($"User {userId} has already entered the market");
-            currentUsers[userId] = new User();
-            Logger.Instance.LogEvent($"User {userId} has entered the market successfuly");
-            return currentUsers[userId];
+            User user = new User();
+            if (currentUsers.TryAdd(userId, user)) 
+            {
+                Logger.Instance.LogEvent($"User {userId} has entered the market successfuly");
+                return user; 
+            }
+            throw new InvalidOperationException($"User {userId} has already entered the market");
         }
 
         /// <summary>
@@ -74,11 +76,11 @@ namespace Workshop.DomainLayer.UserPackage
         public void ExitMarket(int userId)
         {
             Logger.Instance.LogEvent($"User {userId} is trying to exit the market");
-            if (currentUsers[userId] == null)
+            User user;
+            if (!currentUsers.TryRemove(userId, out user))
             {
                 throw new ArgumentException($"User {userId} has not entered the market");
             }
-            currentUsers[userId] = null;
             Logger.Instance.LogEvent($"User {userId} has exited the market successfuly");
         }
 
@@ -87,7 +89,7 @@ namespace Workshop.DomainLayer.UserPackage
         /// </summary>
         /// <param name="username">Username to be registered</param>
         /// <param name="password">Password of the user that registers to the system</param>
-        public void Register(int userId, string username, string password)
+        public void Register(int userId, string username, string password, DateTime birthdate)
         {
             Logger.Instance.LogEvent($"User {userId} is trying to register user {username}");
             EnsureNonEmptyUserDetails(username, password);
@@ -97,7 +99,7 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new ArgumentException($"Username {username} already exists");
 
             string encryptedPassword = securityHandler.Encrypt(password);
-            Member newMember = new Member(username, encryptedPassword);
+            Member newMember = new Member(username, encryptedPassword, birthdate);
             if (members.TryAdd(username, newMember))
                 Logger.Instance.LogEvent($"User {userId} has successfuly registered user {username}");
             else
@@ -149,7 +151,7 @@ namespace Workshop.DomainLayer.UserPackage
         public void Logout(int userId, string username)
         {
             Logger.Instance.LogEvent($"User {userId} is trying to log out member {username}");
-            if (currentUsers[userId] == null)
+            if (!currentUsers.ContainsKey(userId))
             {
                 throw new ArgumentException($"User {userId} has not entered the market");
             }
@@ -346,7 +348,7 @@ namespace Workshop.DomainLayer.UserPackage
 
         private void EnsureEnteredMarket(int userId)
         {
-            if (currentUsers[userId] == null)
+            if (!currentUsers.ContainsKey(userId))
                 throw new InvalidOperationException($"User {userId} must enter the market first");
         }
         
@@ -402,7 +404,20 @@ namespace Workshop.DomainLayer.UserPackage
             throw new ArgumentException($"Username {username} is not a member");
         }
 
-        public ReviewDTO ReviewProduct(int userId, string user, int productId, string review)
+        public int GetAge(int userId, string membername)
+        {
+            if (IsMember(membername))
+            {
+                return (int)(DateTime.Now.Subtract(GetMember(membername).Birthdate).TotalDays / 365);
+            }
+            if (currentUsers.ContainsKey(userId))
+            {
+                return -1;
+            }
+            throw new ArgumentException($"No such user: {userId} or member: {membername}");
+        }
+
+        public ReviewDTO ReviewProduct(int userId, string user, int productId, string review, int rating)
         {
             Logger.Instance.LogEvent("User " + user + " is trying to review product " + productId);
             AssertCurrentUser(userId, user);
@@ -422,7 +437,7 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new ArgumentException($"Username {user} did not purchase product {productId}");
             }
             Logger.Instance.LogEvent("User " + user + " successfuly reviewed product " + productId);
-            return reviewHandler.AddReview(user, productId, review);
+            return reviewHandler.AddReview(user, productId, review, rating);
         }
 
 
@@ -529,6 +544,11 @@ namespace Workshop.DomainLayer.UserPackage
 
             //get online members stats
             return currentUsers.Values.Contains(user);
+        }
+
+        public double GetProductRating(int productId)
+        {
+            return reviewHandler.GetProductRating(productId);
         }
     }
 }

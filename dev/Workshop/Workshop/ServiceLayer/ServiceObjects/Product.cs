@@ -11,19 +11,20 @@ namespace Workshop.ServiceLayer.ServiceObjects
 {
     public class Product
     {
-        public readonly int Id;
-        public readonly string Name;
-        public readonly double BasePrice;
-        public readonly string Description;
-        public readonly int Quantity;
-
-        internal Product(int id, string name, string description, double basePrice, int quantity)
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public double BasePrice { get; set; }
+        public string Description { get; set; }
+        public int Quantity { get; set; }
+        public string Category { get; set; }
+        internal Product(int id, string name, string description, double basePrice, int quantity, string category)
         {
             Id = id;
             Name = name;
             BasePrice = basePrice;
             Description = description;
             Quantity = quantity;
+            Category = category;
         }
 
         internal Product(DomainProduct domainProduct)
@@ -33,6 +34,7 @@ namespace Workshop.ServiceLayer.ServiceObjects
             BasePrice = domainProduct.Price;
             Description = domainProduct.Description;
             Quantity = domainProduct.Quantity;
+            Category = domainProduct.Category;
         }
 
         internal Product(DomainProductDTO domainProduct)
@@ -42,6 +44,7 @@ namespace Workshop.ServiceLayer.ServiceObjects
             BasePrice = domainProduct.Price;
             Description = domainProduct.Description;
             Quantity = domainProduct.Quantity;
+            Category = domainProduct.Category;
         }
 
         internal Product(DomainShoppingBagProduct domainProduct)
@@ -51,6 +54,7 @@ namespace Workshop.ServiceLayer.ServiceObjects
             BasePrice = domainProduct.Price;
             Description = domainProduct.Description;
             Quantity = domainProduct.Quantity;
+            Category = domainProduct.Category;
         }
     }
 }

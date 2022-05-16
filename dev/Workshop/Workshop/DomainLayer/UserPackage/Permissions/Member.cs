@@ -11,16 +11,26 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
     {
         public string Username { get; }
         internal string Password { get; }
+        public DateTime Birthdate { get; }
 
         private List<Role> roles;
+
         private ReaderWriterLock rwl;
 
-        public Member(string username, string password)
+        public Member(string username, string password, DateTime birthdate)
         {
             Username = username;
             Password = password;
+            if (birthdate >= DateTime.Now)
+                throw new ArgumentException($"Member can not be born before this very moment: {username}");
+            Birthdate = birthdate;
             roles = new List<Role>();
             this.rwl = new ReaderWriterLock();
+        }
+
+        public IReadOnlyList<Role> GetAllRoles()
+        {
+            return new List<Role>(roles);
         }
 
         public bool IsAuthorized(Action action)
@@ -68,6 +78,24 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             roles.Add(role);
             rwl.DowngradeFromWriterLock(ref lc);
             rwl.ReleaseReaderLock();
+        }
+
+        public void RemoveRole(Role role)
+        {
+            rwl.AcquireReaderLock(Timeout.Infinite);
+            foreach (Role role2 in roles)
+            {
+                if (role.Equals(role2))
+                {
+                    LockCookie lc = rwl.UpgradeToWriterLock(Timeout.Infinite);
+                    roles.Remove(role2);
+                    rwl.DowngradeFromWriterLock(ref lc);
+                    rwl.ReleaseReaderLock();
+                    return;
+                }
+            }
+            rwl.ReleaseReaderLock();
+            throw new InvalidOperationException($"Member {this.Username} does not have the requested role.");
         }
 
         public List<StoreRole> GetStoreRoles(int storeId)

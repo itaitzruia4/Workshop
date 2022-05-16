@@ -19,7 +19,6 @@ namespace Workshop.DomainLayer.MarketPackage
         private PurchasePolicy purchasePolicy { get; set; }
 
         private ReaderWriterLock rwl;
-
         public Store(int id, string name)
         {
             this.id = id;
@@ -30,7 +29,7 @@ namespace Workshop.DomainLayer.MarketPackage
             this.open = true; //TODO: check if on init store supposed to be open or closed.
             this.rwl = new ReaderWriterLock();
             this.discountPolicy = new DiscountPolicy(this);
-            this.purchasePolicy = new PurchasePolicy();
+            this.purchasePolicy = new PurchasePolicy(this);
         }
 
         public ReaderWriterLock getLock()
@@ -67,17 +66,14 @@ namespace Workshop.DomainLayer.MarketPackage
             this.open = false;
         }
 
-        public Product AddProduct(int productID, string name, string description, double price, int quantity, string category)
+        public Product AddProduct(string name, int productId, string description, double price, int quantity, string category)
         {
-            ValidateID(productID);
-            if (products.ContainsKey(productID))
-                throw new ArgumentException("Product with the same ID already exists.");
             ValidateName(name);
             ValidatePrice(price);
             ValidateQuantity(quantity);
             ValidateCategory(category);
-            Product newProd = new Product(productID, name, description, price, quantity, category);
-            products.Add(productID, newProd);
+            Product newProd = new Product(productId, name, description, price, quantity, category);
+            products.Add(productId, newProd);
             return newProd;
         }
 
@@ -191,7 +187,7 @@ namespace Workshop.DomainLayer.MarketPackage
             
             foreach (ProductDTO product in shoppingBag.products)
             {
-                if(products.ContainsKey(product.Id)&products[product.Id].Quantity>product.Quantity)
+                if(products.ContainsKey(product.Id) && products[product.Id].Quantity >= product.Quantity)
                 {
                     products[product.Id].Quantity -= product.Quantity;
                 }
@@ -223,6 +219,24 @@ namespace Workshop.DomainLayer.MarketPackage
         internal bool ProductExists(int product_id)
         {
             return products.ContainsKey(product_id);
+        }
+
+        internal double CalaculatePrice(ShoppingBagDTO shoppingBag)
+        {
+            double discount = discountPolicy.CalculateDiscount(shoppingBag);
+            double price = 0;
+            foreach (ProductDTO productDTO in shoppingBag.products)
+            {
+                price += productDTO.Price;
+            }
+            return Math.Max(price - discount, 0);
+        }
+
+        internal void CheckPurchasePolicy(ShoppingBagDTO shoppingBag, int age)
+        {
+            double price = CalaculatePrice(shoppingBag);
+            if (!purchasePolicy.CanPurchase(shoppingBag, age))
+                throw new Exception("Cannot purchase shopping bag because it violates our purchase policy.");
         }
     }
 }

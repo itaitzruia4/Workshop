@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.UserPackage.Shopping;
+using Workshop.DomainLayer.MarketPackage.Terms;
 
 namespace Workshop.DomainLayer.MarketPackage.Discounts
 {
     public class ConditionalDiscount: ConcreteDiscount
     {
-        private DiscountTerm discountTerm;
-        public ConditionalDiscount(PriceAction priceAction, DiscountTerm discountTerm): base(priceAction)
+        private Term discountTerm;
+        public ConditionalDiscount(PriceAction priceAction, Term discountTerm): base(priceAction)
         {
             this.discountTerm = discountTerm;
         }

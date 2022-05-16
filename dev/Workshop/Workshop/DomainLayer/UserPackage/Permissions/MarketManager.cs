@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
-    class MarketManager: Role
+    public class MarketManager : Role
     {
         public MarketManager()
         {
