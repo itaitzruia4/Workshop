@@ -67,6 +67,8 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             userController.ExitMarket(1);
         }
 
+        /// Tests for UserController.Register method
+        /// <see cref="UserController.Register"/>
         [TestMethod]
         public void TestRegister_Success()
         {
@@ -127,6 +129,8 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             userController.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
         }
 
+        /// Tests for UserController.EnterMarket method
+        /// <see cref="UserController.EnterMarket"/>
         [TestMethod]
         public void TestEnterMarket_Success()
         {
@@ -140,6 +144,8 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             Assert.ThrowsException<InvalidOperationException>(() => userController.EnterMarket(1));
         }
 
+        /// Tests for UserController.Login method
+        /// <see cref="UserController.Login"/>
         [TestMethod]
         [DataRow("member1", "pass1")]
         [DataRow("member2", "pass2")]
@@ -222,6 +228,8 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             userController.Login(1, username2, password2);
         }
 
+        /// Tests for UserController.Logout method
+        /// <see cref="UserController.Logout"/>
         [TestMethod]
         public void TestLogout_Success()
         {
@@ -260,6 +268,8 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             userController.Logout(1, username2);
         }
 
+        /// Tests for UserController.NominateStoreOwner method
+        /// <see cref="UserController.NominateStoreOwner"/>
         [TestMethod]
         [DataRow("member2", "pass2")]
         [DataRow("member3", "pass3")]
@@ -332,6 +342,8 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             Assert.ThrowsException<InvalidOperationException>(() => userController.NominateStoreOwner(1, nominator, "member2", member2StoreId));
         }
 
+        /// Tests for UserController.NominateStoreManager method
+        /// <see cref="UserController.NominateStoreManager"/>
         [TestMethod]
         [DataRow("member2", "pass2")]
         [DataRow("member3", "pass3")]
@@ -414,6 +426,8 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             Assert.ThrowsException<InvalidOperationException>(() => userController.NominateStoreManager(1, nominator, "member2", member2StoreId));
         }
 
+        /// Tests for UserController.ReviewProduct method
+        /// <see cref="UserController.ReviewProduct"/>
         [TestMethod]
         public void TestReviewProduct_Success(){
             userController.EnterMarket(1);
@@ -448,6 +462,8 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => userController.ReviewProduct(1, "member1", 1, "TestReview", rating));
         }
 
+        /// Tests for UserController.viewCart method
+        /// <see cref="UserController.viewCart"/>
         [DataTestMethod]
         [DataRow("member2", 1, "product1", "desc", 12.0, 1, 1, "cat1")] //normal case
         [DataRow("member2", 2, "product2", "descp", 15.0, 3, 1, "cat1")] //normal case
@@ -475,6 +491,8 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             //Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(product2.GetProductDTO()));
         }
 
+        /// Tests for UserController.editCart method
+        /// <see cref="UserController.editCart"/>
         [DataTestMethod]
         [DataRow("member2", 1, "product1", "desc", 12.0, 1, 1,1, "cat1")] //normal case
         [DataRow("member2", 1, "product1", "descp", 15.0, 3, 1,1, "cat1")] //normal case

@@ -37,6 +37,8 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
             marketController.InitializeSystem();
         }
 
+        /// Tests for MarketController.CloseStore method
+        /// <see cref="MarketController.CloseStore"/>
         [TestMethod]
         public void TestCloseStore_Success()
         {
@@ -57,6 +59,8 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
             Assert.ThrowsException<ArgumentException>(() => marketController.CloseStore(1, member, storeId));
         }
 
+        /// Tests for MarketController.GetWorkersInformation method
+        /// <see cref="MarketController.GetWorkersInformation"/>
         [TestMethod]
         public void TestGetWorkersInformation_Success(){
             string member = "StoreFounder1";
@@ -73,6 +77,8 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
             Assert.ThrowsException<MemberAccessException>(() => marketController.GetWorkersInformation(1, "Notallowed Cohen", storeId));
         }
 
+        /// Tests for MarketController.CreateNewStore method
+        /// <see cref="MarketController.CreateNewStore"/>
         [TestMethod]
         public void TestCreateNewStore_Success(){
             string username = "User1";
@@ -91,6 +97,8 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
             Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(1, username, storeName));
         }
 
+        /// Tests for MarketController.SearchProduct method
+        /// <see cref="MarketController.SearchProduct"/>
         [TestMethod]
         public void TestSearchProduct_Success()
         {
@@ -115,10 +123,11 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
             Assert.AreEqual(marketController.SearchProduct(1, user, keyWords, catagory, minPrice, maxPrice, productReview).Count, 0);
         }
 
-
+        /// Tests for MarketController.addToBag method
+        /// <see cref="MarketController.addToBag"/>
         [DataTestMethod]
         [DataRow("member1", 3)]
-        public void TestAddToCart_Success(string user, int quantity)
+        public void TestAddToBag_Success(string user, int quantity)
         {
             Store st = marketController.CreateNewStore(1, user, "store");
             Product product = marketController.AddProductToStore(1, user, st.GetId(), "someName", "someDesc", 10.0, quantity, "cat1");
@@ -129,7 +138,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         [DataRow("User1", 2, 1, 3)] //wrong id;
         [DataRow("User1", 1, 0, 3)] //wrong store;
         [DataRow("User1", 1, 1, 4)] //wrong quantity;
-        public void TestAddToCart_Failure_WrongArguments(string user, int productId, int storeId, int quantity)
+        public void TestAddToBag_Failure_WrongArguments(string user, int productId, int storeId, int quantity)
         {
             Store st = marketController.CreateNewStore(1, user, "store");
             marketController.AddProductToStore(1, user, st.GetId(), "someName", "someDesc", 10.0, 2, "cat1");

@@ -36,6 +36,8 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             this.member = userController.Login(1, "nirdan", "12345");
         }
 
+        /// Tests for Role.IsAuthorized method
+        /// <see cref="Role.IsAuthorized"/>
         [TestMethod]
         public void GetStoreOrdersListSuccess1()
         {
