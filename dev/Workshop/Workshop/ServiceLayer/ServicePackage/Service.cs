@@ -308,7 +308,7 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        Response AddProductPurchaseTerm(int userId, string user, int storeId, string jsonTerm, int product_id)
+        public Response AddProductPurchaseTerm(int userId, string user, int storeId, string jsonTerm, int product_id)
         {
             try
             {
@@ -321,7 +321,7 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        Response AddCategoryPurchaseTerm(int userId, string user, int storeId, string jsonTerm, string category_name)
+        public Response AddCategoryPurchaseTerm(int userId, string user, int storeId, string jsonTerm, string category_name)
         {
             try
             {
@@ -334,7 +334,7 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        Response AddStorePurchaseTerm(int userId, string user, int storeId, string jsonTerm)
+        public Response AddStorePurchaseTerm(int userId, string user, int storeId, string jsonTerm)
         {
             try
             {
@@ -347,7 +347,7 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        Response AddUserPurchaseTerm(int userId, string user, int storeId, string jsonTerm)
+        public Response AddUserPurchaseTerm(int userId, string user, int storeId, string jsonTerm)
         {
             try
             {

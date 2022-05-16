@@ -7,6 +7,7 @@
         public FrontResponse(T v)
         {
             Value = v;
+            Error = "";
         }
         public FrontResponse(string msg)
         {
