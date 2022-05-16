@@ -1,6 +1,6 @@
 ﻿namespace API.Requests
 {
-    public class AddToCartRequest : EditCartRequest
+    public class StoreRequest : MemberRequest
     {
         public int StoreId { get; set; }
     }

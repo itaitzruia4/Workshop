@@ -1,13 +1,11 @@
 ﻿namespace API.Requests
 {
-    public class ProductSearchRequest
+    public class ProductSearchRequest : MemberRequest
     {
-        public int UserId { get; set; }
-        public string Membername { get; set; }
-        public string KeyWords { get; set; }
+        public string Keywords { get; set; }
         public string Category { get; set; }
-        public int MinPrice { get; set; }
-        public int MaxPrice { get; set; }
-        public int ProductReview { get; set; }
+        public double MinPrice { get; set; }
+        public double MaxPrice { get; set; }
+        public double ProductReview { get; set; }
     }
 }
