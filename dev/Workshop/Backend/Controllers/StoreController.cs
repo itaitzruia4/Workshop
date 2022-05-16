@@ -119,7 +119,7 @@ namespace API.Controllers
         [HttpPost("searchproduct")]
         public ActionResult<ProductsResponse> SearchProduct([FromBody] ProductSearchRequest request)
         {
-            Response<List<Product>> response = Service.SearchProduct(request.UserId, request.Membername, request.ProductId, request.KeyWords, request.Category, request.MinPrice, request.MaxPrice, request.ProductReview);
+            Response<List<Product>> response = Service.SearchProduct(request.UserId, request.Membername, request.KeyWords, request.Category, request.MinPrice, request.MaxPrice, request.ProductReview);
             if (response.ErrorOccured)
             {
                 return BadRequest(new ProductsResponse(response.ErrorMessage));
