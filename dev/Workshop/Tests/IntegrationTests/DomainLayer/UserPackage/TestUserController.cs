@@ -27,19 +27,24 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
             userController.EnterMarket(1);
 
-            userController.Register(1, "member1", "pass1", 40);
+            userController.Register(1, "member1", "pass1", DateTime.Parse("Aug 22, 1972"));
             userController.Login(1, "member1", "pass1");
             userController.addToCart(1, "member1", new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1, "cat1"), 1);
 
             List<ShoppingBagProduct> member1prods = new List<ShoppingBagProduct>();
             member1prods.Add(new ShoppingBagProduct(1, "prod1", "desc1", 11.90, 3, "cat1"));
-            userController.AddOrder(1, new OrderDTO(1, "member1", "whatever", "blasToysRus", member1prods, 12.30), "member1");
+            List<ProductDTO> pdtos1 = new List<ProductDTO>();
+            foreach (ShoppingBagProduct sbp in member1prods)
+            {
+                pdtos1.Add(sbp.GetProductDTO());
+            }
+            userController.AddOrder(1, new OrderDTO(1, "member1", "whatever", "blasToysRus", pdtos1), "member1");
             userController.Logout(1, "member1");
 
-            userController.Register(1, "member3", "pass3", 40);
-            userController.Register(1, "member4", "pass4", 40);
+            userController.Register(1, "member3", "pass3", DateTime.Parse("Aug 22, 1972"));
+            userController.Register(1, "member4", "pass4", DateTime.Parse("Aug 22, 1972"));
 
-            userController.Register(1, "member2", "pass2", 40);
+            userController.Register(1, "member2", "pass2", DateTime.Parse("Aug 22, 1972"));
             userController.Login(1, "member2", "pass2");
             userController.AddStoreFounder("member2", member2StoreId);
 
@@ -51,7 +56,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
             userController.Logout(1, "member2");
 
-            userController.Register(1, "member5", "pass5", 40);
+            userController.Register(1, "member5", "pass5", DateTime.Parse("Aug 22, 1972"));
 
             userController.ExitMarket(1);
         }
@@ -64,7 +69,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             userController.EnterMarket(1);
 
             // Act
-            userController.Register(1, username, password, 40);
+            userController.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
 
             // Assert
             Assert.IsTrue(userController.IsMember(username));
@@ -77,7 +82,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [ExpectedException(typeof(ArgumentException), "Username or password cannot be empty")]
         public void TestRegister_Failure_EmptyDetails(string username, string password)
         {
-            userController.Register(1, username, password, 40);
+            userController.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
             Assert.IsFalse(userController.IsMember(username));
         }
 
@@ -88,7 +93,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [ExpectedException(typeof(ArgumentException), "Username or password cannot be empty")]
         public void TestRegister_Failure_NullDetails(string username, string password)
         {
-            userController.Register(1, username, password, 40);
+            userController.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
             Assert.IsFalse(userController.IsMember(username));
         }
 
@@ -100,9 +105,9 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             Assert.IsFalse(userController.IsMember(username));
             userController.EnterMarket(1);
 
-            userController.Register(1, username, password, 40);
+            userController.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
             Assert.IsTrue(userController.IsMember(username));
-            userController.Register(1, username, password, 40);
+            userController.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
         }
 
         [DataTestMethod]
@@ -113,7 +118,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             Assert.IsTrue(userController.IsMember(username));
 
             userController.EnterMarket(1);
-            userController.Register(1, username, password, 40);
+            userController.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
         }
 
         [TestMethod]

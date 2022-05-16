@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Workshop.DomainLayer.MarketPackage;
 using Workshop.DomainLayer.MarketPackage.ExternalServices.Payment;
 using Workshop.DomainLayer.MarketPackage.ExternalServices.Supply;
@@ -49,14 +50,14 @@ namespace Workshop.DomainLayer
             UserController.Logout(userId, membername);
         }
 
-        public void Register(int userId, string membername, string password, int age)
+        public void Register(int userId, string membername, string password, DateTime birthdate)
         {
-            UserController.Register(userId, membername, password, age);
+            UserController.Register(userId, membername, password, birthdate);
         }
 
-        internal Product AddProduct(int userId, string membername, int storeId, int productId, string productName, string description, double price, int quantity, string category)
+        internal Product AddProduct(int userId, string membername, int storeId, string productName, string description, double price, int quantity, string category)
         {
-            return MarketController.AddProductToStore(userId, membername, storeId, productId, productName, description, price, quantity, category);
+            return MarketController.AddProductToStore(userId, membername, storeId, productName, description, price, quantity, category);
         }
 
         internal StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId)
@@ -159,6 +160,11 @@ namespace Workshop.DomainLayer
         public void ChangeProductCategory(int userId, string username, int storeId, int productID, string category)
         {
             MarketController.ChangeProductCategory(userId, username, storeId, productID, category);
+        }
+
+        internal List<Store> GetAllStores()
+        {
+            return MarketController.GetAllStores();
         }
     }
 }

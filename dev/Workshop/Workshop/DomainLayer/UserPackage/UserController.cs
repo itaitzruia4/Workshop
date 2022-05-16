@@ -43,7 +43,7 @@ namespace Workshop.DomainLayer.UserPackage
         public void InitializeSystem()
         {
             Logger.Instance.LogEvent("Starting initializing the system - User Controller");
-            Member admin = new Member("admin", securityHandler.Encrypt("admin"), 40);
+            Member admin = new Member("admin", securityHandler.Encrypt("admin"), DateTime.Parse("Aug 22, 1972"));
             admin.AddRole(new MarketManager());
             Logger.Instance.LogEvent("Finished initializing the system - User Controller");
         }
@@ -89,7 +89,7 @@ namespace Workshop.DomainLayer.UserPackage
         /// </summary>
         /// <param name="username">Username to be registered</param>
         /// <param name="password">Password of the user that registers to the system</param>
-        public void Register(int userId, string username, string password, int age)
+        public void Register(int userId, string username, string password, DateTime birthdate)
         {
             Logger.Instance.LogEvent($"User {userId} is trying to register user {username}");
             EnsureNonEmptyUserDetails(username, password);
@@ -99,7 +99,7 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new ArgumentException($"Username {username} already exists");
 
             string encryptedPassword = securityHandler.Encrypt(password);
-            Member newMember = new Member(username, encryptedPassword, age);
+            Member newMember = new Member(username, encryptedPassword, birthdate);
             if (members.TryAdd(username, newMember))
                 Logger.Instance.LogEvent($"User {userId} has successfuly registered user {username}");
             else
@@ -408,7 +408,7 @@ namespace Workshop.DomainLayer.UserPackage
         {
             if (IsMember(membername))
             {
-                return GetMember(membername).Age;
+                return (int)(DateTime.Now.Subtract(GetMember(membername).Birthdate).TotalDays / 365);
             }
             if (currentUsers.ContainsKey(userId))
             {

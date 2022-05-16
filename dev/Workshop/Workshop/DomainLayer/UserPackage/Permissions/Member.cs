@@ -11,22 +11,26 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
     {
         public string Username { get; }
         internal string Password { get; }
-
-        public int Age { get; }
+        public DateTime Birthdate { get; }
 
         private List<Role> roles;
 
         private ReaderWriterLock rwl;
 
-        public Member(string username, string password, int age)
+        public Member(string username, string password, DateTime birthdate)
         {
             Username = username;
             Password = password;
-            if (age <= 0)
-                throw new ArgumentException($"Age can't be a non-positive value for member {username}");
-            Age = age;
+            if (birthdate >= DateTime.Now)
+                throw new ArgumentException($"Member can not be born before this very moment: {username}");
+            Birthdate = birthdate;
             roles = new List<Role>();
             this.rwl = new ReaderWriterLock();
+        }
+
+        public IReadOnlyList<Role> GetAllRoles()
+        {
+            return new List<Role>(roles);
         }
 
         public bool IsAuthorized(Action action)

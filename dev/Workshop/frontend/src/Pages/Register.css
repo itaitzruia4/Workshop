@@ -1,0 +1,60 @@
+body {
+    background-color: #2b2828;
+}
+
+.register {
+    margin-top: 70px;
+}
+
+.register_title {
+    margin-left: 270px;
+    font-size: 60px;
+}
+
+.register_userInput {
+    margin-left: 280px;
+}
+
+.register_buttons {
+    margin-left: 280px;
+    text-align: center;
+    display: block;
+    font-size: 20px;
+}
+
+.register_username_textbox {
+    width: 34%;
+    font-size: 20px;
+    display: block;
+}
+
+.register_password_textbox {
+    width: 34%;
+    font-size: 20px;
+    display: block;
+}
+.register_name_textbox {
+    width: 34%;
+    font-size: 20px;
+    display: block;
+}
+
+.register_date_textbox {
+    width: 34%;
+    font-size: 20px;
+    display: block;
+}
+
+.register_register_btn {
+    width: 35%;
+    display: block;
+    font-size: 20px;
+    background-color: #1DB954;
+    color: white;
+    border-radius: 8px;
+}
+
+    .register_register_btn:hover {
+        transform: scale(1.1);
+    }
+

@@ -20,6 +20,8 @@ namespace Workshop.DomainLayer.MarketPackage
 
         private ReaderWriterLock rwl;
 
+        private int CURR_PRODUCT_ID;
+
         public Store(int id, string name)
         {
             this.id = id;
@@ -31,6 +33,7 @@ namespace Workshop.DomainLayer.MarketPackage
             this.rwl = new ReaderWriterLock();
             this.discountPolicy = new DiscountPolicy(this);
             this.purchasePolicy = new PurchasePolicy(this);
+            this.CURR_PRODUCT_ID = 0;
         }
 
         public ReaderWriterLock getLock()
@@ -67,17 +70,14 @@ namespace Workshop.DomainLayer.MarketPackage
             this.open = false;
         }
 
-        public Product AddProduct(int productID, string name, string description, double price, int quantity, string category)
+        public Product AddProduct(string name, string description, double price, int quantity, string category)
         {
-            ValidateID(productID);
-            if (products.ContainsKey(productID))
-                throw new ArgumentException("Product with the same ID already exists.");
             ValidateName(name);
             ValidatePrice(price);
             ValidateQuantity(quantity);
             ValidateCategory(category);
-            Product newProd = new Product(productID, name, description, price, quantity, category);
-            products.Add(productID, newProd);
+            Product newProd = new Product(CURR_PRODUCT_ID, name, description, price, quantity, category);
+            products.Add(CURR_PRODUCT_ID++, newProd);
             return newProd;
         }
 
@@ -233,7 +233,7 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 price += productDTO.Price;
             }
-            return price - discount;
+            return Math.Max(price - discount, 0);
         }
 
         internal void CheckPurchasePolicy(ShoppingBagDTO shoppingBag, int age)

@@ -1,0 +1,32 @@
+body {
+    background-color: #2b2828;
+}
+
+.guest {
+    margin-top: 70px;
+}
+
+.guest_buttons {
+    margin-top: 535px;
+    margin-left: -110px;
+    width: 45%;
+    text-align: center;
+    display: block;
+    font-size: 20px;
+}
+
+.guest_register_btn {
+    display: block;
+    font-size: 20px;
+}
+
+.guest_login_btn {
+    display: block;
+    font-size: 20px;
+}
+
+.guest_exit_btn {
+    display: block;
+    font-size: 20px;
+}
+

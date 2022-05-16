@@ -13,21 +13,19 @@ namespace Workshop.DomainLayer.Orders
         public string clientName { get; set; }
         public string address { get; set; }
         public string storeName { get; set; }
-        public List<ShoppingBagProduct> items { get; set; }
-        public double totalPrice { get; set; }
+        public List<ProductDTO> items { get; set; }
 
-        public OrderDTO(int id, string clientName, string address, string storeName, List<ShoppingBagProduct> items, double totalPrice)
+        public OrderDTO(int id, string clientName, string address, string storeName, List<ProductDTO> items)
         {
             this.id = id;
             this.clientName = clientName;
             this.address = address;
             this.storeName = storeName;
             this.items = items;
-            this.totalPrice = totalPrice;
         }
 
         public bool ContainsProduct(int productId){
-            foreach (ShoppingBagProduct item in items){
+            foreach (ProductDTO item in items){
                 if (item.Id == productId)
                     return true;
             }
