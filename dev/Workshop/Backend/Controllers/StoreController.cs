@@ -17,91 +17,91 @@ namespace API.Controllers
         }
 
         [HttpPost("newstore")]
-        public ActionResult<StoreResponse> CreateNewStore([FromBody] CreateNewStoreRequest request)
+        public ActionResult<FrontResponse<Store>> CreateNewStore([FromBody] CreateNewStoreRequest request)
         {
             Response<Store> response = Service.CreateNewStore(request.UserId, request.Creator, request.StoreName);
             if (response.ErrorOccured)
             {
-                return BadRequest(new StoreResponse(response.ErrorMessage));
+                return BadRequest(new FrontResponse<Store>(response.ErrorMessage));
             }
-            return Ok(new StoreResponse(response.Value));
+            return Ok(new FrontResponse<Store>(response.Value));
         }
 
         [HttpPost("getstores")]
-        public ActionResult<StoresResponse> GetAllStores([FromBody] GuestRequest request)
+        public ActionResult<FrontResponse<List<Store>>> GetAllStores([FromBody] GuestRequest request)
         {
             Response<List<Store>> response = Service.GetAllStores(request.UserId);
             if (response.ErrorOccured)
             {
-                return BadRequest(new StoresResponse(response.ErrorMessage));
+                return BadRequest(new FrontResponse<List<Store>>(response.ErrorMessage));
             }
-            return Ok(new StoresResponse(response.Value));
+            return Ok(new FrontResponse<List<Store>>(response.Value));
         }
 
         [HttpPost("addproduct")]
-        public ActionResult<ProductResponse> AddProduct([FromBody] AddProductRequest request)
+        public ActionResult<FrontResponse<Product>> AddProduct([FromBody] AddProductRequest request)
         {
             Response<Product> response = Service.AddProduct(request.UserId, request.Membername, request.StoreId, request.ProductName, request.Description, request.Price, request.Quantity, request.Category);
             if (response.ErrorOccured)
             {
-                return BadRequest(new ProductResponse(response.ErrorMessage));
+                return BadRequest(new FrontResponse<Product>(response.ErrorMessage));
             }
-            return Ok(new ProductResponse(response.Value));
+            return Ok(new FrontResponse<Product>(response.Value));
         }
 
         [HttpPost("nominatemanager")]
-        public ActionResult<StoreManagerResponse> NominateStoreManager([FromBody] NominationRequest request)
+        public ActionResult<FrontResponse<StoreManager>> NominateStoreManager([FromBody] NominationRequest request)
         {
             Response<StoreManager> response = Service.NominateStoreManager(request.UserId, request.Nominator, request.Nominated, request.StoreId);
             if (response.ErrorOccured)
             {
-                return BadRequest(new StoreManagerResponse(response.ErrorMessage));
+                return BadRequest(new FrontResponse<StoreManager>(response.ErrorMessage));
             }
-            return Ok(new StoreManagerResponse(response.Value));
+            return Ok(new FrontResponse<StoreManager>(response.Value));
         }
 
         [HttpPost("nominateowner")]
-        public ActionResult<StoreOwnerResponse> NominateStoreOwner([FromBody] NominationRequest request)
+        public ActionResult<FrontResponse<StoreOwner>> NominateStoreOwner([FromBody] NominationRequest request)
         {
             Response<StoreOwner> response = Service.NominateStoreOwner(request.UserId, request.Nominator, request.Nominated, request.StoreId);
             if (response.ErrorOccured)
             {
-                return BadRequest(new StoreOwnerResponse(response.ErrorMessage));
+                return BadRequest(new FrontResponse<StoreOwner>(response.ErrorMessage));
             }
-            return Ok(new StoreOwnerResponse(response.Value));
+            return Ok(new FrontResponse<StoreOwner>(response.Value));
         }
 
         [HttpPost("removeownernomination")]
-        public ActionResult<MemberResponse> RemoveStoreOwnerNomination([FromBody] NominationRequest request)
+        public ActionResult<FrontResponse<Member>> RemoveStoreOwnerNomination([FromBody] NominationRequest request)
         {
             Response<Member> response = Service.RemoveStoreOwnerNomination(request.UserId, request.Nominator, request.Nominated, request.StoreId);
             if (response.ErrorOccured)
             {
-                return BadRequest(new MemberResponse(response.ErrorMessage));
+                return BadRequest(new FrontResponse<Member>(response.ErrorMessage));
             }
-            return Ok(new MemberResponse(response.Value));
+            return Ok(new FrontResponse<Member>(response.Value));
         }
 
         [HttpPost("getworkersinformation")]
-        public ActionResult<MembersResponse> GetWorkersInformation([FromBody] UserStoreRequest request)
+        public ActionResult<FrontResponse<List<Member>>> GetWorkersInformation([FromBody] UserStoreRequest request)
         {
             Response<List<Member>> response = Service.GetWorkersInformation(request.UserId, request.Membername, request.StoreId);
             if (response.ErrorOccured)
             {
-                return BadRequest(new MembersResponse(response.ErrorMessage));
+                return BadRequest(new FrontResponse<List<Member>>(response.ErrorMessage));
             }
-            return Ok(new MembersResponse(response.Value));
+            return Ok(new FrontResponse<List<Member>>(response.Value));
         }
 
         [HttpPost("closestore")]
-        public ActionResult<AuthenticationResponse> CloseStore([FromBody] UserStoreRequest request)
+        public ActionResult<FrontResponse<int>> CloseStore([FromBody] UserStoreRequest request)
         {
             Response response = Service.CloseStore(request.UserId, request.Membername, request.StoreId);
             if (response.ErrorOccured)
             {
-                return BadRequest(new AuthenticationResponse(response.ErrorMessage));
+                return BadRequest(new FrontResponse<int>(response.ErrorMessage));
             }
-            return Ok(new AuthenticationResponse(request.UserId));
+            return Ok(new FrontResponse<int>(request.UserId));
         }
     }
 }
