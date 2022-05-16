@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Workshop.DomainLayer.MarketPackage;
 
@@ -22,6 +23,16 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
                 }
             }
             return price;
+        }
+
+        internal bool IsEmpty()
+        {
+            foreach (ShoppingBagDTO bag in shoppingBags.Values)
+            {
+                if (!bag.IsEmpty())
+                    return false;
+            }
+            return true;
         }
     }
 }

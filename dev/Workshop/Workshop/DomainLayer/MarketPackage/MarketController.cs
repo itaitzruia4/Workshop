@@ -619,6 +619,10 @@ namespace Workshop.DomainLayer.MarketPackage
         public ShoppingBagProduct getProductForSale(int productId, int storeId, int quantity)
         {
             ValidateStoreExists(storeId);
+            if (quantity <= 0)
+            {
+                throw new ArgumentException($"Can't add {quantity} of an item to the shopping cart");
+            }
             if(stores[storeId].GetProduct(productId).Quantity >= quantity){
                 return stores[storeId].GetProduct(productId).GetShoppingBagProduct(quantity);
             }
@@ -628,6 +632,10 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             Logger.Instance.LogEvent($"User {username} is trying to buy his cart.");
             ShoppingCartDTO shoppingCart = userController.viewCart(userId, username);
+            if (shoppingCart.IsEmpty())
+            {
+                throw new InvalidOperationException("Can't buy an empty shopping cart");
+            }
             Dictionary<int,List<ProductDTO>> productsSoFar = new Dictionary<int, List<ProductDTO>>();
             try
             {

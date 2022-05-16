@@ -599,8 +599,7 @@ namespace Tests.AcceptanceTests
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 2, "cat1").Value;
             service.addToCart(1, username, prod.Id, storeId, 1);
             Assert.IsFalse(service.BuyCart(1, username, "Ronmi's home").ErrorOccured);
-            service.addToCart(1, username, prod.Id, storeId, 10);
-            Assert.IsTrue(service.BuyCart(1, username, "Ronmi's home").ErrorOccured);
+            Assert.IsTrue(service.addToCart(1, username, prod.Id, storeId, 10).ErrorOccured);
         }
 
         [DataTestMethod]
@@ -612,13 +611,12 @@ namespace Tests.AcceptanceTests
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             service.addToCart(1, username, prod.Id, storeId, 1);
             Assert.IsFalse(service.BuyCart(1, username, "Ronmi's home").ErrorOccured);
-            service.addToCart(1, username, prod.Id, storeId, 10);
-            Assert.IsTrue(service.BuyCart(1, username, "Ronmi's home").ErrorOccured);
+            Assert.IsTrue(service.addToCart(1, username, prod.Id, storeId, 10).ErrorOccured);
         }
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestBuyCart_Bad(string username, string password)
+        public void TestBuyCart_Bad_NothingInCart(string username, string password)
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;

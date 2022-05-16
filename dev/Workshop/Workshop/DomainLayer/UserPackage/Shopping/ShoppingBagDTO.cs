@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Workshop.DomainLayer.MarketPackage;
 
@@ -12,6 +13,11 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
         {
             this.storeId = storeId;
             this.products = products;
+        }
+
+        internal bool IsEmpty()
+        {
+            return products.Count == 0;
         }
     }
 }
