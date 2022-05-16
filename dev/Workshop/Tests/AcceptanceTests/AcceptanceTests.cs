@@ -131,6 +131,31 @@ namespace Tests.AcceptanceTests
             Assert.IsTrue(service.Login(1, wrongUsername, password).ErrorOccured);
         }
 
+        public bool Login_Thread(int userId, string username, string password)
+        {
+            return service.Login(userId, username, password).ErrorOccured;
+        }
+
+
+        [TestMethod]
+        public void TestLogin_Bad_LoginTwiceAtTheSameTime()
+        {
+            bool res1 = false;
+            bool res2 = false;
+
+            service.EnterMarket(1);
+            Assert.IsFalse(service.Register(1, "user1", "1", 40).ErrorOccured);
+
+            Thread thr1 = new Thread(() => res1 = Login_Thread(1, "user1", "1"));
+            Thread thr2 = new Thread(() => res2 = Login_Thread(1, "user1", "1"));
+            thr1.Start();
+            thr2.Start();
+            thr1.Join();
+            thr2.Join();
+
+            Assert.AreNotEqual(res1, res2);
+        }
+
         [DataTestMethod]
         [DataRow(1, username, password)]
         public void TestLogout_Good(int userId, string username, string password)
