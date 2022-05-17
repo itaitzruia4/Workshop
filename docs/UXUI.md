@@ -1,7 +1,10 @@
 # Convenient User Interface
-SLA - Agreement made between company and users/clients
-SLO - The objectives our team must hit to meet that agreement
-SLI - the real numbers on our performance
+## Legend:
+**SLA** - Agreement made between company and users/clients
+
+**SLO** - The objectives our team must hit to meet that agreement
+
+**SLI** - the real numbers on our performance
 
 ## Visibility
 **SLO** - User Accessability
