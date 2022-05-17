@@ -823,10 +823,119 @@ namespace Tests.AcceptanceTests
             Assert.AreNotEqual(res1, res2);
         }
 
-        public void TestBuyProductBad_BuyAndDeleteAtTheSameTime()
+        /*
+        Response AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId);
+
+        Response AddCategoryDiscount(int userId, string user, int storeId, string jsonDiscount, string categoryName);
+
+        Response AddStoreDiscount(int userId, string user, int storeId, string jsonDiscount);
+         */
+
+
+
+        [DataTestMethod]
+        [DataRow(username, password, "{}")]
+        public void TestAddProductDiscount_Good(string username, string password, string discount)
         {
-            Assert.Inconclusive();
+            TestLogin_Good(1, username, password);
+            int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
+            Response res  = service.AddProductDiscount(1, username, storeId, discount, prod.Id);
+            Assert.IsFalse(res.ErrorOccured);
+            //Check for discount
         }
 
+        [DataTestMethod]
+        [DataRow(username, password, "")]
+        public void TestAddProductDiscount_Bad_NoSuchProduct(string username, string password, string discount)
+        {
+            TestLogin_Good(1, username, password);
+            int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
+            Response res = service.AddProductDiscount(1, username, storeId, discount, 0);
+            Assert.IsTrue(res.ErrorOccured);
+            //Check for discount
+        }
+
+        [DataTestMethod]
+        [DataRow(username, password, "")]
+        public void TestAddProductDiscount_bad_BadDiscount(string username, string password, string discount)
+        {
+            TestLogin_Good(1, username, password);
+            int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
+            Response res = service.AddProductDiscount(1, username, storeId, discount, prod.Id);
+            Assert.IsTrue(res.ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow(username, password, "")]
+        public void TestAddCategoryDiscount_Good(string username, string password, string discount)
+        {
+            TestLogin_Good(1, username, password);
+            int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
+            Response res = service.AddCategoryDiscount(1, username, storeId, discount, prod.Category);
+            Assert.IsFalse(res.ErrorOccured);
+            //Check for discount
+        }
+
+        [DataTestMethod]
+        [DataRow(username, password, "")]
+        public void TestAddAddCategoryDiscount_Bad_NoSuchProduct(string username, string password, string discount)
+        {
+            TestLogin_Good(1, username, password);
+            int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
+            Response res = service.AddCategoryDiscount(1, username, storeId, discount, "cat1");
+            Assert.IsTrue(res.ErrorOccured);
+            //Check for discount
+        }
+
+        [DataTestMethod]
+        [DataRow(username, password, "", "cat1")]
+        [DataRow(username, password, "", "")]
+        [DataRow(username, password, "", null)]
+        public void TestAddCategoryDiscount_bad_WrongParameters(string username, string password, string discount, string category)
+        {
+            TestLogin_Good(1, username, password);
+            int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
+            Response res = service.AddCategoryDiscount(1, username, storeId, discount, prod.Category);
+            Assert.IsTrue(res.ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow(username, password, "")]
+        public void TestAddStoreDiscount_Good(string username, string password, string discount)
+        {
+            TestLogin_Good(1, username, password);
+            int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
+            Response res = service.AddStoreDiscount(1, username, storeId, discount);
+            Assert.IsFalse(res.ErrorOccured);
+            //Check for discount
+        }
+
+        [DataTestMethod]
+        [DataRow(username, password, "")]
+        public void TestAddStoreDiscount_Bad_NoSuchProduct(string username, string password, string discount)
+        {
+            TestLogin_Good(1, username, password);
+            int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
+            Response res = service.AddStoreDiscount(1, username, storeId, discount);
+            Assert.IsTrue(res.ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow(username, password, "", 0)]
+        [DataRow(username, password, "", -20)]
+        [DataRow(username, password, "", -1)]
+        public void TestAddStoreDiscount_bad_WrongParameters(string username, string password, string discount, int addToStoreId)
+        {
+            TestLogin_Good(1, username, password);
+            int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
+            Response res = service.AddStoreDiscount(1, username, storeId + addToStoreId, discount);
+            Assert.IsTrue(res.ErrorOccured);
+        }
     }
 }
