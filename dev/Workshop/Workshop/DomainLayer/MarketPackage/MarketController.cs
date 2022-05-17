@@ -482,15 +482,34 @@ namespace Workshop.DomainLayer.MarketPackage
         
         public ShoppingBagProduct getProductForSale(int productId, int storeId, int quantity)
         {
-            ValidateStoreExists(storeId);
-            if (quantity <= 0)
+            ShoppingBagProduct porduct = null;
+            try
             {
-                throw new ArgumentException($"Can't add {quantity} of an item to the shopping cart");
+                storesLocks[storeId].AcquireWriterLock(Timeout.Infinite);
             }
-            if(stores[storeId].GetProduct(productId).Quantity >= quantity){
-                return stores[storeId].GetProduct(productId).GetShoppingBagProduct(quantity);
+            catch
+            {
+                throw new ArgumentException("Store ID does not exist");
             }
-            throw new ArgumentException("Store doesn't has enough from the product");
+            finally
+            {
+                if (quantity <= 0)
+                {
+                    storesLocks[storeId].ReleaseWriterLock();
+                    throw new ArgumentException($"Can't add {quantity} of an item to the shopping cart");
+                }
+                if (stores[storeId].GetProduct(productId).Quantity >= quantity)
+                {
+                    porduct = stores[storeId].GetProduct(productId).GetShoppingBagProduct(quantity);
+                    storesLocks[storeId].ReleaseWriterLock();
+                }
+                else
+                {
+                    storesLocks[storeId].ReleaseWriterLock();
+                    throw new ArgumentException("Store doesn't has enough from the product");
+                }
+            }
+            return porduct;
         }
         public double BuyCart(int userId, string username, string address)
         {
@@ -507,7 +526,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 {
                     try
                     {
-                        storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
+                        storesLocks[storeId].AcquireWriterLock(Timeout.Infinite);
                     }
                     catch
                     {
@@ -522,7 +541,7 @@ namespace Workshop.DomainLayer.MarketPackage
                         OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetStoreName(), shoppingCart.shoppingBags[storeId].products);
                         orderHandler.addOrder(order, storeId);
                         userController.AddOrder(userId, order, username);
-                        storesLocks[storeId].ReleaseReaderLock();
+                        storesLocks[storeId].ReleaseWriterLock();
                     }
                 }
                 supplyService.supplyToAddress(username, address);
