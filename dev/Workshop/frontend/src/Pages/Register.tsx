@@ -62,7 +62,7 @@ function Register() {
             </p>
             <p className="register_buttons">
                 <button className="register_register_btn" onClick={e => handleRegister(e)} > Register </button>
-                <button className="login_back_btn" onClick={routeChange('/')}> Back to home</button>
+                <button className="login_back_btn" onClick={routeChange('/home')}> Back to home</button>
             </p>
         </p>
     )

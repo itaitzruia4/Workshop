@@ -20,7 +20,7 @@ function Register() {
             <p className="guest_buttons">
                 <button className="guest_register_btn" onClick={routeChange('/register') }> Register </button>
                 <button className="guest_login_btn" onClick={routeChange('/login')}> Login </button>
-                <button className="guest_exit_btn" onClick={routeChange('/')}> Exit Market </button>
+                <button className="guest_exit_btn" onClick={routeChange('/home')}> Exit Market </button>
             </p>
         </p>
     )

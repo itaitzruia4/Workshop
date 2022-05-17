@@ -48,7 +48,7 @@ function Login() {
             </p>
             <p className="login_buttons">
                 <button className="login_login_btn" type="submit" onClick={e => handleUserDetails(e)} > Login </button>
-                <button className="login_back_btn" onClick={routeChange('/')}> Back to home </button>
+                <button className="login_back_btn" onClick={routeChange('/home')}> Back to home </button>
             </p>
         </div>
     )

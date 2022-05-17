@@ -1,4 +1,5 @@
-﻿using API.Requests;
+﻿using System.Globalization;
+using API.Requests;
 using API.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Workshop.ServiceLayer;
@@ -67,7 +68,7 @@ namespace API.Controllers
         {
             try
             {
-                Response response = Service.Register(request.UserId, request.Membername, request.Password, DateTime.Parse(request.Birthdate));
+                Response response = Service.Register(request.UserId, request.Membername, request.Password, DateTime.ParseExact(request.Birthdate, "dd/MM/yyyy", CultureInfo.InvariantCulture));
                 if (response.ErrorOccured)
                 {
                     return BadRequest(new FrontResponse<int>(response.ErrorMessage));
