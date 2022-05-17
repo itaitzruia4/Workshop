@@ -308,6 +308,58 @@ namespace Workshop.ServiceLayer
             }
         }
 
+        public Response AddProductPurchaseTerm(int userId, string user, int storeId, string jsonTerm, int productId)
+        {
+            try
+            {
+                facade.AddProducPurchaseTerm(userId, user, storeId, jsonTerm, productId);
+                return new Response(userId);
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message, userId);
+            }
+        }
+
+        public Response AddCategoryPurchaseTerm(int userId, string user, int storeId, string jsonTerm, string category)
+        {
+            try
+            {
+                facade.AddCategoryPurchaseTerm(userId, user, storeId, jsonTerm, category);
+                return new Response(userId);
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message, userId);
+            }
+        }
+
+        public Response AddStorePurchaseTerm(int userId, string user, int storeId, string jsonTerm)
+        {
+            try
+            {
+                facade.AddStorePurchaseTerm(userId, user, storeId, jsonTerm);
+                return new Response(userId);
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message, userId);
+            }
+        }
+
+        public Response AddUserPurchaseTerm(int userId, string user, int storeId, string jsonTerm)
+        {
+            try
+            {
+                facade.AddUserPurchaseTerm(userId, user, storeId, jsonTerm);
+                return new Response(userId);
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message, userId);
+            }
+        }
+
         public Response RemoveProductFromStore(int userId, string username, int storeId, int productID)
         {
             try
@@ -334,7 +386,7 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response ChangeProductPrice(int userId, string username, int storeId, int productID, int price)
+        public Response ChangeProductPrice(int userId, string username, int storeId, int productID, double price)
         {
             try
             {

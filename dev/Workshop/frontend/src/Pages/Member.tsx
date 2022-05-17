@@ -34,7 +34,7 @@ function Member() {
         });
     };
 
-    const [products, setProducts] = React.useState<Products>({ products: [{ tag: 'Product', id: 1, name: "cocaine", basePrice: 1000, description: "cool drug", quantity: 3 }] });
+    const [products, setProducts] = React.useState<Products>({ products: [{ tag: 'Product', id: 1, name: "candy", basePrice: 1000, description: "cool drug", quantity: 3 }] });
     const deleteProducts = (id: number) => {
         setProducts({
             products: products.products.filter(t => t.id !== id),

@@ -103,6 +103,54 @@ namespace API.Controllers
             }
             return Ok(new FrontResponse<int>(request.UserId));
         }
+
+        [HttpPost("removeproduct")]
+        public ActionResult<FrontResponse<int>> RemoveProduct([FromBody] ProductStoreRequest request)
+        {
+            Response response = Service.RemoveProductFromStore(request.UserId, request.Membername, request.StoreId, request.ProductId);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<int>(response.ErrorMessage));
+            }
+            return Ok(new FrontResponse<int>(request.ProductId));
+
+        }
+
+        [HttpPost("addcategorypurchaseterm")]
+        public ActionResult<FrontResponse<string>> AddCategoryPurchaseTerm([FromBody] AddCategoryPurchaseTermRequest request)
+        {
+            Response response = Service.AddCategoryPurchaseTerm(request.UserId, request.Membername, request.StoreId, request.Term, request.Category);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<string>(response.ErrorMessage));
+            }
+            return Ok(new FrontResponse<string>(request.Category));
+
+        }
+
+        [HttpPost("addstorepurchaseterm")]
+        public ActionResult<FrontResponse<int>> AddStorePurchaseTerm([FromBody] StoreTermRequest request)
+        {
+            Response response = Service.AddStorePurchaseTerm(request.UserId, request.Membername, request.StoreId, request.Term);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<int>(response.ErrorMessage));
+            }
+            return Ok(new FrontResponse<int>(request.StoreId));
+
+        }
+
+        [HttpPost("adduserpurchaseterm")]
+        public ActionResult<FrontResponse<int>> AddUserPurchaseTerm([FromBody] StoreTermRequest request)
+        {
+            Response response = Service.AddUserPurchaseTerm(request.UserId, request.Membername, request.StoreId, request.Term);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<int>(response.ErrorMessage));
+            }
+            return Ok(new FrontResponse<int>(request.StoreId));
+
+        }
     }
 }
 

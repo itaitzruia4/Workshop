@@ -139,6 +139,7 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             try
             {
+                
                 double percentage = double.Parse(data.percentage);
                 try
                 {

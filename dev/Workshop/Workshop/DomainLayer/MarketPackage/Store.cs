@@ -140,6 +140,28 @@ namespace Workshop.DomainLayer.MarketPackage
             discountPolicy.AddStoreDiscount(json_discount);
         }
 
+        public void AddProductTerm(string json_term, int product_id)
+        {
+            if (!products.ContainsKey(product_id))
+                throw new Exception("Product with ID: " + product_id + " does not exist in store.");
+            purchasePolicy.AddProductTerm(json_term, product_id);
+        }
+
+        public void AddCategoryTerm(string json_term, string category_name)
+        {
+            purchasePolicy.AddCategoryTerm(json_term, category_name);
+        }
+
+        public void AddStoreTerm(string json_term)
+        {
+            purchasePolicy.AddStoreTerm(json_term);
+        }
+
+        public void AddUserTerm(string json_term)
+        {
+            purchasePolicy.AddUserTerm(json_term);
+        }
+
         private void ValidateID(int ID)
         {
             if (ID < 0)

@@ -23,6 +23,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             product = store.AddProduct(name, id, description, price, quantity, category);
         }
 
+        /// Tests for Store.AddProduct method
+        /// <see cref="Store.AddProduct"/>
         [TestMethod]
         public void AddProductSuccess()
         {
@@ -79,7 +81,9 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => store.AddProduct(name, id, description, price, quantity, category));
             Assert.ThrowsException<ArgumentException>(() => store.GetProduct(id));
         }
-        
+
+        /// Tests for Store.RemoveProduct method
+        /// <see cref="Store.RemoveProduct"/>
         [TestMethod]
         public void RemoveProductSuccess()
         {
@@ -102,6 +106,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             Assert.ThrowsException<Exception>(() => store.RemoveProduct(id));
         }
 
+        /// Tests for Store.ChangeProductName method
+        /// <see cref="Store.ChangeProductName"/>
         [TestMethod]
         public void ChangeProductNameSuccess()
         {
@@ -119,6 +125,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             Assert.AreEqual(previousName, this.product.Name);
         }
 
+        /// Tests for Store.ChangeProductDescription method
+        /// <see cref="Store.ChangeProductDescription"/>
         [TestMethod]
         public void ChangeProductDescriptionSuccess()
         {
@@ -136,6 +144,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             Assert.AreEqual(previousDescription, this.product.Description);
         }
 
+        /// Tests for Store.ChangeProductPrice method
+        /// <see cref="Store.ChangeProductPrice"/>
         [TestMethod]
         public void ChangeProductPriceSuccess()
         {
@@ -153,6 +163,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             Assert.AreEqual(previousPrice, this.product.Price);
         }
 
+        /// Tests for Store.ChangeProductQuantity method
+        /// <see cref="Store.ChangeProductQuantity"/>
         [TestMethod]
         public void ChangeProductQuantitySuccess()
         {

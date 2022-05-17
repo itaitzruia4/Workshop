@@ -42,6 +42,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             userController.Login(1, "member1", "pass1");
         }
 
+        /// Tests for MarketController.CloseStore method
+        /// <see cref="MarketController.CloseStore"/>
         [TestMethod]
         public void TestCloseStore_Success()
         {
@@ -62,6 +64,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             Assert.ThrowsException<ArgumentException>(() => marketController.CloseStore(1, member, storeId));
         }
 
+        /// Tests for MarketController.GetWorkersInformation method
+        /// <see cref="MarketController.GetWorkersInformation"/>
         [TestMethod]
         public void TestGetWorkersInformation_Success()
         {
@@ -82,6 +86,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             Assert.ThrowsException<MemberAccessException>(() => marketController.GetWorkersInformation(2, "Notallowed cohen", storeId));
         }
 
+        /// Tests for MarketController.CreateNewStore method
+        /// <see cref="MarketController.CreateNewStore"/>
         [TestMethod]
         public void TestCreateNewStore_Success()
         {
@@ -101,7 +107,6 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(1, username, "Store123"));
         }
 
-
         [DataTestMethod]
         [DataRow(null, null)]
         [DataRow("", "")]
@@ -112,7 +117,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(1, username, storeName));
         }
 
-        //checks cart is empty and products were taken from stores
+        /// Tests for MarketController.BuyCart method
+        /// <see cref="MarketController.BuyCart"/>
         [DataTestMethod]
         [DataRow("member1", "here", 3, "cat1")]
         [DataRow("member1", "here", 4, "cat1")]
@@ -126,6 +132,9 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             Assert.AreEqual(userController.viewCart(1, user).shoppingBags.Count, 0);
             Assert.IsTrue(marketController.getStoreInfo(1, user, storeId).products[prod1.Id].Quantity == leftovers);
         }
+
+        /// Tests for MarketController.NominateStoreOwner method
+        /// <see cref="MarketController.NominateStoreOwner"/>
         [TestMethod]
         public void TestRemoveStoreOwnerNomination_Success()
         {

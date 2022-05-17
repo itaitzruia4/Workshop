@@ -137,6 +137,26 @@ namespace Workshop.DomainLayer
             MarketController.AddStoreDiscount(userId, user, storeId, jsonDiscount);
         }
 
+        public void AddProducPurchaseTerm(int userId, string user, int storeId, string json_term, int product_id)
+        {
+            MarketController.AddProductPurchaseTerm(userId, user, storeId,json_term,product_id);
+        }
+
+        public void AddCategoryPurchaseTerm(int userId, string user, int storeId, string json_term, string category_name)
+        {
+            MarketController.AddCategoryPurchaseTerm(userId, user, storeId,json_term,category_name);
+        }
+
+        public void AddStorePurchaseTerm(int userId, string user, int storeId, string json_term)
+        {
+            MarketController.AddStorePurchaseTerm(userId, user, storeId,json_term);
+        }
+
+        public void AddUserPurchaseTerm(int userId, string user, int storeId, string json_term)
+        {
+            MarketController.AddUserPurchaseTerm(userId, user, storeId,json_term);
+        }
+
         public void RemoveProductFromStore(int userId, string username, int storeId, int productID)
         {
             MarketController.RemoveProductFromStore(userId, username, storeId, productID);
@@ -147,7 +167,7 @@ namespace Workshop.DomainLayer
             MarketController.ChangeProductName(userId, username, storeId, productID, name);
         }
 
-        public void ChangeProductPrice(int userId, string username, int storeId, int productID, int price)
+        public void ChangeProductPrice(int userId, string username, int storeId, int productID, double price)
         {
             MarketController.ChangeProductPrice(userId, username, storeId, productID, price);
         }
