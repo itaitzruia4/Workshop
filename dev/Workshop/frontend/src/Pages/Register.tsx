@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import './Register.css';
 
-const DATE_FORMAT = 'MM/DD/YYYY';
-
 function Register() {
     const textStyle = { color: 'white' }
 
