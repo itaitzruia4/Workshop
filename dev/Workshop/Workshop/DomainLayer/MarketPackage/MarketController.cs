@@ -500,8 +500,17 @@ namespace Workshop.DomainLayer.MarketPackage
                 }
                 if (stores[storeId].GetProduct(productId).Quantity >= quantity)
                 {
-                    porduct = stores[storeId].GetProduct(productId).GetShoppingBagProduct(quantity);
-                    storesLocks[storeId].ReleaseWriterLock();
+                    try
+                    {
+                        porduct = stores[storeId].GetProductForSale(productId, quantity).GetShoppingBagProduct(quantity);
+                        storesLocks[storeId].ReleaseWriterLock();
+                    }
+                    catch(Exception e)
+                    { 
+                        storesLocks[storeId].ReleaseWriterLock();
+                        throw e;
+                    }
+                    
                 }
                 else
                 {
@@ -534,14 +543,22 @@ namespace Workshop.DomainLayer.MarketPackage
                     }
                     finally
                     {
-                        int age = userController.GetAge(userId, username);
-                        stores[storeId].CheckPurchasePolicy(shoppingCart.shoppingBags[storeId], age);
-                        stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
-                        productsSoFar.Add(storeId, shoppingCart.shoppingBags[storeId].products);
-                        OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetStoreName(), shoppingCart.shoppingBags[storeId].products);
-                        orderHandler.addOrder(order, storeId);
-                        userController.AddOrder(userId, order, username);
-                        storesLocks[storeId].ReleaseWriterLock();
+                        try
+                        {
+                            int age = userController.GetAge(userId, username);
+                            stores[storeId].CheckPurchasePolicy(shoppingCart.shoppingBags[storeId], age);
+                            stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
+                            productsSoFar.Add(storeId, shoppingCart.shoppingBags[storeId].products);
+                            OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetStoreName(), shoppingCart.shoppingBags[storeId].products);
+                            orderHandler.addOrder(order, storeId);
+                            userController.AddOrder(userId, order, username);
+                            storesLocks[storeId].ReleaseWriterLock();
+                        }
+                        catch(Exception e)
+                        {
+                            storesLocks[storeId].ReleaseWriterLock();
+                            throw e;
+                        }
                     }
                 }
                 supplyService.supplyToAddress(username, address);
