@@ -793,7 +793,7 @@ namespace Tests.AcceptanceTests
         {
             Assert.IsFalse(service.Login(userId, user, password).ErrorOccured);
             bool ret = service.addToCart(userId, user, productId, storeId, quantity).ErrorOccured;
-            service.BuyCart(userId, user, "No Maidens?");
+            ret = ret & service.BuyCart(userId, user, "No Maidens?").ErrorOccured;
             return ret;
         }
 
