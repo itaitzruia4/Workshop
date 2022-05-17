@@ -573,9 +573,21 @@ namespace Workshop.DomainLayer.MarketPackage
                 //restore taken products till we have a smarter way of threding
                 foreach (int storeId in productsSoFar.Keys)
                 {
-                    foreach (ProductDTO item in productsSoFar[storeId])
+                    try
                     {
-                       stores[storeId].restoreProduct(item);   
+                        storesLocks[storeId].AcquireWriterLock(Timeout.Infinite);
+                    }
+                    catch
+                    {
+                        throw new ArgumentException("Store ID does not exist");
+                    }
+                    finally
+                    {
+                        foreach (ProductDTO item in productsSoFar[storeId])
+                        {
+                            stores[storeId].restoreProduct(item);
+                        }
+                        storesLocks[storeId].ReleaseWriterLock();
                     }
                 }
                 throw new OperationCanceledException($"User {username} was not able to purchase his cart.");
