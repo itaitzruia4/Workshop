@@ -38,7 +38,7 @@
 ## User Interface State
 **SLO** - User Interface freshness.
 
-**SLI** - The UI must be updated immediately after each state change.
+**SLI** - The UI must be updated in up to 1 second after each state change.
 
 ## Responsive
 **SLO** - Button Hover Feedback
