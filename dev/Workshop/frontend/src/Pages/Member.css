@@ -1,8 +1,17 @@
 .member_page {
     border-radius: 8px;
     border: solid 2px #86BB71;
+
 }
-.member_page_body{
+
+.member_page_components {
+    display: flex;
+    align-Items: center;
+    justify-content: center;
+
+}
+
+.member_page_stores {
     margin: 5px;
 }
 

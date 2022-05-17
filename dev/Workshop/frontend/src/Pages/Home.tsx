@@ -13,7 +13,7 @@ function Home() {
 
     return (
         <p className="home">
-            <div className="home_title" style={textStyle}> Welcome to the Trading System website! </div>
+            <div className="home_title" style={textStyle}> Trading System Homepage</div>
             <p className="home_buttons">
                 <button className="home_login_btn" onClick={routeChange('/login')}> Login </button>
                 <button className="home_register_btn" onClick={routeChange('/register')}> Register </button>
