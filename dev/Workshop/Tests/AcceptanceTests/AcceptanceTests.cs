@@ -832,16 +832,15 @@ namespace Tests.AcceptanceTests
         Response AddStoreDiscount(int userId, string user, int storeId, string jsonDiscount);
          */
 
-        public Func<int, string> makeSimpleProductDiscount(int percent)
+        public Func<int, string> makeSimpleProductDiscount(double percent)
         {
             Func<int, string> func = id => "{\"tag\": \"SimpleDiscount\",\"priceAction\":" +
                 "{\"tag\": \"ProductPriceActionSimple\",\"percentage\":" +
                 percent.ToString() + ", \"productId\": " + id.ToString() + "}}";
-
             return func;
         }
 
-        public Func<int, string> makeAndproductDiscount(int lPercent, int rPercent)
+        public Func<int, string> makeAndproductDiscount(double lPercent, double rPercent)
         {
             Func<int, string> func = id => "{ \"tag\": \"AndDiscount\",\"lhs\": {\"tag\": \"SimpleDiscount\"," +
                                             "\"priceAction\": {\"tag\": \"ProductPriceActionSimple\"," +
@@ -860,8 +859,7 @@ namespace Tests.AcceptanceTests
         [DataRow(username, password, 30.5)]
         [DataRow(username, password, 0.5)]
         [DataRow(username, password, 100)]
-        [DataRow(username, password, 0)]
-        public void TestAddProductDiscount_Good_Simple(string username, string password, int percent)
+        public void TestAddProductDiscount_Good_Simple(string username, string password, double percent)
         {
             TestAddProductDiscount_Good(username, password, makeSimpleProductDiscount(percent));
         }
@@ -873,7 +871,7 @@ namespace Tests.AcceptanceTests
         [DataRow(username, password, 100, 0.5)]
         [DataRow(username, password, 0, 30)]
         [DataRow(username, password, 30, 0)]
-        public void TestAddProductDiscount_Good_And(string username, string password, int lPercent, int rPercent)
+        public void TestAddProductDiscount_Good_And(string username, string password, double lPercent, double rPercent)
         {
             TestAddProductDiscount_Good(username, password, makeAndproductDiscount(lPercent, rPercent));
         }
@@ -891,7 +889,7 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password, 30)]
-        public void TestAddProductDiscount_Bad_NoSuchProduct(string username, string password, int discount)
+        public void TestAddProductDiscount_Bad_NoSuchProduct(string username, string password, double discount)
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
@@ -904,7 +902,7 @@ namespace Tests.AcceptanceTests
         [DataRow(username, password, -1)]
         [DataRow(username, password, -1.5)]
         [DataRow(username, password, 200)]
-        public void TestAddProductDiscount_bad_BadDiscount_simple(string username, string password, int percent)
+        public void TestAddProductDiscount_bad_BadDiscount_simple(string username, string password, double percent)
         {
             TestAddProductDiscount_bad_BadDiscount(username, password, makeSimpleProductDiscount(percent));
         }

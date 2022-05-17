@@ -113,7 +113,7 @@ namespace Workshop.DomainLayer.MarketPackage
             return new ConditionalDiscount(ParsePriceAction(data.priceAction), ParseDiscountTerm(data.discountTerm));
         }
 
-        private Discount ParsePriceAction(dynamic data)
+        private PriceAction ParsePriceAction(dynamic data)
         {
             string tag = data.tag;
             if (tag.Equals(PRICE_ACT_COMP_TAG))
@@ -139,11 +139,10 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             try
             {
-                
-                double percentage = double.Parse(data.percentage);
+                double percentage = double.Parse(((string)data.percentage).Trim('{','}'));
                 try
                 {
-                    int product_id = double.Parse(data.key);
+                    int product_id = int.Parse(((string)data.productId).Trim('{', '}'));
                     if (percentage <= 0 || percentage > 100)
                         throw new Exception("Discount percentage must be between 0 and 100");
 
@@ -153,7 +152,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 }
                 catch (Exception)
                 {
-                    throw new Exception("Invalid product id: " + data.key);
+                    throw new Exception("Invalid product id: " + data.productId);
                 }
             }
             catch (Exception) { 
@@ -167,7 +166,7 @@ namespace Workshop.DomainLayer.MarketPackage
             try
             {
                 double percentage = double.Parse(data.percentage);
-                string category = data.key;
+                string category = data.category;
                 if (percentage <= 0 || percentage > 100)
                     throw new Exception("Discount percentage must be between 0 and 100");
                 if (category == null || category.Equals(""))
@@ -177,7 +176,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             catch (Exception)
             {
-                throw new Exception("Invalid product id: " + data.key);
+                throw new Exception("Invalid product id: " + data.category);
             }
         }
 
