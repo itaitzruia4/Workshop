@@ -38,7 +38,7 @@ function Register() {
                         deleteProducts={deleteProducts} />
                 </div>
                 <p className="guest_control_btns">
-                    <button className="guest_exit_btn" onClick={routeChange('/')}> Exit Market </button>
+                    <button className="guest_exit_btn" onClick={routeChange('/home')}> Exit Market </button>
                 </p>
             </div>
         </div>

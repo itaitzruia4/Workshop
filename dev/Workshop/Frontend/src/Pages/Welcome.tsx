@@ -5,7 +5,7 @@ import './Home.css';
 function Welcome() {
     const textStyle = { color: 'white' }
 
-    const [userId, setUserId] = useState(null);
+    const [userId, setUserId] = useState(0);
 
     let navigate = useNavigate();
     const routeChange = (path: string) =>
