@@ -63,6 +63,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
         /// Tests for UserController.Register method
         /// <see cref="UserController.Register"/>
+        
         [TestMethod]
         public void TestRegister_Success()
         {
@@ -125,6 +126,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
         /// Tests for UserController.EnterMarket method
         /// <see cref="UserController.EnterMarket"/>
+        
         [TestMethod]
         public void TestEnterMarket_Success()
         {
@@ -140,6 +142,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
         /// Tests for UserController.Login method
         /// <see cref="UserController.Login"/>
+        
         [TestMethod]
         [DataRow("member1", "pass1")]
         [DataRow("member2", "pass2")]
@@ -224,6 +227,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
         /// Tests for UserController.Logout method
         /// <see cref="UserController.Logout"/>
+        /// 
         [TestMethod]
         public void TestLogout_Success()
         {
@@ -264,6 +268,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
         /// Tests for UserController.NominateStoreOwner method
         /// <see cref="UserController.NominateStoreOwner"/>
+
         [TestMethod]
         [DataRow("member2", "pass2")]
         [DataRow("member3", "pass3")]
@@ -338,6 +343,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
         /// Tests for UserController.NominateStoreManager method
         /// <see cref="UserController.NominateStoreManager"/>
+        
         [TestMethod]
         [DataRow("member2", "pass2")]
         [DataRow("member3", "pass3")]
@@ -422,6 +428,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
         /// Tests for UserController.ReviewProduct method
         /// <see cref="UserController.ReviewProduct"/>
+        
         [TestMethod]
         public void TestReviewProduct_Success()
         {
