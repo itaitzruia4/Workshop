@@ -204,6 +204,16 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new ArgumentException($"Product with ID {productId} does not exist in the store.");
             return products[productId];
         }
+
+        public Product GetProductForSale(int productId, int quantity)
+        {
+            if (!products.ContainsKey(productId))
+                throw new ArgumentException($"Product with ID {productId} does not exist in the store.");
+            if (products[productId].Quantity<quantity)
+                throw new ArgumentException($"Product with ID {productId} does not has enough quantity.");
+            products[productId].Quantity -= quantity;
+            return products[productId];
+        }
         internal ShoppingBagDTO validateBagInStockAndGet(ShoppingBagDTO shoppingBag)
         {
             
@@ -211,7 +221,7 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 if(products.ContainsKey(product.Id) && products[product.Id].Quantity >= product.Quantity)
                 {
-                    products[product.Id].Quantity -= product.Quantity;
+                    //products[product.Id].Quantity -= product.Quantity;
                 }
                 else {
                     throw new ArgumentException($"store {id} doesn't has enough {product.Name} in stock");

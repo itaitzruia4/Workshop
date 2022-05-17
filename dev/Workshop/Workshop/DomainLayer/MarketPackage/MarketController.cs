@@ -500,7 +500,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 }
                 if (stores[storeId].GetProduct(productId).Quantity >= quantity)
                 {
-                    porduct = stores[storeId].GetProduct(productId).GetShoppingBagProduct(quantity);
+                    porduct = stores[storeId].GetProductForSale(productId,quantity).GetShoppingBagProduct(quantity);
                     storesLocks[storeId].ReleaseWriterLock();
                 }
                 else
