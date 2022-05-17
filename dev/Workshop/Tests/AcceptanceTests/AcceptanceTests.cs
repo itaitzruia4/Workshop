@@ -792,7 +792,9 @@ namespace Tests.AcceptanceTests
         public bool BuyProduct_Thread(int userId, string user, string password, int productId, int storeId, int quantity)
         {
             Assert.IsFalse(service.Login(userId, user, password).ErrorOccured);
-            return service.addToCart(userId, user, productId, storeId, quantity).ErrorOccured;
+            bool ret = service.addToCart(userId, user, productId, storeId, quantity).ErrorOccured;
+            service.BuyCart(userId, user, "No Maidens?");
+            return ret;
         }
 
         [TestMethod]
@@ -919,19 +921,20 @@ namespace Tests.AcceptanceTests
 
 
         [DataTestMethod]
-        [DataRow(username, password, "")]
+        [DataRow(username, password, "{\"tag\": \"CategoryDiscountSimpleTerm\",\"type\": \"q\",\"action\": \"<\",\"value\": 5,\"category\": \"cat1\"} ")]
         public void TestAddCategoryDiscount_Good(string username, string password, string discount)
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
-            Response res = service.AddCategoryDiscount(1, username, storeId, discount, prod.Category);
+            Product prod1 = service.AddProduct(1, username, storeId, product, "Good", 1.0, 2, "cat1").Value;
+            Product prod2 = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
+            Response res = service.AddCategoryDiscount(1, username, storeId, discount, prod1.Category);
             Assert.IsFalse(res.ErrorOccured);
             //Check for discount
         }
 
         [DataTestMethod]
-        [DataRow(username, password, "")]
+        [DataRow(username, password, "{\"tag\": \"CategoryDiscountSimpleTerm\",\"type\": \"q\",\"action\": \"<\",\"value\": 5,\"category\": \"cat1\"} ")]
         public void TestAddAddCategoryDiscount_Bad_NoSuchProduct(string username, string password, string discount)
         {
             TestLogin_Good(1, username, password);
@@ -942,10 +945,9 @@ namespace Tests.AcceptanceTests
         }
 
         [DataTestMethod]
-        [DataRow(username, password, "", "cat1")]
-        [DataRow(username, password, "", "")]
-        [DataRow(username, password, "", null)]
-        public void TestAddCategoryDiscount_bad_WrongParameters(string username, string password, string discount, string category)
+        [DataRow(username, password, "{\"tag\": \"CategoryDiscountSimpleTerm\",\"type\": \"q\",\"action\": \"<\",\"value\": -2,\"category\": \"cat1\"} ")]
+        [DataRow(username, password, "{\"tag\": \"CategoryDiscountSimpleTerm\",\"type\": \"q\",\"action\": \"<\",\"value\": 0.5,\"category\": \"cat1\"} ")]
+        public void TestAddCategoryDiscount_bad_WrongParameters(string username, string password, string discount)
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
