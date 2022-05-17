@@ -830,41 +830,93 @@ namespace Tests.AcceptanceTests
         Response AddStoreDiscount(int userId, string user, int storeId, string jsonDiscount);
          */
 
+        public Func<int, string> makeSimpleProductDiscount(int percent)
+        {
+            Func<int, string> func = id => "{\"tag\": \"SimpleDiscount\",\"priceAction\":" +
+                "{\"tag\": \"ProductPriceActionSimple\",\"percentage\":" +
+                percent.ToString() + ", \"productId\": " + id.ToString() + "}}";
+
+            return func;
+        }
+
+        public Func<int, string> makeAndproductDiscount(int lPercent, int rPercent)
+        {
+            Func<int, string> func = id => "{ \"tag\": \"AndDiscount\",\"lhs\": {\"tag\": \"SimpleDiscount\"," +
+                                            "\"priceAction\": {\"tag\": \"ProductPriceActionSimple\"," +
+                                            "\"percentage\": " + lPercent.ToString() + ", \"productId\": " + id.ToString() +
+                                            "}},\"rhs\": {\"tag\": \"SimpleDiscount\", \"priceAction\": { " +
+                                            "\"tag\": \"ProductPriceActionSimple\", \"percentage\": " + rPercent.ToString() +
+                                            ",\"productId\": " + id.ToString() +"}}}";
+
+            return func;
+        }
+
 
 
         [DataTestMethod]
-        [DataRow(username, password, "{}")]
-        public void TestAddProductDiscount_Good(string username, string password, string discount)
+        [DataRow(username, password, 30)]
+        [DataRow(username, password, 30.5)]
+        [DataRow(username, password, 0.5)]
+        [DataRow(username, password, 100)]
+        [DataRow(username, password, 0)]
+        public void TestAddProductDiscount_Good_Simple(string username, string password, int percent)
+        {
+            TestAddProductDiscount_Good(username, password, makeSimpleProductDiscount(percent));
+        }
+
+        [DataTestMethod]
+        [DataRow(username, password, 30, 30.5)]
+        [DataRow(username, password, 30.5, 30)]
+        [DataRow(username, password, 0.5, 100)]
+        [DataRow(username, password, 100, 0.5)]
+        [DataRow(username, password, 0, 30)]
+        [DataRow(username, password, 30, 0)]
+        public void TestAddProductDiscount_Good_And(string username, string password, int lPercent, int rPercent)
+        {
+            TestAddProductDiscount_Good(username, password, makeAndproductDiscount(lPercent, rPercent));
+        }
+
+
+
+        public void TestAddProductDiscount_Good(string username, string password, Func<int, string> discount)
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
-            Response res  = service.AddProductDiscount(1, username, storeId, discount, prod.Id);
+            Response res  = service.AddProductDiscount(1, username, storeId, discount(prod.Id), prod.Id);
             Assert.IsFalse(res.ErrorOccured);
-            //Check for discount
         }
 
         [DataTestMethod]
-        [DataRow(username, password, "")]
-        public void TestAddProductDiscount_Bad_NoSuchProduct(string username, string password, string discount)
+        [DataRow(username, password, 30)]
+        public void TestAddProductDiscount_Bad_NoSuchProduct(string username, string password, int discount)
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Response res = service.AddProductDiscount(1, username, storeId, discount, 0);
+            Response res = service.AddProductDiscount(1, username, storeId, makeSimpleProductDiscount(discount)(0), 0);
             Assert.IsTrue(res.ErrorOccured);
-            //Check for discount
         }
 
+
         [DataTestMethod]
-        [DataRow(username, password, "")]
-        public void TestAddProductDiscount_bad_BadDiscount(string username, string password, string discount)
+        [DataRow(username, password, -1)]
+        [DataRow(username, password, -1.5)]
+        [DataRow(username, password, 200)]
+        public void TestAddProductDiscount_bad_BadDiscount_simple(string username, string password, int percent)
+        {
+            TestAddProductDiscount_bad_BadDiscount(username, password, makeSimpleProductDiscount(percent));
+        }
+
+        public void TestAddProductDiscount_bad_BadDiscount(string username, string password, Func<int, string> discount)
         {
             TestLogin_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
-            Response res = service.AddProductDiscount(1, username, storeId, discount, prod.Id);
+            Response res = service.AddProductDiscount(1, username, storeId, discount(prod.Id), prod.Id);
             Assert.IsTrue(res.ErrorOccured);
         }
+
+
 
         [DataTestMethod]
         [DataRow(username, password, "")]
