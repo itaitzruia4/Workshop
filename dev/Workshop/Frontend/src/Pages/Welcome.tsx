@@ -37,10 +37,6 @@ function Welcome() {
                 .then((data) => {
                     if (res.ok)
                         setUserId(data.value)
-                    useEffect(() => {
-                        // storing input name
-                        localStorage.setItem("userId", JSON.stringify(userId));
-                    }, [userId]);
                 })
                 .then(routeChange('/home'))
             );
