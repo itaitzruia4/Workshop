@@ -40,50 +40,54 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             userController.Register(1, "member2", "pass2", DateTime.Parse("Aug 22, 1972"));
             userController.Register(1, "Notallowed cohen", "pass", DateTime.Parse("Aug 22, 1972"));
             userController.Login(1, "member1", "pass1");
-            Store store1 = marketController.CreateNewStore(1, "member1", "shop1");
-            userController.NominateStoreManager(1, "member1", "member2", store1.GetId());
         }
 
+        /// Tests for MarketController.CloseStore method
+        /// <see cref="MarketController.CloseStore"/>
         [TestMethod]
         public void TestCloseStore_Success()
         {
-            // Arrange
-            string username = "member1"; int storeId = 1;
-
-            // Act
-            marketController.CloseStore(1, username, storeId);
-
-            // Assert
-            Assert.IsFalse(marketController.IsStoreOpen(1, username, storeId));
+            string member = "member1";
+            Store store1 = marketController.CreateNewStore(1, member, "shop1");
+            int storeId = store1.GetId();
+            marketController.CloseStore(1, member, storeId);
+            Assert.IsFalse(marketController.IsStoreOpen(1, member, storeId));
         }
 
         [TestMethod]
         public void TestCloseStore_Failure_StoreAlreadyClosed()
         {
-            // Arrange
-            string username = "member1"; int storeId = 1;
-
-            //act
-            marketController.CloseStore(1, username, storeId);
-
-            // Assert
-            Assert.ThrowsException<ArgumentException>(() => marketController.CloseStore(1, username, storeId));
+            string member = "member1";
+            Store store1 = marketController.CreateNewStore(1, member, "shop1");
+            int storeId = store1.GetId();
+            marketController.CloseStore(1, member, storeId);
+            Assert.ThrowsException<ArgumentException>(() => marketController.CloseStore(1, member, storeId));
         }
 
+        /// Tests for MarketController.GetWorkersInformation method
+        /// <see cref="MarketController.GetWorkersInformation"/>
         [TestMethod]
         public void TestGetWorkersInformation_Success()
         {
-            CollectionAssert.AreEqual(userController.GetWorkers(1), marketController.GetWorkersInformation(1, "member1", 1));
+            string member = "member1";
+            Store store1 = marketController.CreateNewStore(1, member, "shop1");
+            int storeId = store1.GetId();
+            CollectionAssert.AreEqual(userController.GetWorkers(storeId), marketController.GetWorkersInformation(1, member, storeId));
         }
 
         [TestMethod]
         public void TestGetWorkersInformation_Failure_NoPermission()
         {
+            string member = "member1";
+            Store store1 = marketController.CreateNewStore(1, member, "shop1");
+            int storeId = store1.GetId();
             userController.EnterMarket(2);
             userController.Login(2, "Notallowed cohen", "pass");
-            Assert.ThrowsException<MemberAccessException>(() => marketController.GetWorkersInformation(2, "Notallowed cohen", 1));
+            Assert.ThrowsException<MemberAccessException>(() => marketController.GetWorkersInformation(2, "Notallowed cohen", storeId));
         }
 
+        /// Tests for MarketController.CreateNewStore method
+        /// <see cref="MarketController.CreateNewStore"/>
         [TestMethod]
         public void TestCreateNewStore_Success()
         {
@@ -103,7 +107,6 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(1, username, "Store123"));
         }
 
-
         [DataTestMethod]
         [DataRow(null, null)]
         [DataRow("", "")]
@@ -114,7 +117,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(1, username, storeName));
         }
 
-        //checks cart is empty and products were taken from stores
+        /// Tests for MarketController.BuyCart method
+        /// <see cref="MarketController.BuyCart"/>
         [DataTestMethod]
         [DataRow("member1", "here", 3, "cat1")]
         [DataRow("member1", "here", 4, "cat1")]
@@ -128,15 +132,21 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             Assert.AreEqual(userController.viewCart(1, user).shoppingBags.Count, 0);
             Assert.IsTrue(marketController.getStoreInfo(1, user, storeId).products[prod1.Id].Quantity == leftovers);
         }
+
+        /// Tests for MarketController.NominateStoreOwner method
+        /// <see cref="MarketController.NominateStoreOwner"/>
         [TestMethod]
         public void TestRemoveStoreOwnerNomination_Success()
         {
+            string member = "member1";
+            Store store1 = marketController.CreateNewStore(1, member, "shop1");
+            int storeId = store1.GetId();
             userController.Register(1, "coolStoreOwner", "pass", DateTime.Parse("Aug 22, 1972"));
-            marketController.NominateStoreOwner(1, "member1", "coolStoreOwner", 1);
-            List<StoreRole> original_roles = new List<StoreRole>(userController.GetMember("coolStoreOwner").GetStoreRoles(1));
-            Member res = marketController.RemoveStoreOwnerNomination(1, "member1", "coolStoreOwner", 1);
+            marketController.NominateStoreOwner(1, "member1", "coolStoreOwner", storeId);
+            List<StoreRole> original_roles = new List<StoreRole>(userController.GetMember("coolStoreOwner").GetStoreRoles(storeId));
+            Member res = marketController.RemoveStoreOwnerNomination(1, "member1", "coolStoreOwner", storeId);
             Assert.IsTrue(res.Username == "coolStoreOwner");
-            Assert.IsTrue(res.GetStoreRoles(1).Count != original_roles.Count);
+            Assert.IsTrue(res.GetStoreRoles(storeId).Count != original_roles.Count);
         }
 
         [TestMethod]

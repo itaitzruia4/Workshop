@@ -11,7 +11,7 @@ namespace Workshop.ServiceLayer.ServiceObjects
 {
     public class User
     {
-        ShoppingCartDTO Cart;
+        ShoppingCartDTO Cart { get; set; }
         public User(DomainUser DomainUser)
         {
             Cart = DomainUser.viewShopingCart();

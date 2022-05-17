@@ -36,7 +36,7 @@ namespace Workshop.ServiceLayer
 
         Response<ReviewDTO> ReviewProduct(int userId, string user, int productId, string review, int rating);
 
-        Response<List<Product>> SearchProduct(int userId, string user, string keyWords, string catagory, double minPrice, double maxPrice, int productReview);
+        Response<List<Product>> SearchProduct(int userId, string user, string keyWords, string catagory, double minPrice, double maxPrice, double productReview);
 
         Response<List<Store>> GetAllStores(int userId);
 
@@ -46,7 +46,7 @@ namespace Workshop.ServiceLayer
 
         Response<ShoppingCart> editCart(int userId, string user, int productId, int newQuantity);
 
-        Response BuyCart(int userId, string user, string address);
+        Response<double> BuyCart(int userId, string user, string address);
 
         Response AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId);
 
@@ -58,10 +58,18 @@ namespace Workshop.ServiceLayer
 
         Response ChangeProductName(int userId, string username, int storeId, int productID, string name);
 
-        Response ChangeProductPrice(int userId, string username, int storeId, int productID, int price);
+        Response ChangeProductPrice(int userId, string username, int storeId, int productID, double price);
 
         Response ChangeProductQuantity(int userId, string username, int storeId, int productID, int quantity);
 
         Response ChangeProductCategory(int userId, string username, int storeId, int productID, string category);
+
+        Response AddProductPurchaseTerm(int userId, string user, int storeId, string jsonTerm, int productId);
+
+        Response AddCategoryPurchaseTerm(int userId, string user, int storeId, string jsonTerm, string category);
+
+        Response AddStorePurchaseTerm(int userId, string user, int storeId, string jsonTerm);
+
+        Response AddUserPurchaseTerm(int userId, string user, int storeId, string jsonTerm);
     }
 }

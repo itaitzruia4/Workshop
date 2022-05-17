@@ -35,48 +35,50 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
 
             marketController = new MarketController(userControllerMock.Object, paymentMock.Object, supplyMock.Object);
             marketController.InitializeSystem();
-            Store store1 = marketController.CreateNewStore(1, "StoreFounder1", "shop1");
-
-            // marketController = new MarketController();
-            // userController = new UserController(security);
         }
 
+        /// Tests for MarketController.CloseStore method
+        /// <see cref="MarketController.CloseStore"/>
         [TestMethod]
         public void TestCloseStore_Success()
         {
-            // Arrange
-            string username = "StoreFounder1"; int storeId = 1;
-
-            // Act
-            marketController.CloseStore(1, username, storeId);
-
-            // Assert
-            Assert.IsFalse(marketController.IsStoreOpen(1, username, storeId));
+            string member = "StoreFounder1";
+            Store store1 = marketController.CreateNewStore(1, member, "shop1");
+            int storeId = store1.GetId();
+            marketController.CloseStore(1, member, storeId);
+            Assert.IsFalse(marketController.IsStoreOpen(1, member, storeId));
         }
 
         [TestMethod]
         public void TestCloseStore_Failure_NoSuchStore()
         {
-            // Arrange
-            string username = "StoreFounder1"; int storeId = 1;
-
-            //act
-            marketController.CloseStore(1, username, storeId);
-
-            // Assert
-            Assert.ThrowsException<ArgumentException>(() => marketController.CloseStore(1, username, storeId));
+            string member = "StoreFounder1";
+            Store store1 = marketController.CreateNewStore(1, member, "shop1");
+            int storeId = store1.GetId();
+            marketController.CloseStore(1, member, storeId);
+            Assert.ThrowsException<ArgumentException>(() => marketController.CloseStore(1, member, storeId));
         }
 
+        /// Tests for MarketController.GetWorkersInformation method
+        /// <see cref="MarketController.GetWorkersInformation"/>
         [TestMethod]
         public void TestGetWorkersInformation_Success(){
-            CollectionAssert.AreEqual(userControllerMock.Object.GetWorkers(1), marketController.GetWorkersInformation(1, "User1", 1));
+            string member = "StoreFounder1";
+            Store store1 = marketController.CreateNewStore(1, member, "shop1");
+            int storeId = store1.GetId();
+            CollectionAssert.AreEqual(userControllerMock.Object.GetWorkers(storeId), marketController.GetWorkersInformation(1, "User1", storeId));
         }
 
         [TestMethod]
         public void TestGetWorkersInformation_Failure_NoPermission(){
-            Assert.ThrowsException<MemberAccessException>(() => marketController.GetWorkersInformation(1, "Notallowed Cohen", 1));
+            string member = "StoreFounder1";
+            Store store1 = marketController.CreateNewStore(1, member, "shop1");
+            int storeId = store1.GetId();
+            Assert.ThrowsException<MemberAccessException>(() => marketController.GetWorkersInformation(1, "Notallowed Cohen", storeId));
         }
 
+        /// Tests for MarketController.CreateNewStore method
+        /// <see cref="MarketController.CreateNewStore"/>
         [TestMethod]
         public void TestCreateNewStore_Success(){
             string username = "User1";
@@ -95,12 +97,15 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
             Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(1, username, storeName));
         }
 
+        /// Tests for MarketController.SearchProduct method
+        /// <see cref="MarketController.SearchProduct"/>
         [TestMethod]
         public void TestSearchProduct_Success()
         {
-            marketController.CreateNewStore(1, "User1", "store");
-            Product p1 = marketController.AddProductToStore(1, "User1", 1, "prod1", "desc1", 10.0, 2, "cat1");
-            Product p2 = marketController.AddProductToStore(1, "User1", 1, "prod2", "desc2", 9.6, 2, "cat2");
+            Store st = marketController.CreateNewStore(1, "User1", "store");
+            int storeId = st.GetId();
+            Product p1 = marketController.AddProductToStore(1, "User1", storeId, "prod1", "desc1", 10.0, 2, "cat1");
+            Product p2 = marketController.AddProductToStore(1, "User1", storeId, "prod2", "desc2", 9.6, 2, "cat2");
             List<ProductDTO> searchedProducts = marketController.SearchProduct(1, "User1", "", "", 8.7, 10.0, -1);
             Assert.IsTrue(searchedProducts.Count == 2);
             Assert.IsTrue(p1.GetProductDTO().Equals(searchedProducts[0]) || p1.GetProductDTO().Equals(searchedProducts[1]));
@@ -108,36 +113,35 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         }
 
         [DataTestMethod]
-        [DataRow("User1", 1, "key", "catagory", 2, 9, 3)] //wrong price
-        [DataRow("User1", 2, "key", "catagory", 2, 9, 3)] //wrong Id
-        [DataRow("User1", -1, "key", "catagory", 0, 24, 3)] //not the right keyword
-        [DataRow("User1", -1, "", "catagory", 0, 24, 3)] //not the right catagory
-        [DataRow("User1", -1, "", "", 0, 24, 3)] //no products to filter from 
-        public void TestSearchProduct_Failure_WrongArguments(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
+        [DataRow("member1", "", "", 2, 9, -1)] //wrong price
+        [DataRow("member1", "keyword", "", -1, -1, -1)] //not the right keyword
+        [DataRow("member1", "", "differentCateogry", -1, -1, -1)] //not the right catagory
+        public void TestSearchProduct_Failure_WrongArguments(string user, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
         {
-            marketController.CreateNewStore(1, user, "store");
-            marketController.AddProductToStore(1, user, 1, "someName", "someDesc", 10.0, 2, "cat1");
+            Store st = marketController.CreateNewStore(1, user, "store");
+            marketController.AddProductToStore(1, user, st.GetId(), "someName", "someDesc", 10.0, 2, "cat1");
             Assert.AreEqual(marketController.SearchProduct(1, user, keyWords, catagory, minPrice, maxPrice, productReview).Count, 0);
         }
 
-
+        /// Tests for MarketController.addToBag method
+        /// <see cref="MarketController.addToBag"/>
         [DataTestMethod]
-        [DataRow("member1", 1, 3)]
-        public void TestAddToCart_Success(string user, int storeId, int quantity)
+        [DataRow("member1", 3)]
+        public void TestAddToBag_Success(string user, int quantity)
         {
-            marketController.CreateNewStore(1, user, "store");
-            Product product = marketController.AddProductToStore(1, user, storeId, "someName", "someDesc", 10.0, quantity, "cat1");
-            Assert.IsTrue(product.GetProductDTO().Equals(marketController.addToBag(1, user, product.Id, storeId, quantity).GetProductDTO()));
+            Store st = marketController.CreateNewStore(1, user, "store");
+            Product product = marketController.AddProductToStore(1, user, st.GetId(), "someName", "someDesc", 10.0, quantity, "cat1");
+            Assert.IsTrue(product.GetProductDTO().Equals(marketController.addToBag(1, user, product.Id, st.GetId(), quantity).GetProductDTO()));
         }
 
         [DataTestMethod]
         [DataRow("User1", 2, 1, 3)] //wrong id;
         [DataRow("User1", 1, 0, 3)] //wrong store;
         [DataRow("User1", 1, 1, 4)] //wrong quantity;
-        public void TestAddToCart_Failure_WrongArguments(string user, int productId, int storeId, int quantity)
+        public void TestAddToBag_Failure_WrongArguments(string user, int productId, int storeId, int quantity)
         {
-            marketController.CreateNewStore(1, user, "store");
-            marketController.AddProductToStore(1, user, 1, "someName", "someDesc", 10.0, 2, "cat1");
+            Store st = marketController.CreateNewStore(1, user, "store");
+            marketController.AddProductToStore(1, user, st.GetId(), "someName", "someDesc", 10.0, 2, "cat1");
             Assert.ThrowsException<ArgumentException>(() => marketController.addToBag(1, user, productId, storeId, quantity));
             Product product = new Product(productId, "someName", "someDesc", 10.0, 2, "cat1");
         }

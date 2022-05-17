@@ -10,8 +10,8 @@ namespace Workshop.ServiceLayer.ServiceObjects
 {
     public class StoreRole : Role
     {
-        public int StoreId;
-        public List<StoreRole> Nominees;
+        public int StoreId { get; set; }
+        public List<StoreRole> Nominees { get; set; }
 
         public StoreRole(DomainStoreRole dsr) : base(dsr)
         {

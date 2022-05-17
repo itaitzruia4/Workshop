@@ -27,7 +27,6 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void TestSystemInitiation()
         {
-
             Assert.IsNotNull(service);
             //Assert.IsNotNull(srv.getSystemmanager()); //Further tests will come later on
             //Assert.IsNotNull(srv.getExternalConnections());

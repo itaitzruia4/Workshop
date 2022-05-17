@@ -19,9 +19,6 @@ namespace Workshop.DomainLayer.MarketPackage
         private PurchasePolicy purchasePolicy { get; set; }
 
         private ReaderWriterLock rwl;
-
-        private int CURR_PRODUCT_ID;
-
         public Store(int id, string name)
         {
             this.id = id;
@@ -33,7 +30,6 @@ namespace Workshop.DomainLayer.MarketPackage
             this.rwl = new ReaderWriterLock();
             this.discountPolicy = new DiscountPolicy(this);
             this.purchasePolicy = new PurchasePolicy(this);
-            this.CURR_PRODUCT_ID = 0;
         }
 
         public ReaderWriterLock getLock()
@@ -70,14 +66,14 @@ namespace Workshop.DomainLayer.MarketPackage
             this.open = false;
         }
 
-        public Product AddProduct(string name, string description, double price, int quantity, string category)
+        public Product AddProduct(string name, int productId, string description, double price, int quantity, string category)
         {
             ValidateName(name);
             ValidatePrice(price);
             ValidateQuantity(quantity);
             ValidateCategory(category);
-            Product newProd = new Product(CURR_PRODUCT_ID, name, description, price, quantity, category);
-            products.Add(CURR_PRODUCT_ID++, newProd);
+            Product newProd = new Product(productId, name, description, price, quantity, category);
+            products.Add(productId, newProd);
             return newProd;
         }
 
@@ -142,6 +138,28 @@ namespace Workshop.DomainLayer.MarketPackage
         public void AddStoreDiscount(string json_discount)
         {
             discountPolicy.AddStoreDiscount(json_discount);
+        }
+
+        public void AddProductTerm(string json_term, int product_id)
+        {
+            if (!products.ContainsKey(product_id))
+                throw new Exception("Product with ID: " + product_id + " does not exist in store.");
+            purchasePolicy.AddProductTerm(json_term, product_id);
+        }
+
+        public void AddCategoryTerm(string json_term, string category_name)
+        {
+            purchasePolicy.AddCategoryTerm(json_term, category_name);
+        }
+
+        public void AddStoreTerm(string json_term)
+        {
+            purchasePolicy.AddStoreTerm(json_term);
+        }
+
+        public void AddUserTerm(string json_term)
+        {
+            purchasePolicy.AddUserTerm(json_term);
         }
 
         private void ValidateID(int ID)

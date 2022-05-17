@@ -22,7 +22,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
         void ChangeProductName(int userId, string username, int storeId, int productID, string name);
 
-        void ChangeProductPrice(int userId, string username, int storeId, int productID, int price);
+        void ChangeProductPrice(int userId, string username, int storeId, int productID, double price);
 
         void ChangeProductQuantity(int userId, string username, int storeId, int productID, int quantity);
 
@@ -42,9 +42,9 @@ namespace Workshop.DomainLayer.MarketPackage
 
         StoreDTO getStoreInfo(int userId, string user, int storeId);
 
-        List<ProductDTO> SearchProduct(int userId, string user, string keyWords, string catagory, double minPrice, double maxPrice, int productReview);
+        List<ProductDTO> SearchProduct(int userId, string user, string keyWords, string catagory, double minPrice, double maxPrice, double productReview);
 
-        void BuyCart(int userId, string user,string address);
+        double BuyCart(int userId, string user, string address);
 
         ShoppingBagProduct getProductForSale(int productId, int storeId, int quantity);
 
@@ -55,6 +55,15 @@ namespace Workshop.DomainLayer.MarketPackage
         void AddCategoryDiscount(int userId, string user, int storeId, string jsonDiscount, string categoryName);
 
         void AddStoreDiscount(int userId, string user, int storeId, string jsonDiscount);
+
+        void AddProductPurchaseTerm(int userId, string user, int storeId, string json_term, int product_id);
+
+        void AddCategoryPurchaseTerm(int userId, string user, int storeId, string json_term, string category_name);
+
+        void AddStorePurchaseTerm(int userId, string user, int storeId, string json_term);
+
+        void AddUserPurchaseTerm(int userId, string user, int storeId, string json_term);
+
         List<Store> GetAllStores();
     }
 }
