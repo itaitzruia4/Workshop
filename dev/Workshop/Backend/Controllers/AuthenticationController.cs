@@ -13,7 +13,7 @@ namespace API.Controllers
     public class AuthenticationController : ControllerBase
     {
         IService Service;
-        static int userId = 0;
+        int userId = 0;
         public AuthenticationController(IService service)
         {
             Service = service;
