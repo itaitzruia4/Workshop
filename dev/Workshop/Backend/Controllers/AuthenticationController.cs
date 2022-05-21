@@ -13,11 +13,10 @@ namespace API.Controllers
     public class AuthenticationController : ControllerBase
     {
         IService Service;
-        int userId;
+        static int userId = 0;
         public AuthenticationController(IService service)
         {
             Service = service;
-            userId = 0;
         }
 
         [HttpGet("entermarket")]
