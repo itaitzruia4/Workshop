@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,46 +10,39 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
 {
     class NotificationHandler
     {
-        private Dictionary<UserPackage.User, List<Notification>>  Notifications { get;}
+        private ConcurrentDictionary<SysUser, List<Notification>>  Notifications { get; }
         private IMessageHandler MessageHandler;
-        private Dictionary<Event,List<SysUser>> observers = new Dictionary<Event, List<SysUser>>();
+        private ConcurrentDictionary<Event, HashSet<SysUser>> observers;
         private ILoginChecker LoginChecker;
 
         public NotificationHandler(IMessageHandler messageHandler, ILoginChecker loginChecker)
         {
-            this.Notifications = new Dictionary<UserPackage.User, List<Notification>>();
+            this.Notifications = new ConcurrentDictionary<SysUser, List<Notification>>();
+            observers = new ConcurrentDictionary<Event, HashSet<SysUser>>();
             this.MessageHandler = messageHandler;
             this.LoginChecker = loginChecker;
-            //LoginEvent = new Event("Login", "ErrorOnlyForType", "UserController");
-            //observers.Add(loginEvent,new List<SysUser>());
-            //observers[loginEvent].Add()
         }
-
 
         // The subscription management methods.
         public void Attach(SysUser observer, Event eventt)
         {
-            if(!observers.ContainsKey(eventt))
-                observers.Add(eventt, new List<SysUser>());
+            observers.TryAdd(eventt, new HashSet<SysUser>());
             this.observers[eventt].Add(observer);
         }
 
         public void Detach(SysUser observer, Event eventt)
         {
-            this.observers[eventt].Remove(observer);
+            HashSet<SysUser> subs;
+            if (observers.TryGetValue(eventt, out subs))
+            {
+                subs.Remove(observer);
+            }
+            else
+            {
+                throw new ArgumentException($"User is not subscribed to event {eventt.Name}");
+            }
         }
 
-        //called from login in UC
-        public void LoginEvent(SysUser observer)
-        {
-            if (Notifications.ContainsKey(observer))
-            {
-                foreach (Notification notification in this.Notifications[observer])
-                {
-                    MessageHandler.SendNotification(observer, notification);
-                }
-            }
-            }
 
         public void TriggerEvent(Event eventt)
         {
@@ -59,11 +53,33 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
                     MessageHandler.SendNotification(observer, new Notification(eventt, time));
                 else
                 {
-                    if (!this.Notifications.ContainsKey(observer))
+                    this.Notifications.TryAdd(observer, new List<Notification>());
+                    List<Notification> notis;
+                    if (this.Notifications.TryGetValue(observer, out notis))
                     {
-                        Notifications.Add(observer, new List<Notification>());
+                        notis.Add(new Notification(eventt, time));
                     }
-                    this.Notifications[observer].Add(new Notification(eventt, time));
+                }
+            }
+        }
+
+        public List<Notification> GetNotifications(SysUser user)
+        {
+            List<Notification> notis;
+            if (this.Notifications.TryGetValue(user, out notis))
+            {
+                return notis;
+            }
+            return new List<Notification>();
+        }
+
+        public void RemoveNotifications(SysUser user)
+        {
+            List<Notification> oldNotis;
+            while (!this.Notifications.TryGetValue(user, out oldNotis)) {
+                if (this.Notifications.TryUpdate(user, new List<Notification>(), oldNotis))
+                {
+                    break;
                 }
             }
         }

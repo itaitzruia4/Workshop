@@ -16,7 +16,7 @@ namespace Workshop.ServiceLayer
 
         Response Register(int userId, string username, string password, DateTime birthdate);
 
-        Response<Member> Login(int userId, string username, string password);
+        Response<KeyValuePair<Member, List<Notification>>> Login(int userId, string username, string password);
 
         Response Logout(int userId, string username);
 

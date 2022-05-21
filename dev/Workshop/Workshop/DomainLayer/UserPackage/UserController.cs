@@ -12,15 +12,15 @@ using Workshop.DomainLayer.MarketPackage;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using Workshop.DomainLayer.Loggers;
 using System.Collections.Concurrent;
+using Workshop.DomainLayer.UserPackage.Notifications;
 
 namespace Workshop.DomainLayer.UserPackage
 {
-    public class UserController : IUserController
+    public class UserController : IUserController, ILoginChecker
     {
         private ISecurityHandler securityHandler;
         private IReviewHandler reviewHandler;
-
-        // TODO should user key be member ID or username?
+        private NotificationHandler notificationHandler;
         private OrderHandler<string> orderHandler;
         private ConcurrentDictionary<string, Member> members;
         private ConcurrentDictionary<int, User> currentUsers;
@@ -31,6 +31,13 @@ namespace Workshop.DomainLayer.UserPackage
             this.reviewHandler = reviewHandler;
             members = new ConcurrentDictionary<string, Member>();
             this.orderHandler = new OrderHandler<string>();
+            // TODO Find out how to actually implement IMessageSender, Look at Github Issues!
+            notificationHandler = new NotificationHandler(new TempClass(), this);
+        }
+
+        public bool CheckOnlineStatus(User u)
+        {
+            return currentUsers.Values.Contains(u);
         }
 
         //*************************************************************************************************************
@@ -40,6 +47,7 @@ namespace Workshop.DomainLayer.UserPackage
         /// <summary>
         /// Load all members of the system
         /// </summary>
+        /// 
         public void InitializeSystem()
         {
             Logger.Instance.LogEvent("Starting initializing the system - User Controller");
@@ -119,7 +127,7 @@ namespace Workshop.DomainLayer.UserPackage
         /// <returns>
         /// The logged in member
         /// </returns>
-        public Member Login(int userId, string username, string password)
+        public KeyValuePair<Member, List<Notification>> Login(int userId, string username, string password)
         {
             Logger.Instance.LogEvent($"User {userId} is trying to login member {username}");
             EnsureNonEmptyUserDetails(username, password);
@@ -141,7 +149,9 @@ namespace Workshop.DomainLayer.UserPackage
 
             currentUsers[userId] = member;
             Logger.Instance.LogEvent($"Successfuly logged in user {userId} as member {username}");
-            return member;
+            List<Notification> userNotifications = notificationHandler.GetNotifications(member);
+            notificationHandler.RemoveNotifications(member);
+            return new KeyValuePair<Member, List<Notification>>(member, userNotifications);
         }
 
         /// <summary>
@@ -536,14 +546,6 @@ namespace Workshop.DomainLayer.UserPackage
                 OnlineStats.Add(member.GetMemberDTO(), currentUsers.ContainsKey(userId));
             }
             return OnlineStats;
-        }
-
-        public bool CheckOnlineStatus(User user)
-        {
-            Logger.Instance.LogEvent($"Checking if user {user} is online");
-
-            //get online members stats
-            return currentUsers.Values.Contains(user);
         }
 
         public double GetProductRating(int productId)

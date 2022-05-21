@@ -9,7 +9,7 @@ using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
-
+using Notification = Workshop.DomainLayer.UserPackage.Notifications.Notification;
 namespace Workshop.DomainLayer.UserPackage
 {
     public interface IUserController
@@ -21,7 +21,7 @@ namespace Workshop.DomainLayer.UserPackage
         bool IsMember(string username);
         Member GetMember(string username);
         int GetAge(int userId, string membername);
-        Member Login(int userId, string username, string password);
+        KeyValuePair<Member, List<Notification>> Login(int userId, string username, string password);
         void Logout(int userId, string username);
         StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId);
         StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId);

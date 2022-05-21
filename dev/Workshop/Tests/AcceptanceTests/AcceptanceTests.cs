@@ -93,9 +93,10 @@ namespace Tests.AcceptanceTests
         {
             service.EnterMarket(userId);
             service.Register(userId, username, password, DateTime.Parse("Aug 22, 1972"));
-            Response<Member> rMember = service.Login(userId, username, password);
+            Response<KeyValuePair<Member, List<Notification>>> rMember = service.Login(userId, username, password);
             Assert.IsFalse(rMember.ErrorOccured);
-            Assert.IsNotNull(rMember.Value);
+            Assert.IsNotNull(rMember.Value.Value);
+            Assert.IsNotNull(rMember.Value.Key);
         }
 
         [DataTestMethod]

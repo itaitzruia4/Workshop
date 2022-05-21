@@ -8,7 +8,7 @@ using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Security;
 using Workshop.DomainLayer.UserPackage.Shopping;
-
+using Notification = Workshop.DomainLayer.UserPackage.Notifications.Notification;
 
 
 namespace Workshop.DomainLayer
@@ -40,7 +40,7 @@ namespace Workshop.DomainLayer
             UserController.ExitMarket(userId);
         }
 
-        public Member Login(int userId, string membername, string password)
+        public KeyValuePair<Member, List<Notification>> Login(int userId, string membername, string password)
         {
             return UserController.Login(userId, membername, password);
         }

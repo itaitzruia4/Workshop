@@ -33,7 +33,7 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             userController = new UserController(security, review);
             userController.EnterMarket(1);
             userController.Register(1, "nirdan", "12345", DateTime.Parse("Aug 22, 1972"));
-            this.member = userController.Login(1, "nirdan", "12345");
+            this.member = userController.Login(1, "nirdan", "12345").Key;
         }
 
         /// Tests for Role.IsAuthorized method
