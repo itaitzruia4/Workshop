@@ -10,28 +10,6 @@ import Welcome from './Pages/Welcome'
 
 function App() {
 
-    const [userId, setUserId] = useState(null);
-
-    // Send "EnterMarket" request to server
-    let url = "http://localhost:5165/api/authentication/entermarket";
-
-    (async () => {
-        await delay(5000);
-    })();
-
-    fetch(url, {
-        method: 'GET',
-        mode: 'cors',
-        headers: { "Content-Type": "application/json" }
-    }).then((res) => res.json())
-        .then((data) => setUserId(data.value))
-        .catch();
-
-    // storing user id in local storage
-    useEffect(() => {
-        localStorage.setItem("userId", JSON.stringify(userId));
-    }, [userId]);
-
     return (
         <Router>
             <Routes>

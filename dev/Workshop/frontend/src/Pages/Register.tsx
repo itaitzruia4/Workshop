@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import './Register.css';
+import { userToken, memeberToken, token } from '../Components/roles';
 
 const DATE_FORMAT = 'MM/DD/YYYY';
 
 function Register() {
     const textStyle = { color: 'white' }
 
+    const location = useLocation();
+    const token = location.state as userToken;
+
     let navigate = useNavigate();
-    const routeChange = (path: string) =>
-        () => {
-            navigate(path);
-        }
+    const routeChange = (path: string, token: token) =>
+        () =>
+            navigate(path, { state: token });
 
     const [membername, setMembername] = useState("");
     const [password, setPassword] = useState("");
@@ -36,15 +39,16 @@ function Register() {
             mode: 'cors',
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                userId: localStorage.getItem("userId"),
+                userId: token.userId,
                 membername: membername,
                 password: password,
                 birthDate: birthDate
             })
         }).then((response) =>
             response.json()
-                .then((data) => response.ok ? routeChange("/member") :
+                .then((data) => response.ok ? null :
                     alert(data.error))
+                .then(routeChange("/member", { userId: token.userId, membername: membername }))
         );
     }
     
@@ -62,7 +66,7 @@ function Register() {
             </p>
             <p className="register_buttons">
                 <button className="register_register_btn" onClick={e => handleRegister(e)} > Register </button>
-                <button className="login_back_btn" onClick={routeChange('/home')}> Back to home</button>
+                <button className="login_back_btn" onClick={routeChange('/home', { userId: token.userId })}> Back to home</button>
             </p>
         </p>
     )
