@@ -75,13 +75,7 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
 
         public void RemoveNotifications(SysUser user)
         {
-            List<Notification> oldNotis;
-            while (!this.Notifications.TryGetValue(user, out oldNotis)) {
-                if (this.Notifications.TryUpdate(user, new List<Notification>(), oldNotis))
-                {
-                    break;
-                }
-            }
+            this.Notifications.AddOrUpdate(user, new List<Notification>(), (u, old) => new List<Notification>());
         }
     }
 }
