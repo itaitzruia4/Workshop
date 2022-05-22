@@ -33,8 +33,6 @@
 
 **SLI** - Font size must be at least 12.
 
-**SLI** - Font size must follow optometrist validation standards.
-
 ## User Interface State
 **SLO** - User Interface freshness.
 
