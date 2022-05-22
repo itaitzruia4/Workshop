@@ -93,9 +93,10 @@ namespace Tests.AcceptanceTests
         {
             service.EnterMarket(userId);
             service.Register(userId, username, password, DateTime.Parse("Aug 22, 1972"));
-            Response<Member> rMember = service.Login(userId, username, password);
+            Response<KeyValuePair<Member, List<Notification>>> rMember = service.Login(userId, username, password);
             Assert.IsFalse(rMember.ErrorOccured);
-            Assert.IsNotNull(rMember.Value);
+            Assert.IsNotNull(rMember.Value.Value);
+            Assert.IsNotNull(rMember.Value.Key);
         }
 
         [DataTestMethod]
@@ -954,5 +955,80 @@ namespace Tests.AcceptanceTests
             Assert.IsTrue(res.ErrorOccured);
         }
 
+        [TestMethod]
+        public void Test_HoldedNotifications_NoHoldedNotifications()
+        {
+            TestRegister_Good(1, "Member2", "Password2");
+            TestRegister_Good(2, "Member3", "Password3");
+
+            Response<KeyValuePair<Member, List<Notification>>> response1 = service.Login(0, "Member1", "Password1");
+
+            Assert.Equals(response1.Value.Value.Count, 0);
+            Response<Store> resStore = service.CreateNewStore(0, "Member1", "Store1");
+
+            Assert.IsFalse(resStore.ErrorOccured);
+            Store store1 = resStore.Value;
+
+            service.NominateStoreOwner(0, "Member1", "Member2", store1.StoreId);
+            service.NominateStoreManager(0, "Member1", "Member3", store1.StoreId);
+
+            Response<KeyValuePair<Member, List<Notification>>> response2 = service.Login(1, "Member2", "Password2");
+
+            Assert.IsFalse(response2.ErrorOccured);
+            Assert.IsNotNull(response2.Value);
+            Assert.IsNotNull(response2.Value.Value);
+            Assert.Equals(response2.Value.Value.Count, 0);
+
+            Response<KeyValuePair<Member, List<Notification>>> response3 = service.Login(2, "Member3", "Password3");
+
+            Assert.IsFalse(response3.ErrorOccured);
+            Assert.IsNotNull(response3.Value);
+            Assert.IsNotNull(response3.Value.Value);
+            Assert.Equals(response3.Value.Value.Count, 0);
+        }
+
+        [TestMethod]
+        public void Test_HoldedNotifications_HoldedNotifications_From_CloseStore()
+        {
+            TestRegister_Good(1, "Member2", "Password2");
+            TestRegister_Good(2, "Member3", "Password3");
+
+            Response<KeyValuePair<Member, List<Notification>>> response1 = service.Login(0, "Member1", "Password1");
+
+            Assert.Equals(response1.Value.Value.Count, 0);
+            Response<Store> resStore = service.CreateNewStore(0, "Member1", "Store1");
+
+            Assert.IsFalse(resStore.ErrorOccured);
+            Store store1 = resStore.Value;
+
+            service.NominateStoreOwner(0, "Member1", "Member2", store1.StoreId);
+            service.NominateStoreManager(0, "Member1", "Member3", store1.StoreId);
+
+            Response<KeyValuePair<Member, List<Notification>>> response2 = service.Login(1, "Member2", "Password2");
+
+            Assert.IsFalse(response2.ErrorOccured);
+            Assert.Equals(response2.Value.Value.Count, 0);
+
+            Response<KeyValuePair<Member, List<Notification>>> response3 = service.Login(2, "Member3", "Password3");
+
+            Assert.IsFalse(response3.ErrorOccured);
+            Assert.Equals(response3.Value.Value.Count, 0);
+
+            TestLogout_Good(1, "Member2", "Password2");
+            TestLogout_Good(2, "Member3", "Password3");
+
+            service.CloseStore(0, "Member1", store1.StoreId);
+
+            Response<KeyValuePair<Member, List<Notification>>> response4 = service.Login(1, "Member2", "Password2");
+
+            Assert.IsFalse(response4.ErrorOccured);
+            Assert.Equals(response4.Value.Value.Count, 1);
+            Assert.Equals(response4.Value.Value[0].Sender, "Member1");
+            Response<KeyValuePair<Member, List<Notification>>> response5 = service.Login(2, "Member3", "Password3");
+
+            Assert.IsFalse(response5.ErrorOccured);
+            Assert.Equals(response5.Value.Value.Count, 1);
+            Assert.Equals(response5.Value.Value[0].Sender, "Member1");
+        }
     }
 }

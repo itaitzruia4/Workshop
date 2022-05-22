@@ -135,9 +135,8 @@ namespace Workshop.DomainLayer.MarketPackage
                 ViewStorePermission(userId, username, storeId);
                 if (!IsAuthorized(userId, username, storeId, Action.AddProduct))
                     throw new MemberAccessException("This user is not authorized for adding products to the specified store.");
-                product = stores[storeId].AddProduct(name, PRODUCT_COUNT, description, price, quantity, category);
+                product = stores[storeId].AddProduct(name, PRODUCT_COUNT++, description, price, quantity, category);
                 storesLocks[storeId].ReleaseWriterLock();
-                PRODUCT_COUNT++;
             }
             Logger.Instance.LogEvent($"{username} successfuly added product {name} to store {storeId}.");
             return product;

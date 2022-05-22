@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import React, { useState} from 'react';
+import { useNavigate, useLocation} from "react-router-dom";
 import './Login.css';
+import { userToken } from '../Components/roles';
 
 function Login() {
+
     const textStyle = { color: 'white' }
 
+    const location = useLocation();
+    const token = location.state as userToken;
+
     let navigate = useNavigate();
-    const routeChange = (path: string) =>
-        () => {
-            navigate(path);
-        }
+    const routeChange = (path: string, userId: number) =>
+        () =>
+            navigate(path, { state: { userId: userId } });
 
     const [membername, setMembername] = useState("");
     const [password, setPassword] = useState("");
@@ -27,14 +31,13 @@ function Login() {
             mode: 'cors',
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                userId: localStorage.getItem("userId"),
-                Membername: membername,
-                Password: password,
-                UserId: 0
+                userId: token.userId,
+                membername: membername,
+                password: password,
             })
         }).then((res) => res.json()
-            .then((data) => res.ok ? routeChange("/member") : alert(data.error)))
-            .catch((err) => alert("Error in Login API"));
+            .then((data) => res.ok ? null : alert(data.error)))
+            .then(routeChange("/member", token.userId))
     }
 
     return (
@@ -48,7 +51,7 @@ function Login() {
             </p>
             <p className="login_buttons">
                 <button className="login_login_btn" type="submit" onClick={e => handleUserDetails(e)} > Login </button>
-                <button className="login_back_btn" onClick={routeChange('/home')}> Back to home </button>
+                <button className="login_back_btn" onClick={routeChange('/home', token.userId)}> Back to home </button>
             </p>
         </div>
     )

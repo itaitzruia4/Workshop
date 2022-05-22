@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { delay } from './Utils/utils'
 import Login from './Pages/Login'
 import Register from './Pages/Register'
 import Member from './Pages/Member'
@@ -8,6 +9,7 @@ import Home from './Pages/Home'
 import Welcome from './Pages/Welcome'
 
 function App() {
+
     return (
         <Router>
             <Routes>

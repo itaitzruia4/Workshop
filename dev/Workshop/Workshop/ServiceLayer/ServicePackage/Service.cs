@@ -13,6 +13,8 @@ using DomainStoreManager = Workshop.DomainLayer.UserPackage.Permissions.StoreMan
 using DomainStoreOwner = Workshop.DomainLayer.UserPackage.Permissions.StoreOwner;
 using DomainStoreFounder = Workshop.DomainLayer.UserPackage.Permissions.StoreFounder;
 using DomainStore = Workshop.DomainLayer.MarketPackage.Store;
+using DomainNotification = Workshop.DomainLayer.UserPackage.Notifications.Notification;
+
 using Workshop.DomainLayer.Reviews;
 
 namespace Workshop.ServiceLayer
@@ -66,17 +68,18 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<Member> Login(int userId, string username, string password)
+        public Response<KeyValuePair<Member, List<Notification>>> Login(int userId, string username, string password)
         {
             try
             {
-                DomainMember domainMember = facade.Login(userId, username, password);
-                Member serviceMember = new Member(domainMember);
-                return new Response<Member>(serviceMember, userId);
+                KeyValuePair<DomainMember, List<DomainNotification>> domainAnswer = facade.Login(userId, username, password);
+                Member serviceMember = new Member(domainAnswer.Key);
+                List<Notification> notificationList = domainAnswer.Value.Select(n => new Notification(n)).ToList();
+                return new Response<KeyValuePair<Member, List<Notification>>>(new KeyValuePair<Member, List<Notification>>(serviceMember, notificationList), userId);
             }
             catch (Exception e)
             {
-                return new Response<Member>(e.Message, userId);
+                return new Response<KeyValuePair<Member, List<Notification>>>(e.Message, userId);
             }
         }
 

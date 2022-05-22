@@ -89,6 +89,7 @@
     <Compile Include="DomainLayer\UserPackage\Notifications\Notification.cs" />
     <Compile Include="DomainLayer\UserPackage\Notifications\NotificationHandler.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\MemberDTO.cs" />
+    <Compile Include="DomainLayer\UserPackage\TempClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DomainLayer\Facade.cs" />
     <Compile Include="DomainLayer\Loggers\Logger.cs" />
@@ -139,6 +140,7 @@
     <Compile Include="ServiceLayer\ResponseT.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\MarketManager.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Member.cs" />
+    <Compile Include="ServiceLayer\ServiceObjects\Notification.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Product.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Role.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\StoreRole.cs" />

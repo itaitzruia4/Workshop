@@ -13,15 +13,14 @@ namespace API.Controllers
     public class AuthenticationController : ControllerBase
     {
         IService Service;
-        int userId;
+        int userId = 0;
         public AuthenticationController(IService service)
         {
             Service = service;
-            userId = 0;
         }
 
         [HttpGet("entermarket")]
-        public ActionResult<FrontResponse<int>> Get()
+        public ActionResult<FrontResponse<int>> EnterMarket()
         {
             Response<User> response = Service.EnterMarket(userId);
             if (response.ErrorOccured)
@@ -32,7 +31,7 @@ namespace API.Controllers
         }
 
         [HttpPost("exitmarket")]
-        public ActionResult<FrontResponse<int>> Post([FromBody] BaseRequest request)
+        public ActionResult<FrontResponse<int>> ExitMarket([FromBody] BaseRequest request)
         {
             Response response = Service.ExitMarket(request.UserId);
             if (response.ErrorOccured)
@@ -43,18 +42,18 @@ namespace API.Controllers
         }
 
         [HttpPost("login")]
-        public ActionResult<FrontResponse<Member>> Post([FromBody] AuthenticationRequest request)
+        public ActionResult<FrontResponse<KeyValuePair<Member, List<Notification>>>> Login([FromBody] AuthenticationRequest request)
         {
-            Response<Member> response = Service.Login(request.UserId, request.Membername, request.Password);
+            Response<KeyValuePair<Member, List<Notification>>> response = Service.Login(request.UserId, request.Membername, request.Password);
             if (response.ErrorOccured)
             {
-                return BadRequest(new FrontResponse<Member>(response.ErrorMessage));
+                return BadRequest(new FrontResponse<KeyValuePair<Member, List<Notification>>>(response.ErrorMessage));
             }
-            return Ok(new FrontResponse<Member>(response.Value));
+            return Ok(new FrontResponse<KeyValuePair<Member, List<Notification>>>(response.Value));
         }
 
         [HttpPost("logout")]
-        public ActionResult<FrontResponse<int>> Post([FromBody] MemberRequest request)
+        public ActionResult<FrontResponse<int>> Logout([FromBody] MemberRequest request)
         {
             Response response = Service.Logout(request.UserId, request.Membername);
             if (response.ErrorOccured)
@@ -65,7 +64,7 @@ namespace API.Controllers
         }
 
         [HttpPost("register")]
-        public ActionResult<FrontResponse<int>> Post([FromBody] RegisterRequest request)
+        public ActionResult<FrontResponse<int>> Register([FromBody] RegisterRequest request)
         {
             try
             {
