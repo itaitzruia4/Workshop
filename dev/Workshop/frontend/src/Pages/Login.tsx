@@ -1,7 +1,7 @@
 import React, { useState} from 'react';
 import { useNavigate, useLocation} from "react-router-dom";
 import './Login.css';
-import { userToken } from '../Components/roles';
+import { userToken, token } from '../Components/roles';
 
 function Login() {
 
@@ -11,9 +11,9 @@ function Login() {
     const token = location.state as userToken;
 
     let navigate = useNavigate();
-    const routeChange = (path: string, userId: number) =>
+    const routeChange = (path: string, token: token) =>
         () =>
-            navigate(path, { state: { userId: userId } });
+            navigate(path, { state: token });
 
     const [membername, setMembername] = useState("");
     const [password, setPassword] = useState("");
@@ -35,9 +35,12 @@ function Login() {
                 membername: membername,
                 password: password,
             })
-        }).then((res) => res.json()
-            .then((data) => res.ok ? null : alert(data.error)))
-            .then(routeChange("/member", token.userId))
+        }).then((response) =>
+            response.json()
+                .then((data) => response.ok ? null :
+                    alert(data.error))
+                .then(routeChange("/member", { userId: token.userId ,membername: membername }))
+        );
     }
 
     return (
@@ -50,8 +53,8 @@ function Login() {
                 <input className="login_password_textbox" type="password" onChange={e => setPassword(e.target.value)} />
             </p>
             <p className="login_buttons">
-                <button className="login_login_btn" type="submit" onClick={e => handleUserDetails(e)} > Login </button>
-                <button className="login_back_btn" onClick={routeChange('/home', token.userId)}> Back to home </button>
+                <button className="login_login_btn" type="submit" onClick={e => handleUserDetails(e)}> Login </button>
+                <button className="login_back_btn" onClick={routeChange('/home', { userId: token.userId })}> Back to home </button>
             </p>
         </div>
     )

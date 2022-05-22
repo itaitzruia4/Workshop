@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
-import { userToken } from '../Components/roles';
+import { userToken, token } from '../Components/roles';
 
 
 import './Home.css';
@@ -10,7 +10,7 @@ function Home() {
     const textStyle = { color: 'white' }
 
     const location = useLocation();
-    const token = location.state as userToken;
+    const token = location.state as token;
 
     let navigate = useNavigate();
     const routeChange = (path: string, userId: number) =>

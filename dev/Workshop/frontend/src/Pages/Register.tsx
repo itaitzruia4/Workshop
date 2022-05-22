@@ -46,7 +46,7 @@ function Register() {
             response.json()
                 .then((data) => response.ok ? null :
                     alert(data.error))
-                .then(routeChange("/member", { userId: token.userId, membername: membername }))
+                .then(routeChange("/login", { userId: token.userId}))
         );
     }
     

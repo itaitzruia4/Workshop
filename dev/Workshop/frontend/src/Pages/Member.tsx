@@ -13,6 +13,9 @@ type Products = {
 }
 
 function Member() {
+
+    const textStyle = { color: 'white' }
+
     const location = useLocation();
     const token = location.state as memeberToken;
 
@@ -65,8 +68,8 @@ function Member() {
     }
 
     return (
-        <div className="member_page">
-            <div className="member_page_body">
+        <div className="member_page" style={textStyle}> {"Welcome " + token.membername + "!"} 
+            <div className="member_page_body" >
                 <ConfigStoresComponent addStores={addStores} />
                 <hr />
                 <div className="lists_section">
