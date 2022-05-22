@@ -6,9 +6,6 @@ import { userToken } from '../Components/roles';
 import './Home.css';
 
 function Home() {
-    type user = {
-        userId: number
-    }
 
     const textStyle = { color: 'white' }
 
