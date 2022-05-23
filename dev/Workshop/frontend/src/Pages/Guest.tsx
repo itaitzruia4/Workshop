@@ -71,8 +71,8 @@ const StoresComponent: React.FC<{
             <h2 className="stores-header">Stores</h2>
             {stores.stores.length ? <ul className="stores">
                 {stores.stores.map(store => (
-                    <li key={store.id}>
-                        <span>{store.title}</span>
+                    <li key={store.storeId}>
+                        <span>{store.name}</span>
                         <button
                             className="guest_Open_Store_Btn"
                             onClick={routeChange('/Store')}>Open store

@@ -17,24 +17,6 @@ function Welcome() {
         () => 
             navigate(path, { state: { userId: userId } });
         
-
-    function HandleeeeeeEnterMarket() {
-        let url = "http://localhost:5165/api/authentication/entermarket";
-
-        fetch(url, {
-            method: 'GET',
-            mode: 'cors',
-            headers: { "Content-Type": "application/json" }
-        })
-            .then((res) => res.json()
-                .then((data) => {
-                    if (res.ok)
-                        setUserId(data.value)
-                })
-                .then(routeChange('/home', userId))
-            );
-    }
-
     return (
         <p className="welcome">
             <div className="welcome_title" style={textStyle}> Welcome to the Trading System website! </div>

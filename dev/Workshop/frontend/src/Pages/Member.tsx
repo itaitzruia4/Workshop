@@ -5,6 +5,7 @@ import { Store, Stores } from "../Components/store"
 import { Product } from "../Components/product"
 import { memeberToken} from '../Components/roles';
 import { handleLogout, handleExitMarket } from '../Actions/AuthenticationActions';
+import { handleGetStores, handleNewStore } from '../Actions/StoreActions';
 
 
 // TODO import Store from Store component instead of defining it here
@@ -25,19 +26,18 @@ function Member() {
         () =>
             navigate(path, { state: token });
 
-    const [stores, setStores] = React.useState<Stores>({ stores: []});
+    const [stores, setStores] = React.useState<Stores>({ stores: [] });
+    const refreshStores = () => {
+        handleGetStores(token).then(value => setStores({ stores: value as Store[] })).catch(error => alert(error));
+    };
+    refreshStores();
     const addStores = (storeName: string) => {
-        setStores({
-            stores: [
-                { title: storeName, id: stores.stores.length + 1 },
-                ...stores.stores
-            ]
-        });
+        handleNewStore(token, storeName).then(() => handleGetStores(token).then(value => setStores({ stores: value as Store[] }))).catch(error => alert(error));
     };
 
     const deleteStores = (id: number) => {
         setStores({
-            stores: stores.stores.filter(t => t.id !== id),
+            stores: stores.stores.filter(t => t.storeId !== id),
         });
     };
 
@@ -104,15 +104,15 @@ const StoresComponent: React.FC<{
             <h2 className="stores-header">Stores</h2>
             {stores.stores.length ? <ul className="stores">
                 {stores.stores.map(store => (
-                    <li key={store.id}>
-                        <span>{store.title}</span>
+                    <li key={store.storeId}>
+                        <span>{store.name}</span>
                         <button
                             className="Member_Open_Store_Btn"
                             onClick={routeChange('/Store')}>Open store
                         </button>
                         <button
                             className="Member_Delete_Srore_Btn"
-                            onClick={() => { deleteStore(store.id) }}>X
+                            onClick={() => { deleteStore(store.storeId) }}>X
                         </button>
                     </li>
                 ))}
