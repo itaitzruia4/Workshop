@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
 import './Register.css';
 import { userToken, memeberToken, token } from '../Components/roles';
+import { handleRegister } from '../Actions/AuthenticationActions';
 
 function Register() {
     const textStyle = { color: 'white' }
@@ -16,40 +17,7 @@ function Register() {
 
     const [membername, setMembername] = useState("");
     const [password, setPassword] = useState("");
-    const [birthDate, setBirthDate] = useState("");
-
-    function handleRegister(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        if (membername === "" || password === "" ||  birthDate == "") {
-            alert('User details must not be empty');
-            return;
-        }
-
-        var date_regex = /\d{1,2}\/\d{1,2}\/\d{4}/;
-        if (!(date_regex.test(birthDate))) {
-            alert("Invalid date format");
-            return false;
-        }
-
-        let url = "http://localhost:5165/api/authentication/register";
-
-        fetch(url, {
-            method: 'POST',
-            mode: 'cors',
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                userId: token.userId,
-                membername: membername,
-                password: password,
-                birthDate: birthDate
-            })
-        }).then((response) =>
-            response.json()
-                .then((data) => response.ok ? null :
-                    alert(data.error))
-                .then(routeChange("/login", { userId: token.userId}))
-        );
-    }
-    
+    const [birthDate, setBirthDate] = useState("");   
 
     return (
         <p className="register">
@@ -63,7 +31,14 @@ function Register() {
                 <input className="register_date_textbox" type="text" placeholder="dd/mm/yyyy" onChange={e => setBirthDate(e.target.value)} />
             </p>
             <p className="register_buttons">
-                <button className="register_register_btn" onClick={e => handleRegister(e)} > Register </button>
+                <button className="register_register_btn"
+                    onClick={e =>
+                        handleRegister(token, membername, password, birthDate)
+                            .then(routeChange("/login", { userId: token.userId }))
+                            .catch(error => {
+                                alert(error)
+                            })
+                    } > Register </button>
                 <button className="login_back_btn" onClick={routeChange('/home', { userId: token.userId })}> Back to home</button>
             </p>
         </p>

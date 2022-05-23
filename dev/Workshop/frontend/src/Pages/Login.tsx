@@ -2,6 +2,7 @@ import React, { useState} from 'react';
 import { useNavigate, useLocation} from "react-router-dom";
 import './Login.css';
 import { userToken, token } from '../Components/roles';
+import { handleLogin } from '../Actions/AuthenticationActions';
 
 function Login() {
 
@@ -18,31 +19,6 @@ function Login() {
     const [membername, setMembername] = useState("");
     const [password, setPassword] = useState("");
 
-    function handleUserDetails(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        if (membername === "" || password === "") {
-            alert('User details must not be empty');
-            return;
-        }
-
-        let url = "http://localhost:5165/api/authentication/login";
-
-        fetch(url, {
-            method: 'POST',
-            mode: 'cors',
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                userId: token.userId,
-                membername: membername,
-                password: password,
-            })
-        }).then((response) =>
-            response.json()
-                .then((data) => response.ok ? null :
-                    alert(data.error))
-                .then(routeChange("/member", { userId: token.userId ,membername: membername }))
-        );
-    }
-
     return (
         <div className="login">
             <div className="login_title" style={textStyle}> Login </div>
@@ -53,7 +29,13 @@ function Login() {
                 <input className="login_password_textbox" type="password" onChange={e => setPassword(e.target.value)} />
             </p>
             <p className="login_buttons">
-                <button className="login_login_btn" type="submit" onClick={e => handleUserDetails(e)}> Login </button>
+                <button className="login_login_btn" type="submit" onClick={e =>
+                    handleLogin(token, membername, password)
+                        .then(routeChange("/member", { userId: token.userId, membername: membername }))
+                        .catch(error => {
+                            alert(error)
+                        })
+                } > Login </button>
                 <button className="login_back_btn" onClick={routeChange('/home', { userId: token.userId })}> Back to home </button>
             </p>
         </div>

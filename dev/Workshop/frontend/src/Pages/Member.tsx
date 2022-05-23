@@ -3,7 +3,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import './Member.css';
 import { Store, Stores } from "../Components/store"
 import { Product } from "../Components/product"
-import { memeberToken, userToken } from '../Components/roles';
+import { memeberToken} from '../Components/roles';
+import { handleLogout, handleExitMarket } from '../Actions/AuthenticationActions';
 
 
 // TODO import Store from Store component instead of defining it here
@@ -20,9 +21,9 @@ function Member() {
     const token = location.state as memeberToken;
 
     let navigate = useNavigate();
-    const routeChange = (path: string, userId: number) =>
+    const routeChange = (path: string, token: memeberToken) =>
         () =>
-            navigate(path, { state: { userId: userId } });
+            navigate(path, { state: token });
 
     const [stores, setStores] = React.useState<Stores>({ stores: []});
     const addStores = (storeName: string) => {
@@ -47,26 +48,6 @@ function Member() {
         });
     };
 
-    function HandleLogout() {
-
-        let url = "http://localhost:5165/api/authentication/logout";
-
-        fetch(url, {
-            method: 'POST',
-            mode: 'cors',
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                userId: token.userId,
-                membername: token.membername,
-            })
-        }).then((response) =>
-            response.json()
-                .then((data) => response.ok ? null :
-                    alert(data.error))
-                .then(routeChange("/home", token.userId))
-        );
-    }
-
     return (
         <div className="member_page" style={textStyle}> {"Welcome " + token.membername + "!"} 
             <div className="member_page_body" >
@@ -81,8 +62,20 @@ function Member() {
                         deleteProducts={deleteProducts} />
                 </div>
                 <p className="member_control_btns">
-                    <button className="member_logout_btn" onClick={HandleLogout}> Logout </button>
-                    <button className="member_exit_btn" onClick={routeChange('/', token.userId)}> Exit Market </button>
+                    <button className="member_logout_btn" onClick={e =>
+                        handleLogout(token)
+                            .then(routeChange("/home", token))
+                            .catch(error => {
+                                alert(error)
+                            })
+                    } > Logout </button>
+                    <button className="member_exit_btn" onClick={e =>
+                        handleExitMarket(token)
+                            .then(routeChange("/", token))
+                            .catch(error => {
+                                alert(error)
+                            })
+                    } > Exit Market </button>
                 </p>
             </div>
         </div>
