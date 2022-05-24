@@ -31,6 +31,8 @@ namespace Workshop.DomainLayer.MarketPackage
         List<Member> GetWorkersInformation(int userId, string username, int storeId);
 
         void CloseStore(int userId, string username, int storeId);
+
+        void OpenStore(int userId, string username, int storeId);
         
         Store CreateNewStore(int userId, string creator, string storeName);
 

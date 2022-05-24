@@ -955,6 +955,8 @@ namespace Tests.AcceptanceTests
             Assert.IsTrue(res.ErrorOccured);
         }
 
+        // NEW FOR VERSION 3
+
         [TestMethod]
         public void Test_HoldedNotifications_NoHoldedNotifications()
         {
@@ -988,36 +990,22 @@ namespace Tests.AcceptanceTests
         }
 
         [TestMethod]
-        public void Test_HoldedNotifications_HoldedNotifications_From_CloseStore()
+        public void Test_HoldedNotifications_From_CloseStore()
         {
             TestRegister_Good(1, "Member2", "Password2");
             TestRegister_Good(2, "Member3", "Password3");
-            TestRegister_Good(0, "Member1", "Password1");
-
-            Response<KeyValuePair<Member, List<Notification>>> response1 = service.Login(0, "Member1", "Password1");
-
-            Assert.AreEqual(response1.Value.Value.Count, 0);
+            TestLogin_Good(0, "Member1", "Password1");
             Response<Store> resStore = service.CreateNewStore(0, "Member1", "Store1");
-
             Assert.IsFalse(resStore.ErrorOccured);
             Store store1 = resStore.Value;
 
             service.NominateStoreOwner(0, "Member1", "Member2", store1.StoreId);
             service.NominateStoreManager(0, "Member1", "Member3", store1.StoreId);
 
-            Response<KeyValuePair<Member, List<Notification>>> response2 = service.Login(1, "Member2", "Password2");
-
-            Assert.IsFalse(response2.ErrorOccured);
-            Assert.AreEqual(response2.Value.Value.Count, 0);
-
-            Response<KeyValuePair<Member, List<Notification>>> response3 = service.Login(2, "Member3", "Password3");
-
-            Assert.IsFalse(response3.ErrorOccured);
-            Assert.AreEqual(response3.Value.Value.Count, 0);
-
-            TestLogout_Good(1, "Member2", "Password2");
-            TestLogout_Good(2, "Member3", "Password3");
-
+            service.Login(1, "Member2", "Password2");
+            service.Login(2, "Member3", "Password3");  
+            service.Logout(1, "Member2");
+            service.Logout(2, "Member3");
             service.CloseStore(0, "Member1", store1.StoreId);
 
             Response<KeyValuePair<Member, List<Notification>>> response4 = service.Login(1, "Member2", "Password2");
@@ -1030,6 +1018,206 @@ namespace Tests.AcceptanceTests
             Assert.IsFalse(response5.ErrorOccured);
             Assert.AreEqual(response5.Value.Value.Count, 1);
             Assert.AreEqual(response5.Value.Value[0].Sender, "Member1");
+        }
+
+        [TestMethod]
+        public void Test_CloseStore_Good()
+        {
+            TestLogin_Good(0, "Member1", "Password1");
+            Response<Store> resp1 = service.CreateNewStore(0, "Member1", "Store1");
+            Assert.IsFalse (resp1.ErrorOccured);
+            Store store1 = resp1.Value;
+            Assert.IsNotNull(store1);
+            Response resp2 = service.CloseStore(0, "Member1", store1.StoreId);
+            Assert.IsFalse(resp2.ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_CloseStore_Bad_NoPermission()
+        {
+            TestLogin_Good(0, "Member1", "Password1");
+            TestLogin_Good(1, "Member2", "Password2");
+            Response<Store> resp1 = service.CreateNewStore(0, "Member1", "Store1");
+            Assert.IsFalse(resp1.ErrorOccured);
+            Store store1 = resp1.Value;
+            Assert.IsNotNull(store1);
+            Response resp2 = service.CloseStore(1, "Member2", store1.StoreId);
+            Assert.IsTrue(resp2.ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_CloseStore_Bad_NoSuchStore()
+        {
+            TestLogin_Good(0, "Member1", "Password1");
+            Response<Store> resp1 = service.CreateNewStore(0, "Member1", "Store1");
+            Assert.IsFalse(resp1.ErrorOccured);
+            Store store1 = resp1.Value;
+            Assert.IsNotNull(store1);
+            Response resp2 = service.CloseStore(0, "Member1", store1.StoreId + 1);
+            Assert.IsFalse(resp2.ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_CloseStore_Bad_AlreadyClosed()
+        {
+            TestLogin_Good(0, "Member1", "Password1");
+            Response<Store> resp1 = service.CreateNewStore(0, "Member1", "Store1");
+            Assert.IsFalse(resp1.ErrorOccured);
+            Store store1 = resp1.Value;
+            Assert.IsNotNull(store1);
+            Response resp2 = service.CloseStore(0, "Member1", store1.StoreId);
+            Assert.IsFalse(resp2.ErrorOccured);
+            Response resp3 = service.CloseStore(0, "Member1", store1.StoreId);
+            Assert.IsTrue(resp3.ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_OpenStore_Good()
+        {
+            TestLogin_Good(0, "Member1", "Password1");
+            Response<Store> resp1 = service.CreateNewStore(0, "Member1", "Store1");
+            Assert.IsFalse(resp1.ErrorOccured);
+            Store store1 = resp1.Value;
+            Assert.IsNotNull(store1);
+            Response resp2 = service.CloseStore(0, "Member1", store1.StoreId);
+            Assert.IsFalse(resp2.ErrorOccured);
+            Response resp3 = service.OpenStore(0, "Member1", store1.StoreId);
+            Assert.IsFalse(resp3.ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_OpenStore_Bad_NoPermission()
+        {
+            TestLogin_Good(0, "Member1", "Password1");
+            TestLogin_Good(1, "Member2", "Password2");
+            Response<Store> resp1 = service.CreateNewStore(0, "Member1", "Store1");
+            Assert.IsFalse(resp1.ErrorOccured);
+            Store store1 = resp1.Value;
+            Assert.IsNotNull(store1);
+            Response resp2 = service.CloseStore(0, "Member1", store1.StoreId);
+            Assert.IsFalse(resp2.ErrorOccured);
+            Response resp3 = service.OpenStore(1, "Member2", store1.StoreId);
+            Assert.IsTrue(resp3.ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_OpenStore_Bad_NoSuchStore()
+        {
+            TestLogin_Good(0, "Member1", "Password1");
+            Response<Store> resp1 = service.CreateNewStore(0, "Member1", "Store1");
+            Assert.IsFalse(resp1.ErrorOccured);
+            Store store1 = resp1.Value;
+            Assert.IsNotNull(store1);
+            Response resp2 = service.CloseStore(0, "Member1", store1.StoreId);
+            Assert.IsFalse(resp2.ErrorOccured);
+            Response resp3 = service.OpenStore(0, "Member1", store1.StoreId + 1);
+            Assert.IsTrue(resp3.ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_OpenStore_Bad_AlreadyOpen()
+        {
+            TestLogin_Good(0, "Member1", "Password1");
+            Response<Store> resp1 = service.CreateNewStore(0, "Member1", "Store1");
+            Assert.IsFalse(resp1.ErrorOccured);
+            Store store1 = resp1.Value;
+            Assert.IsNotNull(store1);
+            Response resp2 = service.OpenStore(0, "Member1", store1.StoreId);
+            Assert.IsTrue(resp2.ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_HoldedNotifications_From_OpenStore()
+        {
+            // Store owners need to get a notification when their store opens again
+            TestRegister_Good(1, "Member2", "Password2");
+            TestRegister_Good(2, "Member3", "Password3");
+            TestLogin_Good(0, "Member1", "Password1");
+            Store store1 = service.CreateNewStore(0, "Member1", "Store1").Value;
+
+            service.NominateStoreOwner(0, "Member1", "Member2", store1.StoreId);
+            service.NominateStoreManager(0, "Member1", "Member3", store1.StoreId);
+
+            service.CloseStore(0, "Member1", store1.StoreId);
+
+            service.Login(1, "Member2", "Password2");
+            service.Login(2, "Member3", "Password3");
+            service.Logout(1, "Member2");
+            service.Logout(2, "Member3");
+
+            service.OpenStore(0, "Member1", store1.StoreId);
+
+            Response<KeyValuePair<Member, List<Notification>>> response4 = service.Login(1, "Member2", "Password2");
+            Assert.IsFalse(response4.ErrorOccured);
+            Assert.AreEqual(response4.Value.Value.Count, 1);
+            Assert.AreEqual(response4.Value.Value[0].Sender, "Member1");
+
+            Response<KeyValuePair<Member, List<Notification>>> response5 = service.Login(2, "Member3", "Password3");
+            Assert.IsFalse(response5.ErrorOccured);
+            Assert.AreEqual(response5.Value.Value.Count, 1);
+            Assert.AreEqual(response5.Value.Value[0].Sender, "Member1");
+        }
+
+        [TestMethod]
+        public void Test_HoldedNotifications_From_BuyingProductFromYourStore()
+        {
+            // Store owners need to get a notification when someone buys from them
+            TestLogin_Good(0, "Member1", "Password1");
+            TestRegister_Good(1, "Member2", "Password2");
+            TestRegister_Good(2, "Member3", "Password3");
+            TestRegister_Good(3, "Member4", "Password4");
+
+            Store store1 = service.CreateNewStore(0, "Member1", "Store1").Value;
+            service.NominateStoreOwner(0, "Member1", "Member2", store1.StoreId);
+            service.NominateStoreManager(0, "Member1", "Member3", store1.StoreId);
+            Product product1 = service.AddProduct(0, "Member1", store1.StoreId, "ProductName1", "Description1", 2.7, 10, "Category1").Value;
+            service.Logout(0, "Member1");
+            service.Login(3, "Member4", "Password4");
+            service.addToCart(3, "Member4", product1.Id, store1.StoreId, 1);
+            service.BuyCart(3, "Member4", "My Home!");
+            Response<KeyValuePair<Member, List<Notification>>> response6 = service.Login(0, "Member1", "Password1");
+            Assert.AreEqual(response6.Value.Value.Count, 1);
+            Assert.AreEqual(response6.Value.Value[0].Sender, "Member4");
+            Response<KeyValuePair<Member, List<Notification>>> response4 = service.Login(1, "Member2", "Password2");
+            Assert.AreEqual(response4.Value.Value.Count, 1);
+            Assert.AreEqual(response4.Value.Value[0].Sender, "Member4");
+            Response<KeyValuePair<Member, List<Notification>>> response5 = service.Login(2, "Member3", "Password3");
+            Assert.AreEqual(response5.Value.Value.Count, 1);
+            Assert.AreEqual(response5.Value.Value[0].Sender, "Member4");
+        }
+
+        [TestMethod]
+        public void Test_HoldedNotifications_From_RemovingNomination()
+        {
+            // Store owners and managers need to get a notification when their nomination is removed
+            TestRegister_Good(1, "Member2", "Password2");
+            TestRegister_Good(2, "Member3", "Password3");
+            TestLogin_Good(0, "Member1", "Password1");
+            TestLogin_Good(3, "Member4", "Password4");
+            Store store1 = service.CreateNewStore(0, "Member1", "Store1").Value;
+            service.NominateStoreOwner(0, "Member1", "Member4", store1.StoreId);
+            service.NominateStoreOwner(3, "Member4", "Member2", store1.StoreId);
+            service.Logout(3, "Member4");
+            service.NominateStoreManager(3, "Member4", "Member3", store1.StoreId);
+            service.RemoveStoreOwnerNomination(0, "Member1", "Member4", store1.StoreId);
+
+            Response<KeyValuePair<Member, List<Notification>>> response3 = service.Login(3, "Member4", "Password4");
+            Assert.AreEqual(response3.Value.Value.Count, 1);
+            Assert.AreEqual(response3.Value.Value[0].Sender, "Member1");
+
+            Response<KeyValuePair<Member, List<Notification>>> response4 = service.Login(1, "Member2", "Password2");
+            Assert.AreEqual(response4.Value.Value.Count, 1);
+            Assert.AreEqual(response4.Value.Value[0].Sender, "Member1");
+
+            Response<KeyValuePair<Member, List<Notification>>> response5 = service.Login(2, "Member3", "Password3");
+            Assert.AreEqual(response5.Value.Value.Count, 1);
+            Assert.AreEqual(response5.Value.Value[0].Sender, "Member1");
+        }
+
+        [TestMethod]
+        public void Test_HoldedNotifications_From_GettingMessaged()
+        {
+            // MAKE SURE IT IS IMPLEMENTED ONCE MESSAGES ARE ADDED
         }
     }
 }

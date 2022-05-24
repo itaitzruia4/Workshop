@@ -335,15 +335,29 @@ namespace Workshop.DomainLayer.MarketPackage
             Logger.Instance.LogEvent($"{username} has received information about the workers of store {storeId}.");
             return workers;
         }
-        public void OpenStore(string username, int storeId)
+        public void OpenStore(int userId, string membername, int storeId)
         {
-            Logger.Instance.LogEvent($"{username} is trying to open store {storeId}.");
-            /*if (!IsAuthorized(username, storeId, Action.ChangeProductName))
-                throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
-            ValidateStoreExists(storeId);
-            stores[storeId].openStore();*/
-            throw new NotImplementedException();
-            // Logger.Instance.LogEvent($"{username} successfuly opened store {storeId}.");
+            Logger.Instance.LogEvent($"{membername} is trying to open store {storeId}.");
+            try
+            {
+                storesLocks[storeId].AcquireWriterLock(Timeout.Infinite);
+            }
+            catch
+            {
+                throw new ArgumentException("Store ID does not exist");
+            }
+            finally
+            {
+                if (!IsAuthorized(userId, membername, storeId, Action.CloseStore))
+                    throw new MemberAccessException("This user is not authorized to open this specified store.");
+                if (!IsStoreOpen(userId, membername, storeId)) { stores[storeId].OpenStore(); }
+                else
+                {
+                    throw new ArgumentException($"Store {storeId} is already opened.");
+                }
+                storesLocks[storeId].ReleaseWriterLock();
+            }
+            Logger.Instance.LogEvent($"{membername} successfuly opened store {storeId}.");
         }
 
         public void CloseStore(int userId, string username, int storeId)
@@ -361,10 +375,10 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 if (!IsAuthorized(userId, username, storeId, Action.CloseStore))
                     throw new MemberAccessException("This user is not authorized to close this specified store.");
-                if (IsStoreOpen(userId, username, storeId)) { stores[storeId].closeStore(); }
+                if (IsStoreOpen(userId, username, storeId)) { stores[storeId].CloseStore(); }
                 else
                 {
-                    throw new ArgumentException($"Store {storeId} already closed.");
+                    throw new ArgumentException($"Store {storeId} is already closed.");
                 }
                 storesLocks[storeId].ReleaseWriterLock();
             }

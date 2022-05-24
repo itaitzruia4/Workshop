@@ -84,6 +84,11 @@ namespace Workshop.DomainLayer
             MarketController.CloseStore(userId, username, storeId);
         }
 
+        internal void OpenStore(int userId, string membername, int storeId)
+        {
+            MarketController.OpenStore(userId, membername, storeId);
+        }
+
         internal Store CreateNewStore(int userId, string creator, string storeName)
         {
             return MarketController.CreateNewStore(userId, creator, storeName);

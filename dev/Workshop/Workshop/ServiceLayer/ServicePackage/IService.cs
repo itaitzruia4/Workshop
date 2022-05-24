@@ -32,6 +32,8 @@ namespace Workshop.ServiceLayer
 
         Response CloseStore(int userId, string username, int storeId);
 
+        Response OpenStore(int userId, string username, int storeId);
+
         Response<Store> CreateNewStore(int userId, string creator, string storeName);
 
         Response<ReviewDTO> ReviewProduct(int userId, string user, int productId, string review, int rating);
