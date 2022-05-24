@@ -7,13 +7,17 @@ import Member from './Pages/Member'
 import Guest from './Pages/Guest'
 import Home from './Pages/Home'
 import Welcome from './Pages/Welcome'
+import Demo from './Pages/Demo'
+
 
 function App() {
 
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<Welcome />} />
+                <Route path="/" element={
+                    <Demo />} />
+                <Route path="/asdddds" element={<Welcome />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/login" element={<Login />} />

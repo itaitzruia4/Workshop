@@ -2,7 +2,7 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    background-color: #2b2828;
+    background-color: white;
 }
 
 .App {
@@ -13,4 +13,4 @@ body {
 .App-logo {
     @@ -36,3 +43,68 @@ transform: rotate(360deg);
 }
-}
+

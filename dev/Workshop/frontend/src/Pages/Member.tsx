@@ -62,14 +62,14 @@ function Member() {
                         deleteProducts={deleteProducts} />
                 </div>
                 <p className="member_control_btns">
-                    <button className="member_logout_btn" onClick={e =>
+                    <button className="Member_Btn" onClick={e =>
                         handleLogout(token)
                             .then(routeChange("/home", token))
                             .catch(error => {
                                 alert(error)
                             })
                     } > Logout </button>
-                    <button className="member_exit_btn" onClick={e =>
+                    <button className="Member_Btn" onClick={e =>
                         handleExitMarket(token)
                             .then(routeChange("/", token))
                             .catch(error => {
@@ -87,11 +87,6 @@ const StoresComponent: React.FC<{
     stores: Stores,
     deleteStores: (id: number) => void
 }> = ({ stores, deleteStores }) => {
-    const deleteStore = (id: number) => {
-        if (window.confirm(`Are you sure you want to delete this store?`)) {
-            deleteStores(id);
-        }
-    }
 
     let navigate = useNavigate();
     const routeChange = (path: string) =>
@@ -105,15 +100,11 @@ const StoresComponent: React.FC<{
             {stores.stores.length ? <ul className="stores">
                 {stores.stores.map(store => (
                     <li key={store.storeId}>
-                        <span>{store.name}</span>
                         <button
-                            className="Member_Open_Store_Btn"
-                            onClick={routeChange('/Store')}>Open store
+                            className="Member_Store_Btn"
+                            onClick={routeChange('/Store')}>{store.name}
                         </button>
-                        <button
-                            className="Member_Delete_Srore_Btn"
-                            onClick={() => { deleteStore(store.storeId) }}>X
-                        </button>
+                       
                     </li>
                 ))}
             </ul> : <div style={{ color: 'white' }} >No store have been found</div>}
@@ -137,7 +128,7 @@ const ConfigStoresComponent = ({ addStores}: { addStores : (text: string) => voi
         <div className="Config_Store_Btns">
             <form className="Member_Store_Form">
                 <button
-                    className="Member_Store_Btn"
+                    className="Member_Btn"
                     onClick={add}>Add store
                 </button>
                 <input className="Member_Store_textbox"
@@ -146,7 +137,7 @@ const ConfigStoresComponent = ({ addStores}: { addStores : (text: string) => voi
             </form>
             <form className="Member_Store_Form">
                 <button
-                    className="Member_Store_Btn"
+                    className="Member_Btn"
                     onClick={add}>Search product
                 </button>
                 <input className="Member_Store_textbox"
