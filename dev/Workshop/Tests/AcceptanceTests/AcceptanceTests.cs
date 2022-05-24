@@ -1054,7 +1054,7 @@ namespace Tests.AcceptanceTests
             Store store1 = resp1.Value;
             Assert.IsNotNull(store1);
             Response resp2 = service.CloseStore(0, "Member1", store1.StoreId + 1);
-            Assert.IsFalse(resp2.ErrorOccured);
+            Assert.IsTrue(resp2.ErrorOccured);
         }
 
         [TestMethod]
