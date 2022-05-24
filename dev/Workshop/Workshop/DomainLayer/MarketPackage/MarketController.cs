@@ -14,7 +14,7 @@ using System.Collections.Concurrent;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
-    public class MarketController: IMarketController
+    public class MarketController : IMarketController
     {
         private IUserController userController;
         private OrderHandler<int> orderHandler;
@@ -36,10 +36,10 @@ namespace Workshop.DomainLayer.MarketPackage
 
         public void InitializeSystem()
         {
-            
+
             Logger.Instance.LogEvent("Started initializing the system - Market Controller");
             Logger.Instance.LogEvent("Finished initializing the system - Market Controller");
-            
+
         }
 
         private bool IsAuthorized(int userId, string username, int storeId, Action action)
@@ -61,10 +61,8 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally {
-                storeOwner = userController.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId);
-                storesLocks[storeId].ReleaseReaderLock();
-            }
+            storeOwner = userController.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId);
+            storesLocks[storeId].ReleaseReaderLock();
             return storeOwner;
         }
 
@@ -81,11 +79,8 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally
-            {
-                storeManager = userController.NominateStoreManager(userId, nominatorUsername, nominatedUsername, storeId);
-                storesLocks[storeId].ReleaseReaderLock();
-            }
+            storeManager = userController.NominateStoreManager(userId, nominatorUsername, nominatedUsername, storeId);
+            storesLocks[storeId].ReleaseReaderLock();
             return storeManager;
         }
 
@@ -130,14 +125,11 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException($"Store ID {storeId} does not exist");
             }
-            finally
-            {
-                ViewStorePermission(userId, username, storeId);
-                if (!IsAuthorized(userId, username, storeId, Action.AddProduct))
-                    throw new MemberAccessException("This user is not authorized for adding products to the specified store.");
-                product = stores[storeId].AddProduct(name, PRODUCT_COUNT++, description, price, quantity, category);
-                storesLocks[storeId].ReleaseWriterLock();
-            }
+            ViewStorePermission(userId, username, storeId);
+            if (!IsAuthorized(userId, username, storeId, Action.AddProduct))
+                throw new MemberAccessException("This user is not authorized for adding products to the specified store.");
+            product = stores[storeId].AddProduct(name, PRODUCT_COUNT++, description, price, quantity, category);
+            storesLocks[storeId].ReleaseWriterLock();
             Logger.Instance.LogEvent($"{username} successfuly added product {name} to store {storeId}.");
             return product;
         }
@@ -154,14 +146,11 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally
-            {
-                ViewStorePermission(userId, username, storeId);
-                if (!IsAuthorized(userId, username, storeId, Action.RemoveProduct))
-                    throw new MemberAccessException("This user is not authorized for removing products from the specified store.");
-                stores[storeId].RemoveProduct(productID);
-                storesLocks[storeId].ReleaseWriterLock();
-            }
+            ViewStorePermission(userId, username, storeId);
+            if (!IsAuthorized(userId, username, storeId, Action.RemoveProduct))
+                throw new MemberAccessException("This user is not authorized for removing products from the specified store.");
+            stores[storeId].RemoveProduct(productID);
+            storesLocks[storeId].ReleaseWriterLock();
             Logger.Instance.LogEvent($"{username} successfuly removed product {productID} from store {storeId}.");
         }
 
@@ -177,14 +166,11 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally
-            {
-                ViewStorePermission(userId, username, storeId);
-                if (!IsAuthorized(userId, username, storeId, Action.ChangeProductDescription))
-                    throw new MemberAccessException("This user is not authorized for changing products descriptions in the specified store.");
-                stores[storeId].ChangeProductDescription(productID, description);
-                storesLocks[storeId].ReleaseWriterLock();
-            }
+            ViewStorePermission(userId, username, storeId);
+            if (!IsAuthorized(userId, username, storeId, Action.ChangeProductDescription))
+                throw new MemberAccessException("This user is not authorized for changing products descriptions in the specified store.");
+            stores[storeId].ChangeProductDescription(productID, description);
+            storesLocks[storeId].ReleaseWriterLock();
             Logger.Instance.LogEvent($"{username} successfuly changed the description of product {productID} in store {storeId}.");
         }
 
@@ -200,14 +186,11 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally
-            {
-                ViewStorePermission(userId, username, storeId);
-                if (!IsAuthorized(userId, username, storeId, Action.ChangeProductName))
-                    throw new MemberAccessException("This user is not authorized for changing products names in the specified store.");
-                stores[storeId].ChangeProductName(productID, name);
-                storesLocks[storeId].ReleaseWriterLock();
-            }
+            ViewStorePermission(userId, username, storeId);
+            if (!IsAuthorized(userId, username, storeId, Action.ChangeProductName))
+                throw new MemberAccessException("This user is not authorized for changing products names in the specified store.");
+            stores[storeId].ChangeProductName(productID, name);
+            storesLocks[storeId].ReleaseWriterLock();
             Logger.Instance.LogEvent($"{username} successfuly changed the name of product {productID} in store {storeId}.");
         }
 
@@ -223,14 +206,11 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally
-            {
-                ViewStorePermission(userId, username, storeId);
-                if (!IsAuthorized(userId, username, storeId, Action.ChangeProductPrice))
-                    throw new MemberAccessException("This user is not authorized for changing products prices in the specified store.");
-                stores[storeId].ChangeProductPrice(productID, price);
-                storesLocks[storeId].ReleaseWriterLock();
-            }
+            ViewStorePermission(userId, username, storeId);
+            if (!IsAuthorized(userId, username, storeId, Action.ChangeProductPrice))
+                throw new MemberAccessException("This user is not authorized for changing products prices in the specified store.");
+            stores[storeId].ChangeProductPrice(productID, price);
+            storesLocks[storeId].ReleaseWriterLock();
             Logger.Instance.LogEvent($"{username} successfuly changed the price of product {productID} in store {storeId}.");
         }
 
@@ -246,14 +226,11 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally
-            {
-                ViewStorePermission(userId, username, storeId);
-                if (!IsAuthorized(userId, username, storeId, Action.ChangeProductName))
-                    throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
-                stores[storeId].ChangeProductQuantity(productID, quantity);
-                storesLocks[storeId].ReleaseWriterLock();
-            }
+            ViewStorePermission(userId, username, storeId);
+            if (!IsAuthorized(userId, username, storeId, Action.ChangeProductName))
+                throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
+            stores[storeId].ChangeProductQuantity(productID, quantity);
+            storesLocks[storeId].ReleaseWriterLock();
             Logger.Instance.LogEvent($"{username} successfuly changed the quantity of product {productID} in store {storeId}.");
         }
 
@@ -269,14 +246,11 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally
-            {
-                ViewStorePermission(userId, username, storeId);
-                if (!IsAuthorized(userId, username, storeId, Action.ChangeProductName))
-                    throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
-                stores[storeId].ChangeProductCategory(productID, category);
-                storesLocks[storeId].ReleaseWriterLock();
-            }
+            ViewStorePermission(userId, username, storeId);
+            if (!IsAuthorized(userId, username, storeId, Action.ChangeProductName))
+                throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
+            stores[storeId].ChangeProductCategory(productID, category);
+            storesLocks[storeId].ReleaseWriterLock();
             Logger.Instance.LogEvent($"{username} successfuly changed the quantity of product {productID} in store {storeId}.");
         }
 
@@ -292,16 +266,13 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally
-            {
-                ViewStorePermission(userId, username, storeId);
-                IsAuthorized(userId, username, storeId, Action.GetStoreOrdersList);
+            ViewStorePermission(userId, username, storeId);
+            IsAuthorized(userId, username, storeId, Action.GetStoreOrdersList);
 
-                orders = this.orderHandler.GetOrders(storeId);
-                if (orders == null)
-                    throw new ArgumentException($"Store {storeId} does not exist or it does not have previous orders.");
-                storesLocks[storeId].ReleaseReaderLock();
-            }
+            orders = this.orderHandler.GetOrders(storeId);
+            if (orders == null)
+                throw new ArgumentException($"Store {storeId} does not exist or it does not have previous orders.");
+            storesLocks[storeId].ReleaseReaderLock();
             return orders;
         }
 
@@ -324,14 +295,11 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally
-            {
-                ViewStorePermission(userId, username, storeId);
-                if (!userController.IsAuthorized(username, storeId, Action.GetWorkersInformation))
-                    throw new MemberAccessException($"User {username} is not allowed to request information about the workers of store #{storeId}.");
-                workers = userController.GetWorkers(storeId);
-                storesLocks[storeId].ReleaseReaderLock();
-            }
+            ViewStorePermission(userId, username, storeId);
+            if (!userController.IsAuthorized(username, storeId, Action.GetWorkersInformation))
+                throw new MemberAccessException($"User {username} is not allowed to request information about the workers of store #{storeId}.");
+            workers = userController.GetWorkers(storeId);
+            storesLocks[storeId].ReleaseReaderLock();
             Logger.Instance.LogEvent($"{username} has received information about the workers of store {storeId}.");
             return workers;
         }
@@ -346,17 +314,14 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally
+            if (!IsAuthorized(userId, membername, storeId, Action.CloseStore))
+                throw new MemberAccessException("This user is not authorized to open this specified store.");
+            if (!IsStoreOpen(userId, membername, storeId)) { stores[storeId].OpenStore(); }
+            else
             {
-                if (!IsAuthorized(userId, membername, storeId, Action.CloseStore))
-                    throw new MemberAccessException("This user is not authorized to open this specified store.");
-                if (!IsStoreOpen(userId, membername, storeId)) { stores[storeId].OpenStore(); }
-                else
-                {
-                    throw new ArgumentException($"Store {storeId} is already opened.");
-                }
-                storesLocks[storeId].ReleaseWriterLock();
+                throw new ArgumentException($"Store {storeId} is already opened.");
             }
+            storesLocks[storeId].ReleaseWriterLock();
             Logger.Instance.LogEvent($"{membername} successfuly opened store {storeId}.");
         }
 
@@ -371,17 +336,14 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally
+            if (!IsAuthorized(userId, username, storeId, Action.CloseStore))
+                throw new MemberAccessException("This user is not authorized to close this specified store.");
+            if (IsStoreOpen(userId, username, storeId)) { stores[storeId].CloseStore(); }
+            else
             {
-                if (!IsAuthorized(userId, username, storeId, Action.CloseStore))
-                    throw new MemberAccessException("This user is not authorized to close this specified store.");
-                if (IsStoreOpen(userId, username, storeId)) { stores[storeId].CloseStore(); }
-                else
-                {
-                    throw new ArgumentException($"Store {storeId} is already closed.");
-                }
-                storesLocks[storeId].ReleaseWriterLock();
+                throw new ArgumentException($"Store {storeId} is already closed.");
             }
+            storesLocks[storeId].ReleaseWriterLock();
             Logger.Instance.LogEvent($"{username} successfuly closed store {storeId}.");
         }
 
@@ -389,16 +351,18 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             userController.AssertCurrentUser(userId, username);
             ValidateStoreExists(storeId);
-            if (!IsStoreOpen(userId, username,storeId) && !userController.IsAuthorized(username, storeId, Action.ViewClosedStore))
+            if (!IsStoreOpen(userId, username, storeId) && !userController.IsAuthorized(username, storeId, Action.ViewClosedStore))
             {
                 throw new Exception($"User {username} is not permitted to view closed store {storeId}.");
             }
         }
 
-        public Store CreateNewStore(int userId, string creator, string storeName) {
+        public Store CreateNewStore(int userId, string creator, string storeName)
+        {
             Logger.Instance.LogEvent($"{creator} is trying to create a new store: \"{storeName}\".");
             userController.AssertCurrentUser(userId, creator);
-            if (String.IsNullOrWhiteSpace(storeName)){
+            if (String.IsNullOrWhiteSpace(storeName))
+            {
                 throw new ArgumentException($"User {creator} requestted to create a store with an empty name.");
             }
             int storeId = STORE_COUNT;
@@ -430,7 +394,6 @@ namespace Workshop.DomainLayer.MarketPackage
 
         public StoreDTO getStoreInfo(int userId, string username, int storeId)
         {
-            StoreDTO storeDTO = null;
             userController.AssertCurrentUser(userId, username);
             try
             {
@@ -440,18 +403,15 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally
-            {
-                Store store = stores[storeId];
-                storeDTO = store.GetStoreDTO();
-                storesLocks[storeId].ReleaseWriterLock();
-            }
+            Store store = stores[storeId];
+            StoreDTO storeDTO = store.GetStoreDTO();
+            storesLocks[storeId].ReleaseWriterLock();
             return storeDTO;
         }
 
         private Product getProduct(int productId)
         {
-            foreach(Store store in stores.Values)
+            foreach (Store store in stores.Values)
             {
                 try
                 {
@@ -492,7 +452,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             return products.Select(p => p.GetProductDTO()).ToList();
         }
-        
+
         public ShoppingBagProduct getProductForSale(int productId, int storeId, int quantity)
         {
             ShoppingBagProduct porduct = null;
@@ -504,33 +464,31 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally
+            if (quantity <= 0)
             {
-                if (quantity <= 0)
-                {
-                    storesLocks[storeId].ReleaseWriterLock();
-                    throw new ArgumentException($"Can't add {quantity} of an item to the shopping cart");
-                }
-                if (stores[storeId].GetProduct(productId).Quantity >= quantity)
-                {
-                    try
-                    {
-                        porduct = stores[storeId].GetProductForSale(productId, quantity).GetShoppingBagProduct(quantity);
-                        storesLocks[storeId].ReleaseWriterLock();
-                    }
-                    catch(Exception e)
-                    { 
-                        storesLocks[storeId].ReleaseWriterLock();
-                        throw e;
-                    }
-                    
-                }
-                else
-                {
-                    storesLocks[storeId].ReleaseWriterLock();
-                    throw new ArgumentException("Store doesn't has enough from the product");
-                }
+                storesLocks[storeId].ReleaseWriterLock();
+                throw new ArgumentException($"Can't add {quantity} of an item to the shopping cart");
             }
+            if (stores[storeId].GetProduct(productId).Quantity >= quantity)
+            {
+                try
+                {
+                    porduct = stores[storeId].GetProductForSale(productId, quantity).GetShoppingBagProduct(quantity);
+                    storesLocks[storeId].ReleaseWriterLock();
+                }
+                catch (Exception e)
+                {
+                    storesLocks[storeId].ReleaseWriterLock();
+                    throw e;
+                }
+
+            }
+            else
+            {
+                storesLocks[storeId].ReleaseWriterLock();
+                throw new ArgumentException("Store doesn't has enough from the product");
+            }
+
             return porduct;
         }
         public double BuyCart(int userId, string username, string address)
@@ -541,7 +499,7 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new InvalidOperationException("Can't buy an empty shopping cart");
             }
-            Dictionary<int,List<ProductDTO>> productsSoFar = new Dictionary<int, List<ProductDTO>>();
+            Dictionary<int, List<ProductDTO>> productsSoFar = new Dictionary<int, List<ProductDTO>>();
             try
             {
                 foreach (int storeId in shoppingCart.shoppingBags.Keys)
@@ -554,25 +512,23 @@ namespace Workshop.DomainLayer.MarketPackage
                     {
                         throw new ArgumentException($"Store {storeId} does not exist");
                     }
-                    finally
+                    try
                     {
-                        try
-                        {
-                            int age = userController.GetAge(userId, username);
-                            stores[storeId].CheckPurchasePolicy(shoppingCart.shoppingBags[storeId], age);
-                            stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
-                            productsSoFar.Add(storeId, shoppingCart.shoppingBags[storeId].products);
-                            OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetStoreName(), shoppingCart.shoppingBags[storeId].products);
-                            orderHandler.addOrder(order, storeId);
-                            userController.AddOrder(userId, order, username);
-                            storesLocks[storeId].ReleaseWriterLock();
-                        }
-                        catch(Exception e)
-                        {
-                            storesLocks[storeId].ReleaseWriterLock();
-                            throw e;
-                        }
+                        int age = userController.GetAge(userId, username);
+                        stores[storeId].CheckPurchasePolicy(shoppingCart.shoppingBags[storeId], age);
+                        stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
+                        productsSoFar.Add(storeId, shoppingCart.shoppingBags[storeId].products);
+                        OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetStoreName(), shoppingCart.shoppingBags[storeId].products);
+                        orderHandler.addOrder(order, storeId);
+                        userController.AddOrder(userId, order, username);
+                        storesLocks[storeId].ReleaseWriterLock();
                     }
+                    catch (Exception e)
+                    {
+                        storesLocks[storeId].ReleaseWriterLock();
+                        throw e;
+                    }
+
                 }
                 supplyService.supplyToAddress(username, address);
                 double cartPrice = GetCartPrice(shoppingCart);
@@ -594,14 +550,12 @@ namespace Workshop.DomainLayer.MarketPackage
                     {
                         throw new ArgumentException("Store ID does not exist");
                     }
-                    finally
+                    foreach (ProductDTO item in productsSoFar[storeId])
                     {
-                        foreach (ProductDTO item in productsSoFar[storeId])
-                        {
-                            stores[storeId].restoreProduct(item);
-                        }
-                        storesLocks[storeId].ReleaseWriterLock();
+                        stores[storeId].restoreProduct(item);
                     }
+                    storesLocks[storeId].ReleaseWriterLock();
+
                 }
                 throw new OperationCanceledException($"User {username} was not able to purchase his cart.");
             }
@@ -633,13 +587,10 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally
-            {
-                if (!IsAuthorized(userId, user, storeId, Action.AddDiscount))
-                    throw new MemberAccessException("User " + user + " is not allowed to add discounts in store " + storeId);
-                stores[storeId].AddProductDiscount(jsonDiscount, productId);
-                storesLocks[storeId].ReleaseWriterLock();
-            }
+            if (!IsAuthorized(userId, user, storeId, Action.AddDiscount))
+                throw new MemberAccessException("User " + user + " is not allowed to add discounts in store " + storeId);
+            stores[storeId].AddProductDiscount(jsonDiscount, productId);
+            storesLocks[storeId].ReleaseWriterLock();
         }
         public void AddCategoryDiscount(int userId, string user, int storeId, string jsonDiscount, string categoryName)
         {
@@ -652,13 +603,11 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally
-            {
-                if (!IsAuthorized(userId, user, storeId, Action.AddDiscount))
-                    throw new MemberAccessException("User " + user + " is not allowed to add discounts in store " + storeId);
-                stores[storeId].AddCategoryDiscount(jsonDiscount, categoryName);
-                storesLocks[storeId].ReleaseWriterLock();
-            }
+            if (!IsAuthorized(userId, user, storeId, Action.AddDiscount))
+                throw new MemberAccessException("User " + user + " is not allowed to add discounts in store " + storeId);
+            stores[storeId].AddCategoryDiscount(jsonDiscount, categoryName);
+            storesLocks[storeId].ReleaseWriterLock();
+
         }
         public void AddStoreDiscount(int userId, string user, int storeId, string jsonDiscount)
         {
@@ -671,13 +620,11 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally
-            {
-                if (!IsAuthorized(userId, user, storeId, Action.AddDiscount))
-                    throw new MemberAccessException("User " + user + " is not allowed to add discounts in store " + storeId);
-                stores[storeId].AddStoreDiscount(jsonDiscount);
-                storesLocks[storeId].ReleaseWriterLock();
-            }
+            if (!IsAuthorized(userId, user, storeId, Action.AddDiscount))
+                throw new MemberAccessException("User " + user + " is not allowed to add discounts in store " + storeId);
+            stores[storeId].AddStoreDiscount(jsonDiscount);
+            storesLocks[storeId].ReleaseWriterLock();
+
         }
 
         public void AddProductPurchaseTerm(int userId, string user, int storeId, string json_term, int product_id)
@@ -691,13 +638,11 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally
-            {
-                if (!IsAuthorized(userId, user, storeId, Action.AddPurchaseTerm))
-                    throw new MemberAccessException("User " + user + " is not allowed to add purchase terms in store " + storeId);
-                stores[storeId].AddProductTerm(json_term, product_id);
-                storesLocks[storeId].ReleaseWriterLock();
-            }
+            if (!IsAuthorized(userId, user, storeId, Action.AddPurchaseTerm))
+                throw new MemberAccessException("User " + user + " is not allowed to add purchase terms in store " + storeId);
+            stores[storeId].AddProductTerm(json_term, product_id);
+            storesLocks[storeId].ReleaseWriterLock();
+
         }
 
         public void AddCategoryPurchaseTerm(int userId, string user, int storeId, string json_term, string category_name)
@@ -711,13 +656,11 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally
-            {
-                if (!IsAuthorized(userId, user, storeId, Action.AddPurchaseTerm))
-                    throw new MemberAccessException("User " + user + " is not allowed to add purchase terms in store " + storeId);
-                stores[storeId].AddCategoryTerm(json_term, category_name);
-                storesLocks[storeId].ReleaseWriterLock();
-            }
+            if (!IsAuthorized(userId, user, storeId, Action.AddPurchaseTerm))
+                throw new MemberAccessException("User " + user + " is not allowed to add purchase terms in store " + storeId);
+            stores[storeId].AddCategoryTerm(json_term, category_name);
+            storesLocks[storeId].ReleaseWriterLock();
+
         }
 
         public void AddStorePurchaseTerm(int userId, string user, int storeId, string json_term)
@@ -731,13 +674,11 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally
-            {
-                if (!IsAuthorized(userId, user, storeId, Action.AddPurchaseTerm))
-                    throw new MemberAccessException("User " + user + " is not allowed to add purchase terms in store " + storeId);
-                stores[storeId].AddStoreTerm(json_term);
-                storesLocks[storeId].ReleaseWriterLock();
-            }
+            if (!IsAuthorized(userId, user, storeId, Action.AddPurchaseTerm))
+                throw new MemberAccessException("User " + user + " is not allowed to add purchase terms in store " + storeId);
+            stores[storeId].AddStoreTerm(json_term);
+            storesLocks[storeId].ReleaseWriterLock();
+
         }
 
         public void AddUserPurchaseTerm(int userId, string user, int storeId, string json_term)
@@ -751,13 +692,11 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            finally
-            {
-                if (!IsAuthorized(userId, user, storeId, Action.AddPurchaseTerm))
-                    throw new MemberAccessException("User " + user + " is not allowed to add purchase terms in store " + storeId);
-                stores[storeId].AddUserTerm(json_term);
-                storesLocks[storeId].ReleaseWriterLock();
-            }
+            if (!IsAuthorized(userId, user, storeId, Action.AddPurchaseTerm))
+                throw new MemberAccessException("User " + user + " is not allowed to add purchase terms in store " + storeId);
+            stores[storeId].AddUserTerm(json_term);
+            storesLocks[storeId].ReleaseWriterLock();
+
         }
 
         public List<Store> GetAllStores()
