@@ -7,6 +7,10 @@ import StoresList from '../Components/storesList'
 import { Stack } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
+import AddStoreDialog from '../Components/Dialogs/addStoreDialog';
+
+import { useState } from 'react';
+
 
 function Demo() {
 
@@ -15,22 +19,18 @@ function Demo() {
             mode: 'dark',
         },
     });
-
+    const [stores, setStores] = useState(["snacks","candy","meds"])
     return (
         <ThemeProvider theme={darkTheme}>
-        <p>
-            <Appbar /> 
+            <Appbar />
             <ButtonGroup variant="outlined" aria-label="outlined button group">
-                <Button>Add store</Button>
-                <Button>Two</Button>
-                <Button>Three</Button>
+                {AddStoreDialog(stores, setStores)}
             </ButtonGroup>
-            {StoresList("test")}
+            {StoresList(stores)}
             <Stack direction="row" spacing={2}>
                 <Button variant='contained'>Logout </Button>
                 <Button variant='contained'>Exit market </Button>
             </Stack>
-            </p>
         </ThemeProvider>
     );
 

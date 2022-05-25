@@ -19,7 +19,7 @@ import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantity
 import { useState } from 'react';
 
 
-export default function StoresList(name: string) {
+export default function StoresList(stores: string[]) {
     const [open, setOpen] = React.useState(true);
 
     const handleClick = () => {
@@ -44,7 +44,6 @@ export default function StoresList(name: string) {
                     </ListItemIcon>
                 </ListItem>
                 <Collapse
-                    key={store}
                     in={open}
                     timeout='auto'
                     unmountOnExit
@@ -66,33 +65,10 @@ export default function StoresList(name: string) {
             </div>
         )
     }
-/*
-    return (
-<List sx={{ width: '100%', maxWidth: '100%', bgcolor: 'background.paper' }}
-      component="nav"
-      aria-labelledby="nested-list-subheader"
-      subheader={
-                <ListSubheader component="div" id="nested-list-subheader">
-                    Stores
-                </ListSubheader>
-            }
-        >
-                {['drugs','candy','snacks'].map((store) => (
-                    <ListItemButton>
-                        <ListItemIcon>
-                            <SendIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={<Typography style={{ color: 'white' }}>{store}</Typography>} />
-                    </ListItemButton>
-                ))}
-
-        </List>
-    );
-    */
     return (
         <div>
             <List component='nav' aria-labelledby='nested-list-subheader'>
-                {["drugs", "snacks", "candy"].map(doc => {
+                {stores.map(doc => {
                     return (
                         <CustomizedListItem store={doc} />
                     )

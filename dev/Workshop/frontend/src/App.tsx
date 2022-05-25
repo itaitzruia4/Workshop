@@ -8,16 +8,24 @@ import Guest from './Pages/Guest'
 import Home from './Pages/Home'
 import Welcome from './Pages/Welcome'
 import Demo from './Pages/Demo'
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 
 function App() {
+    const darkTheme = createTheme({
+        palette: {
+            mode: 'dark',
+        },
+    });
+
 
     return (
+        <ThemeProvider theme={darkTheme}>
         <Router>
             <Routes>
-                <Route path="/" element={
+                <Route path="/asdas" element={
                     <Demo />} />
-                <Route path="/asdddds" element={<Welcome />} />
+                <Route path="/" element={<Welcome />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/login" element={<Login />} />
@@ -25,6 +33,7 @@ function App() {
                 <Route path="/guest" element={<Guest />} />
             </Routes>
         </Router>
+        </ThemeProvider>
     )
 }
 
