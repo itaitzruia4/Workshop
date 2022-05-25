@@ -6,10 +6,11 @@ import Appbar from './Appbar';
 import StoresList from '../Components/storesList'
 import { Stack } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-
+import { useNavigate, useLocation } from "react-router-dom";
 import AddStoreDialog from '../Components/Dialogs/addStoreDialog';
 
 import { useState } from 'react';
+import { memberToken } from '../Components/roles';
 
 
 function Demo() {
@@ -19,6 +20,15 @@ function Demo() {
             mode: 'dark',
         },
     });
+
+    const location = useLocation();
+    const token = location.state as memberToken;
+
+    let navigate = useNavigate();
+    const routeChange = (path: string, token: memberToken) =>
+        () =>
+            navigate(path, { state: token });
+
     const [stores, setStores] = useState(["snacks","candy","meds"])
     return (
         <ThemeProvider theme={darkTheme}>

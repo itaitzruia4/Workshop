@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { delay } from './Utils/utils'
-import Login from './Pages/Login'
 import Register from './Pages/Register'
 import Member from './Pages/Member'
 import Guest from './Pages/Guest'
-import Home from './Pages/Home'
 import Welcome from './Pages/Welcome'
 import AddDiscount from './Pages/AddDiscount';
 import Demo from './Pages/Demo'
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import Login from './Pages/Login'
 
 
 function App() {
@@ -24,13 +22,12 @@ function App() {
         <ThemeProvider theme={darkTheme}>
         <Router>
             <Routes>
-                <Route path="/asdas" element={
+                <Route path="/member" element={
                     <Demo />} />
-                <Route path="/" element={<Welcome />} />
-                <Route path="/home" element={<Home />} />
+                <Route path="/" element={<Welcome />} />    
                 <Route path="/register" element={<Register />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/member" element={<Member />} />
+                <Route path="/aaaaaa" element={<Member />} />
                 <Route path="/guest" element={<Guest />} />
                 <Route path="/add-discount" element={<AddDiscount />} />
             </Routes>

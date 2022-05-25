@@ -35,7 +35,7 @@ export default function AddStoreDialog(
                 Add store
             </Button>
             <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>Subscribe</DialogTitle>
+                <DialogTitle>New Store</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
                         Please input your new store's name.
