@@ -1,11 +1,14 @@
+import { Products, Product } from "../Components/product";
+
 export type Store = {
-    id: number,
-    title: string;
+    products: []
+    name: string
+    storeId: number
+    open: boolean
 }
 
 export type Stores = {
     stores: Store[],
 }
 
-export const makeStore = (id: number, title: string): Store => ({ id: id, title: title });
 export const isStore = (x: any): x is Store => x.tag === "Store";

@@ -1,8 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './Guest.css';
 import { Store, Stores } from "../Components/store"
 import { Product } from "../Components/product"
+import { token } from '../Components/roles';
+import { handleExitMarket } from '../Actions/AuthenticationActions';
 
 
 
@@ -10,12 +12,14 @@ type Products = {
     products: Product[],
 }
 
-function Register() {
+function Guest() {
+    const location = useLocation();
+    const token = location.state as token;
+
     let navigate = useNavigate();
-    const routeChange = (path: string) =>
-        () => {
-            navigate(path);
-        }
+    const routeChange = (path: string, token: token) =>
+        () =>
+            navigate(path, { state: token });
 
     const [stores, setStores] = React.useState<Stores>({ stores: [] });
 
@@ -38,7 +42,13 @@ function Register() {
                         deleteProducts={deleteProducts} />
                 </div>
                 <p className="guest_control_btns">
-                    <button className="guest_exit_btn" onClick={routeChange('/home')}> Exit Market </button>
+                    <button className="guest_exit_btn" onClick={e =>
+                        handleExitMarket(token)
+                            .then(routeChange("/", token))
+                            .catch(error => {
+                                alert(error)
+                            })
+                    } > Exit Market </button>
                 </p>
             </div>
         </div>
@@ -61,8 +71,8 @@ const StoresComponent: React.FC<{
             <h2 className="stores-header">Stores</h2>
             {stores.stores.length ? <ul className="stores">
                 {stores.stores.map(store => (
-                    <li key={store.id}>
-                        <span>{store.title}</span>
+                    <li key={store.storeId}>
+                        <span>{store.name}</span>
                         <button
                             className="guest_Open_Store_Btn"
                             onClick={routeChange('/Store')}>Open store
@@ -127,4 +137,4 @@ const CartComponent: React.FC<{
 };
 
 
-export default Register;
+export default Guest;

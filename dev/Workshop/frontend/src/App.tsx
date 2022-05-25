@@ -8,12 +8,24 @@ import Guest from './Pages/Guest'
 import Home from './Pages/Home'
 import Welcome from './Pages/Welcome'
 import AddDiscount from './Pages/AddDiscount';
+import Demo from './Pages/Demo'
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
 
 function App() {
+    const darkTheme = createTheme({
+        palette: {
+            mode: 'dark',
+        },
+    });
+
 
     return (
+        <ThemeProvider theme={darkTheme}>
         <Router>
             <Routes>
+                <Route path="/asdas" element={
+                    <Demo />} />
                 <Route path="/" element={<Welcome />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/register" element={<Register />} />
@@ -23,6 +35,7 @@ function App() {
                 <Route path="/add-discount" element={<AddDiscount />} />
             </Routes>
         </Router>
+        </ThemeProvider>
     )
 }
 

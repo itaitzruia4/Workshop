@@ -3,7 +3,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import './Member.css';
 import { Store, Stores } from "../Components/store"
 import { Product } from "../Components/product"
-import { memberToken, userToken } from '../Components/roles';
+import { memberToken} from '../Components/roles';
+import { handleLogout, handleExitMarket } from '../Actions/AuthenticationActions';
+import { handleGetStores, handleNewStore } from '../Actions/StoreActions';
 
 
 // TODO import Store from Store component instead of defining it here
@@ -20,23 +22,22 @@ function Member() {
     const token = location.state as memberToken;
 
     let navigate = useNavigate();
-    const routeChange = (path: string, userId: number) =>
+    const routeChange = (path: string, token: memberToken) =>
         () =>
-            navigate(path, { state: { userId: userId } });
+            navigate(path, { state: token });
 
-    const [stores, setStores] = React.useState<Stores>({ stores: []});
+    const [stores, setStores] = React.useState<Stores>({ stores: [] });
+    const refreshStores = () => {
+        handleGetStores(token).then(value => setStores({ stores: value as Store[] })).catch(error => alert(error));
+    };
+    refreshStores();
     const addStores = (storeName: string) => {
-        setStores({
-            stores: [
-                { title: storeName, id: stores.stores.length + 1 },
-                ...stores.stores
-            ]
-        });
+        handleNewStore(token, storeName).then(() => handleGetStores(token).then(value => setStores({ stores: value as Store[] }))).catch(error => alert(error));
     };
 
     const deleteStores = (id: number) => {
         setStores({
-            stores: stores.stores.filter(t => t.id !== id),
+            stores: stores.stores.filter(t => t.storeId !== id),
         });
     };
 
@@ -46,26 +47,6 @@ function Member() {
             products: products.products.filter(t => t.id !== id),
         });
     };
-
-    function HandleLogout() {
-
-        let url = "http://localhost:5165/api/authentication/logout";
-
-        fetch(url, {
-            method: 'POST',
-            mode: 'cors',
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                userId: token.userId,
-                membername: token.membername,
-            })
-        }).then((response) =>
-            response.json()
-                .then((data) => response.ok ? null :
-                    alert(data.error))
-                .then(routeChange("/home", token.userId))
-        );
-    }
 
     return (
         <div className="member_page" style={textStyle}> {"Welcome " + token.membername + "!"} 
@@ -81,8 +62,20 @@ function Member() {
                         deleteProducts={deleteProducts} />
                 </div>
                 <p className="member_control_btns">
-                    <button className="member_logout_btn" onClick={HandleLogout}> Logout </button>
-                    <button className="member_exit_btn" onClick={routeChange('/', token.userId)}> Exit Market </button>
+                    <button className="Member_Btn" onClick={e =>
+                        handleLogout(token)
+                            .then(routeChange("/home", token))
+                            .catch(error => {
+                                alert(error)
+                            })
+                    } > Logout </button>
+                    <button className="Member_Btn" onClick={e =>
+                        handleExitMarket(token)
+                            .then(routeChange("/", token))
+                            .catch(error => {
+                                alert(error)
+                            })
+                    } > Exit Market </button>
                 </p>
             </div>
         </div>
@@ -94,11 +87,6 @@ const StoresComponent: React.FC<{
     stores: Stores,
     deleteStores: (id: number) => void
 }> = ({ stores, deleteStores }) => {
-    const deleteStore = (id: number) => {
-        if (window.confirm(`Are you sure you want to delete this store?`)) {
-            deleteStores(id);
-        }
-    }
 
     let navigate = useNavigate();
     const routeChange = (path: string) =>
@@ -111,16 +99,12 @@ const StoresComponent: React.FC<{
             <h2 className="stores-header">Stores</h2>
             {stores.stores.length ? <ul className="stores">
                 {stores.stores.map(store => (
-                    <li key={store.id}>
-                        <span>{store.title}</span>
+                    <li key={store.storeId}>
                         <button
-                            className="Member_Open_Store_Btn"
-                            onClick={routeChange('/Store')}>Open store
+                            className="Member_Store_Btn"
+                            onClick={routeChange('/Store')}>{store.name}
                         </button>
-                        <button
-                            className="Member_Delete_Srore_Btn"
-                            onClick={() => { deleteStore(store.id) }}>X
-                        </button>
+                       
                     </li>
                 ))}
             </ul> : <div style={{ color: 'white' }} >No store have been found</div>}
@@ -144,7 +128,7 @@ const ConfigStoresComponent = ({ addStores}: { addStores : (text: string) => voi
         <div className="Config_Store_Btns">
             <form className="Member_Store_Form">
                 <button
-                    className="Member_Store_Btn"
+                    className="Member_Btn"
                     onClick={add}>Add store
                 </button>
                 <input className="Member_Store_textbox"
@@ -153,7 +137,7 @@ const ConfigStoresComponent = ({ addStores}: { addStores : (text: string) => voi
             </form>
             <form className="Member_Store_Form">
                 <button
-                    className="Member_Store_Btn"
+                    className="Member_Btn"
                     onClick={add}>Search product
                 </button>
                 <input className="Member_Store_textbox"

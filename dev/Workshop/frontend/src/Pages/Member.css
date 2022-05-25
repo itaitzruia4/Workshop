@@ -87,36 +87,6 @@ ul {
     margin: 10px;
 }
 
-
-.Member_Delete_Srore_Btn {
-    margin-left: 50px;
-    margin-top: 10px;
-    color: darkgrey;
-    background-color: transparent;
-    border-color: #ccc;
-    font-size: 20px;
-    border: 0;
-}
-
-.Member_Delete_Srore_Btn:hover {
-    color: white;
-}
-
-.Member_Open_Store_Btn {
-    margin-left: 50px;
-    margin-top: 10px;
-    color: darkgrey;
-    background-color: transparent;
-    border-color: #ccc;
-    font-size: 20px;
-    border: 0;
-}
-
-    .Member_Open_Store_Btn:hover {
-        color: white;
-    }
-
-
 .Member_Store_Form {
     margin-left: 5px;
     margin-right: 5px;
@@ -128,8 +98,9 @@ ul {
 
 .Member_Store_Btn {
     display: block;
-    font-size: 20px;
-    background-color: #1DB954;
+    font-size: 30px;
+    background-color: transparent;
+    border-color: transparent;
     color: white;
     border-radius: 8px;
 }
@@ -138,7 +109,9 @@ ul {
         transform: scale(1.1);
     }
 
-.member_logout_btn {
+
+
+.Member_Btn {
     display: block;
     font-size: 20px;
     background-color: #1DB954;
@@ -146,31 +119,6 @@ ul {
     border-radius: 8px;
 }
 
-    .member_logout_btn:hover {
+    .Member_Btn:hover {
         transform: scale(1.1);
     }
-
-.member_exit_btn {
-    display: block;
-    font-size: 20px;
-    background-color: #1DB954;
-    color: white;
-    border-radius: 8px;
-}
-
-    .member_exit_btn:hover {
-        transform: scale(1.1);
-    }
-
-
-.Member_Buy_Btn {
-    display: block;
-    font-size: 20px;
-    background-color: #1DB954;
-    color: white;
-    border-radius: 8px;
-}
-
-.Member_Buy_Btn:hover {
-    transform: scale(1.1);
-}
