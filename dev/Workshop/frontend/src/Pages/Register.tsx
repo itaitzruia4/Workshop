@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
 import './Register.css';
-import { userToken, memeberToken, token } from '../Components/roles';
+import { userToken, memberToken, token } from '../Components/roles';
 
 function Register() {
     const textStyle = { color: 'white' }

@@ -1,6 +1,9 @@
-import React, { Component } from 'react';
+export type Discount = CompositeDiscount | ConcreteDiscount | EmptyDiscount;
 
-export type Discount = CompositeDiscount | ConcreteDiscount;
+export type EmptyDiscount = { tag: "EmptyDiscount" }
+export const makeEmptyDiscount = (): EmptyDiscount => ({ tag: "EmptyDiscount" });
+export const isEmptyDiscount = (x: any): x is EmptyDiscount => x.tag === "EmptyDiscount";
+
 export type CompositeDiscount = AndDiscount | OrDiscount | XorDiscount;
 export interface AndDiscount { tag: "AndDiscount", lhs: Discount, rhs: Discount };
 export const makeAndDiscount = (lhs: Discount, rhs: Discount): AndDiscount => ({ tag: "AndDiscount", lhs: lhs, rhs: rhs });
@@ -33,7 +36,7 @@ export const isPriceActionComposite = (x: any): x is PriceActionComposite => x.t
 
 export type PriceActionSimple = ProductPriceActionSimple | CategoryPriceActionSimple;
 export interface ProductPriceActionSimple { tag: "ProductPriceActionSimple", percentage: number, productId: number }
-export const makePriceActionSimple = (percentage: number, productId: number): ProductPriceActionSimple => ({ tag: "ProductPriceActionSimple", percentage: percentage, productId: productId });
+export const makeProductPriceActionSimple = (percentage: number, productId: number): ProductPriceActionSimple => ({ tag: "ProductPriceActionSimple", percentage: percentage, productId: productId });
 
 export interface CategoryPriceActionSimple { tag: "CategoryPriceActionSimple", percentage: number, category: string };
 export const makeCategoryPriceActionSimple = (percentage: number, category: string): CategoryPriceActionSimple => ({ tag: "CategoryPriceActionSimple", percentage: percentage, category: category });

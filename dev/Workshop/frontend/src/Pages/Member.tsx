@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import './Member.css';
 import { Store, Stores } from "../Components/store"
 import { Product } from "../Components/product"
-import { memeberToken, userToken } from '../Components/roles';
+import { memberToken, userToken } from '../Components/roles';
 
 
 // TODO import Store from Store component instead of defining it here
@@ -17,7 +17,7 @@ function Member() {
     const textStyle = { color: 'white' }
 
     const location = useLocation();
-    const token = location.state as memeberToken;
+    const token = location.state as memberToken;
 
     let navigate = useNavigate();
     const routeChange = (path: string, userId: number) =>

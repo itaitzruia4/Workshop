@@ -7,6 +7,7 @@ import Member from './Pages/Member'
 import Guest from './Pages/Guest'
 import Home from './Pages/Home'
 import Welcome from './Pages/Welcome'
+import AddDiscount from './Pages/AddDiscount';
 
 function App() {
 
@@ -19,6 +20,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/member" element={<Member />} />
                 <Route path="/guest" element={<Guest />} />
+                <Route path="/add-discount" element={<AddDiscount />} />
             </Routes>
         </Router>
     )
