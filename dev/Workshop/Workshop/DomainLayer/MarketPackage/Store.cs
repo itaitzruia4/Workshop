@@ -56,12 +56,12 @@ namespace Workshop.DomainLayer.MarketPackage
             return name;
         }
 
-        public void openStore()
+        public void OpenStore()
         {
-            throw new NotImplementedException();
+            this.open = true;
         }
 
-        public void closeStore()
+        public void CloseStore()
         {
             this.open = false;
         }

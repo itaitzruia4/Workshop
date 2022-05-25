@@ -104,6 +104,17 @@ namespace API.Controllers
             return Ok(new FrontResponse<int>(request.UserId));
         }
 
+        [HttpPost("openstore")]
+        public ActionResult<FrontResponse<int>> OpenStore([FromBody] StoreRequest request)
+        {
+            Response response = Service.OpenStore(request.UserId, request.Membername, request.StoreId);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<int>(response.ErrorMessage));
+            }
+            return Ok(new FrontResponse<int>(request.UserId));
+        }
+
         [HttpPost("removeproduct")]
         public ActionResult<FrontResponse<int>> RemoveProduct([FromBody] ProductStoreRequest request)
         {

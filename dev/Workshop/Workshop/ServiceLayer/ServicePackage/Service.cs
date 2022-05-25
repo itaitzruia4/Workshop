@@ -179,6 +179,18 @@ namespace Workshop.ServiceLayer
                 return new Response(e.Message, userId);
             }
         }
+        public Response OpenStore(int userId, string username, int storeId)
+        {
+            try
+            {
+                facade.OpenStore(userId, username, storeId);
+                return new Response(userId);
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message, userId);
+            }
+        }
 
         public Response<Store> CreateNewStore(int userId, string creator, string storeName)
         {
