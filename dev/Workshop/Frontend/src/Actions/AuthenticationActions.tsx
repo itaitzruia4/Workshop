@@ -1,4 +1,4 @@
-import { token, memeberToken } from '../Components/roles';
+import { token, memberToken } from '../Components/roles';
 
 
 export function handleEnterMarket() {
@@ -75,7 +75,7 @@ export function handleLogin(token: token, membername: string, password: string):
     })
 }
 
-export function handleLogout(token: memeberToken): Promise<any> {
+export function handleLogout(token: memberToken): Promise<any> {
 
     let url = "http://localhost:5165/api/authentication/logout";
 

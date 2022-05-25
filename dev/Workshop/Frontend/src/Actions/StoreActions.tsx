@@ -1,4 +1,4 @@
-import { token, memeberToken } from '../Components/roles';
+import { token, memberToken } from '../Components/roles';
 
 
 export function handleGetStores(token: token) {
@@ -20,7 +20,7 @@ export function handleGetStores(token: token) {
     })
 }
 
-export function handleNewStore(token: memeberToken, storeName: string) {
+export function handleNewStore(token: memberToken, storeName: string) {
     let url = "http://localhost:5165/api/store/newstore";
 
     return fetch(url, {
