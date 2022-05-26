@@ -235,7 +235,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 string type = ((string)data.type).Trim('{', '}');
                 try
                 {
-                    int product_id = double.Parse(data.key);
+                    int product_id = int.Parse(((string)data.productId).Trim('{', '}'));
                     if (value <= 0)
                         throw new Exception("Discount term value must be above 0.");
 
@@ -300,6 +300,8 @@ namespace Workshop.DomainLayer.MarketPackage
                     // The term is related to quantity of the product
                     else if (type.Equals("q"))
                     {
+                        if (value - (int)(value) > 0)
+                            throw new Exception("Quantity Discount term value must an integer, not double.");
                         if (action.Equals("<"))
                             filter = (ShoppingBagDTO shopping_bag, int age) => {
                                 double quantity = 0;
@@ -360,7 +362,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 }
                 catch (Exception)
                 {
-                    throw new Exception("Invalid product id: " + data.key);
+                    throw new Exception("Invalid product id: " + data.productId);
                 }
             }
             catch (Exception)
@@ -443,6 +445,8 @@ namespace Workshop.DomainLayer.MarketPackage
                 // The term is related to quantity of the product
                 else if (type.Equals("q"))
                 {
+                    if (value - (int)(value) > 0)
+                        throw new Exception("Quantity Discount term value must an integer, not double.");
                     if (action.Equals("<"))
                         filter = (ShoppingBagDTO shopping_bag, int age) => {
                             double quantity = 0;
@@ -572,6 +576,8 @@ namespace Workshop.DomainLayer.MarketPackage
                 // The term is related to quantity of the product
                 else if (type.Equals("q"))
                 {
+                    if (value - (int)(value) > 0)
+                        throw new Exception("Quantity Discount term value must an integer, not double.");
                     if (action.Equals("<"))
                         filter = (ShoppingBagDTO shopping_bag, int age) => {
                             return shopping_bag.products.Count() < value;

@@ -40,6 +40,30 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
             return func;
         }
 
+        public Func<int, string> makeOrproductDiscount(double lPercent, double rPercent)
+        {
+            Func<int, string> func = id => "{ \"tag\": \"OrDiscount\",\"lhs\": {\"tag\": \"SimpleDiscount\"," +
+                                            "\"priceAction\": {\"tag\": \"ProductPriceActionSimple\"," +
+                                            "\"percentage\": " + lPercent.ToString() + ", \"productId\": " + id.ToString() +
+                                            "}},\"rhs\": {\"tag\": \"SimpleDiscount\", \"priceAction\": { " +
+                                            "\"tag\": \"ProductPriceActionSimple\", \"percentage\": " + rPercent.ToString() +
+                                            ",\"productId\": " + id.ToString() + "}}}";
+
+            return func;
+        }
+
+        public Func<int, string> makeXorproductDiscount(double lPercent, double rPercent)
+        {
+            Func<int, string> func = id => "{ \"tag\": \"XorDiscount\",\"lhs\": {\"tag\": \"SimpleDiscount\"," +
+                                            "\"priceAction\": {\"tag\": \"ProductPriceActionSimple\"," +
+                                            "\"percentage\": " + lPercent.ToString() + ", \"productId\": " + id.ToString() +
+                                            "}},\"rhs\": {\"tag\": \"SimpleDiscount\", \"priceAction\": { " +
+                                            "\"tag\": \"ProductPriceActionSimple\", \"percentage\": " + rPercent.ToString() +
+                                            ",\"productId\": " + id.ToString() + "}}, discountTerm: {tag: 'ProductDiscountSimpleTerm', type: 'q', action: '<', value: 3, productId: 1}}";
+
+            return func;
+        }
+
         [DataTestMethod]
         [DataRow(30)]
         [DataRow(30.5)]
@@ -60,6 +84,26 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
             TestAddProductDiscount_Good(makeAndproductDiscount(lPercent, rPercent));
         }
 
+        [DataTestMethod]
+        [DataRow(30, 30.5)]
+        [DataRow(30.5, 30)]
+        [DataRow(0.5, 100)]
+        [DataRow(100, 0.5)]
+        public void TestAddProductDiscount_Good_Or(double lPercent, double rPercent)
+        {
+            TestAddProductDiscount_Good(makeOrproductDiscount(lPercent, rPercent));
+        }
+
+        [DataTestMethod]
+        [DataRow(30, 30.5)]
+        [DataRow(30.5, 30)]
+        [DataRow(0.5, 100)]
+        [DataRow(100, 0.5)]
+        public void TestAddProductDiscount_Good_Xor(double lPercent, double rPercent)
+        {
+            TestAddProductDiscount_Good(makeXorproductDiscount(lPercent, rPercent));
+        }
+
         public void TestAddProductDiscount_Good(Func<int, string> discount)
         {
             discountPolicy.AddProductDiscount(discount(1), 1);
@@ -73,6 +117,15 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
             storeMock.Setup(s => s.ProductExists(It.IsAny<int>())).Returns(false);
             discountPolicy = new DiscountPolicy(storeMock.Object);
             Assert.ThrowsException<Exception>(() => discountPolicy.AddProductDiscount(makeSimpleProductDiscount(discount)(0), 0));
+        }
+
+        [DataTestMethod]
+        [DataRow("{tag: 'ConditionalDiscount', priceAction: { tag: 'ProductPriceActionSimple', percentage: 10, productId: 1 }, discountTerm: {tag: 'ProductDiscountSimpleTerm', type: 'q', action: '<', value: -2, productId: 1}} ")]
+        [DataRow("{tag: 'ConditionalDiscount', priceAction: { tag: 'ProductPriceActionSimple', percentage: 10, productId: 1 }, discountTerm: {tag: 'ProductDiscountSimpleTerm', type: 'q', action: '<', value: 0.5, productId: 1}} ")]
+        [DataRow("{tag: 'ConditionalDiscount', priceAction: { tag: 'ProductPriceActionSimple', percentage: 10, productId: 1 }, discountTerm: {tag: 'ProductDiscountSimpleTerm', type: 'q', action: '$', value: 3, productId: 1}} ")]
+        public void TestAddProductDiscount_bad_WrongParameters(string discount)
+        {
+            Assert.ThrowsException<Exception>(() => discountPolicy.AddProductDiscount(discount, 1));
         }
 
         [DataTestMethod]
@@ -91,17 +144,21 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
 
         [DataTestMethod]
         [DataRow("{tag: 'ConditionalDiscount',priceAction: {tag: 'CategoryPriceActionSimple',percentage: 10,category: 'cat1'},discountTerm: {tag: 'CategoryDiscountSimpleTerm',type: 'q',action: '<',value: 5,category: 'cat1'}} ")]
+        [DataRow("{tag: 'ConditionalDiscount',priceAction: {tag: 'CategoryPriceActionSimple',percentage: 10,category: 'cat1'},discountTerm: {tag: 'CategoryDiscountSimpleTerm',type: 'p',action: '<',value: 0.5,category: 'cat1'}} ")]
         public void TestAddCategoryDiscount_Good(string discount)
         {
             discountPolicy.AddCategoryDiscount(discount, "cat1");
         }
 
         [DataTestMethod]
-        [DataRow("{\"tag\": \"CategoryDiscountSimpleTerm\",\"type\": \"q\",\"action\": \"<\",\"value\": -2,\"category\": \"cat1\"} ")]
-        [DataRow("{\"tag\": \"CategoryDiscountSimpleTerm\",\"type\": \"q\",\"action\": \"<\",\"value\": 0.5,\"category\": \"cat1\"} ")]
+        [DataRow("{tag: 'ConditionalDiscount',priceAction: {tag: 'CategoryPriceActionSimple',percentage: 10,category: 'cat1'},discountTerm: {tag: 'CategoryDiscountSimpleTerm',type: 'q',action: '<',value: -2,category: 'cat1'}} ")]
+        [DataRow("{tag: 'ConditionalDiscount',priceAction: {tag: 'CategoryPriceActionSimple',percentage: 10,category: 'cat1'},discountTerm: {tag: 'CategoryDiscountSimpleTerm',type: 'q',action: '<',value: 0.5,category: 'cat1'}} ")]
+        [DataRow("{tag: 'ConditionalDiscount',priceAction: {tag: 'CategoryPriceActionSimple',percentage: 10,category: 'cat1'},discountTerm: {tag: 'CategoryDiscountSimpleTerm',type: 'q',action: '$',value: 3,category: 'cat1'}} ")]
         public void TestAddCategoryDiscount_bad_WrongParameters(string discount)
         {
             Assert.ThrowsException<Exception>(() => discountPolicy.AddCategoryDiscount(discount, "cat1"));
         }
+
+
     }
 }
