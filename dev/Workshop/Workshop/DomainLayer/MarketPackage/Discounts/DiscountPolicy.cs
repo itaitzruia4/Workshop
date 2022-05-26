@@ -165,7 +165,7 @@ namespace Workshop.DomainLayer.MarketPackage
             
             try
             {
-                double percentage = double.Parse(data.percentage);
+                double percentage = double.Parse(((string)data.percentage).Trim('{', '}'));
                 string category = data.category;
                 if (percentage <= 0 || percentage > 100)
                     throw new Exception("Discount percentage must be between 0 and 100");
@@ -230,9 +230,9 @@ namespace Workshop.DomainLayer.MarketPackage
             try
             {
                 SimpleTerm.TermSimple filter;
-                string action = data.action;
-                double value = double.Parse(data.value);
-                string type = data.type;
+                string action = ((string)data.action).Trim('{', '}');
+                double value = double.Parse(((string)data.value).Trim('{', '}'));
+                string type = ((string)data.type).Trim('{', '}');
                 try
                 {
                     int product_id = double.Parse(data.key);
@@ -374,10 +374,10 @@ namespace Workshop.DomainLayer.MarketPackage
             try
             {
                 SimpleTerm.TermSimple filter;
-                string action = data.action;
-                double value = double.Parse(data.value);
-                string type = data.type;
-                string category = data.key;
+                string action = ((string)data.action).Trim('{', '}');
+                double value = double.Parse(((string)data.value).Trim('{', '}'));
+                string type = ((string)data.type).Trim('{', '}');
+                string category = ((string)data.category).Trim('{', '}');
                 if (value <= 0)
                     throw new Exception("Discount term value must be above 0.");
 
@@ -512,9 +512,9 @@ namespace Workshop.DomainLayer.MarketPackage
             try
             {
                 SimpleTerm.TermSimple filter;
-                string action = data.action;
-                double value = double.Parse(data.value);
-                string type = data.type;
+                string action = data.action.Trim('{', '}');
+                double value = double.Parse(((string)data.value).Trim('{', '}'));
+                string type = ((string)data.type).Trim('{', '}');
                 if (value <= 0)
                     throw new Exception("Discount term value must be above 0.");
 

@@ -920,7 +920,7 @@ namespace Tests.AcceptanceTests
 
 
         [DataTestMethod]
-        [DataRow(username, password, "{\"tag\": \"CategoryDiscountSimpleTerm\",\"type\": \"q\",\"action\": \"<\",\"value\": 5,\"category\": \"cat1\"} ")]
+        [DataRow(username, password, "{tag: 'ConditionalDiscount',priceAction: {tag: 'CategoryPriceActionSimple',percentage: 10,category: 'cat1'},discountTerm: {tag: 'CategoryDiscountSimpleTerm',type: 'q',action: '<',value: 5,category: 'cat1'}} ")]
         public void TestAddCategoryDiscount_Good(string username, string password, string discount)
         {
             TestLogin_Good(1, username, password);
