@@ -90,17 +90,17 @@ namespace Workshop.DomainLayer.MarketPackage
 
         private Discount ParseAndDiscount(dynamic data)
         {
-            return new AndDiscount(ParseDiscount(data.left), ParseDiscount(data.right));
+            return new AndDiscount(ParseDiscount(data.lhs), ParseDiscount(data.rhs));
         }
 
         private Discount ParseOrDiscount(dynamic data)
         {
-            return new OrDiscount(ParseDiscount(data.left), ParseDiscount(data.right));
+            return new OrDiscount(ParseDiscount(data.lhs), ParseDiscount(data.rhs));
         }
 
         private Discount ParseXorDiscount(dynamic data)
         {
-            return new XorDiscount(ParseDiscount(data.left), ParseDiscount(data.right), ParseDiscountTerm(data.discountTerm));
+            return new XorDiscount(ParseDiscount(data.lhs), ParseDiscount(data.rhs), ParseDiscountTerm(data.discountTerm));
         }
 
         private Discount ParseSimpleDiscount(dynamic data)
@@ -129,9 +129,9 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             string action = data.value;
             if (action.Equals("sum"))
-                return new SumComposite(ParsePriceAction(data.left), ParsePriceAction(data.right));
+                return new SumComposite(ParsePriceAction(data.lhs), ParsePriceAction(data.rhs));
             if (action.Equals("max"))
-                return new MaxComposite(ParsePriceAction(data.left), ParsePriceAction(data.right));
+                return new MaxComposite(ParsePriceAction(data.lhs), ParsePriceAction(data.rhs));
             throw new Exception("Unknown price action: " + action);
         }
 
@@ -217,11 +217,11 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             string term = data.value;
             if (term.Equals("and"))
-                return new AndTerm(ParseDiscountTerm(data.left), ParseDiscountTerm(data.right));
+                return new AndTerm(ParseDiscountTerm(data.lhs), ParseDiscountTerm(data.rhs));
             if (term.Equals("or"))
-                return new OrTerm(ParseDiscountTerm(data.left), ParseDiscountTerm(data.right));
+                return new OrTerm(ParseDiscountTerm(data.lhs), ParseDiscountTerm(data.rhs));
             if (term.Equals("xor"))
-                return new XorTerm(ParseDiscountTerm(data.left), ParseDiscountTerm(data.right));
+                return new XorTerm(ParseDiscountTerm(data.lhs), ParseDiscountTerm(data.rhs));
             throw new Exception("Unknown discount term action: " + term);
         }
 
