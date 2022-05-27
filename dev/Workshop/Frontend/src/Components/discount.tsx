@@ -34,13 +34,15 @@ export const makePriceActionComposite = (value: "sum" | "max", lhs: PriceAction,
 export const isPriceActionComposite = (x: any): x is PriceActionComposite => x.tag === "PriceActionComposite";
 
 
-export type PriceActionSimple = ProductPriceActionSimple | CategoryPriceActionSimple;
+export type PriceActionSimple = ProductPriceActionSimple | CategoryPriceActionSimple | StorePriceActionSimple;
 export interface ProductPriceActionSimple { tag: "ProductPriceActionSimple", percentage: number, productId: number }
 export const makeProductPriceActionSimple = (percentage: number, productId: number): ProductPriceActionSimple => ({ tag: "ProductPriceActionSimple", percentage: percentage, productId: productId });
 
 export interface CategoryPriceActionSimple { tag: "CategoryPriceActionSimple", percentage: number, category: string };
 export const makeCategoryPriceActionSimple = (percentage: number, category: string): CategoryPriceActionSimple => ({ tag: "CategoryPriceActionSimple", percentage: percentage, category: category });
 
+export interface StorePriceActionSimple { tag: "StorePriceActionSimple", percentage: number};
+export const makeStorePriceActionSimple = (percentage: number): StorePriceActionSimple => ({ tag: "StorePriceActionSimple", percentage: percentage});
 
 export type DiscountTerm = DiscountCompositeTerm | DiscountSimpleTerm;
 export interface DiscountCompositeTerm { tag: "DiscountCompositeTerm", value: "and" | "or" | "xor" | "if", lhs: DiscountTerm, rhs: DiscountTerm };

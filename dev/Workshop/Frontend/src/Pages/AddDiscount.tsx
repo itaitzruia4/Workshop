@@ -17,8 +17,6 @@ function AddDiscount() {
         () =>
             navigate(path, { state: token });
 
-    // const [discount, setDiscount] = useState<Discount>(makeEmptyDiscount());
-    //const [tempDiscount, setTempDiscount] = useState<Discount>(makeEmptyDiscount());
     const [category, setCategory] = useState<string>("");
     const [productId, setProductId] = useState<string>("");
     const [percentage, setPercentage] = useState<string>("");
