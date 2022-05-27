@@ -24,7 +24,7 @@ function Welcome() {
                 <Button variant="contained"
                     onClick={() =>
                         handleEnterMarket()
-                            .then(value => setUserId(value)).then(routeChange('/home', userId))
+                            .then(value => setUserId(value)).then(routeChange('/login', userId))
                             .catch(error => {
                                 alert("Couldnt connect to server")
                             })
