@@ -187,9 +187,9 @@ namespace Workshop.DomainLayer
             MarketController.ChangeProductCategory(userId, username, storeId, productID, category);
         }
 
-        internal List<Store> GetAllStores()
+        internal List<Store> GetAllStores(int userId)
         {
-            return MarketController.GetAllStores();
+            return MarketController.GetAllStores(userId);
         }
     }
 }

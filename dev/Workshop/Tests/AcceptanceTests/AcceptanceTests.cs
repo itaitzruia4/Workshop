@@ -1202,5 +1202,99 @@ namespace Tests.AcceptanceTests
             // MAKE SURE IT IS IMPLEMENTED ONCE MESSAGES ARE ADDED
             throw new NotImplementedException("Test_HoldedNotifications_From_GettingMessaged");
         }
+
+        [TestMethod]
+        public void Test_InitializeFromFile_Good()
+        {
+            Service service = new Service("enter-market(1)\n" +
+                "register(1,user1,pass1,22/08/1972)\n" +
+                "login(1,user1,pass1)\n" +
+                "create-new-store(1,user1,store1)");
+            Assert.IsTrue(service.WasInitializedWithFile);
+            Assert.IsTrue(service.EnterMarket(1).ErrorOccured);
+            Assert.IsTrue(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
+            Assert.IsTrue(service.Login(1, "user1", "pass1").ErrorOccured);
+            Assert.IsTrue(service.GetAllStores(1).Value.Count == 1);
+            Assert.IsTrue(service.GetAllStores(1).Value[0].Name.Equals("store1"));
+        }
+
+        [TestMethod]
+        public void Test_InitializeFromFile_Consistent()
+        {
+            // Sanity check
+            Service service = new Service();
+            Assert.IsFalse(service.WasInitializedWithFile);
+        }
+
+        [TestMethod]
+        public void Test_InitializeFromFile_Bad_IllegalOrderOfActions()
+        {
+            Service service = new Service("enter-market(1)\n" +
+                "login(1,user1,pass1\n" +
+                "create-new-store(1,user1,store1)");
+            // Expecting error: need to register before logging in
+            Assert.IsFalse(service.WasInitializedWithFile);
+            Assert.IsFalse(service.EnterMarket(1).ErrorOccured); // Make sure nothing happend after it failed
+            Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("Aug 22, 1972")).ErrorOccured); // Make sure nothing happend after it failed
+            Assert.IsFalse(service.Login(1, "user1", "pass1").ErrorOccured);
+            Assert.AreEqual(0, service.GetAllStores(1).Value.Count);
+        }
+
+        [TestMethod]
+        public void Test_InitializeFromFile_Bad_UnrecognizedCommand()
+        {
+            Service service = new Service("enter-market(1)\n" +
+                "register(1,user1,pass1,22/08/1972)\n" +
+                "login(1,user1,pass1)\n" +
+                "create-new-store(1,user1,store1)\n" +
+                "blah-blah(1,user1,pass1,store1)");
+            Assert.IsFalse(service.WasInitializedWithFile);
+            Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
+            Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
+            Assert.IsFalse(service.Login(1, "user1", "pass1").ErrorOccured);
+            Assert.AreEqual(0, service.GetAllStores(1).Value.Count);
+        }
+
+        [TestMethod]
+        public void Test_InitializeFromFile_Bad_BadArgumentsForCommand_Overshoot()
+        {
+            Service service = new Service("enter-market(1)\n" +
+                "register(1,user1,pass1,22/08/1972)\n" +
+                "login(1,user1,pass1)\n" +
+                "create-new-store(1,user1,store1,failureInLife1)");
+            Assert.IsFalse(service.WasInitializedWithFile);
+            Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
+            Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
+            Assert.IsFalse(service.Login(1, "user1", "pass1").ErrorOccured);
+            Assert.AreEqual(0, service.GetAllStores(1).Value.Count);
+        }
+
+        [TestMethod]
+        public void Test_InitializeFromFile_Bad_BadArgumentsForCommand_Undershoot()
+        {
+            Service service = new Service("enter-market(1)\n" +
+                "register(1,user1,pass1,22/08/1972)\n" +
+                "login(1,user1,pass1)\n" +
+                "create-new-store(1,user1)");
+            Assert.IsFalse(service.WasInitializedWithFile);
+            Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
+            Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
+            Assert.IsFalse(service.Login(1, "user1", "pass1").ErrorOccured);
+            Assert.AreEqual(0, service.GetAllStores(1).Value.Count);
+        }
+
+        [TestMethod]
+        public void Test_InitializeFromFile_Bad_BadArgumentsForCommand_WrongType()
+        {
+            Service service = new Service("enter-market(1)\n" +
+                "register(1,user1,pass1,22/08/1972)\n" +
+                "login(1,user1,pass1)\n" +
+                "create-new-store(FAILME,user1,store1)");
+            Assert.IsFalse(service.WasInitializedWithFile);
+            Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
+            Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
+            Assert.IsFalse(service.Login(1, "user1", "pass1").ErrorOccured);
+            Assert.AreEqual(0, service.GetAllStores(1).Value.Count);
+        }
     }
 }

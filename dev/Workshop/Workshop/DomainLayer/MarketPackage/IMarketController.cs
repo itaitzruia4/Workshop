@@ -66,6 +66,6 @@ namespace Workshop.DomainLayer.MarketPackage
 
         void AddUserPurchaseTerm(int userId, string user, int storeId, string json_term);
 
-        List<Store> GetAllStores();
+        List<Store> GetAllStores(int userId);
     }
 }
