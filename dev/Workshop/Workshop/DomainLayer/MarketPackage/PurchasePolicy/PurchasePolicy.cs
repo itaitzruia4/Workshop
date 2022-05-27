@@ -9,7 +9,7 @@ using Workshop.DomainLayer.UserPackage.Shopping;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
-    class PurchasePolicy
+    public class PurchasePolicy
     {
         private Dictionary<int, Term> products_terms;
         private Dictionary<string, Term> category_terms;
@@ -39,7 +39,7 @@ namespace Workshop.DomainLayer.MarketPackage
                     if(!products_terms[product.Id].IsEligible(shoppingBag))
                         return false;
                 }
-                if(category_terms.ContainsKey(product.Category))
+                if(product.Category != null && category_terms.ContainsKey(product.Category))
                 {
                     if (!category_terms[product.Category].IsEligible(shoppingBag))
                         return false;
@@ -76,7 +76,7 @@ namespace Workshop.DomainLayer.MarketPackage
             if (store_terms == null)
                 store_terms = term;
             else
-                store_terms = new OrTerm(store_terms, term);
+                store_terms = new AndTerm(store_terms, term);
         }
 
         public void AddUserTerm(string json_term)
@@ -111,7 +111,7 @@ namespace Workshop.DomainLayer.MarketPackage
         }
         private Term ParseCompositeTerm(dynamic data)
         {
-            string value = data.tag;
+            string value = data.value;
             if (value.Equals("and"))
                 return new AndTerm(ParseTerm(data.lhs), ParseTerm(data.rhs));
             if (value.Equals("or"))
@@ -151,6 +151,8 @@ namespace Workshop.DomainLayer.MarketPackage
             try
             {
                 double price = double.Parse(value);
+                if (price < 0)
+                    throw new Exception("Term price value cannot be negtive number.");
                 try
                 {
 
@@ -163,7 +165,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 foreach (ProductDTO product in shoppingBag.products)
                                 {
                                     if(product.Id == ID)
-                                        bag_product_price += product.Price;
+                                        bag_product_price += product.Price * product.Quantity;
                                 }
                                 if (action.Equals("<"))
                                     return bag_product_price < price;
@@ -193,6 +195,8 @@ namespace Workshop.DomainLayer.MarketPackage
             try
             {
                 int quantity = int.Parse(value);
+                if (quantity < 0)
+                    throw new Exception("Term quantity value cannot be negtive number.");
                 try
                 {
 
@@ -205,7 +209,7 @@ namespace Workshop.DomainLayer.MarketPackage
                         foreach (ProductDTO product in shoppingBag.products)
                         {
                             if(product.Id == ID)
-                                bag_product_quantity++;
+                                bag_product_quantity += product.Quantity;
                         }
                         if (action.Equals("<"))
                             return bag_product_quantity < quantity;
@@ -287,6 +291,8 @@ namespace Workshop.DomainLayer.MarketPackage
             try
             {
                 DateTime date = DateTime.Parse(value).Date;
+                if (date < DateTime.Now)
+                    throw new Exception("Term date must be in the future.");
                 try
                 {
                     int ID = int.Parse(productId);
@@ -361,7 +367,8 @@ namespace Workshop.DomainLayer.MarketPackage
             try
             {
                 double price = double.Parse(value);
-
+                if (price < 0)
+                    throw new Exception("Term price value cannot be negtive number.");
                 if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
                     throw new Exception("Unknown term operand: " + action);
                 SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
@@ -370,7 +377,7 @@ namespace Workshop.DomainLayer.MarketPackage
                     foreach (ProductDTO product in shoppingBag.products)
                     {
                         if (product.Category != null && category.Equals(product.Category))
-                            bag_product_price += product.Price;
+                            bag_product_price += product.Price * product.Quantity;
                     }
                     if (action.Equals("<"))
                         return bag_product_price < price;
@@ -398,6 +405,8 @@ namespace Workshop.DomainLayer.MarketPackage
             try
             {
                 int quantity = int.Parse(value);
+                if (quantity < 0)
+                    throw new Exception("Term quantity value cannot be negtive number.");
 
                 if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
                     throw new Exception("Unknown term operand: " + action);
@@ -407,7 +416,7 @@ namespace Workshop.DomainLayer.MarketPackage
                     foreach (ProductDTO product in shoppingBag.products)
                     {
                         if (product.Category != null && category.Equals(product.Category))
-                            bag_product_quantity++;
+                            bag_product_quantity += product.Quantity;
                     }
                     if (action.Equals("<"))
                         return bag_product_quantity < quantity;
@@ -477,6 +486,8 @@ namespace Workshop.DomainLayer.MarketPackage
             try
             {
                 DateTime date = DateTime.Parse(value).Date;
+                if (date < DateTime.Now)
+                    throw new Exception("Term date must be in the future.");
                 if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
                     throw new Exception("Unknown term operand: " + action);
                 SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
@@ -542,7 +553,8 @@ namespace Workshop.DomainLayer.MarketPackage
             try
             {
                 double price = double.Parse(value);
-
+                if (price < 0)
+                    throw new Exception("Term price value cannot be negtive number.");
                 if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
                     throw new Exception("Unknown term operand: " + action);
                 SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
@@ -550,7 +562,7 @@ namespace Workshop.DomainLayer.MarketPackage
                     double bag_price = 0;
                     foreach (ProductDTO product in shoppingBag.products)
                     {
-                        bag_price += product.Price;
+                        bag_price += product.Price * product.Quantity;
                     }
                     if (action.Equals("<"))
                         return bag_price < price;
@@ -578,12 +590,17 @@ namespace Workshop.DomainLayer.MarketPackage
             try
             {
                 int quantity = int.Parse(value);
-
+                if (quantity < 0)
+                    throw new Exception("Term quantity value cannot be negtive number.");
                 if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
                     throw new Exception("Unknown term operand: " + action);
                 SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
                 {
-                    int bag_quantity = shoppingBag.products.Count();
+                    int bag_quantity = 0;
+                    foreach (ProductDTO product in shoppingBag.products)
+                    {
+                        bag_quantity += product.Quantity;
+                    }
                     if (action.Equals("<"))
                         return bag_quantity < quantity;
                     if (action.Equals("<="))
@@ -641,6 +658,8 @@ namespace Workshop.DomainLayer.MarketPackage
             try
             {
                 DateTime date = DateTime.Parse(value).Date;
+                if (date < DateTime.Now)
+                    throw new Exception("Term date must be in the future.");
                 if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
                     throw new Exception("Unknown term operand: " + action);
                 SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
@@ -670,7 +689,7 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             try
             {
-                int age_value = int.Parse(data.age);
+                int age_value = int.Parse(((string)data.age).Trim('{', '}'));
                 if (age_value < 0)
                     throw new Exception("Age value must be bigger that 0.");
                 string action = data.action;
