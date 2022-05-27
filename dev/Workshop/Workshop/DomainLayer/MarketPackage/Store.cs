@@ -248,7 +248,7 @@ namespace Workshop.DomainLayer.MarketPackage
             return new StoreDTO(id, name, products,open);
         }
 
-        internal bool ProductExists(int product_id)
+        public virtual bool ProductExists(int product_id)
         {
             return products.ContainsKey(product_id);
         }

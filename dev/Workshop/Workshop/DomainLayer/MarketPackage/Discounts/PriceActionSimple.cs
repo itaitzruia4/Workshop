@@ -27,7 +27,7 @@ namespace Workshop.DomainLayer.MarketPackage.Discounts
             foreach (ProductDTO item in shoppingBag.products)
             {
                 if (filter(item))
-                    discount += ((percentage / 100) * item.Price);
+                    discount += ((percentage / 100) * item.Price)*item.Quantity;
             }
             return discount;
         }
