@@ -789,7 +789,6 @@ namespace Tests.AcceptanceTests
             Assert.IsTrue(service.ChangeProductCategory(1, username, storeId, prod.Id, cat).ErrorOccured);
         }
 
-
         public bool BuyProduct_Thread(int userId, string user, string password, int productId, int storeId, int quantity)
         {
             Assert.IsFalse(service.Login(userId, user, password).ErrorOccured);
@@ -853,8 +852,6 @@ namespace Tests.AcceptanceTests
             return func;
         }
 
-
-
         [DataTestMethod]
         [DataRow(username, password, 30)]
         [DataRow(username, password, 30.5)]
@@ -876,8 +873,6 @@ namespace Tests.AcceptanceTests
         {
             TestAddProductDiscount_Good(username, password, makeAndproductDiscount(lPercent, rPercent));
         }
-
-
 
         public void TestAddProductDiscount_Good(string username, string password, Func<int, string> discount)
         {
@@ -917,8 +912,6 @@ namespace Tests.AcceptanceTests
             Assert.IsTrue(res.ErrorOccured);
         }
 
-
-
         [DataTestMethod]
         [DataRow(username, password, "{\"tag\": \"CategoryDiscountSimpleTerm\",\"type\": \"q\",\"action\": \"<\",\"value\": 5,\"category\": \"cat1\"} ")]
         public void TestAddCategoryDiscount_Good(string username, string password, string discount)
@@ -929,17 +922,6 @@ namespace Tests.AcceptanceTests
             Product prod2 = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Response res = service.AddCategoryDiscount(1, username, storeId, discount, prod1.Category);
             Assert.IsFalse(res.ErrorOccured);
-            //Check for discount
-        }
-
-        [DataTestMethod]
-        [DataRow(username, password, "{\"tag\": \"CategoryDiscountSimpleTerm\",\"type\": \"q\",\"action\": \"<\",\"value\": 5,\"category\": \"cat1\"} ")]
-        public void TestAddAddCategoryDiscount_Bad_NoSuchProduct(string username, string password, string discount)
-        {
-            TestLogin_Good(1, username, password);
-            int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Response res = service.AddCategoryDiscount(1, username, storeId, discount, "cat1");
-            Assert.IsTrue(res.ErrorOccured);
             //Check for discount
         }
 
@@ -1218,6 +1200,7 @@ namespace Tests.AcceptanceTests
         public void Test_HoldedNotifications_From_GettingMessaged()
         {
             // MAKE SURE IT IS IMPLEMENTED ONCE MESSAGES ARE ADDED
+            throw new NotImplementedException("Test_HoldedNotifications_From_GettingMessaged");
         }
     }
 }

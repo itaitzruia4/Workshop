@@ -22,12 +22,11 @@ namespace API.Controllers
                             .AllowAnyHeader();
                     });
             });
-
+            builder.Services.AddSignalR();
             var app = builder.Build();
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
-
             app.UseCors();
 
             app.UseAuthorization();
