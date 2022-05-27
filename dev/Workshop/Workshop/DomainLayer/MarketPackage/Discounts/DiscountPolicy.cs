@@ -26,6 +26,7 @@ namespace Workshop.DomainLayer.MarketPackage
         private const string PRICE_ACT_COMP_TAG = "PriceActionComposite";
         private const string PRODUCT_PRICE_ACT_TAG = "ProductPriceActionSimple";
         private const string CATEGORY_PRICE_ACT_TAG = "CategoryPriceActionSimple";
+        private const string STORE_PRICE_ACT_TAG = "StorePriceActionSimple"; 
         private const string DISCOUNT_COMP_TERM_TAG = "DiscountCompositeTerm";
         private const string PRODUCT_SIMPLE_TERM_TAG = "ProductDiscountSimpleTerm";
         private const string CATEGORY_SIMPLE_TERM_TAG = "CategoryDiscountSimpleTerm";
@@ -122,6 +123,8 @@ namespace Workshop.DomainLayer.MarketPackage
                 return ParseProductPriceActionSimple(data);
             if (tag.Equals(CATEGORY_PRICE_ACT_TAG))
                 return ParseCategoryPriceActionSimple(data);
+            if (tag.Equals(STORE_PRICE_ACT_TAG))
+                return ParseStorePriceActionSimple(data);
             throw new Exception("Unknown price action tag: " + tag);
         }
 
@@ -179,6 +182,21 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new Exception("Invalid product id: " + data.category);
             }
         }
+        private PriceAction ParseStorePriceActionSimple(dynamic data)
+        {
+            try
+            {
+                double percentage = double.Parse(((string)data.percentage).Trim('{', '}'));
+                if (percentage <= 0 || percentage > 100)
+                    throw new Exception("Discount percentage must be between 0 and 100");
+
+                return new PriceActionSimple(percentage, (ProductDTO product) => { return true; });
+            }
+            catch (Exception)
+            {
+                throw new Exception("Invalid product id: " + data.category);
+            }
+        }
 
         private Term ParseDiscountTerm(dynamic data)
         {
@@ -194,7 +212,7 @@ namespace Workshop.DomainLayer.MarketPackage
             throw new Exception("Unknown discount term tag: " + tag);
         }
 
-        internal double CalculateDiscount(ShoppingBagDTO shoppingBag)
+        public double CalculateDiscount(ShoppingBagDTO shoppingBag)
         {
             double totalDiscount = 0.0;
             foreach (ProductDTO prod in shoppingBag.products)
@@ -250,7 +268,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
                                     if (product.Id == product_id)
-                                        total_price += product.Price;
+                                        total_price += product.Price * product.Quantity;
                                 }
                                 return total_price < value;
                             };
@@ -260,7 +278,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
                                     if (product.Id == product_id)
-                                        total_price += product.Price;
+                                        total_price += product.Price * product.Quantity;
                                 }
                                 return total_price > value;
                             };
@@ -270,7 +288,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
                                     if (product.Id == product_id)
-                                        total_price += product.Price;
+                                        total_price += product.Price * product.Quantity;
                                 }
                                 return total_price == value;
                             };
@@ -280,7 +298,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
                                     if (product.Id == product_id)
-                                        total_price += product.Price;
+                                        total_price += product.Price * product.Quantity;
                                 }
                                 return total_price >= value;
                             };
@@ -290,7 +308,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
                                     if (product.Id == product_id)
-                                        total_price += product.Price;
+                                        total_price += product.Price * product.Quantity;
                                 }
                                 return total_price <= value;
                             };
@@ -308,7 +326,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
                                     if (product.Id == product_id)
-                                        quantity++;
+                                        quantity += product.Quantity;
                                 }
                                 return quantity < value;
                             };
@@ -318,7 +336,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
                                     if (product.Id == product_id)
-                                        quantity++;
+                                        quantity += product.Quantity;
                                 }
                                 return quantity > value;
                             };
@@ -328,7 +346,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
                                     if (product.Id == product_id)
-                                        quantity++;
+                                        quantity += product.Quantity;
                                 }
                                 return quantity == value;
                             };
@@ -338,7 +356,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
                                     if (product.Id == product_id)
-                                        quantity++;
+                                        quantity += product.Quantity;
                                 }
                                 return quantity >= value;
                             };
@@ -348,7 +366,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
                                     if (product.Id == product_id)
-                                        quantity++;
+                                        quantity += product.Quantity;
                                 }
                                 return quantity <= value;
                             };
@@ -395,7 +413,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             foreach (ProductDTO product in shopping_bag.products)
                             {
                                 if (product.Category == category)
-                                    total_price += product.Price;
+                                    total_price += product.Price * product.Quantity;
                             }
                             return total_price < value;
                         };
@@ -405,7 +423,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             foreach (ProductDTO product in shopping_bag.products)
                             {
                                 if (product.Category == category)
-                                    total_price += product.Price;
+                                    total_price += product.Price * product.Quantity;
                             }
                             return total_price > value;
                         };
@@ -415,7 +433,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             foreach (ProductDTO product in shopping_bag.products)
                             {
                                 if (product.Category == category)
-                                    total_price += product.Price;
+                                    total_price += product.Price * product.Quantity;
                             }
                             return total_price == value;
                         };
@@ -425,7 +443,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             foreach (ProductDTO product in shopping_bag.products)
                             {
                                 if (product.Category == category)
-                                    total_price += product.Price;
+                                    total_price += product.Price * product.Quantity;
                             }
                             return total_price >= value;
                         };
@@ -435,7 +453,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             foreach (ProductDTO product in shopping_bag.products)
                             {
                                 if (product.Category == category)
-                                    total_price += product.Price;
+                                    total_price += product.Price * product.Quantity;
                             }
                             return total_price <= value;
                         };
@@ -453,7 +471,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             foreach (ProductDTO product in shopping_bag.products)
                             {
                                 if (product.Category == category)
-                                    quantity++;
+                                    quantity += product.Quantity;
                             }
                             return quantity < value;
                         };
@@ -463,7 +481,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             foreach (ProductDTO product in shopping_bag.products)
                             {
                                 if (product.Category == category)
-                                    quantity++;
+                                    quantity += product.Quantity;
                             }
                             return quantity > value;
                         };
@@ -473,7 +491,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             foreach (ProductDTO product in shopping_bag.products)
                             {
                                 if (product.Category == category)
-                                    quantity++;
+                                    quantity += product.Quantity;
                             }
                             return quantity == value;
                         };
@@ -483,7 +501,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             foreach (ProductDTO product in shopping_bag.products)
                             {
                                 if (product.Category == category)
-                                    quantity++;
+                                    quantity += product.Quantity;
                             }
                             return quantity >= value;
                         };
@@ -493,7 +511,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             foreach (ProductDTO product in shopping_bag.products)
                             {
                                 if (product.Category == category)
-                                    quantity++;
+                                    quantity += product.Quantity;
                             }
                             return quantity <= value;
                         };
@@ -530,7 +548,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             double total_price = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
-                                total_price += product.Price;
+                                total_price += product.Price * product.Quantity;
                             }
                             return total_price < value;
                         };
@@ -539,7 +557,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             double total_price = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
-                                total_price += product.Price;
+                                total_price += product.Price * product.Quantity;
                             }
                             return total_price > value;
                         };
@@ -548,7 +566,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             double total_price = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
-                                total_price += product.Price;
+                                total_price += product.Price * product.Quantity;
                             }
                             return total_price == value;
                         };
@@ -557,7 +575,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             double total_price = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
-                                total_price += product.Price;
+                                total_price += product.Price * product.Quantity;
                             }
                             return total_price >= value;
                         };
@@ -566,7 +584,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             double total_price = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
-                                total_price += product.Price;
+                                total_price += product.Price * product.Quantity;
                             }
                             return total_price <= value;
                         };
