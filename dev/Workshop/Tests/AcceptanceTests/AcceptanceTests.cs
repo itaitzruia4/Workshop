@@ -1521,24 +1521,28 @@ namespace Tests.AcceptanceTests
             TestLogin_Good(1, member1, "Password1");
             TestLogin_Good(2, member2, "Password2");
             TestLogin_Good(3, member3, "Password3");
+
             Store store = service.CreateNewStore(1, member1, "Store1").Value;
-            service.NominateStoreOwner(1, member1, member2, store.StoreId);
-            service.NominateStoreOwner(2, member2, member3, store.StoreId);
-            Product p1 = service.AddProduct(3, member3, store.StoreId, "Product1", "Description1", 100.0, 5, "Category1").Value;
-            Product p2 = service.AddProduct(2, member2, store.StoreId, "Product2", "Description2", 10.0, 5, "Category2").Value;
-            service.RemoveStoreOwnerNomination(1, member1, member2, store.StoreId);
-            Assert.IsTrue(service.RemoveProductFromStore(3, member3, store.StoreId, p2.Id).ErrorOccured);
-            Assert.IsTrue(service.RemoveProductFromStore(2, member2, store.StoreId, p2.Id).ErrorOccured);
-            Assert.IsFalse(service.RemoveProductFromStore(1, member1, store.StoreId, p2.Id).ErrorOccured);
-            service.addToCart(3, member3, p1.Id, store.StoreId, 2);
-            Assert.AreEqual(200, service.BuyCart(3, member3, "TestAddress").Value);
-            string review_string = "Good product, that is!";
-            ReviewDTO rev = service.ReviewProduct(3, member3, p1.Id, review_string, 4).Value;
-            Assert.AreEqual(review_string, rev.Review);
-            Assert.AreEqual(4, rev.Rating);
-            Assert.AreEqual(member3, rev.Reviewer);
-            Assert.AreEqual(p1.Id, rev.ProductId);
-            Assert.IsTrue(service.ReviewProduct(2, member2, p1.Id, review_string, 4).ErrorOccured);
+            Product p1 = service.AddProduct(1, member1, store.StoreId, "Product1", "Description1", 100.0, 5, "Category1").Value;
+            Product p2 = service.AddProduct(1, member1, store.StoreId, "Product2", "Description2", 10.0, 5, "Category2").Value;
+            service.addToCart(2, member2, p1.Id, store.StoreId, 2);
+            service.addToCart(2, member2, p2.Id, store.StoreId, 3);
+            service.Logout(2, member2);
+            service.ExitMarket(2);
+            service.EnterMarket(55);
+            service.Login(55, member2, "Password2");
+            ShoppingCart cart = service.viewCart(55, member2).Value;
+            Assert.AreEqual(cart.shoppingBags.Count, 1);
+            Assert.AreEqual(cart.shoppingBags[store.StoreId].products.Count, 2);
+            Assert.AreEqual(cart.shoppingBags[store.StoreId].products[0].Name, "Product1");
+            Assert.AreEqual(cart.shoppingBags[store.StoreId].products[0].Quantity, 2);
+            Assert.AreEqual(cart.shoppingBags[store.StoreId].products[0].Id, p1.Id);
+
+            Assert.AreEqual(cart.shoppingBags[store.StoreId].products[1].Name, "Product2");
+            Assert.AreEqual(cart.shoppingBags[store.StoreId].products[1].Quantity, 3);
+            Assert.AreEqual(cart.shoppingBags[store.StoreId].products[1].Id, p2.Id);
+
+            Assert.IsFalse(service.BuyCart(55, member2, "TestAddress").ErrorOccured);
         }
 
         [TestMethod]
