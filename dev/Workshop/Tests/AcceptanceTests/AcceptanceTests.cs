@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Workshop.ServiceLayer;
 using Workshop.ServiceLayer.ServiceObjects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Workshop.DomainLayer.Reviews;
 
 namespace Tests.AcceptanceTests
 {
@@ -1484,6 +1485,61 @@ namespace Tests.AcceptanceTests
         }
 
         // NEW FOR VERSION 3
+
+        [TestMethod]
+        public void Test_Scenario1()
+        {
+            string member1 = "Member1";
+            string member2 = "Member2";
+            string member3 = "Member3";
+            TestLogin_Good(1, member1, "Password1");
+            TestLogin_Good(2, member2, "Password2");
+            TestLogin_Good(3, member3, "Password3");
+            Store store = service.CreateNewStore(1, member1, "Store1").Value;
+            service.NominateStoreOwner(1, member1, member2, store.StoreId);
+            Product p1 = service.AddProduct(2, member2, store.StoreId, "Product1", "Description1", 100.0, 5, "Category1").Value;
+            Product p2 = service.AddProduct(1, member1, store.StoreId, "Product2", "Description2", 10.0, 5, "Category2").Value;
+            service.AddCategoryDiscount(1, member1, store.StoreId, makeSimpleCategoryDiscount(10)("Category1"), "Category1");
+            service.AddProductDiscount(2, member2, store.StoreId, makeSimpleProductDiscount(20)(p2.Id), p2.Id);
+            service.addToCart(3, member3, p1.Id, store.StoreId, 2); // 200 before discount, 180 after
+            service.addToCart(3, member3, p2.Id, store.StoreId, 3); // 30 before discount, 24 after
+            Assert.AreEqual(204, service.BuyCart(3, member3, "TestAddress").Value);
+            string review_string = "Good product, that is!";
+            ReviewDTO rev = service.ReviewProduct(3, member3, p1.Id, review_string, 4).Value;
+            Assert.AreEqual(review_string, rev.Review);
+            Assert.AreEqual(4, rev.Rating);
+            Assert.AreEqual(member3, rev.Reviewer);
+            Assert.AreEqual(p1.Id, rev.ProductId);
+        }
+
+        [TestMethod]
+        public void Test_Scenario2()
+        {
+            string member1 = "Member1";
+            string member2 = "Member2";
+            string member3 = "Member3";
+            TestLogin_Good(1, member1, "Password1");
+            TestLogin_Good(2, member2, "Password2");
+            TestLogin_Good(3, member3, "Password3");
+            Store store = service.CreateNewStore(1, member1, "Store1").Value;
+            service.NominateStoreOwner(1, member1, member2, store.StoreId);
+            service.NominateStoreOwner(2, member2, member3, store.StoreId);
+            Product p1 = service.AddProduct(3, member3, store.StoreId, "Product1", "Description1", 100.0, 5, "Category1").Value;
+            Product p2 = service.AddProduct(2, member2, store.StoreId, "Product2", "Description2", 10.0, 5, "Category2").Value;
+            service.RemoveStoreOwnerNomination(1, member1, member2, store.StoreId);
+            Assert.IsTrue(service.RemoveProductFromStore(3, member3, store.StoreId, p2.Id).ErrorOccured);
+            Assert.IsTrue(service.RemoveProductFromStore(2, member2, store.StoreId, p2.Id).ErrorOccured);
+            Assert.IsFalse(service.RemoveProductFromStore(1, member1, store.StoreId, p2.Id).ErrorOccured);
+            service.addToCart(3, member3, p1.Id, store.StoreId, 2);
+            Assert.AreEqual(200, service.BuyCart(3, member3, "TestAddress").Value);
+            string review_string = "Good product, that is!";
+            ReviewDTO rev = service.ReviewProduct(3, member3, p1.Id, review_string, 4).Value;
+            Assert.AreEqual(review_string, rev.Review);
+            Assert.AreEqual(4, rev.Rating);
+            Assert.AreEqual(member3, rev.Reviewer);
+            Assert.AreEqual(p1.Id, rev.ProductId);
+            Assert.IsTrue(service.ReviewProduct(2, member2, p1.Id, review_string, 4).ErrorOccured);
+        }
 
         [TestMethod]
         public void Test_HoldedNotifications_NoHoldedNotifications()
