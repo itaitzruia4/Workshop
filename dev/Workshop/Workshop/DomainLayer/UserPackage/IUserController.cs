@@ -15,6 +15,7 @@ namespace Workshop.DomainLayer.UserPackage
     public interface IUserController
     {
         void InitializeSystem();
+        bool IsConnected(int userId);
         User EnterMarket(int userId);
         void ExitMarket(int userId);
         void Register(int userId, string username, string password, DateTime birthdate);

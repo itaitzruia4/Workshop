@@ -699,8 +699,12 @@ namespace Workshop.DomainLayer.MarketPackage
 
         }
 
-        public List<Store> GetAllStores()
+        public List<Store> GetAllStores(int userId)
         {
+            if (!userController.IsConnected(userId))
+            {
+                throw new ArgumentException($"{userId} is not connected");
+            }
             return new List<Store>(stores.Values);
         }
     }
