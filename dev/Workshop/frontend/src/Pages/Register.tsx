@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import * as moment from 'moment';
 import { useNavigate, useLocation } from "react-router-dom";
 import { Grid, Paper, Avatar, TextField, Button, Typography, Link } from '@mui/material/';
-import { userToken, token } from '../Components/roles';
+import { userToken, token } from '../Types/roles';
 import { handleRegister } from '../Actions/AuthenticationActions';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 

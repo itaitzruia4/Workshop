@@ -1,4 +1,4 @@
-import { token, memberToken } from '../Components/roles';
+import { token, memberToken } from '../Types/roles';
 
 
 export function handleEnterMarket() {

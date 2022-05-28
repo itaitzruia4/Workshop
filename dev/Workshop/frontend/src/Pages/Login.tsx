@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate, useLocation } from "react-router-dom";
 import { Grid, Paper, Avatar, TextField, Button, Typography, Link } from '@mui/material/';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { userToken, token } from '../Components/roles';
+import { userToken, token } from '../Types/roles';
 import { handleLogin } from '../Actions/AuthenticationActions';
 
 const Login = () => {

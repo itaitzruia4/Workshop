@@ -8,8 +8,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 export default function AddStoreDialog(
-    stores: string[],
-    setStores: React.Dispatch<React.SetStateAction<string[]>>) {
+    addStore: (storeName: string) => void) {
 
     const [open, setOpen] = React.useState(false);
     const [name, setName] = React.useState("");
@@ -24,7 +23,7 @@ export default function AddStoreDialog(
 
     const handleAdd = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setStores([name, ...stores]);
+        addStore(name);
         setName("");
         handleClose();
     };

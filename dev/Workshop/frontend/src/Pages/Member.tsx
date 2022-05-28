@@ -1,22 +1,25 @@
-import React from 'react';
-import { useNavigate, useLocation } from "react-router-dom";
-import './Member.css';
-import { Store, Stores } from "../Components/store"
-import { Product } from "../Components/product"
-import { memberToken} from '../Components/roles';
+import * as React from 'react';
+import ReactDOM from 'react-dom';
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
+import Appbar from './Appbar';
+import StoresList from '../Components/storesList'
+import { Stack } from '@mui/material';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useNavigate, useLocation} from "react-router-dom";
+import AddStoreDialog from '../Components/Dialogs/addStoreDialog';
+import { useState, useEffect } from 'react';
+
 import { handleLogout, handleExitMarket } from '../Actions/AuthenticationActions';
-import { handleGetStores, handleNewStore } from '../Actions/StoreActions';
+import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore } from '../Actions/StoreActions';
 
+import { memberToken } from '../Types/roles';
+import { Store } from "../Types/store"
+import { Product } from "../Types/product"
 
-// TODO import Store from Store component instead of defining it here
-
-type Products = {
-    products: Product[],
-}
 
 function Member() {
-
-    const textStyle = { color: 'white' }
+    const [refreshKey, setRefreshKey] = useState(0);
 
     const location = useLocation();
     const token = location.state as memberToken;
@@ -26,161 +29,53 @@ function Member() {
         () =>
             navigate(path, { state: token });
 
-    const [stores, setStores] = React.useState<Stores>({ stores: [] });
-    const refreshStores = () => {
-        handleGetStores(token).then(value => setStores({ stores: value as Store[] })).catch(error => alert(error));
-    };
-    refreshStores();
-    const addStores = (storeName: string) => {
-        handleNewStore(token, storeName).then(() => handleGetStores(token).then(value => setStores({ stores: value as Store[] }))).catch(error => alert(error));
+    const [stores, setStores] = useState<Store[]>([])
+
+    const refresh = () => {
+        handleGetStores(token).then(value => setStores(value as Store[])).catch(error => alert(error));
     };
 
-    const deleteStores = (id: number) => {
-        setStores({
-            stores: stores.stores.filter(t => t.storeId !== id),
-        });
+    useEffect(() => {
+        refresh();
+        console.log(stores.length > 0 ? stores[0].products.constructor.name : 0)
+    }, [refreshKey])
+
+    const addStore = (storeName: string) => {
+        handleNewStore(token, storeName).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     };
-
-    const [products, setProducts] = React.useState<Products>({ products: [{ tag: 'Product', id: 1, name: "candy", basePrice: 1000, description: "cool drug", quantity: 3 }] });
-    const deleteProducts = (id: number) => {
-        setProducts({
-            products: products.products.filter(t => t.id !== id),
-        });
+    const addProduct = (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => {
+        handleAddProduct(token, storeId, productName, description, price, quantity, category).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     };
-
-    return (
-        <div className="member_page" style={textStyle}> {"Welcome " + token.membername + "!"} 
-            <div className="member_page_body" >
-                <ConfigStoresComponent addStores={addStores} />
-                <hr />
-                <div className="lists_section">
-                    <StoresComponent
-                        stores={stores}
-                        deleteStores={deleteStores} />
-                    <CartComponent
-                        products={products}
-                        deleteProducts={deleteProducts} />
-                </div>
-                <p className="member_control_btns">
-                    <button className="Member_Btn" onClick={e =>
-                        handleLogout(token)
-                            .then(routeChange("/home", token))
-                            .catch(error => {
-                                alert(error)
-                            })
-                    } > Logout </button>
-                    <button className="Member_Btn" onClick={e =>
-                        handleExitMarket(token)
-                            .then(routeChange("/", token))
-                            .catch(error => {
-                                alert(error)
-                            })
-                    } > Exit Market </button>
-                </p>
-            </div>
-        </div>
-    );
-}
-
-
-const StoresComponent: React.FC<{
-    stores: Stores,
-    deleteStores: (id: number) => void
-}> = ({ stores, deleteStores }) => {
-
-    let navigate = useNavigate();
-    const routeChange = (path: string) =>
-        () => {
-            navigate(path);
-        } 
-
-    return (
-        <div className="section__store">
-            <h2 className="stores-header">Stores</h2>
-            {stores.stores.length ? <ul className="stores">
-                {stores.stores.map(store => (
-                    <li key={store.storeId}>
-                        <button
-                            className="Member_Store_Btn"
-                            onClick={routeChange('/Store')}>{store.name}
-                        </button>
-                       
-                    </li>
-                ))}
-            </ul> : <div style={{ color: 'white' }} >No store have been found</div>}
-        </div>
-    );
-
-};
-
-const ConfigStoresComponent = ({ addStores}: { addStores : (text: string) => void}) => {
-    const [store, setStore] = React.useState<string>("");
-    const add = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        e.preventDefault();
-        if (!store) {
-            alert("Please enter a store name");
-        } else {
-            addStores(store);
-            setStore("");
-        }
-    };
-    return (
-        <div className="Config_Store_Btns">
-            <form className="Member_Store_Form">
-                <button
-                    className="Member_Btn"
-                    onClick={add}>Add store
-                </button>
-                <input className="Member_Store_textbox"
-                    value={store}
-                    onChange={e => { setStore(e.target.value) }} />
-            </form>
-            <form className="Member_Store_Form">
-                <button
-                    className="Member_Btn"
-                    onClick={add}>Search product
-                </button>
-                <input className="Member_Store_textbox"
-                    value={store}
-                    onChange={e => { setStore(e.target.value) }} />
-            </form>
-        </div>
-    );
-};
-
-
-const CartComponent: React.FC<{
-    products: Products,
-    deleteProducts: (id: number) => void
-}> = ({ products, deleteProducts }) => {
-    const deleteProduct = (id: number) => {
-        if (window.confirm(`Are you sure you want to remove this product from your shopping cart?`)) {
-            deleteProducts(id);
-        }
+    const closeStore = (storeId: number) => {
+        handleCloseStore(token, storeId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     }
 
     return (
-        <div className="section__store">
-            <h2 className="stores-header">Shopping cart</h2>
-            {products.products.length ? <ul className="products">
-                {products.products.map(product => (
-                    <li key={product.id}>
-                        <span>{product.name}</span>
-                        <button
-                            className="Member_Delete_Srore_Btn"
-                            onClick={() => { deleteProduct(product.id) }}>X
-                        </button>
-                    </li>
-                ))}
-            </ul> : <div style={{ color: 'white' }} >Your shopping cart is empty</div>}
-            <button
-                className="Member_Buy_Btn"
-                >Buy cart
-            </button>
-        </div>
+            <div>
+            <Appbar />
+            <ButtonGroup variant="outlined" aria-label="outlined button group">
+                {AddStoreDialog(addStore)}
+            </ButtonGroup>
+            {StoresList(stores, addProduct, closeStore)}
+            <Stack direction="row" spacing={2}>
+                <Button variant='contained' onClick={e =>
+                    handleLogout(token)
+                        .then(routeChange("/login", token))
+                        .catch(error => {
+                            alert(error)
+                        })
+                } >Logout </Button>
+                <Button variant='contained' onClick={e =>
+                    handleExitMarket(token)
+                        .then(routeChange("/", token))
+                        .catch(error => {
+                            alert(error)
+                        })
+                } >Exit market </Button>
+            </Stack>
+            </div>
     );
 
-};
-
+}
 
 export default Member;
