@@ -824,7 +824,7 @@ namespace Tests.AcceptanceTests
             Assert.AreNotEqual(res1, res2);
         }
 
-        // PurchaseTerm + DiscountPolicy tests below
+        // PurchaseTerm tests
         private Func<int, string> makeSimpleProductPurchaseTerm(string type, string action, string value)
         {
             Func<int, string> func = id => "{ tag: 'ProductPurchaseSimpleTerm', type: '" + type + "', action: '" + action + "', value: '" + value + "', productId: " + id + "}";
@@ -1112,8 +1112,25 @@ namespace Tests.AcceptanceTests
             Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Desc2", 100.0, 10, "Category1").Value;
             service.AddCategoryPurchaseTerm(1, member, store.StoreId, makeSimpleCategoryPurchaseTerm("q", action, "3")("Category1"), "Category1");
             service.addToCart(1, member, p1.Id, store.StoreId, n - 1);
-            service.addToCart(1, member, p1.Id, store.StoreId, 1);
+            service.addToCart(1, member, p2.Id, store.StoreId, 1);
             Assert.IsFalse(service.BuyCart(1, member, "TestAddress").ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("=", 2)]
+        [DataRow("<", 2)]
+        [DataRow(">", 1)]
+        public void Test_AddCategoryPurchaseTerm_Bad_BadQuantity_WithTwoProducts(string action, int n)
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Desc1", 100.0, 10, "Category1").Value;
+            Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Desc2", 100.0, 10, "Category1").Value;
+            service.AddCategoryPurchaseTerm(1, member, store.StoreId, makeSimpleCategoryPurchaseTerm("q", action, "3")("Category1"), "Category1");
+            service.addToCart(1, member, p1.Id, store.StoreId, n);
+            service.addToCart(1, member, p2.Id, store.StoreId, n);
+            Assert.IsTrue(service.BuyCart(1, member, "TestAddress").ErrorOccured);
         }
 
         [DataTestMethod]
@@ -1132,7 +1149,7 @@ namespace Tests.AcceptanceTests
             if (n != 1)
             {
                 service.addToCart(1, member, p1.Id, store.StoreId, n - 1);
-                service.addToCart(1, member, p1.Id, store.StoreId, 1);
+                service.addToCart(1, member, p2.Id, store.StoreId, 1);
             }
             else
             {
@@ -1209,6 +1226,8 @@ namespace Tests.AcceptanceTests
             service.addToCart(1, member, p1.Id, store.StoreId, 1);
             Assert.IsTrue(service.BuyCart(1, member, "TestAddress").ErrorOccured);
         }
+
+        // Discount policy tests
 
         // NEW FOR VERSION 3
 
