@@ -90,6 +90,8 @@
     <Compile Include="IntegrationTests\DomainLayer\UserPackage\TestUserController.cs" />
     <Compile Include="IntegrationTests\DomainLayer\MarketPackage\TestStore.cs" />
     <Compile Include="UnitTests\DomainLayer\MarketPackage\TestMarketController.cs" />
+    <Compile Include="UnitTests\DomainLayer\MarketPackage\TestDiscountPolicy.cs" />
+    <Compile Include="UnitTests\DomainLayer\MarketPackage\TestPurchasePolicy.cs" />
     <Compile Include="UnitTests\DomainLayer\UserPackage\TestUserController.cs" />
     <Compile Include="UnitTests\DomainLayer\UserPackage\RolesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

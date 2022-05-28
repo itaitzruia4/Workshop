@@ -26,6 +26,7 @@ namespace Workshop.DomainLayer.MarketPackage
         private const string PRICE_ACT_COMP_TAG = "PriceActionComposite";
         private const string PRODUCT_PRICE_ACT_TAG = "ProductPriceActionSimple";
         private const string CATEGORY_PRICE_ACT_TAG = "CategoryPriceActionSimple";
+        private const string STORE_PRICE_ACT_TAG = "StorePriceActionSimple"; 
         private const string DISCOUNT_COMP_TERM_TAG = "DiscountCompositeTerm";
         private const string PRODUCT_SIMPLE_TERM_TAG = "ProductDiscountSimpleTerm";
         private const string CATEGORY_SIMPLE_TERM_TAG = "CategoryDiscountSimpleTerm";
@@ -90,17 +91,17 @@ namespace Workshop.DomainLayer.MarketPackage
 
         private Discount ParseAndDiscount(dynamic data)
         {
-            return new AndDiscount(ParseDiscount(data.left), ParseDiscount(data.right));
+            return new AndDiscount(ParseDiscount(data.lhs), ParseDiscount(data.rhs));
         }
 
         private Discount ParseOrDiscount(dynamic data)
         {
-            return new OrDiscount(ParseDiscount(data.left), ParseDiscount(data.right));
+            return new OrDiscount(ParseDiscount(data.lhs), ParseDiscount(data.rhs));
         }
 
         private Discount ParseXorDiscount(dynamic data)
         {
-            return new XorDiscount(ParseDiscount(data.left), ParseDiscount(data.right), ParseDiscountTerm(data.discountTerm));
+            return new XorDiscount(ParseDiscount(data.lhs), ParseDiscount(data.rhs), ParseDiscountTerm(data.discountTerm));
         }
 
         private Discount ParseSimpleDiscount(dynamic data)
@@ -122,6 +123,8 @@ namespace Workshop.DomainLayer.MarketPackage
                 return ParseProductPriceActionSimple(data);
             if (tag.Equals(CATEGORY_PRICE_ACT_TAG))
                 return ParseCategoryPriceActionSimple(data);
+            if (tag.Equals(STORE_PRICE_ACT_TAG))
+                return ParseStorePriceActionSimple(data);
             throw new Exception("Unknown price action tag: " + tag);
         }
 
@@ -129,9 +132,9 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             string action = data.value;
             if (action.Equals("sum"))
-                return new SumComposite(ParsePriceAction(data.left), ParsePriceAction(data.right));
+                return new SumComposite(ParsePriceAction(data.lhs), ParsePriceAction(data.rhs));
             if (action.Equals("max"))
-                return new MaxComposite(ParsePriceAction(data.left), ParsePriceAction(data.right));
+                return new MaxComposite(ParsePriceAction(data.lhs), ParsePriceAction(data.rhs));
             throw new Exception("Unknown price action: " + action);
         }
 
@@ -165,7 +168,7 @@ namespace Workshop.DomainLayer.MarketPackage
             
             try
             {
-                double percentage = double.Parse(data.percentage);
+                double percentage = double.Parse(((string)data.percentage).Trim('{', '}'));
                 string category = data.category;
                 if (percentage <= 0 || percentage > 100)
                     throw new Exception("Discount percentage must be between 0 and 100");
@@ -173,6 +176,21 @@ namespace Workshop.DomainLayer.MarketPackage
                     throw new Exception("Discount category must be non-empty.");
 
                 return new PriceActionSimple(percentage, (ProductDTO product) => { return category.Equals(product.Category); });
+            }
+            catch (Exception)
+            {
+                throw new Exception("Invalid product id: " + data.category);
+            }
+        }
+        private PriceAction ParseStorePriceActionSimple(dynamic data)
+        {
+            try
+            {
+                double percentage = double.Parse(((string)data.percentage).Trim('{', '}'));
+                if (percentage <= 0 || percentage > 100)
+                    throw new Exception("Discount percentage must be between 0 and 100");
+
+                return new PriceActionSimple(percentage, (ProductDTO product) => { return true; });
             }
             catch (Exception)
             {
@@ -217,11 +235,11 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             string term = data.value;
             if (term.Equals("and"))
-                return new AndTerm(ParseDiscountTerm(data.left), ParseDiscountTerm(data.right));
+                return new AndTerm(ParseDiscountTerm(data.lhs), ParseDiscountTerm(data.rhs));
             if (term.Equals("or"))
-                return new OrTerm(ParseDiscountTerm(data.left), ParseDiscountTerm(data.right));
+                return new OrTerm(ParseDiscountTerm(data.lhs), ParseDiscountTerm(data.rhs));
             if (term.Equals("xor"))
-                return new XorTerm(ParseDiscountTerm(data.left), ParseDiscountTerm(data.right));
+                return new XorTerm(ParseDiscountTerm(data.lhs), ParseDiscountTerm(data.rhs));
             throw new Exception("Unknown discount term action: " + term);
         }
 
@@ -230,12 +248,12 @@ namespace Workshop.DomainLayer.MarketPackage
             try
             {
                 SimpleTerm.TermSimple filter;
-                string action = data.action;
-                double value = double.Parse(data.value);
-                string type = data.type;
+                string action = ((string)data.action).Trim('{', '}');
+                double value = double.Parse(((string)data.value).Trim('{', '}'));
+                string type = ((string)data.type).Trim('{', '}');
                 try
                 {
-                    int product_id = double.Parse(data.key);
+                    int product_id = int.Parse(((string)data.productId).Trim('{', '}'));
                     if (value <= 0)
                         throw new Exception("Discount term value must be above 0.");
 
@@ -250,7 +268,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
                                     if (product.Id == product_id)
-                                        total_price += product.Price;
+                                        total_price += product.Price * product.Quantity;
                                 }
                                 return total_price < value;
                             };
@@ -260,7 +278,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
                                     if (product.Id == product_id)
-                                        total_price += product.Price;
+                                        total_price += product.Price * product.Quantity;
                                 }
                                 return total_price > value;
                             };
@@ -270,7 +288,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
                                     if (product.Id == product_id)
-                                        total_price += product.Price;
+                                        total_price += product.Price * product.Quantity;
                                 }
                                 return total_price == value;
                             };
@@ -280,7 +298,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
                                     if (product.Id == product_id)
-                                        total_price += product.Price;
+                                        total_price += product.Price * product.Quantity;
                                 }
                                 return total_price >= value;
                             };
@@ -290,7 +308,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
                                     if (product.Id == product_id)
-                                        total_price += product.Price;
+                                        total_price += product.Price * product.Quantity;
                                 }
                                 return total_price <= value;
                             };
@@ -300,13 +318,15 @@ namespace Workshop.DomainLayer.MarketPackage
                     // The term is related to quantity of the product
                     else if (type.Equals("q"))
                     {
+                        if (value - (int)(value) > 0)
+                            throw new Exception("Quantity Discount term value must an integer, not double.");
                         if (action.Equals("<"))
                             filter = (ShoppingBagDTO shopping_bag, int age) => {
                                 double quantity = 0;
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
                                     if (product.Id == product_id)
-                                        quantity++;
+                                        quantity += product.Quantity;
                                 }
                                 return quantity < value;
                             };
@@ -316,7 +336,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
                                     if (product.Id == product_id)
-                                        quantity++;
+                                        quantity += product.Quantity;
                                 }
                                 return quantity > value;
                             };
@@ -326,7 +346,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
                                     if (product.Id == product_id)
-                                        quantity++;
+                                        quantity += product.Quantity;
                                 }
                                 return quantity == value;
                             };
@@ -336,7 +356,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
                                     if (product.Id == product_id)
-                                        quantity++;
+                                        quantity += product.Quantity;
                                 }
                                 return quantity >= value;
                             };
@@ -346,7 +366,7 @@ namespace Workshop.DomainLayer.MarketPackage
                                 foreach (ProductDTO product in shopping_bag.products)
                                 {
                                     if (product.Id == product_id)
-                                        quantity++;
+                                        quantity += product.Quantity;
                                 }
                                 return quantity <= value;
                             };
@@ -360,7 +380,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 }
                 catch (Exception)
                 {
-                    throw new Exception("Invalid product id: " + data.key);
+                    throw new Exception("Invalid product id: " + data.productId);
                 }
             }
             catch (Exception)
@@ -374,10 +394,10 @@ namespace Workshop.DomainLayer.MarketPackage
             try
             {
                 SimpleTerm.TermSimple filter;
-                string action = data.action;
-                double value = double.Parse(data.value);
-                string type = data.type;
-                string category = data.key;
+                string action = ((string)data.action).Trim('{', '}');
+                double value = double.Parse(((string)data.value).Trim('{', '}'));
+                string type = ((string)data.type).Trim('{', '}');
+                string category = ((string)data.category).Trim('{', '}');
                 if (value <= 0)
                     throw new Exception("Discount term value must be above 0.");
 
@@ -393,7 +413,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             foreach (ProductDTO product in shopping_bag.products)
                             {
                                 if (product.Category == category)
-                                    total_price += product.Price;
+                                    total_price += product.Price * product.Quantity;
                             }
                             return total_price < value;
                         };
@@ -403,7 +423,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             foreach (ProductDTO product in shopping_bag.products)
                             {
                                 if (product.Category == category)
-                                    total_price += product.Price;
+                                    total_price += product.Price * product.Quantity;
                             }
                             return total_price > value;
                         };
@@ -413,7 +433,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             foreach (ProductDTO product in shopping_bag.products)
                             {
                                 if (product.Category == category)
-                                    total_price += product.Price;
+                                    total_price += product.Price * product.Quantity;
                             }
                             return total_price == value;
                         };
@@ -423,7 +443,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             foreach (ProductDTO product in shopping_bag.products)
                             {
                                 if (product.Category == category)
-                                    total_price += product.Price;
+                                    total_price += product.Price * product.Quantity;
                             }
                             return total_price >= value;
                         };
@@ -433,7 +453,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             foreach (ProductDTO product in shopping_bag.products)
                             {
                                 if (product.Category == category)
-                                    total_price += product.Price;
+                                    total_price += product.Price * product.Quantity;
                             }
                             return total_price <= value;
                         };
@@ -443,13 +463,15 @@ namespace Workshop.DomainLayer.MarketPackage
                 // The term is related to quantity of the product
                 else if (type.Equals("q"))
                 {
+                    if (value - (int)(value) > 0)
+                        throw new Exception("Quantity Discount term value must an integer, not double.");
                     if (action.Equals("<"))
                         filter = (ShoppingBagDTO shopping_bag, int age) => {
                             double quantity = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
                                 if (product.Category == category)
-                                    quantity++;
+                                    quantity += product.Quantity;
                             }
                             return quantity < value;
                         };
@@ -459,7 +481,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             foreach (ProductDTO product in shopping_bag.products)
                             {
                                 if (product.Category == category)
-                                    quantity++;
+                                    quantity += product.Quantity;
                             }
                             return quantity > value;
                         };
@@ -469,7 +491,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             foreach (ProductDTO product in shopping_bag.products)
                             {
                                 if (product.Category == category)
-                                    quantity++;
+                                    quantity += product.Quantity;
                             }
                             return quantity == value;
                         };
@@ -479,7 +501,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             foreach (ProductDTO product in shopping_bag.products)
                             {
                                 if (product.Category == category)
-                                    quantity++;
+                                    quantity += product.Quantity;
                             }
                             return quantity >= value;
                         };
@@ -489,7 +511,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             foreach (ProductDTO product in shopping_bag.products)
                             {
                                 if (product.Category == category)
-                                    quantity++;
+                                    quantity += product.Quantity;
                             }
                             return quantity <= value;
                         };
@@ -512,9 +534,9 @@ namespace Workshop.DomainLayer.MarketPackage
             try
             {
                 SimpleTerm.TermSimple filter;
-                string action = data.action;
-                double value = double.Parse(data.value);
-                string type = data.type;
+                string action = data.action.Trim('{', '}');
+                double value = double.Parse(((string)data.value).Trim('{', '}'));
+                string type = ((string)data.type).Trim('{', '}');
                 if (value <= 0)
                     throw new Exception("Discount term value must be above 0.");
 
@@ -526,7 +548,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             double total_price = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
-                                total_price += product.Price;
+                                total_price += product.Price * product.Quantity;
                             }
                             return total_price < value;
                         };
@@ -535,7 +557,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             double total_price = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
-                                total_price += product.Price;
+                                total_price += product.Price * product.Quantity;
                             }
                             return total_price > value;
                         };
@@ -544,7 +566,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             double total_price = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
-                                total_price += product.Price;
+                                total_price += product.Price * product.Quantity;
                             }
                             return total_price == value;
                         };
@@ -553,7 +575,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             double total_price = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
-                                total_price += product.Price;
+                                total_price += product.Price * product.Quantity;
                             }
                             return total_price >= value;
                         };
@@ -562,7 +584,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             double total_price = 0;
                             foreach (ProductDTO product in shopping_bag.products)
                             {
-                                total_price += product.Price;
+                                total_price += product.Price * product.Quantity;
                             }
                             return total_price <= value;
                         };
@@ -572,6 +594,8 @@ namespace Workshop.DomainLayer.MarketPackage
                 // The term is related to quantity of the product
                 else if (type.Equals("q"))
                 {
+                    if (value - (int)(value) > 0)
+                        throw new Exception("Quantity Discount term value must an integer, not double.");
                     if (action.Equals("<"))
                         filter = (ShoppingBagDTO shopping_bag, int age) => {
                             return shopping_bag.products.Count() < value;
