@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
 import './AddDiscount.css';
-import { StoreToken, token } from '../Components/roles';
-import { Discount, makeCategoryDiscountSimpleTerm, makeCategoryPriceActionSimple, makeEmptyDiscount, makeProductPriceActionSimple, makeSimpleDiscount, SimpleDiscount } from '../Components/discount';
+import { StoreToken, token } from '../Types/roles';
+import { Discount, makeCategoryDiscountSimpleTerm, makeCategoryPriceActionSimple, makeEmptyDiscount, makeProductPriceActionSimple, makeSimpleDiscount, SimpleDiscount } from '../Types/discount';
 import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material';
 
 function AddDiscount() {

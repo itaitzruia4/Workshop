@@ -1,9 +1,9 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './Guest.css';
-import { Store, Stores } from "../Components/store"
-import { Product } from "../Components/product"
-import { token } from '../Components/roles';
+import { Store, Stores } from "../Types/store"
+import { Product } from "../Types/product"
+import { token } from '../Types/roles';
 import { handleExitMarket } from '../Actions/AuthenticationActions';
 
 
@@ -23,7 +23,7 @@ function Guest() {
 
     const [stores, setStores] = React.useState<Stores>({ stores: [] });
 
-    const [products, setProducts] = React.useState<Products>({ products: [{ tag: 'Product', id: 1, name: "candy", basePrice: 1000, description: "cool drug", quantity: 3 }] });
+    const [products, setProducts] = React.useState<Products>({ products: [{ tag: 'Product', id: 1, name: "candy", basePrice: 1000, description: "cool drug", quantity: 3, category: "hi" }] });
     const deleteProducts = (id: number) => {
         setProducts({
             products: products.products.filter(t => t.id !== id),

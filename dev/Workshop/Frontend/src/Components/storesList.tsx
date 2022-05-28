@@ -1,7 +1,8 @@
 import * as React from 'react';
-import ListSubheader from '@mui/material/ListSubheader';
+
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
 import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Collapse from '@mui/material/Collapse';
@@ -12,64 +13,76 @@ import ListItem from '@mui/material/ListItem';
 import Divider from '@mui/material/Divider';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantityLimits';
+import ListItemButton from '@mui/material/ListItemButton';
 import { useState } from 'react';
 
+import AddProductDialog from '../Components/Dialogs/addProductDialog';
 
-export default function StoresList(stores: string[]) {
-    const [open, setOpen] = React.useState(true);
+import { Store } from "../Types/store"
+import { Product } from "../Types/product"
 
-    const handleClick = () => {
-        setOpen(!open);
-    };
 
-    const CustomizedListItem: React.FC<{
-        store: string
-    }> = ({ store }) => {
-        const [open, setOpen] = useState(false)
-        const handleClick = () => {
-            setOpen(!open)
+export default function StoresList(
+    stores: Store[],
+    addProduct: (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => void,
+    closeStore: (storeId: number) => void
+    )
+    {
+        const CustomizedListItem: React.FC<{
+            store: Store
+        }> = ({ store }) => {
+            const [open, setOpen] = useState(false)
+            const handleClick = () => {
+                setOpen(!open)
+            }
+
+            return (
+                <div>
+                    <ListItemButton key={store.storeId} onClick={handleClick}>
+                        <ListItemText primary={<Typography style={{ color: 'white' }}>{store.name}</Typography>} />
+                        {open ? <ExpandLess /> : <ExpandMore />}
+                        <ListItemIcon>
+                            <StorefrontIcon />
+                        </ListItemIcon>
+                    </ListItemButton>
+                    <Collapse
+                        in={open}
+                        timeout='auto'
+                        unmountOnExit
+                    >
+                        <ButtonGroup variant="outlined" aria-label="outlined button group">
+                            {AddProductDialog(store.storeId, addProduct)}
+                            <div>
+                                <Button onClick={e => closeStore(store.storeId)}>Close store</Button>
+                            </div>
+                        </ButtonGroup>
+                        <List component='li' disablePadding key={store.storeId}>
+                            {[].map((product: Product) => {
+                                        return (
+                                            <ListItem button key={product.id}>
+                                                <ListItemIcon>
+                                                    <ProductionQuantityLimitsIcon />
+                                                </ListItemIcon>
+                                                <ListItemText key={product.id} primary={<Typography style={{ color: 'white' }}>{product.name}</Typography>} />
+                                            </ListItem>
+                                        )
+                                    })
+                               }
+                        </List>
+                    </Collapse>
+                    <Divider />
+                </div>
+            )
         }
-
         return (
             <div>
-                <ListItem button key={store} onClick={handleClick}>
-                    <ListItemText primary={<Typography style={{ color: 'white' }}>{store}</Typography>} />
-                    {open ? <ExpandLess /> : <ExpandMore />}
-                    <ListItemIcon>
-                        <StorefrontIcon />
-                    </ListItemIcon>
-                </ListItem>
-                <Collapse
-                    in={open}
-                    timeout='auto'
-                    unmountOnExit
-                >
-                    <List component='li' disablePadding key={store}>
-                        {store.split('').map(sheet => {
-                            return (
-                                <ListItem button key={sheet}>
-                                    <ListItemIcon>
-                                        <ProductionQuantityLimitsIcon />
-                                    </ListItemIcon>
-                                    <ListItemText key={sheet} primary={<Typography style={{ color: 'white' }}>{sheet}</Typography>} />
-                                </ListItem>
-                            )
-                        })}
-                    </List>
-                </Collapse>
-                <Divider />
+                <List component='nav' aria-labelledby='nested-list-subheader'>
+                    {stores.map(storeItem => {
+                        return (storeItem.open ?
+                            <CustomizedListItem store={storeItem} />
+                         : null)
+                    })}
+                </List>
             </div>
-        )
-    }
-    return (
-        <div>
-            <List component='nav' aria-labelledby='nested-list-subheader'>
-                {stores.map(doc => {
-                    return (
-                        <CustomizedListItem store={doc} />
-                    )
-                })}
-            </List>
-        </div>
-    );
+        );
 }
