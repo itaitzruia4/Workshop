@@ -996,7 +996,6 @@ namespace Tests.AcceptanceTests
             Assert.IsFalse(service.AddStorePurchaseTerm(1, member, store.StoreId, makeAndPurchaseTerm(makeSimpleBagPurchaseTerm(l_type, l_action, l_value), makeSimpleBagPurchaseTerm(r_type, r_action, r_value))).ErrorOccured);
         }
 
-
         [DataTestMethod]
         [DataRow("member1", "p", ">", "10", "q", "<", "5")]
         [DataRow("member1", "h", ">", "01:00", "d", "<", "27/08/2023")]
@@ -1134,10 +1133,10 @@ namespace Tests.AcceptanceTests
         }
 
         [DataTestMethod]
-        //[DataRow(">", 2)]
+        [DataRow(">", 2)]
         [DataRow("<", 2)]
-        //[DataRow("=", 3)]
-        //[DataRow("=", 1)]
+        [DataRow("=", 3)]
+        [DataRow("=", 1)]
         public void Test_AddCategoryPurchaseTerm_Bad_BadQuantity(string action, int n)
         {
             string member = "member1";
@@ -1228,6 +1227,261 @@ namespace Tests.AcceptanceTests
         }
 
         // Discount policy tests
+
+        public Func<int, string> makeSimpleProductDiscount(double percent)
+        {
+            Func<int, string> func = id => "{\"tag\": \"SimpleDiscount\",\"priceAction\":" +
+                "{\"tag\": \"ProductPriceActionSimple\",\"percentage\":" +
+                percent.ToString() + ", \"productId\": " + id.ToString() + "}}";
+            return func;
+        }
+
+        public Func<int, string> makeConditionalProductDiscount(double percent, int qunatity)
+        {
+            Func<int, string> func = id => "{tag: 'ConditionalDiscount', priceAction: { tag: 'ProductPriceActionSimple', percentage: " + percent.ToString() + ", productId: " + id + " }, discountTerm: {tag: 'ProductDiscountSimpleTerm', type: 'q', action: '>', value: " + qunatity + ", productId: " + id.ToString() + "}}";
+            return func;
+        }
+
+        public Func<string, string> makeSimpleCategoryDiscount(double percent)
+        {
+            Func<string, string> func = category => "{\"tag\": \"SimpleDiscount\",\"priceAction\":" +
+                "{\"tag\": \"CategoryPriceActionSimple\",\"percentage\":" +
+                percent.ToString() + ", \"category\": \"" + category + "\"}}";
+            return func;
+        }
+
+        public string makeSimpleStoreDiscount(double percent)
+        {
+            return "{tag: 'SimpleDiscount', priceAction: { tag: 'StorePriceActionSimple', percentage: " + percent.ToString() + "}}";
+        }
+
+        public Func<int, string> makeAndproductDiscount(double lPercent, double rPercent)
+        {
+            Func<int, string> func = id => "{ \"tag\": \"AndDiscount\",\"lhs\": {\"tag\": \"SimpleDiscount\"," +
+                                            "\"priceAction\": {\"tag\": \"ProductPriceActionSimple\"," +
+                                            "\"percentage\": " + lPercent.ToString() + ", \"productId\": " + id.ToString() +
+                                            "}},\"rhs\": {\"tag\": \"SimpleDiscount\", \"priceAction\": { " +
+                                            "\"tag\": \"ProductPriceActionSimple\", \"percentage\": " + rPercent.ToString() +
+                                            ",\"productId\": " + id.ToString() + "}}}";
+
+            return func;
+        }
+
+        public Func<int, string> makeOrproductDiscount(double lPercent, double rPercent)
+        {
+            Func<int, string> func = id => "{ \"tag\": \"OrDiscount\",\"lhs\": {\"tag\": \"SimpleDiscount\"," +
+                                            "\"priceAction\": {\"tag\": \"ProductPriceActionSimple\"," +
+                                            "\"percentage\": " + lPercent.ToString() + ", \"productId\": " + id.ToString() +
+                                            "}},\"rhs\": {\"tag\": \"SimpleDiscount\", \"priceAction\": { " +
+                                            "\"tag\": \"ProductPriceActionSimple\", \"percentage\": " + rPercent.ToString() +
+                                            ",\"productId\": " + id.ToString() + "}}}";
+
+            return func;
+        }
+
+        public Func<int, string> makeXorproductDiscount(double lPercent, double rPercent)
+        {
+            Func<int, string> func = id => "{ \"tag\": \"XorDiscount\",\"lhs\": {\"tag\": \"SimpleDiscount\"," +
+                                            "\"priceAction\": {\"tag\": \"ProductPriceActionSimple\"," +
+                                            "\"percentage\": " + lPercent.ToString() + ", \"productId\": " + id.ToString() +
+                                            "}},\"rhs\": {\"tag\": \"SimpleDiscount\", \"priceAction\": { " +
+                                            "\"tag\": \"ProductPriceActionSimple\", \"percentage\": " + rPercent.ToString() +
+                                            ",\"productId\": " + id.ToString() + "}}, discountTerm: {tag: 'ProductDiscountSimpleTerm', type: 'q', action: '<', value: 3, productId: 1}}";
+
+            return func;
+        }
+
+        [DataTestMethod]
+        [DataRow(30)]
+        [DataRow(30.5)]
+        [DataRow(0.5)]
+        [DataRow(100)]
+        public void Test_AddProductDiscount_Good_Simple(double percent)
+        {
+            Test_AddProductDiscount_Good(makeSimpleProductDiscount(percent));
+        }
+
+        [DataTestMethod]
+        [DataRow(30, 30.5)]
+        [DataRow(30.5, 30)]
+        [DataRow(0.5, 100)]
+        [DataRow(100, 0.5)]
+        public void Test_AddProductDiscount_Good_And(double lPercent, double rPercent)
+        {
+            Test_AddProductDiscount_Good(makeAndproductDiscount(lPercent, rPercent));
+        }
+
+        [DataTestMethod]
+        [DataRow(30, 30.5)]
+        [DataRow(30.5, 30)]
+        [DataRow(0.5, 100)]
+        [DataRow(100, 0.5)]
+        public void Test_AddProductDiscount_Good_Or(double lPercent, double rPercent)
+        {
+            Test_AddProductDiscount_Good(makeOrproductDiscount(lPercent, rPercent));
+        }
+
+        [DataTestMethod]
+        [DataRow(30, 30.5)]
+        [DataRow(30.5, 30)]
+        [DataRow(0.5, 100)]
+        [DataRow(100, 0.5)]
+        public void Test_AddProductDiscount_Good_Xor(double lPercent, double rPercent)
+        {
+            Test_AddProductDiscount_Good(makeXorproductDiscount(lPercent, rPercent));
+        }
+
+        private void Test_AddProductDiscount_Good(Func<int, string> discount)
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
+            Assert.IsFalse(service.AddProductDiscount(1, member, store.StoreId, discount(product.Id), product.Id).ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_AddProductDiscount_Bad_NoSuchProduct()
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
+            Assert.IsFalse(service.AddProductDiscount(1, member, store.StoreId, makeSimpleProductDiscount(30)(product.Id + 1), product.Id + 1).ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("{tag: 'ConditionalDiscount', priceAction: { tag: 'ProductPriceActionSimple', percentage: 10, productId: 1 }, discountTerm: {tag: 'ProductDiscountSimpleTerm', type: 'q', action: '<', value: -2, productId: 1}} ")]
+        [DataRow("{tag: 'ConditionalDiscount', priceAction: { tag: 'ProductPriceActionSimple', percentage: 10, productId: 1 }, discountTerm: {tag: 'ProductDiscountSimpleTerm', type: 'q', action: '<', value: 0.5, productId: 1}} ")]
+        [DataRow("{tag: 'ConditionalDiscount', priceAction: { tag: 'ProductPriceActionSimple', percentage: 10, productId: 1 }, discountTerm: {tag: 'ProductDiscountSimpleTerm', type: 'q', action: '$', value: 3, productId: 1}} ")]
+        public void Test_AddProductDiscount_Bad_WrongParameters(string discount)
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
+            Assert.IsFalse(product.Id != 1);
+            Assert.IsTrue(service.AddProductDiscount(1, member, store.StoreId, discount, 1).ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow(-1)]
+        [DataRow(-1.5)]
+        [DataRow(200)]
+        public void Test_AddProductDiscount_Bad_BadPercentage_Simple(double percent)
+        {
+            Test_AddProductDiscount_Bad_BadDiscount(makeSimpleProductDiscount(percent));
+        }
+
+        public void Test_AddProductDiscount_Bad_BadDiscount(Func<int, string> discount)
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
+            Assert.IsTrue(service.AddProductDiscount(1, member, store.StoreId, discount(product.Id), product.Id).ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("{tag: 'ConditionalDiscount',priceAction: {tag: 'CategoryPriceActionSimple',percentage: 10,category: 'cat1'},discountTerm: {tag: 'CategoryDiscountSimpleTerm',type: 'q',action: '<',value: 5,category: 'cat1'}} ")]
+        [DataRow("{tag: 'ConditionalDiscount',priceAction: {tag: 'CategoryPriceActionSimple',percentage: 10,category: 'cat1'},discountTerm: {tag: 'CategoryDiscountSimpleTerm',type: 'p',action: '<',value: 0.5,category: 'cat1'}} ")]
+        public void Test_AddCategoryDiscount_Good(string discount)
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "cat1");
+            Assert.IsFalse(service.AddCategoryDiscount(1, member, store.StoreId, discount, "cat1").ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("{tag: 'ConditionalDiscount',priceAction: {tag: 'CategoryPriceActionSimple',percentage: 10,category: 'cat1'},discountTerm: {tag: 'CategoryDiscountSimpleTerm',type: 'q',action: '<',value: -2,category: 'cat1'}} ")]
+        [DataRow("{tag: 'ConditionalDiscount',priceAction: {tag: 'CategoryPriceActionSimple',percentage: 10,category: 'cat1'},discountTerm: {tag: 'CategoryDiscountSimpleTerm',type: 'q',action: '<',value: 0.5,category: 'cat1'}} ")]
+        [DataRow("{tag: 'ConditionalDiscount',priceAction: {tag: 'CategoryPriceActionSimple',percentage: 10,category: 'cat1'},discountTerm: {tag: 'CategoryDiscountSimpleTerm',type: 'q',action: '$',value: 3,category: 'cat1'}} ")]
+        public void TestAddCategoryDiscount_Bad_WrongParameters(string discount)
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "cat1");
+            Assert.IsTrue(service.AddCategoryDiscount(1, member, store.StoreId, discount, "cat1").ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_BuyCart_ProductAndCategoryDiscounts()
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 3, "no_cat").Value;
+            Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Description2", 200.0, 2, "Cat1").Value;
+            Product p3 = service.AddProduct(1, member, store.StoreId, "Product3", "Description3", 50.0, 5, "Cat2").Value;
+            service.AddProductDiscount(1, member, store.StoreId, makeSimpleProductDiscount(10)(p1.Id), p1.Id);
+            service.AddProductDiscount(1, member, store.StoreId, makeSimpleProductDiscount(20)(p2.Id), p2.Id);
+            service.AddCategoryDiscount(1, member, store.StoreId, makeSimpleCategoryDiscount(50)("Cat1"), "Cat1");
+            service.AddCategoryDiscount(1, member, store.StoreId, makeSimpleCategoryDiscount(10)("Cat2"), "Cat2");
+            service.addToCart(1, member, p1.Id, store.StoreId, 3);
+            service.addToCart(1, member, p2.Id, store.StoreId, 2);
+            service.addToCart(1, member, p3.Id, store.StoreId, 5);
+            double expected_price = 335;
+            Assert.AreEqual(expected_price, service.BuyCart(1, member, "TestAddress").Value);
+        }
+
+        [TestMethod]
+        public void Test_BuyCart_ProductAndStoreDiscounts()
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 3, "no_cat").Value;
+            Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Description2", 200.0, 2, "Cat1").Value;
+            Product p3 = service.AddProduct(1, member, store.StoreId, "Product3", "Description3", 50.0, 5, "Cat2").Value;
+            service.AddProductDiscount(1, member, store.StoreId, makeSimpleProductDiscount(10)(p1.Id), p1.Id);
+            service.AddProductDiscount(1, member, store.StoreId, makeSimpleProductDiscount(20)(p2.Id), p2.Id);
+            service.AddStoreDiscount(1, member, store.StoreId, makeSimpleStoreDiscount(10));
+            service.addToCart(1, member, p1.Id, store.StoreId, 3);
+            service.addToCart(1, member, p2.Id, store.StoreId, 2);
+            service.addToCart(1, member, p3.Id, store.StoreId, 5);
+            double expected_price = 205;
+            Assert.AreEqual(expected_price, service.BuyCart(1, member, "TestAddress").Value);
+        }
+
+        [TestMethod]
+        public void Test_BuyCart_ConditionalProductDiscounts()
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 3, "no_cat").Value;
+            Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Description2", 200.0, 2, "Cat1").Value;
+            Product p3 = service.AddProduct(1, member, store.StoreId, "Product3", "Description3", 50.0, 5, "Cat2").Value;
+            service.AddProductDiscount(1, member, store.StoreId, makeConditionalProductDiscount(10, 2)(p1.Id), p1.Id);
+            service.AddProductDiscount(1, member, store.StoreId, makeConditionalProductDiscount(20, 2)(p2.Id), p2.Id);
+            service.addToCart(1, member, p1.Id, store.StoreId, 3);
+            service.addToCart(1, member, p2.Id, store.StoreId, 2);
+            service.addToCart(1, member, p3.Id, store.StoreId, 5);
+            double expected_price = 30;
+            Assert.AreEqual(expected_price, service.BuyCart(1, member, "TestAddress").Value);
+        }
+
+        [TestMethod]
+        public void Test_BuyCart_CompositeProductDiscounts()
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 3, "no_cat").Value;
+            Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Description2", 200.0, 2, "Cat1").Value;
+            Product p3 = service.AddProduct(1, member, store.StoreId, "Product3", "Description3", 50.0, 5, "Cat2").Value;
+            service.AddProductDiscount(1, member, store.StoreId, makeAndproductDiscount(10, 20)(p1.Id), p1.Id);
+            service.AddProductDiscount(1, member, store.StoreId, makeXorproductDiscount(10, 20)(p2.Id), p2.Id);
+            service.AddProductDiscount(1, member, store.StoreId, makeXorproductDiscount(30, 40)(p3.Id), p3.Id);
+            service.addToCart(1, member, p1.Id, store.StoreId, 3);
+            service.addToCart(1, member, p2.Id, store.StoreId, 2);
+            service.addToCart(1, member, p3.Id, store.StoreId, 5);
+            double expected_price = 270;
+            Assert.AreEqual(expected_price, service.BuyCart(1, member, "TestAddress").Value);
+        }
 
         // NEW FOR VERSION 3
 

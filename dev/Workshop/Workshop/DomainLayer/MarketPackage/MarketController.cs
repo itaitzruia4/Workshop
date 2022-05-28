@@ -534,7 +534,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 double cartPrice = GetCartPrice(shoppingCart);
                 paymentService.PayAmount(username, cartPrice);
                 userController.ClearUserCart(userId);
-                Logger.Instance.LogEvent($"User {userId} successfuly paid {shoppingCart.getPrice()} and purchased his cart.");
+                Logger.Instance.LogEvent($"User {userId} successfuly paid {cartPrice} and purchased his cart.");
                 return cartPrice;
             }
             catch (ArgumentException)
