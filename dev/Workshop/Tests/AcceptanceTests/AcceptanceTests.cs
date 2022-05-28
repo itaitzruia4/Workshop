@@ -26,7 +26,7 @@ namespace Tests.AcceptanceTests
         }
 
         [TestMethod]
-        public void TestSystemInitiation()
+        public void Test_SystemInitiation()
         {
             Assert.IsNotNull(service);
             //Assert.IsNotNull(srv.getSystemmanager()); //Further tests will come later on
@@ -34,7 +34,7 @@ namespace Tests.AcceptanceTests
         }
 
         [TestMethod]
-        public void TestEnterMarket_Good()
+        public void Test_EnterMarket_Good()
         {
             Response<User> ru = service.EnterMarket(1);
             Assert.IsFalse(ru.ErrorOccured);
@@ -42,27 +42,27 @@ namespace Tests.AcceptanceTests
         }
 
         [TestMethod]
-        public void TestEnterMarket_Bad()
+        public void Test_EnterMarket_Bad()
         {
             Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
             Assert.IsTrue(service.EnterMarket(1).ErrorOccured);
         }
 
         [TestMethod]
-        public void TestExitMarket_Good()
+        public void Test_ExitMarket_Good()
         {
             service.EnterMarket(1);
             Assert.IsFalse(service.ExitMarket(1).ErrorOccured);
         }
 
         [TestMethod]
-        public void TestExitMarket_Bad_NeverEntered()
+        public void Test_ExitMarket_Bad_NeverEntered()
         {
             Assert.IsTrue(service.ExitMarket(1).ErrorOccured);
         }
 
         [TestMethod]
-        public void TestExitMarket_Bad_ExitTwice()
+        public void Test_ExitMarket_Bad_ExitTwice()
         {
             service.EnterMarket(1);
             Assert.IsFalse(service.ExitMarket(1).ErrorOccured);
@@ -71,7 +71,7 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(1, username, password)]
-        public void TestRegister_Good(int userId, string username, string password)
+        public void Test_Register_Good(int userId, string username, string password)
         {
             service.EnterMarket(userId);
             Assert.IsFalse(service.Register(userId, username, password, DateTime.Parse("Aug 22, 1972")).ErrorOccured);
@@ -81,7 +81,7 @@ namespace Tests.AcceptanceTests
         [DataRow(username, password)]
         [DataRow("TestRegister_Bad", password)]
         [DataRow(username, "TestRegister_Bad")]
-        public void TestRegister_Bad(string username, string password)
+        public void Test_Register_Bad(string username, string password)
         {
             service.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
             Assert.IsTrue(service.Register(1, username, password, DateTime.Parse("Aug 22, 1972")).ErrorOccured);
@@ -90,7 +90,7 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(1, username, password)]
-        public void TestLogin_Good(int userId, string username, string password)
+        public void Test_Login_Good(int userId, string username, string password)
         {
             service.EnterMarket(userId);
             service.Register(userId, username, password, DateTime.Parse("Aug 22, 1972"));
@@ -105,7 +105,7 @@ namespace Tests.AcceptanceTests
         [DataRow("", "")]
         [DataRow("", "Fake2")]
         [DataRow("Fake1", "")]
-        public void TestLogin_Bad_NoSuchUser(string username, string password)
+        public void Test_Login_Bad_NoSuchUser(string username, string password)
         {
             Assert.IsTrue(service.Login(1, username, password).ErrorOccured);
         }
@@ -115,7 +115,7 @@ namespace Tests.AcceptanceTests
         [DataRow(username, password, username)]
         [DataRow(username, password, "")]
         [DataRow(username, password, null)]
-        public void TestLogin_Bad_WrongPassword(string username, string password, string wrongPassword)
+        public void Test_Login_Bad_WrongPassword(string username, string password, string wrongPassword)
         {
             service.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
             Assert.IsTrue(service.Login(1, username, wrongPassword).ErrorOccured);
@@ -126,7 +126,7 @@ namespace Tests.AcceptanceTests
         [DataRow(username, password, password)]
         [DataRow(username, password, "")]
         [DataRow(username, password, null)]
-        public void TestLogin_Bad_WrongUsername(string username, string password, string wrongUsername)
+        public void Test_Login_Bad_WrongUsername(string username, string password, string wrongUsername)
         {
             service.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
             Assert.IsTrue(service.Login(1, wrongUsername, password).ErrorOccured);
@@ -137,9 +137,8 @@ namespace Tests.AcceptanceTests
             return service.Login(userId, username, password).ErrorOccured;
         }
 
-
         [TestMethod]
-        public void TestLogin_Bad_LoginTwiceAtTheSameTime()
+        public void Test_Login_Bad_LoginTwiceAtTheSameTime()
         {
             bool res1 = false;
             bool res2 = false;
@@ -159,17 +158,17 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(1, username, password)]
-        public void TestLogout_Good(int userId, string username, string password)
+        public void Test_Logout_Good(int userId, string username, string password)
         {
-            TestLogin_Good(userId, username, password);
+            Test_Login_Good(userId, username, password);
             Assert.IsFalse(service.Logout(userId, username).ErrorOccured);
         }
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestLogout_Bad_LogoutTwice(string username, string password)
+        public void Test_Logout_Bad_LogoutTwice(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             Assert.IsFalse(service.Logout(1, username).ErrorOccured);
             Assert.IsTrue(service.Logout(1, username).ErrorOccured);
         }
@@ -178,25 +177,25 @@ namespace Tests.AcceptanceTests
         [DataRow(username)]
         [DataRow(null)]
         [DataRow("")]
-        public void TestLogout_Bad_NoSuchUser(string username)
+        public void Test_Logout_Bad_NoSuchUser(string username)
         {
             Assert.IsTrue(service.Logout(1, username).ErrorOccured);
         }
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestLogout_Bad_NotLoggedIn(string username, string password)
+        public void Test_Logout_Bad_NotLoggedIn(string username, string password)
         {
-            TestRegister_Good(1, username, password);
+            Test_Register_Good(1, username, password);
             Assert.IsTrue(service.Logout(1, null).ErrorOccured);
         }
 
         [DataTestMethod]
         [DataRow(username, password, product)]
-        public Product TestAddProduct_Good(string username, string password, string product)
+        public Product Test_AddProduct_Good(string username, string password, string product)
         {
             int storeId = 0;
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Response<Product> prodResult = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1");
             Assert.IsFalse(prodResult.ErrorOccured);
@@ -206,10 +205,10 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password, "no", "perm")]
-        public void TestAddProduct_Bad_NoPermission(string username, string password, string noPermU, string noPermP)
+        public void Test_AddProduct_Bad_NoPermission(string username, string password, string noPermU, string noPermP)
         {
-            TestLogin_Good(1, username, password);
-            TestLogin_Good(2, noPermU, noPermP);
+            Test_Login_Good(1, username, password);
+            Test_Login_Good(2, noPermU, noPermP);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Assert.IsTrue(service.AddProduct(2, noPermU, storeId, "TestAddProduct", "Bad", 1, 1, "cat1").ErrorOccured);
             Assert.IsTrue(service.AddProduct(2, username, storeId, "TestAddProduct", "Bad", 1, 1, "cat1").ErrorOccured);
@@ -218,28 +217,28 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password, "Random")]
-        public int TestNominateStoreOwner_Good(string username, string password, string nominated)
+        public int Test_NominateStoreOwner_Good(string username, string password, string nominated)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            TestRegister_Good(2, nominated, nominated);
+            Test_Register_Good(2, nominated, nominated);
             Assert.IsFalse(service.NominateStoreOwner(1, username, nominated, storeId).ErrorOccured);
             return storeId;
         }
 
         [DataTestMethod]
         [DataRow(username, password, "Random")]
-        public void TestNominateStoreOwner_Bad_NominateTwice(string username, string password, string nominated)
+        public void Test_NominateStoreOwner_Bad_NominateTwice(string username, string password, string nominated)
         {
-            int storeId = TestNominateStoreOwner_Good(username, password, nominated);
+            int storeId = Test_NominateStoreOwner_Good(username, password, nominated);
             Assert.IsTrue(service.NominateStoreOwner(1, username, nominated, storeId).ErrorOccured);
         }
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestNominateStoreOwner_Bad_NominateUsrself(string username, string password)
+        public void Test_NominateStoreOwner_Bad_NominateUsrself(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Assert.IsTrue(service.NominateStoreOwner(1, username, username, storeId).ErrorOccured);
         }
@@ -247,57 +246,55 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password, "Random1", "Random2")]
-        public void TestNominateStoreOwner_Bad_NominateNoPermission(string username, string password, string nominated, string nominator)
+        public void Test_NominateStoreOwner_Bad_NominateNoPermission(string username, string password, string nominated, string nominator)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            TestRegister_Good(2, nominated, nominated);
-            TestRegister_Good(3, nominator, nominator);
+            Test_Register_Good(2, nominated, nominated);
+            Test_Register_Good(3, nominator, nominator);
             Assert.IsTrue(service.NominateStoreOwner(3, nominator, nominated, storeId).ErrorOccured);
         }
 
 
         [DataTestMethod]
         [DataRow(username, password, "Random")]
-        public int TestNominateStoreManager_Good(string username, string password, string nominated)
+        public int Test_NominateStoreManager_Good(string username, string password, string nominated)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            TestRegister_Good(2, nominated, nominated);
+            Test_Register_Good(2, nominated, nominated);
             Assert.IsFalse(service.NominateStoreManager(1, username, nominated, storeId).ErrorOccured);
             return storeId;
         }
 
         [DataTestMethod]
         [DataRow(username, password, "Random")]
-        public void TestNominateStoreManager_Bad_NominateTwice(string username, string password, string nominated)
+        public void Test_NominateStoreManager_Bad_NominateTwice(string username, string password, string nominated)
         {
-            int storeId = TestNominateStoreManager_Good(username, password, nominated);
+            int storeId = Test_NominateStoreManager_Good(username, password, nominated);
             Assert.IsTrue(service.NominateStoreManager(1, username, nominated, storeId).ErrorOccured);
         }
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestNominateStoreManager_Bad_NominateUsrself(string username, string password)
+        public void Test_NominateStoreManager_Bad_NominateUsrself(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Assert.IsTrue(service.NominateStoreManager(1, username, username, storeId).ErrorOccured);
         }
 
-
         [DataTestMethod]
         [DataRow(username, password, "Random1", "Random2")]
-        public void TestNominateStoreManager_Bad_NominateNoPermission(string username, string password, string nominated, string nominator)
+        public void Test_NominateStoreManager_Bad_NominateNoPermission(string username, string password, string nominated, string nominator)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Assert.IsFalse(service.Logout(1, username).ErrorOccured);
-            TestRegister_Good(2, nominated, nominated);
-            TestLogin_Good(3, nominator, nominator);
+            Test_Register_Good(2, nominated, nominated);
+            Test_Login_Good(3, nominator, nominator);
             Assert.IsTrue(service.NominateStoreManager(3, nominator, nominated, storeId).ErrorOccured);
         }
-
 
         public bool NominateStoreManager_Thread(int userId, string nominator, string password, string nominated, int storeId)
         {
@@ -307,9 +304,8 @@ namespace Tests.AcceptanceTests
             return service.NominateStoreManager(userId, nominator, nominated, storeId).ErrorOccured;
         }
 
-
         [TestMethod]
-        public void TestNominateStoreManager_BadNominateTwiceAtTheSameTime()
+        public void Test_NominateStoreManager_BadNominateTwiceAtTheSameTime()
         {
             bool res1 = false;
             bool res2 = false;
@@ -341,49 +337,49 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestGetWorkersInformation_Good(string username, string password)
+        public void Test_GetWorkersInformation_Good(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Assert.IsFalse(service.GetWorkersInformation(1, username, storeId).ErrorOccured);
         }
 
         [DataTestMethod]
         [DataRow(username, password, "Who?")]
-        public void TestGetWorkersInformation_Bad(string username, string password, string npUser)
+        public void Test_GetWorkersInformation_Bad(string username, string password, string npUser)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Assert.IsFalse(service.Logout(1, username).ErrorOccured);
-            TestLogin_Good(2, npUser, npUser);
+            Test_Login_Good(2, npUser, npUser);
             Assert.IsTrue(service.GetWorkersInformation(2, npUser, storeId).ErrorOccured);
         }
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestCloseStore_Good(string username, string password)
+        public void Test_CloseStore_Good(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Assert.IsFalse(service.CloseStore(1, username, storeId).ErrorOccured);
         }
 
         [DataTestMethod]
         [DataRow(username, password, "Who?")]
-        public void TestCloseStore_Bad(string username, string password, string npUser)
+        public void Test_CloseStore_Bad(string username, string password, string npUser)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, username).Value.StoreId;
             Assert.IsFalse(service.Logout(1, username).ErrorOccured);
-            TestLogin_Good(2, npUser, npUser);
+            Test_Login_Good(2, npUser, npUser);
             Assert.IsTrue(service.CloseStore(2, npUser, storeId).ErrorOccured);
         }
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public int TestCreateNewStore_Good(string username, string password)
+        public int Test_CreateNewStore_Good(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             Response<Store> res = service.CreateNewStore(1, username, "RandomStore");
             Assert.IsFalse(res.ErrorOccured);
             Assert.IsTrue(res.Value.StoreId >= 0);
@@ -396,16 +392,16 @@ namespace Tests.AcceptanceTests
         [DataRow(username, "")]
         [DataRow("", "")]
         [DataRow(null, null)]
-        public void TestCreateNewStore_Bad(string username, string password)
+        public void Test_CreateNewStore_Bad(string username, string password)
         {
             Assert.IsTrue(service.CreateNewStore(1, username, password).ErrorOccured);
         }
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestReviewProduct_Good(string username, string password)
+        public void Test_ReviewProduct_Good(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             int prodId = service.AddProduct(1, username, storeId, "TestReviewProduct", "Good", 1, 2, "cat1").Value.Id;
             service.addToCart(1, username, prodId, storeId, 1);
@@ -415,9 +411,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestReviewProduct_Bad_userLoggeedOut(string username, string password)
+        public void Test_ReviewProduct_Bad_userLoggeedOut(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             service.AddProduct(1, password, storeId, "TestReviewProduct", "Good", 1, 1, "cat1");
             service.Logout(1, username);
@@ -426,25 +422,13 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestReviewProduct_Bad_noSuchProduct(string username, string password)
+        public void Test_ReviewProduct_Bad_noSuchProduct(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             service.AddProduct(1, password, storeId, "TestReviewProduct", "Good", 1, 1, "cat1");
             Assert.IsTrue(service.ReviewProduct(1, username, 2, "Blank", 6).ErrorOccured);
         }
-
-        /*
-            Response<List<Product>> SearchProduct(string user, int productId, string keyWords, string catagory, int minPrice, int maxPrice, int productReview);
-
-            Response<Product> addToCart(string user, int productId, int storeId, int quantity);
-
-            Response<ShoppingCart> viewCart(string user);
-
-            Response<ShoppingCart> editCart(string user, int productId, int newQuantity);
-
-            Response BuyCart(string user, string address);
-         */
 
         public void AssertProductsEqual(Product prodA, Product prodB)
         {
@@ -462,9 +446,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestSearchProduct_Good_SpecificProduct(string username, string password)
+        public void Test_SearchProduct_Good_SpecificProduct(string username, string password)
         {
-            Product prod = TestAddProduct_Good(username, password, product);
+            Product prod = Test_AddProduct_Good(username, password, product);
             Response<List<Product>> searchResult = service.SearchProduct(1, username, prod.Name, "", -1, -1, -1);
             Assert.IsFalse(searchResult.ErrorOccured);
             AssertProductsEqual(prod, searchResult.Value.First());
@@ -472,9 +456,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password, product)]
-        public void TestSearchProduct_Good_SearchForEveryProduct(string username, string password, string product)
+        public void Test_SearchProduct_Good_SearchForEveryProduct(string username, string password, string product)
         {
-            Product prod = TestAddProduct_Good(username, password, product);
+            Product prod = Test_AddProduct_Good(username, password, product);
             Response<List<Product>> searchResult = service.SearchProduct(1, username, "", "", -1, -1, -1);
             Assert.IsFalse(searchResult.ErrorOccured);
             Assert.IsTrue(searchResult.Value.Count() > 0);
@@ -482,9 +466,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestSearchProduct_Bad_NoProducts(string username, string password)
+        public void Test_SearchProduct_Bad_NoProducts(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Response<List<Product>> searchResult = service.SearchProduct(1, username, "", "", -1, -1, -1);
             Assert.IsFalse(searchResult.ErrorOccured);
@@ -493,9 +477,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestSearchProduct_Bad_WrongName(string username, string password)
+        public void Test_SearchProduct_Bad_WrongName(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             Response<List<Product>> searchResult = service.SearchProduct(1, username, "Worong", "", -1, -1, -1);
@@ -506,9 +490,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestAddToCart_Good(string username, string password)
+        public void Test_AddToCart_Good(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             Response<Product> resProd = service.addToCart(1, username, prod.Id, storeId, 1);
@@ -518,9 +502,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestAddToCart_Bad_NoSuchProduct(string username, string password)
+        public void Test_AddToCart_Bad_NoSuchProduct(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             Response<Product> resProd = service.addToCart(1, username, 20, storeId, 1);
@@ -529,9 +513,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestAddToCart_Bad_NotEnoughQuantity(string username, string password)
+        public void Test_AddToCart_Bad_NotEnoughQuantity(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             Response<Product> resProd = service.addToCart(1, username, prod.Id, storeId, 100);
@@ -540,9 +524,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestAddToCart_Bad_AddZero(string username, string password)
+        public void Test_AddToCart_Bad_AddZero(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             Response<Product> resProd = service.addToCart(1, username, prod.Id, storeId, 0);
@@ -551,9 +535,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestViewCart_Good_EmptyCart(string username, string password)
+        public void Test_ViewCart_Good_EmptyCart(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             Response<ShoppingCart> resSC = service.viewCart(1, username);
@@ -563,9 +547,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestViewCart_Good_FullCart(string username, string password)
+        public void Test_ViewCart_Good_FullCart(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             service.addToCart(1, username, prod.Id, storeId, 1);
@@ -578,9 +562,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestViewCart_Bad_NoUserLoggedIn(string username, string password)
+        public void Test_ViewCart_Bad_NoUserLoggedIn(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             service.addToCart(1, username, prod.Id, storeId, 1);
@@ -591,9 +575,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestEditCart_Good(string username, string password)
+        public void Test_EditCart_Good(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             service.addToCart(1, username, prod.Id, storeId, 1);
@@ -608,9 +592,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestBuyCart_Good_MoreThenEnoughInStock(string username, string password)
+        public void Test_BuyCart_Good_MoreThenEnoughInStock(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 2, "cat1").Value;
             service.addToCart(1, username, prod.Id, storeId, 1);
@@ -620,9 +604,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestBuyCart_Good_LastOneInStock(string username, string password)
+        public void Test_BuyCart_Good_LastOneInStock(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             service.addToCart(1, username, prod.Id, storeId, 1);
@@ -632,9 +616,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestBuyCart_Bad_NothingInCart(string username, string password)
+        public void Test_BuyCart_Bad_NothingInCart(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsTrue(service.BuyCart(1, username, "Ronmi's home").ErrorOccured);
@@ -643,9 +627,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestRemoveProductFromStore_Good(string username, string password)
+        public void Test_RemoveProductFromStore_Good(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsFalse(service.RemoveProductFromStore(1, username, storeId, prod.Id).ErrorOccured);
@@ -654,20 +638,18 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestRemoveProductFromStore_Bad(string username, string password)
+        public void Test_RemoveProductFromStore_Bad(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Assert.IsTrue(service.RemoveProductFromStore(1, username, storeId, 0).ErrorOccured);
         }
 
-
-
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestChangeProductName_Good(string username, string password)
+        public void Test_ChangeProductName_Good(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsFalse(service.ChangeProductName(1, username, storeId, prod.Id, "newName").ErrorOccured);
@@ -677,9 +659,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestChangeProductName_Bad_NoSuchProduct(string username, string password)
+        public void Test_ChangeProductName_Bad_NoSuchProduct(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Assert.IsTrue(service.ChangeProductName(1, username, storeId, 0, "newName").ErrorOccured);
         }
@@ -688,9 +670,9 @@ namespace Tests.AcceptanceTests
         [DataTestMethod]
         [DataRow(username, password, "")]
         [DataRow(username, password, null)]
-        public void TestChangeProductName_Bad_InvalidName(string username, string password, string newName)
+        public void Test_ChangeProductName_Bad_InvalidName(string username, string password, string newName)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsTrue(service.ChangeProductName(1, username, storeId, prod.Id, newName).ErrorOccured);
@@ -698,9 +680,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestChangeProductPrice_Good(string username, string password)
+        public void Test_ChangeProductPrice_Good(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsFalse(service.ChangeProductPrice(1, username, storeId, prod.Id, 1711).ErrorOccured);
@@ -710,9 +692,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestChangeProductPrice_Bad_NoSuchProduct(string username, string password)
+        public void Test_ChangeProductPrice_Bad_NoSuchProduct(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Assert.IsTrue(service.ChangeProductPrice(1, username, storeId, 0, 1711).ErrorOccured);
         }
@@ -720,9 +702,9 @@ namespace Tests.AcceptanceTests
         [DataTestMethod]
         [DataRow(username, password, -1)]
         //[DataRow(username, password, 0)]
-        public void TestChangeProductPrice_Bad_InvalidPrice(string username, string password, int price)
+        public void Test_ChangeProductPrice_Bad_InvalidPrice(string username, string password, int price)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsTrue(service.ChangeProductPrice(1, username, storeId, prod.Id, price).ErrorOccured);
@@ -730,9 +712,9 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestChangeProductQuantity_Good(string username, string password)
+        public void Test_ChangeProductQuantity_Good(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsFalse(service.ChangeProductQuantity(1, username, storeId, prod.Id, 1711).ErrorOccured);
@@ -741,18 +723,18 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestChangeProductQuantity_Bad_NoSuchProduct(string username, string password)
+        public void Test_ChangeProductQuantity_Bad_NoSuchProduct(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Assert.IsTrue(service.ChangeProductQuantity(1, username, storeId, 0, 1711).ErrorOccured);
         }
 
         [DataTestMethod]
         [DataRow(username, password, -1)]
-        public void TestChangeProductQuantity_Bad_InvalidQuantity(string username, string password, int quantity)
+        public void Test_ChangeProductQuantity_Bad_InvalidQuantity(string username, string password, int quantity)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsTrue(service.ChangeProductQuantity(1, username, storeId, prod.Id, quantity).ErrorOccured);
@@ -760,21 +742,20 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestChangeProductCategory_Good(string username, string password)
+        public void Test_ChangeProductCategory_Good(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsFalse(service.ChangeProductCategory(1, username, storeId, prod.Id, "newName").ErrorOccured);
             prod = service.addToCart(1, username, prod.Id, storeId, 1).Value;
-            //Assert.AreEqual(prod.category, "newName");
         }
 
         [DataTestMethod]
         [DataRow(username, password)]
-        public void TestChangeProductCategory_Bad_NoSuchProduct(string username, string password)
+        public void Test_ChangeProductCategory_Bad_NoSuchProduct(string username, string password)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Assert.IsTrue(service.ChangeProductCategory(1, username, storeId, 0, "newName").ErrorOccured);
         }
@@ -782,9 +763,9 @@ namespace Tests.AcceptanceTests
         [DataTestMethod]
         [DataRow(username, password, "")]
         [DataRow(username, password, null)]
-        public void TestChangeProductCategory_Bad_InvalidCategory(string username, string password, string cat)
+        public void Test_ChangeProductCategory_Bad_InvalidCategory(string username, string password, string cat)
         {
-            TestLogin_Good(1, username, password);
+            Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             Assert.IsTrue(service.ChangeProductCategory(1, username, storeId, prod.Id, cat).ErrorOccured);
@@ -799,7 +780,7 @@ namespace Tests.AcceptanceTests
         }
 
         [TestMethod]
-        public void TestBuyProductBad_BuylastAtTheSameTime()
+        public void Test_BuyProductBad_BuylastAtTheSameTime()
         {
             bool res1 = false;
             bool res2 = false;
@@ -864,9 +845,9 @@ namespace Tests.AcceptanceTests
         [DataRow("member1", "q", "<", "5")]
         [DataRow("member1", "h", "!=", "01:00")]
         [DataRow("member1", "d", "!=", "27/08/2023")]
-        public void TestAddProductPurchaseTerm_Good_Simple(string member, string type, string action, string value)
+        public void Test_AddProductPurchaseTerm_Good_Simple(string member, string type, string action, string value)
         {
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 20.4, 10, "Category1").Value;
             Assert.IsFalse(service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm(type, action, value)(product.Id), product.Id).ErrorOccured);
@@ -878,9 +859,9 @@ namespace Tests.AcceptanceTests
         [DataRow("member1", "q", "$", "5")]
         [DataRow("member1", "h", "!=", "25:00")]
         [DataRow("member1", "d", "!=", "27/08/2020")]
-        public void TestAddProductPurchaseTerm_Bad_Simple_WrongParameters(string member, string type, string action, string value)
+        public void Test_AddProductPurchaseTerm_Bad_Simple_WrongParameters(string member, string type, string action, string value)
         {
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 20.4, 10, "Category1").Value;
             Assert.IsTrue(service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm(type, action, value)(product.Id), product.Id).ErrorOccured);
@@ -891,9 +872,9 @@ namespace Tests.AcceptanceTests
         [DataRow("member1", "p", ">", "10", "q", "<", "5")]
         [DataRow("member1", "h", ">", "01:00", "d", "<", "27/08/2023")]
         [DataRow("member1", "d", "!=", "20/01/2023", "q", "<=", "2")]
-        public void TestAddProductPurchaseTerm_Good_And(string member, string l_type, string l_action, string l_value, string r_type, string r_action, string r_value)
+        public void Test_AddProductPurchaseTerm_Good_And(string member, string l_type, string l_action, string l_value, string r_type, string r_action, string r_value)
         {
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 20.4, 10, "Category1").Value;
             Assert.IsFalse(service.AddProductPurchaseTerm(1, member, store.StoreId, (makeAndPurchaseTerm(makeSimpleProductPurchaseTerm(l_type, l_action, l_value)(product.Id), makeSimpleProductPurchaseTerm(r_type, r_action, r_value)(product.Id))), product.Id).ErrorOccured);
@@ -903,9 +884,9 @@ namespace Tests.AcceptanceTests
         [DataRow("member1", "p", ">", "10", "q", "<", "5")]
         [DataRow("member1", "h", ">", "01:00", "d", "<", "27/08/2023")]
         [DataRow("member1", "d", "!=", "20/01/2023", "q", "<=", "2")]
-        public void TestAddProductPurchaseTerm_Good_Or(string member, string l_type, string l_action, string l_value, string r_type, string r_action, string r_value)
+        public void Test_AddProductPurchaseTerm_Good_Or(string member, string l_type, string l_action, string l_value, string r_type, string r_action, string r_value)
         {
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 20.4, 10, "Category1").Value;
             Assert.IsFalse(service.AddProductPurchaseTerm(1, member, store.StoreId, makeOrPurchaseTerm(makeSimpleProductPurchaseTerm(l_type, l_action, l_value)(product.Id), makeSimpleProductPurchaseTerm(r_type, r_action, r_value)(product.Id)), product.Id).ErrorOccured);
@@ -916,9 +897,9 @@ namespace Tests.AcceptanceTests
         [DataRow("member1", "q", "<", "5")]
         [DataRow("member1", "h", "!=", "01:00")]
         [DataRow("member1", "d", "!=", "27/08/2023")]
-        public void TestAddCategoryPurchaseTerm_Good_Simple(string member, string type, string action, string value)
+        public void Test_AddCategoryPurchaseTerm_Good_Simple(string member, string type, string action, string value)
         {
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 20.4, 10, "Category1").Value;
             Assert.IsFalse(service.AddCategoryPurchaseTerm(1, member, store.StoreId, makeSimpleCategoryPurchaseTerm(type, action, value)("Category1"), "Category1").ErrorOccured);
@@ -929,9 +910,9 @@ namespace Tests.AcceptanceTests
         [DataRow("member1", "q", "<", "-2")]
         [DataRow("member1", "h", "$", "01:00")]
         [DataRow("member1", "d", "!=", "27/08/2020")]
-        public void TestAddCategoryPurchaseTerm_Bad_Simple_WrongParameters(string member, string type, string action, string value)
+        public void Test_AddCategoryPurchaseTerm_Bad_Simple_WrongParameters(string member, string type, string action, string value)
         {
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 20.4, 10, "Category1").Value;
             Assert.IsTrue(service.AddCategoryPurchaseTerm(1, member, store.StoreId, makeSimpleCategoryPurchaseTerm(type, action, value)("Category1"), "Category1").ErrorOccured);
@@ -941,9 +922,9 @@ namespace Tests.AcceptanceTests
         [DataRow("member1", "p", ">", "10", "q", "<", "5")]
         [DataRow("member1", "h", ">", "01:00", "d", "<", "27/08/2023")]
         [DataRow("member1", "d", "!=", "20/01/2023", "q", "<=", "2")]
-        public void TestAddCategoryPurchaseTerm_Good_And(string member, string l_type, string l_action, string l_value, string r_type, string r_action, string r_value)
+        public void Test_AddCategoryPurchaseTerm_Good_And(string member, string l_type, string l_action, string l_value, string r_type, string r_action, string r_value)
         {
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 20.4, 10, "Category1").Value;
             Assert.IsFalse(service.AddCategoryPurchaseTerm(1, member, store.StoreId, makeAndPurchaseTerm(makeSimpleCategoryPurchaseTerm(l_type, l_action, l_value)("Category1"), makeSimpleCategoryPurchaseTerm(r_type, r_action, r_value)("Category1")), "Category1").ErrorOccured);
@@ -954,9 +935,9 @@ namespace Tests.AcceptanceTests
         [DataRow("member1", "p", ">", "10", "q", "<", "5")]
         [DataRow("member1", "h", ">", "01:00", "d", "<", "27/08/2023")]
         [DataRow("member1", "d", "!=", "20/01/2023", "q", "<=", "2")]
-        public void TestAddCategoryPurchaseTerm_Good_Or(string member, string l_type, string l_action, string l_value, string r_type, string r_action, string r_value)
+        public void Test_AddCategoryPurchaseTerm_Good_Or(string member, string l_type, string l_action, string l_value, string r_type, string r_action, string r_value)
         {
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 20.4, 10, "Category1").Value;
             Assert.IsFalse(service.AddCategoryPurchaseTerm(1, member, store.StoreId, makeOrPurchaseTerm(makeSimpleCategoryPurchaseTerm(l_type, l_action, l_value)("Category1"), makeSimpleCategoryPurchaseTerm(r_type, r_action, r_value)("Category1")), "Category1").ErrorOccured);
@@ -967,9 +948,9 @@ namespace Tests.AcceptanceTests
         [DataRow("member1", "q", "<", "5")]
         [DataRow("member1", "h", "!=", "01:00")]
         [DataRow("member1", "d", "!=", "27/08/2023")]
-        public void TestAddStorePurchaseTerm_Good_Simple(string member, string type, string action, string value)
+        public void Test_AddStorePurchaseTerm_Good_Simple(string member, string type, string action, string value)
         {
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Assert.IsFalse(service.AddStorePurchaseTerm(1, member, store.StoreId, makeSimpleBagPurchaseTerm(type, action, value)).ErrorOccured);
         }
@@ -979,9 +960,9 @@ namespace Tests.AcceptanceTests
         [DataRow("member1", "q", "<", "-2")]
         [DataRow("member1", "h", "$", "01:00")]
         [DataRow("member1", "d", "!=", "27/08/2020")]
-        public void TestAddStorePurchaseTerm_Bad_WrongParameters(string member, string type, string action, string value)
+        public void Test_AddStorePurchaseTerm_Bad_WrongParameters(string member, string type, string action, string value)
         {
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Assert.IsTrue(service.AddStorePurchaseTerm(1, member, store.StoreId, makeSimpleBagPurchaseTerm(type, action, value)).ErrorOccured);
         }
@@ -990,9 +971,9 @@ namespace Tests.AcceptanceTests
         [DataRow("member1", "p", ">", "10", "q", "<", "5")]
         [DataRow("member1", "h", ">", "01:00", "d", "<", "27/08/2023")]
         [DataRow("member1", "d", "!=", "20/01/2023", "q", "<=", "2")]
-        public void TestAddStorePurchaseTerm_Good_And(string member, string l_type, string l_action, string l_value, string r_type, string r_action, string r_value)
+        public void Test_AddStorePurchaseTerm_Good_And(string member, string l_type, string l_action, string l_value, string r_type, string r_action, string r_value)
         {
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Assert.IsFalse(service.AddStorePurchaseTerm(1, member, store.StoreId, makeAndPurchaseTerm(makeSimpleBagPurchaseTerm(l_type, l_action, l_value), makeSimpleBagPurchaseTerm(r_type, r_action, r_value))).ErrorOccured);
         }
@@ -1001,9 +982,9 @@ namespace Tests.AcceptanceTests
         [DataRow("member1", "p", ">", "10", "q", "<", "5")]
         [DataRow("member1", "h", ">", "01:00", "d", "<", "27/08/2023")]
         [DataRow("member1", "d", "!=", "20/01/2023", "q", "<=", "2")]
-        public void TestAddStorePurchaseTerm_Good_Or(string member, string l_type, string l_action, string l_value, string r_type, string r_action, string r_value)
+        public void Test_AddStorePurchaseTerm_Good_Or(string member, string l_type, string l_action, string l_value, string r_type, string r_action, string r_value)
         {
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Assert.IsFalse(service.AddStorePurchaseTerm(1, member, store.StoreId, makeOrPurchaseTerm(makeSimpleBagPurchaseTerm(l_type, l_action, l_value), makeSimpleBagPurchaseTerm(r_type, r_action, r_value))).ErrorOccured);
         }
@@ -1011,9 +992,9 @@ namespace Tests.AcceptanceTests
         [DataTestMethod]
         [DataRow("member1", "$", 10)]
         [DataRow("member1", ">=", -2)]
-        public void TestAddUserPurchaseTerm_Good_Simple(string member, string action, int age)
+        public void Test_AddUserPurchaseTerm_Good_Simple(string member, string action, int age)
         {
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Assert.IsFalse(service.AddUserPurchaseTerm(1, member, store.StoreId, makeSimpleUserPurchaseTerm(action, age)).ErrorOccured);
         }
@@ -1022,9 +1003,9 @@ namespace Tests.AcceptanceTests
         [DataRow("member1", ">", 10)]
         [DataRow("member1", ">=", 13)]
         [DataRow("member1", "!=", 18)]
-        public void TestAddUserPurchaseTerm_Bad_Simple_WrongParameters(string member, string action, int age)
+        public void Test_AddUserPurchaseTerm_Bad_Simple_WrongParameters(string member, string action, int age)
         {
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Assert.IsTrue(service.AddUserPurchaseTerm(1, member, store.StoreId, makeSimpleUserPurchaseTerm(action, age)).ErrorOccured);
         }
@@ -1036,7 +1017,7 @@ namespace Tests.AcceptanceTests
         [DataRow("member1", "!=", 18, ">=", 16)]
         public void Test_AddUserPurchaseTerm_Good_And(string member, string l_action, int l_age, string r_action, int r_age)
         {
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Assert.IsFalse(service.AddUserPurchaseTerm(1, member, store.StoreId, makeAndPurchaseTerm(makeSimpleUserPurchaseTerm(l_action, l_age), makeSimpleUserPurchaseTerm(r_action, r_age))).ErrorOccured);
         }
@@ -1047,7 +1028,7 @@ namespace Tests.AcceptanceTests
         [DataRow("member1", "!=", 18, ">=", 16)]
         public void Test_AddUserPurchaseTerm_Good_Or(string member, string l_action, int l_age, string r_action, int r_age)
         {
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Assert.IsFalse(service.AddUserPurchaseTerm(1, member, store.StoreId, makeOrPurchaseTerm(makeSimpleUserPurchaseTerm(l_action, l_age), makeSimpleUserPurchaseTerm(r_action, r_age))).ErrorOccured);
         }
@@ -1056,7 +1037,7 @@ namespace Tests.AcceptanceTests
         public void Test_AddProductPurchaseTerm_GoodTerm()
         {
             string member = "member1";
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
             service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm("p", ">", "200")(p1.Id), p1.Id);
@@ -1075,7 +1056,7 @@ namespace Tests.AcceptanceTests
         public void Test_AddProductPurchaseTerm_Bad_BadQuantity(string action, int n)
         {
             string member = "member1";
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
             service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm("q", action, "2")(p1.Id), p1.Id);
@@ -1091,7 +1072,7 @@ namespace Tests.AcceptanceTests
         public void Test_AddProductPurchaseTerm_Bad_BadPrice(string action, int n)
         {
             string member = "member1";
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product p1 = service.AddProduct(1, member, store.StoreId, "Prod1", "Desc1", 100.0, 100, "Cat1").Value;
             service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm("p", action, "200")(p1.Id), p1.Id);
@@ -1106,7 +1087,7 @@ namespace Tests.AcceptanceTests
         public void Test_AddCategoryPurchaseTerm_Good(string action, int n)
         {
             string member = "member1";
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Desc1", 100.0, 10, "Category1").Value;
             Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Desc2", 100.0, 10, "Category1").Value;
@@ -1123,7 +1104,7 @@ namespace Tests.AcceptanceTests
         public void Test_AddCategoryPurchaseTerm_Bad_BadQuantity_WithTwoProducts(string action, int n)
         {
             string member = "member1";
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Desc1", 100.0, 10, "Category1").Value;
             Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Desc2", 100.0, 10, "Category1").Value;
@@ -1141,7 +1122,7 @@ namespace Tests.AcceptanceTests
         public void Test_AddCategoryPurchaseTerm_Bad_BadQuantity(string action, int n)
         {
             string member = "member1";
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Desc1", 100.0, 10, "Category1").Value;
             Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Desc2", 100.0, 10, "Category1").Value;
@@ -1162,7 +1143,7 @@ namespace Tests.AcceptanceTests
         public void Test_AddUserPurchaseTerm_Good()
         {
             string member = "member1";
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
             service.AddUserPurchaseTerm(1, member, store.StoreId, makeSimpleUserPurchaseTerm(">", 18));
@@ -1195,7 +1176,7 @@ namespace Tests.AcceptanceTests
                 val = DateTime.Now.ToString("dd/MM/yyyy");
             }
             string member = "member1";
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product p1 = service.AddProduct(1, member, store.StoreId, "Prod1", "Desc1", 100.0, 100, "Cat1").Value;
             service.AddStorePurchaseTerm(1, member, store.StoreId, makeSimpleBagPurchaseTerm(type, action, val));
@@ -1207,7 +1188,7 @@ namespace Tests.AcceptanceTests
         public void Test_AddStorePurchaseTerm_BadHour()
         {
             string member = "member1";
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product p1 = service.AddProduct(1, member, store.StoreId, "Prod1", "Desc1", 100.0, 100, "Cat1").Value;
             service.AddStorePurchaseTerm(1, member, store.StoreId, makeSimpleBagPurchaseTerm("h", "=", "04:04"));
@@ -1219,7 +1200,7 @@ namespace Tests.AcceptanceTests
         public void Test_AddStorePurchaseTerm_Bad_BadDate()
         {
             string member = "member1";
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product p1 = service.AddProduct(1, member, store.StoreId, "Prod1", "Desc1", 100.0, 100, "Cat1").Value;
             service.AddStorePurchaseTerm(1, member, store.StoreId, makeSimpleBagPurchaseTerm("d", "=", "30/08/2030"));
@@ -1335,7 +1316,7 @@ namespace Tests.AcceptanceTests
         private void Test_AddProductDiscount_Good(Func<int, string> discount)
         {
             string member = "member1";
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
             Assert.IsFalse(service.AddProductDiscount(1, member, store.StoreId, discount(product.Id), product.Id).ErrorOccured);
@@ -1345,7 +1326,7 @@ namespace Tests.AcceptanceTests
         public void Test_AddProductDiscount_Bad_NoSuchProduct()
         {
             string member = "member1";
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
             Assert.IsFalse(service.AddProductDiscount(1, member, store.StoreId, makeSimpleProductDiscount(30)(product.Id + 1), product.Id + 1).ErrorOccured);
@@ -1358,7 +1339,7 @@ namespace Tests.AcceptanceTests
         public void Test_AddProductDiscount_Bad_WrongParameters(string discount)
         {
             string member = "member1";
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
             Assert.IsFalse(product.Id != 1);
@@ -1377,7 +1358,7 @@ namespace Tests.AcceptanceTests
         public void Test_AddProductDiscount_Bad_BadDiscount(Func<int, string> discount)
         {
             string member = "member1";
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
             Assert.IsTrue(service.AddProductDiscount(1, member, store.StoreId, discount(product.Id), product.Id).ErrorOccured);
@@ -1389,7 +1370,7 @@ namespace Tests.AcceptanceTests
         public void Test_AddCategoryDiscount_Good(string discount)
         {
             string member = "member1";
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "cat1");
             Assert.IsFalse(service.AddCategoryDiscount(1, member, store.StoreId, discount, "cat1").ErrorOccured);
@@ -1402,7 +1383,7 @@ namespace Tests.AcceptanceTests
         public void TestAddCategoryDiscount_Bad_WrongParameters(string discount)
         {
             string member = "member1";
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "cat1");
             Assert.IsTrue(service.AddCategoryDiscount(1, member, store.StoreId, discount, "cat1").ErrorOccured);
@@ -1412,7 +1393,7 @@ namespace Tests.AcceptanceTests
         public void Test_BuyCart_ProductAndCategoryDiscounts()
         {
             string member = "member1";
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 3, "no_cat").Value;
             Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Description2", 200.0, 2, "Cat1").Value;
@@ -1432,7 +1413,7 @@ namespace Tests.AcceptanceTests
         public void Test_BuyCart_ProductAndStoreDiscounts()
         {
             string member = "member1";
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 3, "no_cat").Value;
             Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Description2", 200.0, 2, "Cat1").Value;
@@ -1451,7 +1432,7 @@ namespace Tests.AcceptanceTests
         public void Test_BuyCart_ConditionalProductDiscounts()
         {
             string member = "member1";
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 3, "no_cat").Value;
             Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Description2", 200.0, 2, "Cat1").Value;
@@ -1469,7 +1450,7 @@ namespace Tests.AcceptanceTests
         public void Test_BuyCart_CompositeProductDiscounts()
         {
             string member = "member1";
-            TestLogin_Good(1, member, "password1");
+            Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 3, "no_cat").Value;
             Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Description2", 200.0, 2, "Cat1").Value;
@@ -1492,9 +1473,9 @@ namespace Tests.AcceptanceTests
             string member1 = "Member1";
             string member2 = "Member2";
             string member3 = "Member3";
-            TestLogin_Good(1, member1, "Password1");
-            TestLogin_Good(2, member2, "Password2");
-            TestLogin_Good(3, member3, "Password3");
+            Test_Login_Good(1, member1, "Password1");
+            Test_Login_Good(2, member2, "Password2");
+            Test_Login_Good(3, member3, "Password3");
             Store store = service.CreateNewStore(1, member1, "Store1").Value;
             service.NominateStoreOwner(1, member1, member2, store.StoreId);
             Product p1 = service.AddProduct(2, member2, store.StoreId, "Product1", "Description1", 100.0, 5, "Category1").Value;
@@ -1518,9 +1499,9 @@ namespace Tests.AcceptanceTests
             string member1 = "Member1";
             string member2 = "Member2";
             string member3 = "Member3";
-            TestLogin_Good(1, member1, "Password1");
-            TestLogin_Good(2, member2, "Password2");
-            TestLogin_Good(3, member3, "Password3");
+            Test_Login_Good(1, member1, "Password1");
+            Test_Login_Good(2, member2, "Password2");
+            Test_Login_Good(3, member3, "Password3");
 
             Store store = service.CreateNewStore(1, member1, "Store1").Value;
             Product p1 = service.AddProduct(1, member1, store.StoreId, "Product1", "Description1", 100.0, 5, "Category1").Value;
@@ -1548,9 +1529,9 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_HoldedNotifications_NoHoldedNotifications()
         {
-            TestRegister_Good(1, "Member2", "Password2");
-            TestRegister_Good(2, "Member3", "Password3");
-            TestRegister_Good(0, "Member1", "Password1");
+            Test_Register_Good(1, "Member2", "Password2");
+            Test_Register_Good(2, "Member3", "Password3");
+            Test_Register_Good(0, "Member1", "Password1");
             Response<KeyValuePair<Member, List<Notification>>> response1 = service.Login(0, "Member1", "Password1");
 
             Assert.AreEqual(response1.Value.Value.Count, 0);
@@ -1580,9 +1561,9 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_HoldedNotifications_From_CloseStore()
         {
-            TestRegister_Good(1, "Member2", "Password2");
-            TestRegister_Good(2, "Member3", "Password3");
-            TestLogin_Good(0, "Member1", "Password1");
+            Test_Register_Good(1, "Member2", "Password2");
+            Test_Register_Good(2, "Member3", "Password3");
+            Test_Login_Good(0, "Member1", "Password1");
             Response<Store> resStore = service.CreateNewStore(0, "Member1", "Store1");
             Assert.IsFalse(resStore.ErrorOccured);
             Store store1 = resStore.Value;
@@ -1611,7 +1592,7 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_CloseStore_Good()
         {
-            TestLogin_Good(0, "Member1", "Password1");
+            Test_Login_Good(0, "Member1", "Password1");
             Response<Store> resp1 = service.CreateNewStore(0, "Member1", "Store1");
             Assert.IsFalse (resp1.ErrorOccured);
             Store store1 = resp1.Value;
@@ -1623,8 +1604,8 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_CloseStore_Bad_NoPermission()
         {
-            TestLogin_Good(0, "Member1", "Password1");
-            TestLogin_Good(1, "Member2", "Password2");
+            Test_Login_Good(0, "Member1", "Password1");
+            Test_Login_Good(1, "Member2", "Password2");
             Response<Store> resp1 = service.CreateNewStore(0, "Member1", "Store1");
             Assert.IsFalse(resp1.ErrorOccured);
             Store store1 = resp1.Value;
@@ -1636,7 +1617,7 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_CloseStore_Bad_NoSuchStore()
         {
-            TestLogin_Good(0, "Member1", "Password1");
+            Test_Login_Good(0, "Member1", "Password1");
             Response<Store> resp1 = service.CreateNewStore(0, "Member1", "Store1");
             Assert.IsFalse(resp1.ErrorOccured);
             Store store1 = resp1.Value;
@@ -1648,7 +1629,7 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_CloseStore_Bad_AlreadyClosed()
         {
-            TestLogin_Good(0, "Member1", "Password1");
+            Test_Login_Good(0, "Member1", "Password1");
             Response<Store> resp1 = service.CreateNewStore(0, "Member1", "Store1");
             Assert.IsFalse(resp1.ErrorOccured);
             Store store1 = resp1.Value;
@@ -1662,7 +1643,7 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_OpenStore_Good()
         {
-            TestLogin_Good(0, "Member1", "Password1");
+            Test_Login_Good(0, "Member1", "Password1");
             Response<Store> resp1 = service.CreateNewStore(0, "Member1", "Store1");
             Assert.IsFalse(resp1.ErrorOccured);
             Store store1 = resp1.Value;
@@ -1676,8 +1657,8 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_OpenStore_Bad_NoPermission()
         {
-            TestLogin_Good(0, "Member1", "Password1");
-            TestLogin_Good(1, "Member2", "Password2");
+            Test_Login_Good(0, "Member1", "Password1");
+            Test_Login_Good(1, "Member2", "Password2");
             Response<Store> resp1 = service.CreateNewStore(0, "Member1", "Store1");
             Assert.IsFalse(resp1.ErrorOccured);
             Store store1 = resp1.Value;
@@ -1691,7 +1672,7 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_OpenStore_Bad_NoSuchStore()
         {
-            TestLogin_Good(0, "Member1", "Password1");
+            Test_Login_Good(0, "Member1", "Password1");
             Response<Store> resp1 = service.CreateNewStore(0, "Member1", "Store1");
             Assert.IsFalse(resp1.ErrorOccured);
             Store store1 = resp1.Value;
@@ -1705,7 +1686,7 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_OpenStore_Bad_AlreadyOpen()
         {
-            TestLogin_Good(0, "Member1", "Password1");
+            Test_Login_Good(0, "Member1", "Password1");
             Response<Store> resp1 = service.CreateNewStore(0, "Member1", "Store1");
             Assert.IsFalse(resp1.ErrorOccured);
             Store store1 = resp1.Value;
@@ -1718,9 +1699,9 @@ namespace Tests.AcceptanceTests
         public void Test_HoldedNotifications_From_OpenStore()
         {
             // Store owners need to get a notification when their store opens again
-            TestRegister_Good(1, "Member2", "Password2");
-            TestRegister_Good(2, "Member3", "Password3");
-            TestLogin_Good(0, "Member1", "Password1");
+            Test_Register_Good(1, "Member2", "Password2");
+            Test_Register_Good(2, "Member3", "Password3");
+            Test_Login_Good(0, "Member1", "Password1");
             Store store1 = service.CreateNewStore(0, "Member1", "Store1").Value;
 
             service.NominateStoreOwner(0, "Member1", "Member2", store1.StoreId);
@@ -1750,10 +1731,10 @@ namespace Tests.AcceptanceTests
         public void Test_HoldedNotifications_From_BuyingProductFromYourStore()
         {
             // Store owners need to get a notification when someone buys from them
-            TestLogin_Good(0, "Member1", "Password1");
-            TestRegister_Good(1, "Member2", "Password2");
-            TestRegister_Good(2, "Member3", "Password3");
-            TestRegister_Good(3, "Member4", "Password4");
+            Test_Login_Good(0, "Member1", "Password1");
+            Test_Register_Good(1, "Member2", "Password2");
+            Test_Register_Good(2, "Member3", "Password3");
+            Test_Register_Good(3, "Member4", "Password4");
 
             Store store1 = service.CreateNewStore(0, "Member1", "Store1").Value;
             service.NominateStoreOwner(0, "Member1", "Member2", store1.StoreId);
@@ -1778,10 +1759,10 @@ namespace Tests.AcceptanceTests
         public void Test_HoldedNotifications_From_RemovingNomination()
         {
             // Store owners and managers need to get a notification when their nomination is removed
-            TestRegister_Good(1, "Member2", "Password2");
-            TestRegister_Good(2, "Member3", "Password3");
-            TestLogin_Good(0, "Member1", "Password1");
-            TestLogin_Good(3, "Member4", "Password4");
+            Test_Register_Good(1, "Member2", "Password2");
+            Test_Register_Good(2, "Member3", "Password3");
+            Test_Login_Good(0, "Member1", "Password1");
+            Test_Login_Good(3, "Member4", "Password4");
             Store store1 = service.CreateNewStore(0, "Member1", "Store1").Value;
             service.NominateStoreOwner(0, "Member1", "Member4", store1.StoreId);
             service.NominateStoreOwner(3, "Member4", "Member2", store1.StoreId);
@@ -1908,8 +1889,8 @@ namespace Tests.AcceptanceTests
         {
             string member1 = "Member1";
             string member2 = "Member2";
-            TestLogin_Good(1, member1, "password1");
-            TestLogin_Good(2, member2, "password2");
+            Test_Login_Good(1, member1, "password1");
+            Test_Login_Good(2, member2, "password2");
             Store store = service.CreateNewStore(1, member1, "Store1").Value;
             service.NominateStoreManager(1, member1, member2, store.StoreId);
             Assert.IsTrue(service.AddProduct(2, member2, store.StoreId, "Product1", "Description1", 10.0, 3, "Category1").ErrorOccured);
@@ -1922,8 +1903,8 @@ namespace Tests.AcceptanceTests
         {
             string member1 = "Member1";
             string member2 = "Member2";
-            TestLogin_Good(1, member1, "password1");
-            TestLogin_Good(2, member2, "password2");
+            Test_Login_Good(1, member1, "password1");
+            Test_Login_Good(2, member2, "password2");
             Store store = service.CreateNewStore(1, member1, "Store1").Value;
             service.NominateStoreManager(1, member1, member2, store.StoreId);
             Assert.IsTrue(service.AddActionToManager(1, member1, member2, store.StoreId, "BlahBlah").ErrorOccured);
@@ -1934,8 +1915,8 @@ namespace Tests.AcceptanceTests
         {
             string member1 = "Member1";
             string member2 = "Member2";
-            TestLogin_Good(1, member1, "password1");
-            TestLogin_Good(2, member2, "password2");
+            Test_Login_Good(1, member1, "password1");
+            Test_Login_Good(2, member2, "password2");
             Store store = service.CreateNewStore(1, member1, "Store1").Value;
             Assert.IsTrue(service.AddProduct(2, member2, store.StoreId, "Product1", "Description1", 10.0, 3, "Category1").ErrorOccured);
             Assert.IsTrue(service.AddActionToManager(1, member1, member2, store.StoreId, "AddProduct").ErrorOccured);
@@ -1948,9 +1929,9 @@ namespace Tests.AcceptanceTests
             string member1 = "Member1";
             string member2 = "Member2";
             string member3 = "Member3";
-            TestLogin_Good(1, member1, "password1");
-            TestLogin_Good(2, member2, "password2");
-            TestLogin_Good(3, member3, "password3");
+            Test_Login_Good(1, member1, "password1");
+            Test_Login_Good(2, member2, "password2");
+            Test_Login_Good(3, member3, "password3");
             Store store = service.CreateNewStore(1, member1, "Store1").Value;
             service.NominateStoreManager(1, member1, member2, store.StoreId);
             service.NominateStoreManager(1, member1, member3, store.StoreId);
