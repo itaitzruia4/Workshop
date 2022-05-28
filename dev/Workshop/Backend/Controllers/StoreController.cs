@@ -82,6 +82,17 @@ namespace API.Controllers
             return Ok(new FrontResponse<Member>(response.Value));
         }
 
+        [HttpPost("addactiontomanager")]
+        public ActionResult<FrontResponse<string>> AddActionToManager([FromBody] AddActionToManagerRequest request)
+        {
+            Response response = Service.AddActionToManager(request.UserId, request.Membername, request.Nominee, request.StoreId, request.Action);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<string>(response.ErrorMessage));
+            }
+            return Ok(new FrontResponse<string>(request.Action));
+        }
+
         [HttpPost("getworkersinformation")]
         public ActionResult<FrontResponse<List<Member>>> GetWorkersInformation([FromBody] StoreRequest request)
         {

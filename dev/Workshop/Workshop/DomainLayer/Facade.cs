@@ -75,6 +75,11 @@ namespace Workshop.DomainLayer
             return MarketController.RemoveStoreOwnerNomination(userId, nominatorMembername, nominatedMembername, storeId);
         }
 
+        internal void AddActionToManager(int userId, string owner, string manager, int storeId, string action)
+        {
+            MarketController.AddActionToManager(userId, owner, manager, storeId, action);
+        }
+
         internal List<Member> GetWorkersInformation(int userId, string membername, int storeId)
         {
             return MarketController.GetWorkersInformation(userId, membername, storeId);

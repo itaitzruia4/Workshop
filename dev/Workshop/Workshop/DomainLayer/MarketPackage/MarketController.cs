@@ -52,7 +52,6 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             Logger.Instance.LogEvent($"{nominatorUsername} is trying to nominate {nominatedUsername} to be a store owner of store {storeId}");
             userController.AssertCurrentUser(userId, nominatorUsername);
-            StoreOwner storeOwner = null;
             try
             {
                 storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
@@ -61,7 +60,7 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            storeOwner = userController.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId);
+            StoreOwner storeOwner = userController.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId);
             storesLocks[storeId].ReleaseReaderLock();
             return storeOwner;
         }
@@ -70,7 +69,6 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             Logger.Instance.LogEvent($"{nominatorUsername} is trying to nominate {nominatedUsername} to be a store manager of store {storeId}.");
             userController.AssertCurrentUser(userId, nominatorUsername);
-            StoreManager storeManager = null;
             try
             {
                 storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
@@ -79,7 +77,7 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            storeManager = userController.NominateStoreManager(userId, nominatorUsername, nominatedUsername, storeId);
+            StoreManager storeManager = userController.NominateStoreManager(userId, nominatorUsername, nominatedUsername, storeId);
             storesLocks[storeId].ReleaseReaderLock();
             return storeManager;
         }
@@ -104,6 +102,88 @@ namespace Workshop.DomainLayer.MarketPackage
                 }
             }
             throw new ArgumentException($"User {userId} with member {nominatorMembername} FAILED to remove store owner nomination from {nominatedMembername} in store {storeId}.");
+        }
+        public void AddActionToManager(int userId, string owner, string manager, int storeId, string action)
+        {
+            Logger.Instance.LogEvent($"{owner} is trying to add action {action} to manager {manager} in store {storeId}.");
+            userController.AssertCurrentUser(userId, owner);
+            if (userController.GetMember(owner).GetStoreRoles(storeId).All(x => !(x is StoreOwner)))
+            {
+                throw new ArgumentException($"{owner} is not an owner and can not add action to a manager");
+            }
+            if (!userController.GetMember(manager).GetStoreRoles(storeId).Any(x => x is StoreManager))
+            {
+                throw new ArgumentException($"{manager} is not a store manager so an action can not be added to him");
+            }
+            try
+            {
+                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
+            }
+            catch
+            {
+                throw new ArgumentException("Store ID does not exist");
+            }
+            Action actualAction = ParseAction(action);
+            foreach (StoreRole storeRole in userController.GetMember(manager).GetStoreRoles(storeId))
+            {
+                if (storeRole is StoreManager)
+                {
+                    if (!storeRole.IsAuthorized(actualAction))
+                    {
+                        storeRole.AddAction(actualAction);
+                    }
+                }
+            }
+            Logger.Instance.LogEvent($"{owner} successfuly added action {action} to manager {manager} in store {storeId}.");
+            storesLocks[storeId].ReleaseReaderLock();
+        }
+
+        private Action ParseAction(string action)
+        {
+            switch (action) {
+                case "AddProduct":
+                    return Action.AddProduct;
+                case "RemoveProduct":
+                    return Action.RemoveProduct;
+                case "ChangeProductName":
+                    return Action.ChangeProductName;
+                case "ChangeProductPrice":
+                    return Action.ChangeProductPrice;
+                case "ChangeProductQuantity":
+                    return Action.ChangeProductQuantity;
+                case "ChangeProductDescription":
+                    return Action.ChangeProductDescription;
+                case "NominateStoreOwner":
+                    return Action.NominateStoreOwner;
+                case "NominateStoreManager":
+                    return Action.NominateStoreManager;
+                case "GetWorkersInformation":
+                    return Action.GetWorkersInformation;
+                case "OpenStore":
+                    return Action.OpenStore;
+                case "CloseStore":
+                    return Action.CloseStore;
+                case "AddPermissionToStoreManager":
+                    return Action.AddPermissionToStoreManager;
+                case "RemovePermissionFromStoreManager":
+                    return Action.RemovePermissionFromStoreManager;
+                case "GetStoreOrdersList":
+                    return Action.GetStoreOrdersList;
+                case "ViewClosedStore":
+                    return Action.ViewClosedStore;
+                case "AddDiscount":
+                    return Action.AddDiscount;
+                case "GetMarketStatistics":
+                    return Action.GetMarketStatistics;
+                case "CancelMember":
+                    return Action.CancelMember;
+                case "GetMembersOnlineStats":
+                    return Action.GetMembersOnlineStats;
+                case "AddPurchaseTerm":
+                    return Action.AddPurchaseTerm;
+                default:
+                    throw new ArgumentException($"Unrecognized action: {action}");
+            }
         }
 
         private void ValidateStoreExists(int ID)

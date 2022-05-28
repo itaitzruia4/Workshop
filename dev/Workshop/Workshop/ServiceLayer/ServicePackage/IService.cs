@@ -73,5 +73,7 @@ namespace Workshop.ServiceLayer
         Response AddStorePurchaseTerm(int userId, string user, int storeId, string jsonTerm);
 
         Response AddUserPurchaseTerm(int userId, string user, int storeId, string jsonTerm);
+
+        Response AddActionToManager(int userId, string owner, string manager, int storeId, string action);
     }
 }

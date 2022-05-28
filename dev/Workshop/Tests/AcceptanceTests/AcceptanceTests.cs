@@ -1898,5 +1898,61 @@ namespace Tests.AcceptanceTests
             Assert.IsFalse(service.Login(1, "user1", "pass1").ErrorOccured);
             Assert.AreEqual(0, service.GetAllStores(1).Value.Count);
         }
+
+        [TestMethod]
+        public void Test_AddActionToManager_Good()
+        {
+            string member1 = "Member1";
+            string member2 = "Member2";
+            TestLogin_Good(1, member1, "password1");
+            TestLogin_Good(2, member2, "password2");
+            Store store = service.CreateNewStore(1, member1, "Store1").Value;
+            service.NominateStoreManager(1, member1, member2, store.StoreId);
+            Assert.IsTrue(service.AddProduct(2, member2, store.StoreId, "Product1", "Description1", 10.0, 3, "Category1").ErrorOccured);
+            Assert.IsFalse(service.AddActionToManager(1, member1, member2, store.StoreId, "AddProduct").ErrorOccured);
+            Assert.IsFalse(service.AddProduct(2, member2, store.StoreId, "Product1", "Description1", 10.0, 3, "Category1").ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_AddActionToManager_Bad_NoSuchAction()
+        {
+            string member1 = "Member1";
+            string member2 = "Member2";
+            TestLogin_Good(1, member1, "password1");
+            TestLogin_Good(2, member2, "password2");
+            Store store = service.CreateNewStore(1, member1, "Store1").Value;
+            service.NominateStoreManager(1, member1, member2, store.StoreId);
+            Assert.IsTrue(service.AddActionToManager(1, member1, member2, store.StoreId, "BlahBlah").ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_AddActionToManager_Bad_DoesntWorkOnNotManager()
+        {
+            string member1 = "Member1";
+            string member2 = "Member2";
+            TestLogin_Good(1, member1, "password1");
+            TestLogin_Good(2, member2, "password2");
+            Store store = service.CreateNewStore(1, member1, "Store1").Value;
+            Assert.IsTrue(service.AddProduct(2, member2, store.StoreId, "Product1", "Description1", 10.0, 3, "Category1").ErrorOccured);
+            Assert.IsTrue(service.AddActionToManager(1, member1, member2, store.StoreId, "AddProduct").ErrorOccured);
+            Assert.IsTrue(service.AddProduct(2, member2, store.StoreId, "Product1", "Description1", 10.0, 3, "Category1").ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_AddActionToManager_Bad_DoesntWorkFromNotOwner()
+        {
+            string member1 = "Member1";
+            string member2 = "Member2";
+            string member3 = "Member3";
+            TestLogin_Good(1, member1, "password1");
+            TestLogin_Good(2, member2, "password2");
+            TestLogin_Good(3, member3, "password3");
+            Store store = service.CreateNewStore(1, member1, "Store1").Value;
+            service.NominateStoreManager(1, member1, member2, store.StoreId);
+            service.NominateStoreManager(1, member1, member3, store.StoreId);
+            Assert.IsTrue(service.AddProduct(3, member3, store.StoreId, "Product1", "Description1", 10.0, 3, "Category1").ErrorOccured);
+            Assert.IsTrue(service.AddActionToManager(2, member2, member3, store.StoreId, "AddProduct").ErrorOccured);
+            Assert.IsTrue(service.AddProduct(3, member3, store.StoreId, "Product1", "Description1", 10.0, 3, "Category1").ErrorOccured);
+        }
     }
 }

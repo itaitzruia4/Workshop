@@ -178,6 +178,10 @@ namespace Workshop.ServiceLayer
                                 if (actualParams.Length != 4) { throw new ArgumentException(); }
                                 facade.AddUserPurchaseTerm(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), actualParams[3]);
                                 break;
+                            case "add-action-to-manager":
+                                if (actualParams.Length != 5) { throw new ArgumentException(); }
+                                facade.AddActionToManager(int.Parse(actualParams[0]), actualParams[1], actualParams[2], int.Parse(actualParams[3]), actualParams[4]);
+                                break;
                             default:
                                 throw new ArgumentException();
                         }
@@ -320,6 +324,18 @@ namespace Workshop.ServiceLayer
                 return new Response<Member>(e.Message, userId);
             }
 
+        }
+        public Response AddActionToManager(int userId, string owner, string manager, int storeId, string action)
+        {
+            try
+            {
+                facade.AddActionToManager(userId, owner, manager, storeId, action);
+                return new Response(userId);
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message, userId);
+            }
         }
 
 
