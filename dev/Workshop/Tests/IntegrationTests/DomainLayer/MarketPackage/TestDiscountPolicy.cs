@@ -18,6 +18,9 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         {
             store = new Store(1, "Store1");
             discountPolicy = new DiscountPolicy(store);
+            store.AddProduct("p1",1,"desc1",100.0,3,"Cat0");
+            store.AddProduct("p2", 2, "desc2", 200.0, 2, "Cat1");
+            store.AddProduct("p3", 3, "desc3", 50.0, 5, "Cat2");
         }
 
         public Func<int, string> makeSimpleProductDiscount(double percent)
