@@ -900,8 +900,8 @@ namespace Tests.AcceptanceTests
 
         [DataTestMethod]
         [DataRow("member1", "p", ">", "10", "q", "<", "5")]
-        [DataRow("member1", ">", "01:00", "d", "<", "27/08/2023")]
-        [DataRow("member1", "!=", "20/01/2023", "q", "<=", "2")]
+        [DataRow("member1", "h", ">", "01:00", "d", "<", "27/08/2023")]
+        [DataRow("member1", "d", "!=", "20/01/2023", "q", "<=", "2")]
         public void TestAddProductPurchaseTerm_Good_Or(string member, string l_type, string l_action, string l_value, string r_type, string r_action, string r_value)
         {
             TestLogin_Good(1, member, "password1");
@@ -974,10 +974,10 @@ namespace Tests.AcceptanceTests
         }
 
         [DataTestMethod]
-        [DataRow("member1", ">", "10")]
-        [DataRow("member1", "<", "-2")]
-        [DataRow("member1", "$", "01:00")]
-        [DataRow("member1", "!=", "27/08/2020")]
+        [DataRow("member1", "t", ">", "10")]
+        [DataRow("member1", "q", "<", "-2")]
+        [DataRow("member1", "h", "$", "01:00")]
+        [DataRow("member1", "d", "!=", "27/08/2020")]
         public void TestAddStorePurchaseTerm_Bad_WrongParameters(string member, string type, string action, string value)
         {
             TestLogin_Good(1, member, "password1");
@@ -1058,7 +1058,7 @@ namespace Tests.AcceptanceTests
             string member = "member1";
             TestLogin_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
-            Product p1 = service.AddProduct(1, member, store.StoreId, "", "", 100.0, 10, null).Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
             service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm("p", ">", "200")(p1.Id), p1.Id);
             service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm("q", "<", "4")(p1.Id), p1.Id);
             service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm("d", "=", DateTime.Now.ToString("dd/MM/yyyy"))(p1.Id), p1.Id);
@@ -1077,7 +1077,7 @@ namespace Tests.AcceptanceTests
             string member = "member1";
             TestLogin_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
-            Product p1 = service.AddProduct(1, member, store.StoreId, "", "", 100.0, 10, null).Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
             service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm("q", action, "2")(p1.Id), p1.Id);
             service.addToCart(1, member, p1.Id, store.StoreId, n);
             Assert.IsTrue(service.BuyCart(1, member, "TestAddress").ErrorOccured);
@@ -1147,7 +1147,7 @@ namespace Tests.AcceptanceTests
             string member = "member1";
             TestLogin_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
-            Product p1 = service.AddProduct(1, member, store.StoreId, "", "", 100.0, 10, null).Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
             service.AddUserPurchaseTerm(1, member, store.StoreId, makeSimpleUserPurchaseTerm(">", 18));
             service.addToCart(1, member, p1.Id, store.StoreId, 3);
             Assert.IsFalse(service.BuyCart(1, member, "TestAddress").ErrorOccured);
@@ -1161,7 +1161,7 @@ namespace Tests.AcceptanceTests
             service.Register(1, member, "password1", DateTime.Parse("Aug 30, 2016"));
             service.Login(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
-            Product p1 = service.AddProduct(1, member, store.StoreId, "", "", 100.0, 10, null).Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
             service.AddUserPurchaseTerm(1, member, store.StoreId, makeSimpleUserPurchaseTerm(">", 18));
             service.addToCart(1, member, p1.Id, store.StoreId, 3);
             Assert.IsTrue(service.BuyCart(1, member, "TestAddress").ErrorOccured);
