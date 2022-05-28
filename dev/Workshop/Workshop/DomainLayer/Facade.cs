@@ -75,6 +75,11 @@ namespace Workshop.DomainLayer
             return MarketController.RemoveStoreOwnerNomination(userId, nominatorMembername, nominatedMembername, storeId);
         }
 
+        internal void AddActionToManager(int userId, string owner, string manager, int storeId, string action)
+        {
+            MarketController.AddActionToManager(userId, owner, manager, storeId, action);
+        }
+
         internal List<Member> GetWorkersInformation(int userId, string membername, int storeId)
         {
             return MarketController.GetWorkersInformation(userId, membername, storeId);
@@ -187,9 +192,9 @@ namespace Workshop.DomainLayer
             MarketController.ChangeProductCategory(userId, username, storeId, productID, category);
         }
 
-        internal List<Store> GetAllStores()
+        internal List<Store> GetAllStores(int userId)
         {
-            return MarketController.GetAllStores();
+            return MarketController.GetAllStores(userId);
         }
     }
 }

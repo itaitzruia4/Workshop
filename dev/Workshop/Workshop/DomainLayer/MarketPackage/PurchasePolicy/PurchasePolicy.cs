@@ -9,7 +9,7 @@ using Workshop.DomainLayer.UserPackage.Shopping;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
-    class PurchasePolicy
+    public class PurchasePolicy
     {
         private Dictionary<int, Term> products_terms;
         private Dictionary<string, Term> category_terms;
@@ -39,7 +39,7 @@ namespace Workshop.DomainLayer.MarketPackage
                     if(!products_terms[product.Id].IsEligible(shoppingBag))
                         return false;
                 }
-                if(category_terms.ContainsKey(product.Category))
+                if(product.Category != null && category_terms.ContainsKey(product.Category))
                 {
                     if (!category_terms[product.Category].IsEligible(shoppingBag))
                         return false;
@@ -76,7 +76,7 @@ namespace Workshop.DomainLayer.MarketPackage
             if (store_terms == null)
                 store_terms = term;
             else
-                store_terms = new OrTerm(store_terms, term);
+                store_terms = new AndTerm(store_terms, term);
         }
 
         public void AddUserTerm(string json_term)
@@ -111,7 +111,7 @@ namespace Workshop.DomainLayer.MarketPackage
         }
         private Term ParseCompositeTerm(dynamic data)
         {
-            string value = data.tag;
+            string value = data.value;
             if (value.Equals("and"))
                 return new AndTerm(ParseTerm(data.lhs), ParseTerm(data.rhs));
             if (value.Equals("or"))
@@ -148,36 +148,18 @@ namespace Workshop.DomainLayer.MarketPackage
 
         private Term ParseProductPriceTerm(string action, string value, string productId)
         {
+            double price;
+            int ID;
             try
             {
-                double price = double.Parse(value);
+                price = double.Parse(value);
+                if (price < 0)
+                    throw new Exception("Term price value cannot be negtive number.");
                 try
                 {
 
-                    int ID = int.Parse(productId);
-                    if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
-                        throw new Exception("Unknown term operand: " + action);
-                        SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
-                            {
-                                double bag_product_price = 0;
-                                foreach (ProductDTO product in shoppingBag.products)
-                                {
-                                    if(product.Id == ID)
-                                        bag_product_price += product.Price;
-                                }
-                                if (action.Equals("<"))
-                                    return bag_product_price < price;
-                                if (action.Equals("<="))
-                                    return bag_product_price <= price;
-                                if (action.Equals(">"))
-                                    return bag_product_price > price;
-                                if (action.Equals(">="))
-                                    return bag_product_price >= price;
-                                if (action.Equals("="))
-                                    return bag_product_price == price;
-                                return bag_product_price != price;
-                            };
-                    return new SimpleTerm(term);
+                    ID = int.Parse(productId);
+                    
                 }catch (Exception)
                 {
                     throw new Exception("Invalid product ID term value: " + productId);
@@ -186,40 +168,44 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new Exception("Invalid price term value: " + value);
             }
+            if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
+                throw new Exception("Unknown term operand: " + action);
+            SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
+            {
+                double bag_product_price = 0;
+                foreach (ProductDTO product in shoppingBag.products)
+                {
+                    if (product.Id == ID)
+                        bag_product_price += product.Price * product.Quantity;
+                }
+                if (action.Equals("<"))
+                    return bag_product_price < price;
+                if (action.Equals("<="))
+                    return bag_product_price <= price;
+                if (action.Equals(">"))
+                    return bag_product_price > price;
+                if (action.Equals(">="))
+                    return bag_product_price >= price;
+                if (action.Equals("="))
+                    return bag_product_price == price;
+                return bag_product_price != price;
+            };
+            return new SimpleTerm(term);
         }
 
         private Term ParseProductQuantityTerm(string action, string value, string productId)
         {
+            int quantity;
+            int ID;
             try
             {
-                int quantity = int.Parse(value);
+                quantity = int.Parse(value);
+                
                 try
                 {
 
-                    int ID = int.Parse(productId);
-                    if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
-                        throw new Exception("Unknown term operand: " + action);
-                    SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
-                    {
-                        int bag_product_quantity = 0;
-                        foreach (ProductDTO product in shoppingBag.products)
-                        {
-                            if(product.Id == ID)
-                                bag_product_quantity++;
-                        }
-                        if (action.Equals("<"))
-                            return bag_product_quantity < quantity;
-                        if (action.Equals("<="))
-                            return bag_product_quantity <= quantity;
-                        if (action.Equals(">"))
-                            return bag_product_quantity > quantity;
-                        if (action.Equals(">="))
-                            return bag_product_quantity >= quantity;
-                        if (action.Equals("="))
-                            return bag_product_quantity == quantity;
-                        return bag_product_quantity != quantity;
-                    };
-                    return new SimpleTerm(term);
+                    ID = int.Parse(productId);
+                    
                 }
                 catch (Exception)
                 {
@@ -230,46 +216,45 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new Exception("Invalid price term value: " + value);
             }
+            if (quantity < 0)
+                throw new Exception("Term quantity value cannot be negtive number.");
+            if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
+                throw new Exception("Unknown term operand: " + action);
+            SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
+            {
+                int bag_product_quantity = 0;
+                foreach (ProductDTO product in shoppingBag.products)
+                {
+                    if (product.Id == ID)
+                        bag_product_quantity += product.Quantity;
+                }
+                if (action.Equals("<"))
+                    return bag_product_quantity < quantity;
+                if (action.Equals("<="))
+                    return bag_product_quantity <= quantity;
+                if (action.Equals(">"))
+                    return bag_product_quantity > quantity;
+                if (action.Equals(">="))
+                    return bag_product_quantity >= quantity;
+                if (action.Equals("="))
+                    return bag_product_quantity == quantity;
+                return bag_product_quantity != quantity;
+            };
+            return new SimpleTerm(term);
         }
 
         private Term ParseProductHourTerm(string action, string value, string productId)
         {
+            TimeSpan hour;
+            int ID;
             try
             {
-                TimeSpan hour = DateTime.Parse(value).TimeOfDay;
+                hour = DateTime.Parse(value).TimeOfDay;
                 try
                 {
 
-                    int ID = int.Parse(productId);
-                    if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
-                        throw new Exception("Unknown term operand: " + action);
-                    SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
-                    {
-                        TimeSpan now = DateTime.Now.TimeOfDay;
-                        bool found = false;
-                        foreach (ProductDTO product in shoppingBag.products)
-                        {
-                            if(product.Id == ID)
-                            {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (found && action.Equals("<"))
-                            return now < hour;
-                        if (found && action.Equals("<="))
-                            return now <= hour;
-                        if (found && action.Equals(">"))
-                            return now > hour;
-                        if (found && action.Equals(">="))
-                            return now >= hour;
-                        if (found && action.Equals("="))
-                            return now == hour;
-                        if (found && action.Equals("!="))
-                            return now != hour;
-                        return true;
-                    };
-                    return new SimpleTerm(term);
+                    ID = int.Parse(productId);
+                    
                 }
                 catch (Exception)
                 {
@@ -280,45 +265,48 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new Exception("Invalid hour term value: " + value);
             }
+            if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
+                throw new Exception("Unknown term operand: " + action);
+            SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
+            {
+                TimeSpan now = DateTime.Now.TimeOfDay;
+                bool found = false;
+                foreach (ProductDTO product in shoppingBag.products)
+                {
+                    if (product.Id == ID)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found && action.Equals("<"))
+                    return now < hour;
+                if (found && action.Equals("<="))
+                    return now <= hour;
+                if (found && action.Equals(">"))
+                    return now > hour;
+                if (found && action.Equals(">="))
+                    return now >= hour;
+                if (found && action.Equals("="))
+                    return now == hour;
+                if (found && action.Equals("!="))
+                    return now != hour;
+                return true;
+            };
+            return new SimpleTerm(term);
         }
 
         private Term ParseProductDateTerm(string action, string value, string productId)
         {
+            DateTime date;
+            int ID;
             try
             {
-                DateTime date = DateTime.Parse(value).Date;
+                date = DateTime.Parse(value).Date;
                 try
                 {
-                    int ID = int.Parse(productId);
-                    if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
-                        throw new Exception("Unknown term operand: " + action);
-                    SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
-                    {
-                        DateTime now = DateTime.Now.Date;
-                        bool found = false;
-                        foreach (ProductDTO product in shoppingBag.products)
-                        {
-                            if (product.Id == ID)
-                            {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (found && action.Equals("<"))
-                            return now < date;
-                        if (found && action.Equals("<="))
-                            return now <= date;
-                        if (found && action.Equals(">"))
-                            return now > date;
-                        if (found && action.Equals(">="))
-                            return now >= date;
-                        if (found && action.Equals("="))
-                            return now == date;
-                        if (found && action.Equals("!="))
-                            return now != date;
-                        return true;
-                    };
-                    return new SimpleTerm(term);
+                    ID = int.Parse(productId);
+                    
                 }
                 catch (Exception)
                 {
@@ -329,6 +317,37 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new Exception("Invalid date term value: " + value);
             }
+            if (date < DateTime.Now)
+                throw new Exception("Term date must be in the future.");
+            if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
+                throw new Exception("Unknown term operand: " + action);
+            SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
+            {
+                DateTime now = DateTime.Now.Date;
+                bool found = false;
+                foreach (ProductDTO product in shoppingBag.products)
+                {
+                    if (product.Id == ID)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found && action.Equals("<"))
+                    return now < date;
+                if (found && action.Equals("<="))
+                    return now <= date;
+                if (found && action.Equals(">"))
+                    return now > date;
+                if (found && action.Equals(">="))
+                    return now >= date;
+                if (found && action.Equals("="))
+                    return now == date;
+                if (found && action.Equals("!="))
+                    return now != date;
+                return true;
+            };
+            return new SimpleTerm(term);
         }
 
         private Term ParseCategoryTerm(dynamic data)
@@ -358,159 +377,165 @@ namespace Workshop.DomainLayer.MarketPackage
 
         private Term ParseCategoryPriceTerm(string action, string value, string category)
         {
+            double price;
             try
             {
-                double price = double.Parse(value);
-
-                if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
-                    throw new Exception("Unknown term operand: " + action);
-                SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
-                {
-                    double bag_product_price = 0;
-                    foreach (ProductDTO product in shoppingBag.products)
-                    {
-                        if (product.Category != null && category.Equals(product.Category))
-                            bag_product_price += product.Price;
-                    }
-                    if (action.Equals("<"))
-                        return bag_product_price < price;
-                    if (action.Equals("<="))
-                        return bag_product_price <= price;
-                    if (action.Equals(">"))
-                        return bag_product_price > price;
-                    if (action.Equals(">="))
-                        return bag_product_price >= price;
-                    if (action.Equals("="))
-                        return bag_product_price == price;
-                    return bag_product_price != price;
-                };
-                return new SimpleTerm(term);
-
+                price = double.Parse(value);
             }
             catch (Exception)
             {
                 throw new Exception("Invalid price term value: " + value);
             }
+            if (price < 0)
+                throw new Exception("Term price value cannot be negtive number.");
+            if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
+                throw new Exception("Unknown term operand: " + action);
+            SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
+            {
+                double bag_product_price = 0;
+                foreach (ProductDTO product in shoppingBag.products)
+                {
+                    if (product.Category != null && category.Equals(product.Category))
+                        bag_product_price += product.Price * product.Quantity;
+                }
+                if (action.Equals("<"))
+                    return bag_product_price < price;
+                if (action.Equals("<="))
+                    return bag_product_price <= price;
+                if (action.Equals(">"))
+                    return bag_product_price > price;
+                if (action.Equals(">="))
+                    return bag_product_price >= price;
+                if (action.Equals("="))
+                    return bag_product_price == price;
+                return bag_product_price != price;
+            };
+            return new SimpleTerm(term);
         }
 
         private Term ParseCategoryQuantityTerm(string action, string value, string category)
         {
+            int quantity;
             try
             {
-                int quantity = int.Parse(value);
-
-                if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
-                    throw new Exception("Unknown term operand: " + action);
-                SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
-                {
-                    int bag_product_quantity = 0;
-                    foreach (ProductDTO product in shoppingBag.products)
-                    {
-                        if (product.Category != null && category.Equals(product.Category))
-                            bag_product_quantity++;
-                    }
-                    if (action.Equals("<"))
-                        return bag_product_quantity < quantity;
-                    if (action.Equals("<="))
-                        return bag_product_quantity <= quantity;
-                    if (action.Equals(">"))
-                        return bag_product_quantity > quantity;
-                    if (action.Equals(">="))
-                        return bag_product_quantity >= quantity;
-                    if (action.Equals("="))
-                        return bag_product_quantity == quantity;
-                    return bag_product_quantity != quantity;
-                };
-                return new SimpleTerm(term);
-
+                quantity = int.Parse(value);
             }
             catch (Exception)
             {
                 throw new Exception("Invalid price term value: " + value);
             }
+            if (quantity < 0)
+                throw new Exception("Term quantity value cannot be negtive number.");
+
+            if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
+                throw new Exception("Unknown term operand: " + action);
+            SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
+            {
+                int bag_product_quantity = 0;
+                foreach (ProductDTO product in shoppingBag.products)
+                {
+                    if (product.Category != null && category.Equals(product.Category))
+                        bag_product_quantity += product.Quantity;
+                }
+                if (action.Equals("<"))
+                    return bag_product_quantity < quantity;
+                if (action.Equals("<="))
+                    return bag_product_quantity <= quantity;
+                if (action.Equals(">"))
+                    return bag_product_quantity > quantity;
+                if (action.Equals(">="))
+                    return bag_product_quantity >= quantity;
+                if (action.Equals("="))
+                    return bag_product_quantity == quantity;
+                return bag_product_quantity != quantity;
+            };
+            return new SimpleTerm(term);
         }
 
         private Term ParseCategoryHourTerm(string action, string value, string category)
         {
+            TimeSpan hour;
             try
             {
-                TimeSpan hour = DateTime.Parse(value).TimeOfDay;
-
-                if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
-                    throw new Exception("Unknown term operand: " + action);
-                SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
-                {
-                    TimeSpan now = DateTime.Now.TimeOfDay;
-                    bool found = false;
-                    foreach (ProductDTO product in shoppingBag.products)
-                    {
-                        if (product.Category != null && category.Equals(product.Category))
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (found && action.Equals("<"))
-                        return now < hour;
-                    if (found && action.Equals("<="))
-                        return now <= hour;
-                    if (found && action.Equals(">"))
-                        return now > hour;
-                    if (found && action.Equals(">="))
-                        return now >= hour;
-                    if (found && action.Equals("="))
-                        return now == hour;
-                    if (found && action.Equals("!="))
-                        return now != hour;
-                    return true;
-                };
-                return new SimpleTerm(term);
+                hour = DateTime.Parse(value).TimeOfDay;
             }
             catch (Exception)
             {
                 throw new Exception("Invalid hour term value: " + value);
             }
+            if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
+                throw new Exception("Unknown term operand: " + action);
+            SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
+            {
+                TimeSpan now = DateTime.Now.TimeOfDay;
+                bool found = false;
+                foreach (ProductDTO product in shoppingBag.products)
+                {
+                    if (product.Category != null && category.Equals(product.Category))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found && action.Equals("<"))
+                    return now < hour;
+                if (found && action.Equals("<="))
+                    return now <= hour;
+                if (found && action.Equals(">"))
+                    return now > hour;
+                if (found && action.Equals(">="))
+                    return now >= hour;
+                if (found && action.Equals("="))
+                    return now == hour;
+                if (found && action.Equals("!="))
+                    return now != hour;
+                return true;
+            };
+            return new SimpleTerm(term);
         }
 
         private Term ParseCategoryDateTerm(string action, string value, string category)
         {
+            DateTime date;
             try
             {
-                DateTime date = DateTime.Parse(value).Date;
-                if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
-                    throw new Exception("Unknown term operand: " + action);
-                SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
-                {
-                    DateTime now = DateTime.Now.Date;
-                    bool found = false;
-                    foreach (ProductDTO product in shoppingBag.products)
-                    {
-                        if (product.Category != null && category.Equals(product.Category))
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (found && action.Equals("<"))
-                        return now < date;
-                    if (found && action.Equals("<="))
-                        return now <= date;
-                    if (found && action.Equals(">"))
-                        return now > date;
-                    if (found && action.Equals(">="))
-                        return now >= date;
-                    if (found && action.Equals("="))
-                        return now == date;
-                    if (found && action.Equals("!="))
-                        return now != date;
-                    return true;
-                };
-                return new SimpleTerm(term);
+                date = DateTime.Parse(value).Date;
             }
             catch (Exception)
             {
                 throw new Exception("Invalid date term value: " + value);
             }
+            if (date < DateTime.Now)
+                throw new Exception("Term date must be in the future.");
+            if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
+                throw new Exception("Unknown term operand: " + action);
+            SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
+            {
+                DateTime now = DateTime.Now.Date;
+                bool found = false;
+                foreach (ProductDTO product in shoppingBag.products)
+                {
+                    if (product.Category != null && category.Equals(product.Category))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found && action.Equals("<"))
+                    return now < date;
+                if (found && action.Equals("<="))
+                    return now <= date;
+                if (found && action.Equals(">"))
+                    return now > date;
+                if (found && action.Equals(">="))
+                    return now >= date;
+                if (found && action.Equals("="))
+                    return now == date;
+                if (found && action.Equals("!="))
+                    return now != date;
+                return true;
+            };
+            return new SimpleTerm(term);
         }
 
         private Term ParseBagTerm(dynamic data)
@@ -539,159 +564,168 @@ namespace Workshop.DomainLayer.MarketPackage
 
         private Term ParseBagPriceTerm(string action, string value)
         {
+            double price;
             try
             {
-                double price = double.Parse(value);
-
-                if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
-                    throw new Exception("Unknown term operand: " + action);
-                SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
-                {
-                    double bag_price = 0;
-                    foreach (ProductDTO product in shoppingBag.products)
-                    {
-                        bag_price += product.Price;
-                    }
-                    if (action.Equals("<"))
-                        return bag_price < price;
-                    if (action.Equals("<="))
-                        return bag_price <= price;
-                    if (action.Equals(">"))
-                        return bag_price > price;
-                    if (action.Equals(">="))
-                        return bag_price >= price;
-                    if (action.Equals("="))
-                        return bag_price == price;
-                    return bag_price != price;
-                };
-                return new SimpleTerm(term);
-
+                price = double.Parse(value);
             }
             catch (Exception)
             {
                 throw new Exception("Invalid price term value: " + value);
             }
+            if (price < 0)
+                throw new Exception("Term price value cannot be negtive number.");
+            if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
+                throw new Exception("Unknown term operand: " + action);
+            SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
+            {
+                double bag_price = 0;
+                foreach (ProductDTO product in shoppingBag.products)
+                {
+                    bag_price += product.Price * product.Quantity;
+                }
+                if (action.Equals("<"))
+                    return bag_price < price;
+                if (action.Equals("<="))
+                    return bag_price <= price;
+                if (action.Equals(">"))
+                    return bag_price > price;
+                if (action.Equals(">="))
+                    return bag_price >= price;
+                if (action.Equals("="))
+                    return bag_price == price;
+                return bag_price != price;
+            };
+            return new SimpleTerm(term);
         }
 
         private Term ParseBagQuantityTerm(string action, string value)
         {
+            int quantity;
             try
             {
-                int quantity = int.Parse(value);
-
-                if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
-                    throw new Exception("Unknown term operand: " + action);
-                SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
-                {
-                    int bag_quantity = shoppingBag.products.Count();
-                    if (action.Equals("<"))
-                        return bag_quantity < quantity;
-                    if (action.Equals("<="))
-                        return bag_quantity <= quantity;
-                    if (action.Equals(">"))
-                        return bag_quantity > quantity;
-                    if (action.Equals(">="))
-                        return bag_quantity >= quantity;
-                    if (action.Equals("="))
-                        return bag_quantity == quantity;
-                    return bag_quantity != quantity;
-                };
-                return new SimpleTerm(term);
-
+                quantity = int.Parse(value);
             }
             catch (Exception)
             {
                 throw new Exception("Invalid price term value: " + value);
             }
+            if (quantity < 0)
+                throw new Exception("Term quantity value cannot be negtive number.");
+            if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
+                throw new Exception("Unknown term operand: " + action);
+            SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
+            {
+                int bag_quantity = 0;
+                foreach (ProductDTO product in shoppingBag.products)
+                {
+                    bag_quantity += product.Quantity;
+                }
+                if (action.Equals("<"))
+                    return bag_quantity < quantity;
+                if (action.Equals("<="))
+                    return bag_quantity <= quantity;
+                if (action.Equals(">"))
+                    return bag_quantity > quantity;
+                if (action.Equals(">="))
+                    return bag_quantity >= quantity;
+                if (action.Equals("="))
+                    return bag_quantity == quantity;
+                return bag_quantity != quantity;
+            };
+            return new SimpleTerm(term);
         }
 
         private Term ParseBagHourTerm(string action, string value)
         {
+            TimeSpan hour;
             try
             {
-                TimeSpan hour = DateTime.Parse(value).TimeOfDay;
-
-                if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
-                    throw new Exception("Unknown term operand: " + action);
-                SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
-                {
-                    TimeSpan now = DateTime.Now.TimeOfDay;
-                    if (action.Equals("<"))
-                        return now < hour;
-                    if (action.Equals("<="))
-                        return now <= hour;
-                    if (action.Equals(">"))
-                        return now > hour;
-                    if (action.Equals(">="))
-                        return now >= hour;
-                    if (action.Equals("="))
-                        return now == hour;
-                    return now != hour;
-                };
-                return new SimpleTerm(term);
+                hour = DateTime.Parse(value).TimeOfDay;
             }
             catch (Exception)
             {
                 throw new Exception("Invalid hour term value: " + value);
             }
+            if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
+                throw new Exception("Unknown term operand: " + action);
+            SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
+            {
+                TimeSpan now = DateTime.Now.TimeOfDay;
+                if (action.Equals("<"))
+                    return now < hour;
+                if (action.Equals("<="))
+                    return now <= hour;
+                if (action.Equals(">"))
+                    return now > hour;
+                if (action.Equals(">="))
+                    return now >= hour;
+                if (action.Equals("="))
+                    return now == hour;
+                return now != hour;
+            };
+            return new SimpleTerm(term);
         }
 
         private Term ParseBagDateTerm(string action, string value)
         {
+            DateTime date;
             try
             {
-                DateTime date = DateTime.Parse(value).Date;
-                if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
-                    throw new Exception("Unknown term operand: " + action);
-                SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
-                {
-                    DateTime now = DateTime.Now.Date;
-                    if (action.Equals("<"))
-                        return now < date;
-                    if (action.Equals("<="))
-                        return now <= date;
-                    if (action.Equals(">"))
-                        return now > date;
-                    if (action.Equals(">="))
-                        return now >= date;
-                    if (action.Equals("="))
-                        return now == date;
-                    return now != date;
-                };
-                return new SimpleTerm(term);
+                date = DateTime.Parse(value).Date;
             }
             catch (Exception)
             {
                 throw new Exception("Invalid date term value: " + value);
             }
+            if (date < DateTime.Now)
+                throw new Exception("Term date must be in the future.");
+            if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
+                throw new Exception("Unknown term operand: " + action);
+            SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
+            {
+                DateTime now = DateTime.Now.Date;
+                if (action.Equals("<"))
+                    return now < date;
+                if (action.Equals("<="))
+                    return now <= date;
+                if (action.Equals(">"))
+                    return now > date;
+                if (action.Equals(">="))
+                    return now >= date;
+                if (action.Equals("="))
+                    return now == date;
+                return now != date;
+            };
+            return new SimpleTerm(term);
         }
 
         private Term ParseUserTerm(dynamic data)
         {
+            int age_value;
             try
             {
-                int age_value = int.Parse(data.age);
-                if (age_value < 0)
-                    throw new Exception("Age value must be bigger that 0.");
-                string action = data.action;
-
-                if (!action.Equals(">") && !action.Equals(">=") && !action.Equals("!="))
-                    throw new Exception("Unknown term operand: " + action);
-                SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
-                {
-                    if (action.Equals(">"))
-                        return age > age_value;
-                    if (action.Equals(">="))
-                        return age >= age_value;
-                    return age != age_value;
-                };
-                return new SimpleTerm(term);
-
+                age_value = int.Parse(((string)data.age).Trim('{', '}'));
             }
             catch (Exception)
             {
                 throw new Exception("Invalid age term value: " + data.age);
             }
+            if (age_value < 0)
+                throw new Exception("Age value must be bigger that 0.");
+            string action = data.action;
+
+            if (!action.Equals(">") && !action.Equals(">=") && !action.Equals("!="))
+                throw new Exception("Unknown term operand: " + action);
+            SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
+            {
+                if (action.Equals(">"))
+                    return age > age_value;
+                if (action.Equals(">="))
+                    return age >= age_value;
+                return age != age_value;
+            };
+            return new SimpleTerm(term);
         }
     }
 }

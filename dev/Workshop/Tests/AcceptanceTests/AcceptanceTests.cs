@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Workshop.ServiceLayer;
 using Workshop.ServiceLayer.ServiceObjects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Workshop.DomainLayer.Reviews;
 
 namespace Tests.AcceptanceTests
 {
@@ -789,7 +790,6 @@ namespace Tests.AcceptanceTests
             Assert.IsTrue(service.ChangeProductCategory(1, username, storeId, prod.Id, cat).ErrorOccured);
         }
 
-
         public bool BuyProduct_Thread(int userId, string user, string password, int productId, int storeId, int quantity)
         {
             Assert.IsFalse(service.Login(userId, user, password).ErrorOccured);
@@ -825,13 +825,409 @@ namespace Tests.AcceptanceTests
             Assert.AreNotEqual(res1, res2);
         }
 
-        /*
-        Response AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId);
+        // PurchaseTerm tests
+        private Func<int, string> makeSimpleProductPurchaseTerm(string type, string action, string value)
+        {
+            Func<int, string> func = id => "{ tag: 'ProductPurchaseSimpleTerm', type: '" + type + "', action: '" + action + "', value: '" + value + "', productId: " + id + "}";
+            return func;
+        }
 
-        Response AddCategoryDiscount(int userId, string user, int storeId, string jsonDiscount, string categoryName);
+        private Func<string, string> makeSimpleCategoryPurchaseTerm(string type, string action, string value)
+        {
+            Func<string, string> func = category => "{ tag: 'CategoryPurchaseSimpleTerm', type: '" + type + "', action: '" + action + "', value: '" + value + "', category: '" + category + "'}";
+            return func;
+        }
 
-        Response AddStoreDiscount(int userId, string user, int storeId, string jsonDiscount);
-         */
+        private string makeSimpleBagPurchaseTerm(string type, string action, string value)
+        {
+            return "{ tag: 'BagPurchaseSimpleTerm', type: '" + type + "', action: '" + action + "', value: '" + value + "'}";
+        }
+
+        private string makeSimpleUserPurchaseTerm(string action, int age)
+        {
+            return "{ tag: 'UserPurchaseSimpleTerm', action: '" + action + "', age: '" + age + "'}";
+        }
+
+        private string makeAndPurchaseTerm(string l_term, string r_term)
+        {
+            return "{ tag: 'PurchaseCompositeTerm', value: 'and', lhs: " + l_term + ", rhs: " + r_term + "}";
+        }
+
+        private string makeOrPurchaseTerm(string l_term, string r_term)
+        {
+            return "{ tag: 'PurchaseCompositeTerm', value: 'or', lhs: " + l_term + ", rhs: " + r_term + "}";
+        }
+
+
+        [DataTestMethod]
+        [DataRow("member1", "p", ">", "10")]
+        [DataRow("member1", "q", "<", "5")]
+        [DataRow("member1", "h", "!=", "01:00")]
+        [DataRow("member1", "d", "!=", "27/08/2023")]
+        public void TestAddProductPurchaseTerm_Good_Simple(string member, string type, string action, string value)
+        {
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 20.4, 10, "Category1").Value;
+            Assert.IsFalse(service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm(type, action, value)(product.Id), product.Id).ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("member1", "t", ">", "10")]
+        [DataRow("member1", "t", ">", "-2")]
+        [DataRow("member1", "q", "$", "5")]
+        [DataRow("member1", "h", "!=", "25:00")]
+        [DataRow("member1", "d", "!=", "27/08/2020")]
+        public void TestAddProductPurchaseTerm_Bad_Simple_WrongParameters(string member, string type, string action, string value)
+        {
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 20.4, 10, "Category1").Value;
+            Assert.IsTrue(service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm(type, action, value)(product.Id), product.Id).ErrorOccured);
+        }
+
+
+        [DataTestMethod]
+        [DataRow("member1", "p", ">", "10", "q", "<", "5")]
+        [DataRow("member1", "h", ">", "01:00", "d", "<", "27/08/2023")]
+        [DataRow("member1", "d", "!=", "20/01/2023", "q", "<=", "2")]
+        public void TestAddProductPurchaseTerm_Good_And(string member, string l_type, string l_action, string l_value, string r_type, string r_action, string r_value)
+        {
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 20.4, 10, "Category1").Value;
+            Assert.IsFalse(service.AddProductPurchaseTerm(1, member, store.StoreId, (makeAndPurchaseTerm(makeSimpleProductPurchaseTerm(l_type, l_action, l_value)(product.Id), makeSimpleProductPurchaseTerm(r_type, r_action, r_value)(product.Id))), product.Id).ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("member1", "p", ">", "10", "q", "<", "5")]
+        [DataRow("member1", "h", ">", "01:00", "d", "<", "27/08/2023")]
+        [DataRow("member1", "d", "!=", "20/01/2023", "q", "<=", "2")]
+        public void TestAddProductPurchaseTerm_Good_Or(string member, string l_type, string l_action, string l_value, string r_type, string r_action, string r_value)
+        {
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 20.4, 10, "Category1").Value;
+            Assert.IsFalse(service.AddProductPurchaseTerm(1, member, store.StoreId, makeOrPurchaseTerm(makeSimpleProductPurchaseTerm(l_type, l_action, l_value)(product.Id), makeSimpleProductPurchaseTerm(r_type, r_action, r_value)(product.Id)), product.Id).ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("member1", "p", ">", "10")]
+        [DataRow("member1", "q", "<", "5")]
+        [DataRow("member1", "h", "!=", "01:00")]
+        [DataRow("member1", "d", "!=", "27/08/2023")]
+        public void TestAddCategoryPurchaseTerm_Good_Simple(string member, string type, string action, string value)
+        {
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 20.4, 10, "Category1").Value;
+            Assert.IsFalse(service.AddCategoryPurchaseTerm(1, member, store.StoreId, makeSimpleCategoryPurchaseTerm(type, action, value)("Category1"), "Category1").ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("member1", "t", ">", "10")]
+        [DataRow("member1", "q", "<", "-2")]
+        [DataRow("member1", "h", "$", "01:00")]
+        [DataRow("member1", "d", "!=", "27/08/2020")]
+        public void TestAddCategoryPurchaseTerm_Bad_Simple_WrongParameters(string member, string type, string action, string value)
+        {
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 20.4, 10, "Category1").Value;
+            Assert.IsTrue(service.AddCategoryPurchaseTerm(1, member, store.StoreId, makeSimpleCategoryPurchaseTerm(type, action, value)("Category1"), "Category1").ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("member1", "p", ">", "10", "q", "<", "5")]
+        [DataRow("member1", "h", ">", "01:00", "d", "<", "27/08/2023")]
+        [DataRow("member1", "d", "!=", "20/01/2023", "q", "<=", "2")]
+        public void TestAddCategoryPurchaseTerm_Good_And(string member, string l_type, string l_action, string l_value, string r_type, string r_action, string r_value)
+        {
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 20.4, 10, "Category1").Value;
+            Assert.IsFalse(service.AddCategoryPurchaseTerm(1, member, store.StoreId, makeAndPurchaseTerm(makeSimpleCategoryPurchaseTerm(l_type, l_action, l_value)("Category1"), makeSimpleCategoryPurchaseTerm(r_type, r_action, r_value)("Category1")), "Category1").ErrorOccured);
+        }
+
+
+        [DataTestMethod]
+        [DataRow("member1", "p", ">", "10", "q", "<", "5")]
+        [DataRow("member1", "h", ">", "01:00", "d", "<", "27/08/2023")]
+        [DataRow("member1", "d", "!=", "20/01/2023", "q", "<=", "2")]
+        public void TestAddCategoryPurchaseTerm_Good_Or(string member, string l_type, string l_action, string l_value, string r_type, string r_action, string r_value)
+        {
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 20.4, 10, "Category1").Value;
+            Assert.IsFalse(service.AddCategoryPurchaseTerm(1, member, store.StoreId, makeOrPurchaseTerm(makeSimpleCategoryPurchaseTerm(l_type, l_action, l_value)("Category1"), makeSimpleCategoryPurchaseTerm(r_type, r_action, r_value)("Category1")), "Category1").ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("member1", "p", ">", "10")]
+        [DataRow("member1", "q", "<", "5")]
+        [DataRow("member1", "h", "!=", "01:00")]
+        [DataRow("member1", "d", "!=", "27/08/2023")]
+        public void TestAddStorePurchaseTerm_Good_Simple(string member, string type, string action, string value)
+        {
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Assert.IsFalse(service.AddStorePurchaseTerm(1, member, store.StoreId, makeSimpleBagPurchaseTerm(type, action, value)).ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("member1", "t", ">", "10")]
+        [DataRow("member1", "q", "<", "-2")]
+        [DataRow("member1", "h", "$", "01:00")]
+        [DataRow("member1", "d", "!=", "27/08/2020")]
+        public void TestAddStorePurchaseTerm_Bad_WrongParameters(string member, string type, string action, string value)
+        {
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Assert.IsTrue(service.AddStorePurchaseTerm(1, member, store.StoreId, makeSimpleBagPurchaseTerm(type, action, value)).ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("member1", "p", ">", "10", "q", "<", "5")]
+        [DataRow("member1", "h", ">", "01:00", "d", "<", "27/08/2023")]
+        [DataRow("member1", "d", "!=", "20/01/2023", "q", "<=", "2")]
+        public void TestAddStorePurchaseTerm_Good_And(string member, string l_type, string l_action, string l_value, string r_type, string r_action, string r_value)
+        {
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Assert.IsFalse(service.AddStorePurchaseTerm(1, member, store.StoreId, makeAndPurchaseTerm(makeSimpleBagPurchaseTerm(l_type, l_action, l_value), makeSimpleBagPurchaseTerm(r_type, r_action, r_value))).ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("member1", "p", ">", "10", "q", "<", "5")]
+        [DataRow("member1", "h", ">", "01:00", "d", "<", "27/08/2023")]
+        [DataRow("member1", "d", "!=", "20/01/2023", "q", "<=", "2")]
+        public void TestAddStorePurchaseTerm_Good_Or(string member, string l_type, string l_action, string l_value, string r_type, string r_action, string r_value)
+        {
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Assert.IsFalse(service.AddStorePurchaseTerm(1, member, store.StoreId, makeOrPurchaseTerm(makeSimpleBagPurchaseTerm(l_type, l_action, l_value), makeSimpleBagPurchaseTerm(r_type, r_action, r_value))).ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("member1", "$", 10)]
+        [DataRow("member1", ">=", -2)]
+        public void TestAddUserPurchaseTerm_Good_Simple(string member, string action, int age)
+        {
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Assert.IsFalse(service.AddUserPurchaseTerm(1, member, store.StoreId, makeSimpleUserPurchaseTerm(action, age)).ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("member1", ">", 10)]
+        [DataRow("member1", ">=", 13)]
+        [DataRow("member1", "!=", 18)]
+        public void TestAddUserPurchaseTerm_Bad_Simple_WrongParameters(string member, string action, int age)
+        {
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Assert.IsTrue(service.AddUserPurchaseTerm(1, member, store.StoreId, makeSimpleUserPurchaseTerm(action, age)).ErrorOccured);
+        }
+
+
+        [DataTestMethod]
+        [DataRow("member1", ">", 10, "!=", 18)]
+        [DataRow("member1", ">=", 13, ">", 10)]
+        [DataRow("member1", "!=", 18, ">=", 16)]
+        public void Test_AddUserPurchaseTerm_Good_And(string member, string l_action, int l_age, string r_action, int r_age)
+        {
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Assert.IsFalse(service.AddUserPurchaseTerm(1, member, store.StoreId, makeAndPurchaseTerm(makeSimpleUserPurchaseTerm(l_action, l_age), makeSimpleUserPurchaseTerm(r_action, r_age))).ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("member1", ">", 10, "!=", 18)]
+        [DataRow("member1", ">=", 13, ">", 10)]
+        [DataRow("member1", "!=", 18, ">=", 16)]
+        public void Test_AddUserPurchaseTerm_Good_Or(string member, string l_action, int l_age, string r_action, int r_age)
+        {
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Assert.IsFalse(service.AddUserPurchaseTerm(1, member, store.StoreId, makeOrPurchaseTerm(makeSimpleUserPurchaseTerm(l_action, l_age), makeSimpleUserPurchaseTerm(r_action, r_age))).ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_AddProductPurchaseTerm_GoodTerm()
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
+            service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm("p", ">", "200")(p1.Id), p1.Id);
+            service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm("q", "<", "4")(p1.Id), p1.Id);
+            service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm("d", "=", DateTime.Now.ToString("dd/MM/yyyy"))(p1.Id), p1.Id);
+            service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm("h", ">", "00:01")(p1.Id), p1.Id);
+            service.addToCart(1, member, p1.Id, store.StoreId, 3);
+            Assert.IsFalse(service.BuyCart(1, member, "TestAddress").ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow(">", 2)]
+        [DataRow("<", 2)]
+        [DataRow("=", 3)]
+        [DataRow("=", 1)]
+        public void Test_AddProductPurchaseTerm_Bad_BadQuantity(string action, int n)
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
+            service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm("q", action, "2")(p1.Id), p1.Id);
+            service.addToCart(1, member, p1.Id, store.StoreId, n);
+            Assert.IsTrue(service.BuyCart(1, member, "TestAddress").ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow(">", 2)]
+        [DataRow("<", 2)]
+        [DataRow("=", 3)]
+        [DataRow("=", 1)]
+        public void Test_AddProductPurchaseTerm_Bad_BadPrice(string action, int n)
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Prod1", "Desc1", 100.0, 100, "Cat1").Value;
+            service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm("p", action, "200")(p1.Id), p1.Id);
+            service.addToCart(1, member, p1.Id, store.StoreId, n);
+            Assert.IsTrue(service.BuyCart(1, member, "TestAddress").ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow(">", 4)]
+        [DataRow("<", 2)]
+        [DataRow("=", 3)]
+        public void Test_AddCategoryPurchaseTerm_Good(string action, int n)
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Desc1", 100.0, 10, "Category1").Value;
+            Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Desc2", 100.0, 10, "Category1").Value;
+            service.AddCategoryPurchaseTerm(1, member, store.StoreId, makeSimpleCategoryPurchaseTerm("q", action, "3")("Category1"), "Category1");
+            service.addToCart(1, member, p1.Id, store.StoreId, n - 1);
+            service.addToCart(1, member, p2.Id, store.StoreId, 1);
+            Assert.IsFalse(service.BuyCart(1, member, "TestAddress").ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("=", 2)]
+        [DataRow("<", 2)]
+        [DataRow(">", 1)]
+        public void Test_AddCategoryPurchaseTerm_Bad_BadQuantity_WithTwoProducts(string action, int n)
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Desc1", 100.0, 10, "Category1").Value;
+            Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Desc2", 100.0, 10, "Category1").Value;
+            service.AddCategoryPurchaseTerm(1, member, store.StoreId, makeSimpleCategoryPurchaseTerm("q", action, "3")("Category1"), "Category1");
+            service.addToCart(1, member, p1.Id, store.StoreId, n);
+            service.addToCart(1, member, p2.Id, store.StoreId, n);
+            Assert.IsTrue(service.BuyCart(1, member, "TestAddress").ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow(">", 2)]
+        [DataRow("<", 2)]
+        [DataRow("=", 3)]
+        [DataRow("=", 1)]
+        public void Test_AddCategoryPurchaseTerm_Bad_BadQuantity(string action, int n)
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Desc1", 100.0, 10, "Category1").Value;
+            Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Desc2", 100.0, 10, "Category1").Value;
+            service.AddCategoryPurchaseTerm(1, member, store.StoreId, makeSimpleCategoryPurchaseTerm("q", action, "2")("Category1"), "Category1");
+            if (n != 1)
+            {
+                service.addToCart(1, member, p1.Id, store.StoreId, n - 1);
+                service.addToCart(1, member, p2.Id, store.StoreId, 1);
+            }
+            else
+            {
+                service.addToCart(1, member, p1.Id, store.StoreId, 1);
+            }
+            Assert.IsTrue(service.BuyCart(1, member, "TestAddress").ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_AddUserPurchaseTerm_Good()
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
+            service.AddUserPurchaseTerm(1, member, store.StoreId, makeSimpleUserPurchaseTerm(">", 18));
+            service.addToCart(1, member, p1.Id, store.StoreId, 3);
+            Assert.IsFalse(service.BuyCart(1, member, "TestAddress").ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_AddUserPurchaseTerm_Bad_BadAge()
+        {
+            string member = "member1";
+            service.EnterMarket(1);
+            service.Register(1, member, "password1", DateTime.Parse("Aug 30, 2016"));
+            service.Login(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
+            service.AddUserPurchaseTerm(1, member, store.StoreId, makeSimpleUserPurchaseTerm(">", 18));
+            service.addToCart(1, member, p1.Id, store.StoreId, 3);
+            Assert.IsTrue(service.BuyCart(1, member, "TestAddress").ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("h", ">", "00:01")]
+        [DataRow("h", "<", "23:59")]
+        [DataRow("d", "=", "NULL")]
+        public void Test_AddStorePurchaseTerm_Good(string type, string action, string val)
+        {
+            if (val.Equals("NULL"))
+            {
+                val = DateTime.Now.ToString("dd/MM/yyyy");
+            }
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Prod1", "Desc1", 100.0, 100, "Cat1").Value;
+            service.AddStorePurchaseTerm(1, member, store.StoreId, makeSimpleBagPurchaseTerm(type, action, val));
+            service.addToCart(1, member, p1.Id, store.StoreId, 1);
+            Assert.IsTrue(service.BuyCart(1, member, "TestAddress").ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_AddStorePurchaseTerm_BadHour()
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Prod1", "Desc1", 100.0, 100, "Cat1").Value;
+            service.AddStorePurchaseTerm(1, member, store.StoreId, makeSimpleBagPurchaseTerm("h", "=", "04:04"));
+            service.addToCart(1, member, p1.Id, store.StoreId, 1);
+            Assert.IsTrue(service.BuyCart(1, member, "TestAddress").ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_AddStorePurchaseTerm_Bad_BadDate()
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Prod1", "Desc1", 100.0, 100, "Cat1").Value;
+            service.AddStorePurchaseTerm(1, member, store.StoreId, makeSimpleBagPurchaseTerm("d", "=", "30/08/2030"));
+            service.addToCart(1, member, p1.Id, store.StoreId, 1);
+            Assert.IsTrue(service.BuyCart(1, member, "TestAddress").ErrorOccured);
+        }
+
+        // Discount policy tests
 
         public Func<int, string> makeSimpleProductDiscount(double percent)
         {
@@ -841,6 +1237,25 @@ namespace Tests.AcceptanceTests
             return func;
         }
 
+        public Func<int, string> makeConditionalProductDiscount(double percent, int qunatity)
+        {
+            Func<int, string> func = id => "{tag: 'ConditionalDiscount', priceAction: { tag: 'ProductPriceActionSimple', percentage: " + percent.ToString() + ", productId: " + id + " }, discountTerm: {tag: 'ProductDiscountSimpleTerm', type: 'q', action: '>', value: " + qunatity + ", productId: " + id.ToString() + "}}";
+            return func;
+        }
+
+        public Func<string, string> makeSimpleCategoryDiscount(double percent)
+        {
+            Func<string, string> func = category => "{\"tag\": \"SimpleDiscount\",\"priceAction\":" +
+                "{\"tag\": \"CategoryPriceActionSimple\",\"percentage\":" +
+                percent.ToString() + ", \"category\": \"" + category + "\"}}";
+            return func;
+        }
+
+        public string makeSimpleStoreDiscount(double percent)
+        {
+            return "{tag: 'SimpleDiscount', priceAction: { tag: 'StorePriceActionSimple', percentage: " + percent.ToString() + "}}";
+        }
+
         public Func<int, string> makeAndproductDiscount(double lPercent, double rPercent)
         {
             Func<int, string> func = id => "{ \"tag\": \"AndDiscount\",\"lhs\": {\"tag\": \"SimpleDiscount\"," +
@@ -848,114 +1263,283 @@ namespace Tests.AcceptanceTests
                                             "\"percentage\": " + lPercent.ToString() + ", \"productId\": " + id.ToString() +
                                             "}},\"rhs\": {\"tag\": \"SimpleDiscount\", \"priceAction\": { " +
                                             "\"tag\": \"ProductPriceActionSimple\", \"percentage\": " + rPercent.ToString() +
-                                            ",\"productId\": " + id.ToString() +"}}}";
+                                            ",\"productId\": " + id.ToString() + "}}}";
 
             return func;
         }
 
-
-
-        [DataTestMethod]
-        [DataRow(username, password, 30)]
-        [DataRow(username, password, 30.5)]
-        [DataRow(username, password, 0.5)]
-        [DataRow(username, password, 100)]
-        public void TestAddProductDiscount_Good_Simple(string username, string password, double percent)
+        public Func<int, string> makeOrproductDiscount(double lPercent, double rPercent)
         {
-            TestAddProductDiscount_Good(username, password, makeSimpleProductDiscount(percent));
+            Func<int, string> func = id => "{ \"tag\": \"OrDiscount\",\"lhs\": {\"tag\": \"SimpleDiscount\"," +
+                                            "\"priceAction\": {\"tag\": \"ProductPriceActionSimple\"," +
+                                            "\"percentage\": " + lPercent.ToString() + ", \"productId\": " + id.ToString() +
+                                            "}},\"rhs\": {\"tag\": \"SimpleDiscount\", \"priceAction\": { " +
+                                            "\"tag\": \"ProductPriceActionSimple\", \"percentage\": " + rPercent.ToString() +
+                                            ",\"productId\": " + id.ToString() + "}}}";
+
+            return func;
+        }
+
+        public Func<int, string> makeXorproductDiscount(double lPercent, double rPercent)
+        {
+            Func<int, string> func = id => "{ \"tag\": \"XorDiscount\",\"lhs\": {\"tag\": \"SimpleDiscount\"," +
+                                            "\"priceAction\": {\"tag\": \"ProductPriceActionSimple\"," +
+                                            "\"percentage\": " + lPercent.ToString() + ", \"productId\": " + id.ToString() +
+                                            "}},\"rhs\": {\"tag\": \"SimpleDiscount\", \"priceAction\": { " +
+                                            "\"tag\": \"ProductPriceActionSimple\", \"percentage\": " + rPercent.ToString() +
+                                            ",\"productId\": " + id.ToString() + "}}, discountTerm: {tag: 'ProductDiscountSimpleTerm', type: 'q', action: '<', value: 3, productId: 1}}";
+
+            return func;
         }
 
         [DataTestMethod]
-        [DataRow(username, password, 30, 30.5)]
-        [DataRow(username, password, 30.5, 30)]
-        [DataRow(username, password, 0.5, 100)]
-        [DataRow(username, password, 100, 0.5)]
-        [DataRow(username, password, 0, 30)]
-        [DataRow(username, password, 30, 0)]
-        public void TestAddProductDiscount_Good_And(string username, string password, double lPercent, double rPercent)
+        [DataRow(30)]
+        [DataRow(30.5)]
+        [DataRow(0.5)]
+        [DataRow(100)]
+        public void Test_AddProductDiscount_Good_Simple(double percent)
         {
-            TestAddProductDiscount_Good(username, password, makeAndproductDiscount(lPercent, rPercent));
-        }
-
-
-
-        public void TestAddProductDiscount_Good(string username, string password, Func<int, string> discount)
-        {
-            TestLogin_Good(1, username, password);
-            int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
-            Response res  = service.AddProductDiscount(1, username, storeId, discount(prod.Id), prod.Id);
-            Assert.IsFalse(res.ErrorOccured);
+            Test_AddProductDiscount_Good(makeSimpleProductDiscount(percent));
         }
 
         [DataTestMethod]
-        [DataRow(username, password, 30)]
-        public void TestAddProductDiscount_Bad_NoSuchProduct(string username, string password, double discount)
+        [DataRow(30, 30.5)]
+        [DataRow(30.5, 30)]
+        [DataRow(0.5, 100)]
+        [DataRow(100, 0.5)]
+        public void Test_AddProductDiscount_Good_And(double lPercent, double rPercent)
         {
-            TestLogin_Good(1, username, password);
-            int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Response res = service.AddProductDiscount(1, username, storeId, makeSimpleProductDiscount(discount)(0), 0);
-            Assert.IsTrue(res.ErrorOccured);
-        }
-
-
-        [DataTestMethod]
-        [DataRow(username, password, -1)]
-        [DataRow(username, password, -1.5)]
-        [DataRow(username, password, 200)]
-        public void TestAddProductDiscount_bad_BadDiscount_simple(string username, string password, double percent)
-        {
-            TestAddProductDiscount_bad_BadDiscount(username, password, makeSimpleProductDiscount(percent));
-        }
-
-        public void TestAddProductDiscount_bad_BadDiscount(string username, string password, Func<int, string> discount)
-        {
-            TestLogin_Good(1, username, password);
-            int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
-            Response res = service.AddProductDiscount(1, username, storeId, discount(prod.Id), prod.Id);
-            Assert.IsTrue(res.ErrorOccured);
-        }
-
-
-
-        [DataTestMethod]
-        [DataRow(username, password, "{\"tag\": \"CategoryDiscountSimpleTerm\",\"type\": \"q\",\"action\": \"<\",\"value\": 5,\"category\": \"cat1\"} ")]
-        public void TestAddCategoryDiscount_Good(string username, string password, string discount)
-        {
-            TestLogin_Good(1, username, password);
-            int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod1 = service.AddProduct(1, username, storeId, product, "Good", 1.0, 2, "cat1").Value;
-            Product prod2 = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
-            Response res = service.AddCategoryDiscount(1, username, storeId, discount, prod1.Category);
-            Assert.IsFalse(res.ErrorOccured);
-            //Check for discount
+            Test_AddProductDiscount_Good(makeAndproductDiscount(lPercent, rPercent));
         }
 
         [DataTestMethod]
-        [DataRow(username, password, "{\"tag\": \"CategoryDiscountSimpleTerm\",\"type\": \"q\",\"action\": \"<\",\"value\": 5,\"category\": \"cat1\"} ")]
-        public void TestAddAddCategoryDiscount_Bad_NoSuchProduct(string username, string password, string discount)
+        [DataRow(30, 30.5)]
+        [DataRow(30.5, 30)]
+        [DataRow(0.5, 100)]
+        [DataRow(100, 0.5)]
+        public void Test_AddProductDiscount_Good_Or(double lPercent, double rPercent)
         {
-            TestLogin_Good(1, username, password);
-            int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Response res = service.AddCategoryDiscount(1, username, storeId, discount, "cat1");
-            Assert.IsTrue(res.ErrorOccured);
-            //Check for discount
+            Test_AddProductDiscount_Good(makeOrproductDiscount(lPercent, rPercent));
         }
 
         [DataTestMethod]
-        [DataRow(username, password, "{\"tag\": \"CategoryDiscountSimpleTerm\",\"type\": \"q\",\"action\": \"<\",\"value\": -2,\"category\": \"cat1\"} ")]
-        [DataRow(username, password, "{\"tag\": \"CategoryDiscountSimpleTerm\",\"type\": \"q\",\"action\": \"<\",\"value\": 0.5,\"category\": \"cat1\"} ")]
-        public void TestAddCategoryDiscount_bad_WrongParameters(string username, string password, string discount)
+        [DataRow(30, 30.5)]
+        [DataRow(30.5, 30)]
+        [DataRow(0.5, 100)]
+        [DataRow(100, 0.5)]
+        public void Test_AddProductDiscount_Good_Xor(double lPercent, double rPercent)
         {
-            TestLogin_Good(1, username, password);
-            int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
-            Response res = service.AddCategoryDiscount(1, username, storeId, discount, prod.Category);
-            Assert.IsTrue(res.ErrorOccured);
+            Test_AddProductDiscount_Good(makeXorproductDiscount(lPercent, rPercent));
+        }
+
+        private void Test_AddProductDiscount_Good(Func<int, string> discount)
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
+            Assert.IsFalse(service.AddProductDiscount(1, member, store.StoreId, discount(product.Id), product.Id).ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_AddProductDiscount_Bad_NoSuchProduct()
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
+            Assert.IsFalse(service.AddProductDiscount(1, member, store.StoreId, makeSimpleProductDiscount(30)(product.Id + 1), product.Id + 1).ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("{tag: 'ConditionalDiscount', priceAction: { tag: 'ProductPriceActionSimple', percentage: 10, productId: 1 }, discountTerm: {tag: 'ProductDiscountSimpleTerm', type: 'q', action: '<', value: -2, productId: 1}} ")]
+        [DataRow("{tag: 'ConditionalDiscount', priceAction: { tag: 'ProductPriceActionSimple', percentage: 10, productId: 1 }, discountTerm: {tag: 'ProductDiscountSimpleTerm', type: 'q', action: '<', value: 0.5, productId: 1}} ")]
+        [DataRow("{tag: 'ConditionalDiscount', priceAction: { tag: 'ProductPriceActionSimple', percentage: 10, productId: 1 }, discountTerm: {tag: 'ProductDiscountSimpleTerm', type: 'q', action: '$', value: 3, productId: 1}} ")]
+        public void Test_AddProductDiscount_Bad_WrongParameters(string discount)
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
+            Assert.IsFalse(product.Id != 1);
+            Assert.IsTrue(service.AddProductDiscount(1, member, store.StoreId, discount, 1).ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow(-1)]
+        [DataRow(-1.5)]
+        [DataRow(200)]
+        public void Test_AddProductDiscount_Bad_BadPercentage_Simple(double percent)
+        {
+            Test_AddProductDiscount_Bad_BadDiscount(makeSimpleProductDiscount(percent));
+        }
+
+        public void Test_AddProductDiscount_Bad_BadDiscount(Func<int, string> discount)
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
+            Assert.IsTrue(service.AddProductDiscount(1, member, store.StoreId, discount(product.Id), product.Id).ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("{tag: 'ConditionalDiscount',priceAction: {tag: 'CategoryPriceActionSimple',percentage: 10,category: 'cat1'},discountTerm: {tag: 'CategoryDiscountSimpleTerm',type: 'q',action: '<',value: 5,category: 'cat1'}} ")]
+        [DataRow("{tag: 'ConditionalDiscount',priceAction: {tag: 'CategoryPriceActionSimple',percentage: 10,category: 'cat1'},discountTerm: {tag: 'CategoryDiscountSimpleTerm',type: 'p',action: '<',value: 0.5,category: 'cat1'}} ")]
+        public void Test_AddCategoryDiscount_Good(string discount)
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "cat1");
+            Assert.IsFalse(service.AddCategoryDiscount(1, member, store.StoreId, discount, "cat1").ErrorOccured);
+        }
+
+        [DataTestMethod]
+        [DataRow("{tag: 'ConditionalDiscount',priceAction: {tag: 'CategoryPriceActionSimple',percentage: 10,category: 'cat1'},discountTerm: {tag: 'CategoryDiscountSimpleTerm',type: 'q',action: '<',value: -2,category: 'cat1'}} ")]
+        [DataRow("{tag: 'ConditionalDiscount',priceAction: {tag: 'CategoryPriceActionSimple',percentage: 10,category: 'cat1'},discountTerm: {tag: 'CategoryDiscountSimpleTerm',type: 'q',action: '<',value: 0.5,category: 'cat1'}} ")]
+        [DataRow("{tag: 'ConditionalDiscount',priceAction: {tag: 'CategoryPriceActionSimple',percentage: 10,category: 'cat1'},discountTerm: {tag: 'CategoryDiscountSimpleTerm',type: 'q',action: '$',value: 3,category: 'cat1'}} ")]
+        public void TestAddCategoryDiscount_Bad_WrongParameters(string discount)
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "cat1");
+            Assert.IsTrue(service.AddCategoryDiscount(1, member, store.StoreId, discount, "cat1").ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_BuyCart_ProductAndCategoryDiscounts()
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 3, "no_cat").Value;
+            Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Description2", 200.0, 2, "Cat1").Value;
+            Product p3 = service.AddProduct(1, member, store.StoreId, "Product3", "Description3", 50.0, 5, "Cat2").Value;
+            service.AddProductDiscount(1, member, store.StoreId, makeSimpleProductDiscount(10)(p1.Id), p1.Id);
+            service.AddProductDiscount(1, member, store.StoreId, makeSimpleProductDiscount(20)(p2.Id), p2.Id);
+            service.AddCategoryDiscount(1, member, store.StoreId, makeSimpleCategoryDiscount(50)("Cat1"), "Cat1");
+            service.AddCategoryDiscount(1, member, store.StoreId, makeSimpleCategoryDiscount(10)("Cat2"), "Cat2");
+            service.addToCart(1, member, p1.Id, store.StoreId, 3);
+            service.addToCart(1, member, p2.Id, store.StoreId, 2);
+            service.addToCart(1, member, p3.Id, store.StoreId, 5);
+            double expected_price = 335;
+            Assert.AreEqual(expected_price, service.BuyCart(1, member, "TestAddress").Value);
+        }
+
+        [TestMethod]
+        public void Test_BuyCart_ProductAndStoreDiscounts()
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 3, "no_cat").Value;
+            Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Description2", 200.0, 2, "Cat1").Value;
+            Product p3 = service.AddProduct(1, member, store.StoreId, "Product3", "Description3", 50.0, 5, "Cat2").Value;
+            service.AddProductDiscount(1, member, store.StoreId, makeSimpleProductDiscount(10)(p1.Id), p1.Id);
+            service.AddProductDiscount(1, member, store.StoreId, makeSimpleProductDiscount(20)(p2.Id), p2.Id);
+            service.AddStoreDiscount(1, member, store.StoreId, makeSimpleStoreDiscount(10));
+            service.addToCart(1, member, p1.Id, store.StoreId, 3);
+            service.addToCart(1, member, p2.Id, store.StoreId, 2);
+            service.addToCart(1, member, p3.Id, store.StoreId, 5);
+            double expected_price = 205;
+            Assert.AreEqual(expected_price, service.BuyCart(1, member, "TestAddress").Value);
+        }
+
+        [TestMethod]
+        public void Test_BuyCart_ConditionalProductDiscounts()
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 3, "no_cat").Value;
+            Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Description2", 200.0, 2, "Cat1").Value;
+            Product p3 = service.AddProduct(1, member, store.StoreId, "Product3", "Description3", 50.0, 5, "Cat2").Value;
+            service.AddProductDiscount(1, member, store.StoreId, makeConditionalProductDiscount(10, 2)(p1.Id), p1.Id);
+            service.AddProductDiscount(1, member, store.StoreId, makeConditionalProductDiscount(20, 2)(p2.Id), p2.Id);
+            service.addToCart(1, member, p1.Id, store.StoreId, 3);
+            service.addToCart(1, member, p2.Id, store.StoreId, 2);
+            service.addToCart(1, member, p3.Id, store.StoreId, 5);
+            double expected_price = 30;
+            Assert.AreEqual(expected_price, service.BuyCart(1, member, "TestAddress").Value);
+        }
+
+        [TestMethod]
+        public void Test_BuyCart_CompositeProductDiscounts()
+        {
+            string member = "member1";
+            TestLogin_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 3, "no_cat").Value;
+            Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Description2", 200.0, 2, "Cat1").Value;
+            Product p3 = service.AddProduct(1, member, store.StoreId, "Product3", "Description3", 50.0, 5, "Cat2").Value;
+            service.AddProductDiscount(1, member, store.StoreId, makeAndproductDiscount(10, 20)(p1.Id), p1.Id);
+            service.AddProductDiscount(1, member, store.StoreId, makeXorproductDiscount(10, 20)(p2.Id), p2.Id);
+            service.AddProductDiscount(1, member, store.StoreId, makeXorproductDiscount(30, 40)(p3.Id), p3.Id);
+            service.addToCart(1, member, p1.Id, store.StoreId, 3);
+            service.addToCart(1, member, p2.Id, store.StoreId, 2);
+            service.addToCart(1, member, p3.Id, store.StoreId, 5);
+            double expected_price = 270;
+            Assert.AreEqual(expected_price, service.BuyCart(1, member, "TestAddress").Value);
         }
 
         // NEW FOR VERSION 3
+
+        [TestMethod]
+        public void Test_Scenario1()
+        {
+            string member1 = "Member1";
+            string member2 = "Member2";
+            string member3 = "Member3";
+            TestLogin_Good(1, member1, "Password1");
+            TestLogin_Good(2, member2, "Password2");
+            TestLogin_Good(3, member3, "Password3");
+            Store store = service.CreateNewStore(1, member1, "Store1").Value;
+            service.NominateStoreOwner(1, member1, member2, store.StoreId);
+            Product p1 = service.AddProduct(2, member2, store.StoreId, "Product1", "Description1", 100.0, 5, "Category1").Value;
+            Product p2 = service.AddProduct(1, member1, store.StoreId, "Product2", "Description2", 10.0, 5, "Category2").Value;
+            service.AddCategoryDiscount(1, member1, store.StoreId, makeSimpleCategoryDiscount(10)("Category1"), "Category1");
+            service.AddProductDiscount(2, member2, store.StoreId, makeSimpleProductDiscount(20)(p2.Id), p2.Id);
+            service.addToCart(3, member3, p1.Id, store.StoreId, 2); // 200 before discount, 180 after
+            service.addToCart(3, member3, p2.Id, store.StoreId, 3); // 30 before discount, 24 after
+            Assert.AreEqual(204, service.BuyCart(3, member3, "TestAddress").Value);
+            string review_string = "Good product, that is!";
+            ReviewDTO rev = service.ReviewProduct(3, member3, p1.Id, review_string, 4).Value;
+            Assert.AreEqual(review_string, rev.Review);
+            Assert.AreEqual(4, rev.Rating);
+            Assert.AreEqual(member3, rev.Reviewer);
+            Assert.AreEqual(p1.Id, rev.ProductId);
+        }
+
+        [TestMethod]
+        public void Test_Scenario2()
+        {
+            string member1 = "Member1";
+            string member2 = "Member2";
+            string member3 = "Member3";
+            TestLogin_Good(1, member1, "Password1");
+            TestLogin_Good(2, member2, "Password2");
+            TestLogin_Good(3, member3, "Password3");
+            Store store = service.CreateNewStore(1, member1, "Store1").Value;
+            service.NominateStoreOwner(1, member1, member2, store.StoreId);
+            service.NominateStoreOwner(2, member2, member3, store.StoreId);
+            Product p1 = service.AddProduct(3, member3, store.StoreId, "Product1", "Description1", 100.0, 5, "Category1").Value;
+            Product p2 = service.AddProduct(2, member2, store.StoreId, "Product2", "Description2", 10.0, 5, "Category2").Value;
+            service.RemoveStoreOwnerNomination(1, member1, member2, store.StoreId);
+            Assert.IsTrue(service.RemoveProductFromStore(3, member3, store.StoreId, p2.Id).ErrorOccured);
+            Assert.IsTrue(service.RemoveProductFromStore(2, member2, store.StoreId, p2.Id).ErrorOccured);
+            Assert.IsFalse(service.RemoveProductFromStore(1, member1, store.StoreId, p2.Id).ErrorOccured);
+            service.addToCart(3, member3, p1.Id, store.StoreId, 2);
+            Assert.AreEqual(200, service.BuyCart(3, member3, "TestAddress").Value);
+            string review_string = "Good product, that is!";
+            ReviewDTO rev = service.ReviewProduct(3, member3, p1.Id, review_string, 4).Value;
+            Assert.AreEqual(review_string, rev.Review);
+            Assert.AreEqual(4, rev.Rating);
+            Assert.AreEqual(member3, rev.Reviewer);
+            Assert.AreEqual(p1.Id, rev.ProductId);
+            Assert.IsTrue(service.ReviewProduct(2, member2, p1.Id, review_string, 4).ErrorOccured);
+        }
 
         [TestMethod]
         public void Test_HoldedNotifications_NoHoldedNotifications()
@@ -1218,6 +1802,157 @@ namespace Tests.AcceptanceTests
         public void Test_HoldedNotifications_From_GettingMessaged()
         {
             // MAKE SURE IT IS IMPLEMENTED ONCE MESSAGES ARE ADDED
+            throw new NotImplementedException("Test_HoldedNotifications_From_GettingMessaged");
+        }
+
+        [TestMethod]
+        public void Test_InitializeFromFile_Good()
+        {
+            Service service = new Service("enter-market(1)\n" +
+                "register(1,user1,pass1,22/08/1972)\n" +
+                "login(1,user1,pass1)\n" +
+                "create-new-store(1,user1,store1)");
+            Assert.IsTrue(service.WasInitializedWithFile);
+            Assert.IsTrue(service.EnterMarket(1).ErrorOccured);
+            Assert.IsTrue(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
+            Assert.IsTrue(service.Login(1, "user1", "pass1").ErrorOccured);
+            Assert.IsTrue(service.GetAllStores(1).Value.Count == 1);
+            Assert.IsTrue(service.GetAllStores(1).Value[0].Name.Equals("store1"));
+        }
+
+        [TestMethod]
+        public void Test_InitializeFromFile_Consistent()
+        {
+            // Sanity check
+            Service service = new Service();
+            Assert.IsFalse(service.WasInitializedWithFile);
+        }
+
+        [TestMethod]
+        public void Test_InitializeFromFile_Bad_IllegalOrderOfActions()
+        {
+            Service service = new Service("enter-market(1)\n" +
+                "login(1,user1,pass1\n" +
+                "create-new-store(1,user1,store1)");
+            // Expecting error: need to register before logging in
+            Assert.IsFalse(service.WasInitializedWithFile);
+            Assert.IsFalse(service.EnterMarket(1).ErrorOccured); // Make sure nothing happend after it failed
+            Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("Aug 22, 1972")).ErrorOccured); // Make sure nothing happend after it failed
+            Assert.IsFalse(service.Login(1, "user1", "pass1").ErrorOccured);
+            Assert.AreEqual(0, service.GetAllStores(1).Value.Count);
+        }
+
+        [TestMethod]
+        public void Test_InitializeFromFile_Bad_UnrecognizedCommand()
+        {
+            Service service = new Service("enter-market(1)\n" +
+                "register(1,user1,pass1,22/08/1972)\n" +
+                "login(1,user1,pass1)\n" +
+                "create-new-store(1,user1,store1)\n" +
+                "blah-blah(1,user1,pass1,store1)");
+            Assert.IsFalse(service.WasInitializedWithFile);
+            Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
+            Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
+            Assert.IsFalse(service.Login(1, "user1", "pass1").ErrorOccured);
+            Assert.AreEqual(0, service.GetAllStores(1).Value.Count);
+        }
+
+        [TestMethod]
+        public void Test_InitializeFromFile_Bad_BadArgumentsForCommand_Overshoot()
+        {
+            Service service = new Service("enter-market(1)\n" +
+                "register(1,user1,pass1,22/08/1972)\n" +
+                "login(1,user1,pass1)\n" +
+                "create-new-store(1,user1,store1,failureInLife1)");
+            Assert.IsFalse(service.WasInitializedWithFile);
+            Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
+            Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
+            Assert.IsFalse(service.Login(1, "user1", "pass1").ErrorOccured);
+            Assert.AreEqual(0, service.GetAllStores(1).Value.Count);
+        }
+
+        [TestMethod]
+        public void Test_InitializeFromFile_Bad_BadArgumentsForCommand_Undershoot()
+        {
+            Service service = new Service("enter-market(1)\n" +
+                "register(1,user1,pass1,22/08/1972)\n" +
+                "login(1,user1,pass1)\n" +
+                "create-new-store(1,user1)");
+            Assert.IsFalse(service.WasInitializedWithFile);
+            Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
+            Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
+            Assert.IsFalse(service.Login(1, "user1", "pass1").ErrorOccured);
+            Assert.AreEqual(0, service.GetAllStores(1).Value.Count);
+        }
+
+        [TestMethod]
+        public void Test_InitializeFromFile_Bad_BadArgumentsForCommand_WrongType()
+        {
+            Service service = new Service("enter-market(1)\n" +
+                "register(1,user1,pass1,22/08/1972)\n" +
+                "login(1,user1,pass1)\n" +
+                "create-new-store(FAILME,user1,store1)");
+            Assert.IsFalse(service.WasInitializedWithFile);
+            Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
+            Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
+            Assert.IsFalse(service.Login(1, "user1", "pass1").ErrorOccured);
+            Assert.AreEqual(0, service.GetAllStores(1).Value.Count);
+        }
+
+        [TestMethod]
+        public void Test_AddActionToManager_Good()
+        {
+            string member1 = "Member1";
+            string member2 = "Member2";
+            TestLogin_Good(1, member1, "password1");
+            TestLogin_Good(2, member2, "password2");
+            Store store = service.CreateNewStore(1, member1, "Store1").Value;
+            service.NominateStoreManager(1, member1, member2, store.StoreId);
+            Assert.IsTrue(service.AddProduct(2, member2, store.StoreId, "Product1", "Description1", 10.0, 3, "Category1").ErrorOccured);
+            Assert.IsFalse(service.AddActionToManager(1, member1, member2, store.StoreId, "AddProduct").ErrorOccured);
+            Assert.IsFalse(service.AddProduct(2, member2, store.StoreId, "Product1", "Description1", 10.0, 3, "Category1").ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_AddActionToManager_Bad_NoSuchAction()
+        {
+            string member1 = "Member1";
+            string member2 = "Member2";
+            TestLogin_Good(1, member1, "password1");
+            TestLogin_Good(2, member2, "password2");
+            Store store = service.CreateNewStore(1, member1, "Store1").Value;
+            service.NominateStoreManager(1, member1, member2, store.StoreId);
+            Assert.IsTrue(service.AddActionToManager(1, member1, member2, store.StoreId, "BlahBlah").ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_AddActionToManager_Bad_DoesntWorkOnNotManager()
+        {
+            string member1 = "Member1";
+            string member2 = "Member2";
+            TestLogin_Good(1, member1, "password1");
+            TestLogin_Good(2, member2, "password2");
+            Store store = service.CreateNewStore(1, member1, "Store1").Value;
+            Assert.IsTrue(service.AddProduct(2, member2, store.StoreId, "Product1", "Description1", 10.0, 3, "Category1").ErrorOccured);
+            Assert.IsTrue(service.AddActionToManager(1, member1, member2, store.StoreId, "AddProduct").ErrorOccured);
+            Assert.IsTrue(service.AddProduct(2, member2, store.StoreId, "Product1", "Description1", 10.0, 3, "Category1").ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_AddActionToManager_Bad_DoesntWorkFromNotOwner()
+        {
+            string member1 = "Member1";
+            string member2 = "Member2";
+            string member3 = "Member3";
+            TestLogin_Good(1, member1, "password1");
+            TestLogin_Good(2, member2, "password2");
+            TestLogin_Good(3, member3, "password3");
+            Store store = service.CreateNewStore(1, member1, "Store1").Value;
+            service.NominateStoreManager(1, member1, member2, store.StoreId);
+            service.NominateStoreManager(1, member1, member3, store.StoreId);
+            Assert.IsTrue(service.AddProduct(3, member3, store.StoreId, "Product1", "Description1", 10.0, 3, "Category1").ErrorOccured);
+            Assert.IsTrue(service.AddActionToManager(2, member2, member3, store.StoreId, "AddProduct").ErrorOccured);
+            Assert.IsTrue(service.AddProduct(3, member3, store.StoreId, "Product1", "Description1", 10.0, 3, "Category1").ErrorOccured);
         }
     }
 }

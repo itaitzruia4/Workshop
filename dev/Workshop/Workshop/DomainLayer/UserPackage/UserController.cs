@@ -552,5 +552,10 @@ namespace Workshop.DomainLayer.UserPackage
         {
             return reviewHandler.GetProductRating(productId);
         }
+
+        bool IUserController.IsConnected(int userId)
+        {
+            return currentUsers.ContainsKey(userId);
+        }
     }
 }

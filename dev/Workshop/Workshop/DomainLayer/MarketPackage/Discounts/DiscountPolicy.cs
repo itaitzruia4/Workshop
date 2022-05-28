@@ -26,6 +26,7 @@ namespace Workshop.DomainLayer.MarketPackage
         private const string PRICE_ACT_COMP_TAG = "PriceActionComposite";
         private const string PRODUCT_PRICE_ACT_TAG = "ProductPriceActionSimple";
         private const string CATEGORY_PRICE_ACT_TAG = "CategoryPriceActionSimple";
+        private const string STORE_PRICE_ACT_TAG = "StorePriceActionSimple"; 
         private const string DISCOUNT_COMP_TERM_TAG = "DiscountCompositeTerm";
         private const string PRODUCT_SIMPLE_TERM_TAG = "ProductDiscountSimpleTerm";
         private const string CATEGORY_SIMPLE_TERM_TAG = "CategoryDiscountSimpleTerm";
@@ -90,17 +91,17 @@ namespace Workshop.DomainLayer.MarketPackage
 
         private Discount ParseAndDiscount(dynamic data)
         {
-            return new AndDiscount(ParseDiscount(data.left), ParseDiscount(data.right));
+            return new AndDiscount(ParseDiscount(data.lhs), ParseDiscount(data.rhs));
         }
 
         private Discount ParseOrDiscount(dynamic data)
         {
-            return new OrDiscount(ParseDiscount(data.left), ParseDiscount(data.right));
+            return new OrDiscount(ParseDiscount(data.lhs), ParseDiscount(data.rhs));
         }
 
         private Discount ParseXorDiscount(dynamic data)
         {
-            return new XorDiscount(ParseDiscount(data.left), ParseDiscount(data.right), ParseDiscountTerm(data.discountTerm));
+            return new XorDiscount(ParseDiscount(data.lhs), ParseDiscount(data.rhs), ParseDiscountTerm(data.discountTerm));
         }
 
         private Discount ParseSimpleDiscount(dynamic data)
@@ -122,6 +123,8 @@ namespace Workshop.DomainLayer.MarketPackage
                 return ParseProductPriceActionSimple(data);
             if (tag.Equals(CATEGORY_PRICE_ACT_TAG))
                 return ParseCategoryPriceActionSimple(data);
+            if (tag.Equals(STORE_PRICE_ACT_TAG))
+                return ParseStorePriceActionSimple(data);
             throw new Exception("Unknown price action tag: " + tag);
         }
 
@@ -129,26 +132,23 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             string action = data.value;
             if (action.Equals("sum"))
-                return new SumComposite(ParsePriceAction(data.left), ParsePriceAction(data.right));
+                return new SumComposite(ParsePriceAction(data.lhs), ParsePriceAction(data.rhs));
             if (action.Equals("max"))
-                return new MaxComposite(ParsePriceAction(data.left), ParsePriceAction(data.right));
+                return new MaxComposite(ParsePriceAction(data.lhs), ParsePriceAction(data.rhs));
             throw new Exception("Unknown price action: " + action);
         }
 
         private PriceAction ParseProductPriceActionSimple(dynamic data)
         {
+            double percentage;
+            int product_id;
             try
             {
-                double percentage = double.Parse(((string)data.percentage).Trim('{','}'));
+                percentage = double.Parse(((string)data.percentage).Trim('{','}'));
                 try
                 {
-                    int product_id = int.Parse(((string)data.productId).Trim('{', '}'));
-                    if (percentage <= 0 || percentage > 100)
-                        throw new Exception("Discount percentage must be between 0 and 100");
-
-                    if (!store.ProductExists(product_id))
-                        throw new Exception("Product id: " + product_id + "does not exist in store: " + store.GetId());
-                    return new PriceActionSimple(percentage, (ProductDTO product) => { return product.Id == product_id; });
+                    product_id = int.Parse(((string)data.productId).Trim('{', '}'));
+                    
                 }
                 catch (Exception)
                 {
@@ -157,27 +157,50 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             catch (Exception) { 
                 throw new Exception("Invalid percentage: " + data.percentage);
-            } 
+            }
+
+            if (percentage <= 0 || percentage > 100)
+                throw new Exception("Discount percentage must be between 0 and 100");
+
+            if (!store.ProductExists(product_id))
+                throw new Exception("Product id: " + product_id + "does not exist in store: " + store.GetId());
+            return new PriceActionSimple(percentage, (ProductDTO product) => { return product.Id == product_id; });
         }
 
         private PriceAction ParseCategoryPriceActionSimple(dynamic data)
         {
-            
+            double percentage = 0;
             try
             {
-                double percentage = double.Parse(data.percentage);
-                string category = data.category;
-                if (percentage <= 0 || percentage > 100)
-                    throw new Exception("Discount percentage must be between 0 and 100");
-                if (category == null || category.Equals(""))
-                    throw new Exception("Discount category must be non-empty.");
+                percentage = double.Parse(((string)data.percentage).Trim('{', '}'));
+            }
+            catch (Exception)
+            {
+                throw new Exception("Invalid percentage: " + data.percentage);
+            }
+            string category = data.category;
+            if (percentage <= 0 || percentage > 100)
+                throw new Exception("Discount percentage must be between 0 and 100");
+            if (category == null || category.Equals(""))
+                throw new Exception("Discount category must be non-empty.");
 
-                return new PriceActionSimple(percentage, (ProductDTO product) => { return category.Equals(product.Category); });
+            return new PriceActionSimple(percentage, (ProductDTO product) => { return category.Equals(product.Category); });
+        }
+        private PriceAction ParseStorePriceActionSimple(dynamic data)
+        {
+            double percentage;
+            try
+            {
+                percentage = double.Parse(((string)data.percentage).Trim('{', '}'));
             }
             catch (Exception)
             {
                 throw new Exception("Invalid product id: " + data.category);
             }
+            if (percentage <= 0 || percentage > 100)
+                throw new Exception("Discount percentage must be between 0 and 100");
+
+            return new PriceActionSimple(percentage, (ProductDTO product) => { return true; });
         }
 
         private Term ParseDiscountTerm(dynamic data)
@@ -194,7 +217,7 @@ namespace Workshop.DomainLayer.MarketPackage
             throw new Exception("Unknown discount term tag: " + tag);
         }
 
-        internal double CalculateDiscount(ShoppingBagDTO shoppingBag)
+        public double CalculateDiscount(ShoppingBagDTO shoppingBag)
         {
             double totalDiscount = 0.0;
             foreach (ProductDTO prod in shoppingBag.products)
@@ -217,393 +240,404 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             string term = data.value;
             if (term.Equals("and"))
-                return new AndTerm(ParseDiscountTerm(data.left), ParseDiscountTerm(data.right));
+                return new AndTerm(ParseDiscountTerm(data.lhs), ParseDiscountTerm(data.rhs));
             if (term.Equals("or"))
-                return new OrTerm(ParseDiscountTerm(data.left), ParseDiscountTerm(data.right));
+                return new OrTerm(ParseDiscountTerm(data.lhs), ParseDiscountTerm(data.rhs));
             if (term.Equals("xor"))
-                return new XorTerm(ParseDiscountTerm(data.left), ParseDiscountTerm(data.right));
+                return new XorTerm(ParseDiscountTerm(data.lhs), ParseDiscountTerm(data.rhs));
             throw new Exception("Unknown discount term action: " + term);
         }
 
         private Term ParseProductDiscountSimpleTerm(dynamic data)
         {
+            SimpleTerm.TermSimple filter;
+            string action = ((string)data.action).Trim('{', '}');
+            string type = ((string)data.type).Trim('{', '}');
+            double value;
+            int product_id;
             try
             {
-                SimpleTerm.TermSimple filter;
-                string action = data.action;
-                double value = double.Parse(data.value);
-                string type = data.type;
+                value = double.Parse(((string)data.value).Trim('{', '}'));
                 try
                 {
-                    int product_id = double.Parse(data.key);
-                    if (value <= 0)
-                        throw new Exception("Discount term value must be above 0.");
-
-                    if (!store.ProductExists(product_id))
-                        throw new Exception("Product id: " + product_id + "does not exist in store: " + store.GetId());
-                    // The term is related to price of the product
-                    if (type.Equals("p"))
-                    {
-                        if (action.Equals("<"))
-                            filter = (ShoppingBagDTO shopping_bag, int age) => {
-                                double total_price = 0;
-                                foreach (ProductDTO product in shopping_bag.products)
-                                {
-                                    if (product.Id == product_id)
-                                        total_price += product.Price;
-                                }
-                                return total_price < value;
-                            };
-                        else if (action.Equals(">"))
-                            filter = (ShoppingBagDTO shopping_bag, int age) => {
-                                double total_price = 0;
-                                foreach (ProductDTO product in shopping_bag.products)
-                                {
-                                    if (product.Id == product_id)
-                                        total_price += product.Price;
-                                }
-                                return total_price > value;
-                            };
-                        else if (action.Equals("="))
-                            filter = (ShoppingBagDTO shopping_bag, int age) => {
-                                double total_price = 0;
-                                foreach (ProductDTO product in shopping_bag.products)
-                                {
-                                    if (product.Id == product_id)
-                                        total_price += product.Price;
-                                }
-                                return total_price == value;
-                            };
-                        else if (action.Equals(">="))
-                            filter = (ShoppingBagDTO shopping_bag, int age) => {
-                                double total_price = 0;
-                                foreach (ProductDTO product in shopping_bag.products)
-                                {
-                                    if (product.Id == product_id)
-                                        total_price += product.Price;
-                                }
-                                return total_price >= value;
-                            };
-                        else if (action.Equals("<="))
-                            filter = (ShoppingBagDTO shopping_bag, int age) => {
-                                double total_price = 0;
-                                foreach (ProductDTO product in shopping_bag.products)
-                                {
-                                    if (product.Id == product_id)
-                                        total_price += product.Price;
-                                }
-                                return total_price <= value;
-                            };
-                        else
-                            throw new Exception("Unknown term action: " + action);
-                    }
-                    // The term is related to quantity of the product
-                    else if (type.Equals("q"))
-                    {
-                        if (action.Equals("<"))
-                            filter = (ShoppingBagDTO shopping_bag, int age) => {
-                                double quantity = 0;
-                                foreach (ProductDTO product in shopping_bag.products)
-                                {
-                                    if (product.Id == product_id)
-                                        quantity++;
-                                }
-                                return quantity < value;
-                            };
-                        else if (action.Equals(">"))
-                            filter = (ShoppingBagDTO shopping_bag, int age) => {
-                                double quantity = 0;
-                                foreach (ProductDTO product in shopping_bag.products)
-                                {
-                                    if (product.Id == product_id)
-                                        quantity++;
-                                }
-                                return quantity > value;
-                            };
-                        else if (action.Equals("="))
-                            filter = (ShoppingBagDTO shopping_bag, int age) => {
-                                double quantity = 0;
-                                foreach (ProductDTO product in shopping_bag.products)
-                                {
-                                    if (product.Id == product_id)
-                                        quantity++;
-                                }
-                                return quantity == value;
-                            };
-                        else if (action.Equals(">="))
-                            filter = (ShoppingBagDTO shopping_bag, int age) => {
-                                double quantity = 0;
-                                foreach (ProductDTO product in shopping_bag.products)
-                                {
-                                    if (product.Id == product_id)
-                                        quantity++;
-                                }
-                                return quantity >= value;
-                            };
-                        else if (action.Equals("<="))
-                            filter = (ShoppingBagDTO shopping_bag, int age) => {
-                                double quantity = 0;
-                                foreach (ProductDTO product in shopping_bag.products)
-                                {
-                                    if (product.Id == product_id)
-                                        quantity++;
-                                }
-                                return quantity <= value;
-                            };
-                        else
-                            throw new Exception("Unknown term action: " + action);
-                    }
-                    else
-                        throw new Exception("Unknown term type: " + type);
-
-                    return new Terms.SimpleTerm(filter);
+                    product_id = int.Parse(((string)data.productId).Trim('{', '}'));
+                    
                 }
                 catch (Exception)
                 {
-                    throw new Exception("Invalid product id: " + data.key);
+                    throw new Exception("Invalid product id: " + data.productId);
                 }
             }
             catch (Exception)
             {
                 throw new Exception("Invalid term value: " + data.value);
             }
+            if (value <= 0)
+                throw new Exception("Discount term value must be above 0.");
+
+            if (!store.ProductExists(product_id))
+                throw new Exception("Product id: " + product_id + "does not exist in store: " + store.GetId());
+            // The term is related to price of the product
+            if (type.Equals("p"))
+            {
+                if (action.Equals("<"))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double total_price = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            if (product.Id == product_id)
+                                total_price += product.Price * product.Quantity;
+                        }
+                        return total_price < value;
+                    };
+                else if (action.Equals(">"))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double total_price = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            if (product.Id == product_id)
+                                total_price += product.Price * product.Quantity;
+                        }
+                        return total_price > value;
+                    };
+                else if (action.Equals("="))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double total_price = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            if (product.Id == product_id)
+                                total_price += product.Price * product.Quantity;
+                        }
+                        return total_price == value;
+                    };
+                else if (action.Equals(">="))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double total_price = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            if (product.Id == product_id)
+                                total_price += product.Price * product.Quantity;
+                        }
+                        return total_price >= value;
+                    };
+                else if (action.Equals("<="))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double total_price = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            if (product.Id == product_id)
+                                total_price += product.Price * product.Quantity;
+                        }
+                        return total_price <= value;
+                    };
+                else
+                    throw new Exception("Unknown term action: " + action);
+            }
+            // The term is related to quantity of the product
+            else if (type.Equals("q"))
+            {
+                if (value - (int)(value) > 0)
+                    throw new Exception("Quantity Discount term value must an integer, not double.");
+                if (action.Equals("<"))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double quantity = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            if (product.Id == product_id)
+                                quantity += product.Quantity;
+                        }
+                        return quantity < value;
+                    };
+                else if (action.Equals(">"))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double quantity = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            if (product.Id == product_id)
+                                quantity += product.Quantity;
+                        }
+                        return quantity > value;
+                    };
+                else if (action.Equals("="))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double quantity = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            if (product.Id == product_id)
+                                quantity += product.Quantity;
+                        }
+                        return quantity == value;
+                    };
+                else if (action.Equals(">="))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double quantity = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            if (product.Id == product_id)
+                                quantity += product.Quantity;
+                        }
+                        return quantity >= value;
+                    };
+                else if (action.Equals("<="))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double quantity = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            if (product.Id == product_id)
+                                quantity += product.Quantity;
+                        }
+                        return quantity <= value;
+                    };
+                else
+                    throw new Exception("Unknown term action: " + action);
+            }
+            else
+                throw new Exception("Unknown term type: " + type);
+
+            return new Terms.SimpleTerm(filter);
         }
 
         private Term ParseCategoryDiscountSimpleTerm(dynamic data)
         {
+            SimpleTerm.TermSimple filter;
+            string action = ((string)data.action).Trim('{', '}');
+            double value;
+            string type = ((string)data.type).Trim('{', '}');
+            string category = ((string)data.category).Trim('{', '}');
             try
             {
-                SimpleTerm.TermSimple filter;
-                string action = data.action;
-                double value = double.Parse(data.value);
-                string type = data.type;
-                string category = data.key;
-                if (value <= 0)
-                    throw new Exception("Discount term value must be above 0.");
-
-                if (category == null || category.Equals(""))
-                    throw new Exception("Discount term category must be non-empty.");
-
-                // The term is related to price of the product
-                if (type.Equals("p"))
-                {
-                    if (action.Equals("<"))
-                        filter = (ShoppingBagDTO shopping_bag, int age) => {
-                            double total_price = 0;
-                            foreach (ProductDTO product in shopping_bag.products)
-                            {
-                                if (product.Category == category)
-                                    total_price += product.Price;
-                            }
-                            return total_price < value;
-                        };
-                    else if (action.Equals(">"))
-                        filter = (ShoppingBagDTO shopping_bag, int age) => {
-                            double total_price = 0;
-                            foreach (ProductDTO product in shopping_bag.products)
-                            {
-                                if (product.Category == category)
-                                    total_price += product.Price;
-                            }
-                            return total_price > value;
-                        };
-                    else if (action.Equals("="))
-                        filter = (ShoppingBagDTO shopping_bag, int age) => {
-                            double total_price = 0;
-                            foreach (ProductDTO product in shopping_bag.products)
-                            {
-                                if (product.Category == category)
-                                    total_price += product.Price;
-                            }
-                            return total_price == value;
-                        };
-                    else if (action.Equals(">="))
-                        filter = (ShoppingBagDTO shopping_bag, int age) => {
-                            double total_price = 0;
-                            foreach (ProductDTO product in shopping_bag.products)
-                            {
-                                if (product.Category == category)
-                                    total_price += product.Price;
-                            }
-                            return total_price >= value;
-                        };
-                    else if (action.Equals("<="))
-                        filter = (ShoppingBagDTO shopping_bag, int age) => {
-                            double total_price = 0;
-                            foreach (ProductDTO product in shopping_bag.products)
-                            {
-                                if (product.Category == category)
-                                    total_price += product.Price;
-                            }
-                            return total_price <= value;
-                        };
-                    else
-                        throw new Exception("Unknown term action: " + action);
-                }
-                // The term is related to quantity of the product
-                else if (type.Equals("q"))
-                {
-                    if (action.Equals("<"))
-                        filter = (ShoppingBagDTO shopping_bag, int age) => {
-                            double quantity = 0;
-                            foreach (ProductDTO product in shopping_bag.products)
-                            {
-                                if (product.Category == category)
-                                    quantity++;
-                            }
-                            return quantity < value;
-                        };
-                    else if (action.Equals(">"))
-                        filter = (ShoppingBagDTO shopping_bag, int age) => {
-                            double quantity = 0;
-                            foreach (ProductDTO product in shopping_bag.products)
-                            {
-                                if (product.Category == category)
-                                    quantity++;
-                            }
-                            return quantity > value;
-                        };
-                    else if (action.Equals("="))
-                        filter = (ShoppingBagDTO shopping_bag, int age) => {
-                            double quantity = 0;
-                            foreach (ProductDTO product in shopping_bag.products)
-                            {
-                                if (product.Category == category)
-                                    quantity++;
-                            }
-                            return quantity == value;
-                        };
-                    else if (action.Equals(">="))
-                        filter = (ShoppingBagDTO shopping_bag, int age) => {
-                            double quantity = 0;
-                            foreach (ProductDTO product in shopping_bag.products)
-                            {
-                                if (product.Category == category)
-                                    quantity++;
-                            }
-                            return quantity >= value;
-                        };
-                    else if (action.Equals("<="))
-                        filter = (ShoppingBagDTO shopping_bag, int age) => {
-                            double quantity = 0;
-                            foreach (ProductDTO product in shopping_bag.products)
-                            {
-                                if (product.Category == category)
-                                    quantity++;
-                            }
-                            return quantity <= value;
-                        };
-                    else
-                        throw new Exception("Unknown term action: " + action);
-                }
-                else
-                    throw new Exception("Unknown term type: " + type);
-
-                return new Terms.SimpleTerm(filter);
+                value = double.Parse(((string)data.value).Trim('{', '}'));
             }
             catch (Exception)
             {
                 throw new Exception("Invalid term value: " + data.value);
             }
+            if (value <= 0)
+                throw new Exception("Discount term value must be above 0.");
+
+            if (category == null || category.Equals(""))
+                throw new Exception("Discount term category must be non-empty.");
+
+            // The term is related to price of the product
+            if (type.Equals("p"))
+            {
+                if (action.Equals("<"))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double total_price = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            if (product.Category == category)
+                                total_price += product.Price * product.Quantity;
+                        }
+                        return total_price < value;
+                    };
+                else if (action.Equals(">"))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double total_price = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            if (product.Category == category)
+                                total_price += product.Price * product.Quantity;
+                        }
+                        return total_price > value;
+                    };
+                else if (action.Equals("="))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double total_price = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            if (product.Category == category)
+                                total_price += product.Price * product.Quantity;
+                        }
+                        return total_price == value;
+                    };
+                else if (action.Equals(">="))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double total_price = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            if (product.Category == category)
+                                total_price += product.Price * product.Quantity;
+                        }
+                        return total_price >= value;
+                    };
+                else if (action.Equals("<="))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double total_price = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            if (product.Category == category)
+                                total_price += product.Price * product.Quantity;
+                        }
+                        return total_price <= value;
+                    };
+                else
+                    throw new Exception("Unknown term action: " + action);
+            }
+            // The term is related to quantity of the product
+            else if (type.Equals("q"))
+            {
+                if (value - (int)(value) > 0)
+                    throw new Exception("Quantity Discount term value must an integer, not double.");
+                if (action.Equals("<"))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double quantity = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            if (product.Category == category)
+                                quantity += product.Quantity;
+                        }
+                        return quantity < value;
+                    };
+                else if (action.Equals(">"))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double quantity = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            if (product.Category == category)
+                                quantity += product.Quantity;
+                        }
+                        return quantity > value;
+                    };
+                else if (action.Equals("="))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double quantity = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            if (product.Category == category)
+                                quantity += product.Quantity;
+                        }
+                        return quantity == value;
+                    };
+                else if (action.Equals(">="))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double quantity = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            if (product.Category == category)
+                                quantity += product.Quantity;
+                        }
+                        return quantity >= value;
+                    };
+                else if (action.Equals("<="))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double quantity = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            if (product.Category == category)
+                                quantity += product.Quantity;
+                        }
+                        return quantity <= value;
+                    };
+                else
+                    throw new Exception("Unknown term action: " + action);
+            }
+            else
+                throw new Exception("Unknown term type: " + type);
+
+            return new Terms.SimpleTerm(filter);
         }
 
         private Term ParseBagDiscountSimpleTerm(dynamic data)
         {
+            SimpleTerm.TermSimple filter;
+            string action = data.action.Trim('{', '}');
+            double value = double.Parse(((string)data.value).Trim('{', '}'));
+            string type = ((string)data.type).Trim('{', '}');
             try
             {
-                SimpleTerm.TermSimple filter;
-                string action = data.action;
-                double value = double.Parse(data.value);
-                string type = data.type;
-                if (value <= 0)
-                    throw new Exception("Discount term value must be above 0.");
-
-                // The term is related to price of the product
-                if (type.Equals("p"))
-                {
-                    if (action.Equals("<"))
-                        filter = (ShoppingBagDTO shopping_bag, int age) => {
-                            double total_price = 0;
-                            foreach (ProductDTO product in shopping_bag.products)
-                            {
-                                total_price += product.Price;
-                            }
-                            return total_price < value;
-                        };
-                    else if (action.Equals(">"))
-                        filter = (ShoppingBagDTO shopping_bag, int age) => {
-                            double total_price = 0;
-                            foreach (ProductDTO product in shopping_bag.products)
-                            {
-                                total_price += product.Price;
-                            }
-                            return total_price > value;
-                        };
-                    else if (action.Equals("="))
-                        filter = (ShoppingBagDTO shopping_bag, int age) => {
-                            double total_price = 0;
-                            foreach (ProductDTO product in shopping_bag.products)
-                            {
-                                total_price += product.Price;
-                            }
-                            return total_price == value;
-                        };
-                    else if (action.Equals(">="))
-                        filter = (ShoppingBagDTO shopping_bag, int age) => {
-                            double total_price = 0;
-                            foreach (ProductDTO product in shopping_bag.products)
-                            {
-                                total_price += product.Price;
-                            }
-                            return total_price >= value;
-                        };
-                    else if (action.Equals("<="))
-                        filter = (ShoppingBagDTO shopping_bag, int age) => {
-                            double total_price = 0;
-                            foreach (ProductDTO product in shopping_bag.products)
-                            {
-                                total_price += product.Price;
-                            }
-                            return total_price <= value;
-                        };
-                    else
-                        throw new Exception("Unknown term action: " + action);
-                }
-                // The term is related to quantity of the product
-                else if (type.Equals("q"))
-                {
-                    if (action.Equals("<"))
-                        filter = (ShoppingBagDTO shopping_bag, int age) => {
-                            return shopping_bag.products.Count() < value;
-                        };
-                    else if (action.Equals(">"))
-                        filter = (ShoppingBagDTO shopping_bag, int age) => {
-                            return shopping_bag.products.Count() > value;
-                        };
-                    else if (action.Equals("="))
-                        filter = (ShoppingBagDTO shopping_bag, int age) => {
-                            return shopping_bag.products.Count() == value;
-                        };
-                    else if (action.Equals(">="))
-                        filter = (ShoppingBagDTO shopping_bag, int age) => {
-                            return shopping_bag.products.Count() >= value;
-                        };
-                    else if (action.Equals("<="))
-                        filter = (ShoppingBagDTO shopping_bag, int age) => {
-                            return shopping_bag.products.Count() <= value;
-                        };
-                    else
-                        throw new Exception("Unknown term action: " + action);
-                }
-                else
-                    throw new Exception("Unknown term type: " + type);
-
-                return new Terms.SimpleTerm(filter);
+                value = double.Parse(((string)data.value).Trim('{', '}'));
             }
             catch (Exception)
             {
                 throw new Exception("Invalid term value: " + data.value);
             }
+            if (value <= 0)
+                throw new Exception("Discount term value must be above 0.");
+
+            // The term is related to price of the product
+            if (type.Equals("p"))
+            {
+                if (action.Equals("<"))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double total_price = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            total_price += product.Price * product.Quantity;
+                        }
+                        return total_price < value;
+                    };
+                else if (action.Equals(">"))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double total_price = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            total_price += product.Price * product.Quantity;
+                        }
+                        return total_price > value;
+                    };
+                else if (action.Equals("="))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double total_price = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            total_price += product.Price * product.Quantity;
+                        }
+                        return total_price == value;
+                    };
+                else if (action.Equals(">="))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double total_price = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            total_price += product.Price * product.Quantity;
+                        }
+                        return total_price >= value;
+                    };
+                else if (action.Equals("<="))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        double total_price = 0;
+                        foreach (ProductDTO product in shopping_bag.products)
+                        {
+                            total_price += product.Price * product.Quantity;
+                        }
+                        return total_price <= value;
+                    };
+                else
+                    throw new Exception("Unknown term action: " + action);
+            }
+            // The term is related to quantity of the product
+            else if (type.Equals("q"))
+            {
+                if (value - (int)(value) > 0)
+                    throw new Exception("Quantity Discount term value must an integer, not double.");
+                if (action.Equals("<"))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        return shopping_bag.products.Count() < value;
+                    };
+                else if (action.Equals(">"))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        return shopping_bag.products.Count() > value;
+                    };
+                else if (action.Equals("="))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        return shopping_bag.products.Count() == value;
+                    };
+                else if (action.Equals(">="))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        return shopping_bag.products.Count() >= value;
+                    };
+                else if (action.Equals("<="))
+                    filter = (ShoppingBagDTO shopping_bag, int age) => {
+                        return shopping_bag.products.Count() <= value;
+                    };
+                else
+                    throw new Exception("Unknown term action: " + action);
+            }
+            else
+                throw new Exception("Unknown term type: " + type);
+
+            return new Terms.SimpleTerm(filter);
         }
     }
 }
