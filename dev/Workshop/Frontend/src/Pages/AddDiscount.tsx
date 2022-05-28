@@ -1,107 +1,81 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation } from "react-router-dom";
-import './AddDiscount.css';
-import { StoreToken, token } from '../Components/roles';
-import { Discount, makeCategoryDiscountSimpleTerm, makeCategoryPriceActionSimple, makeEmptyDiscount, makeProductPriceActionSimple, makeSimpleDiscount, SimpleDiscount } from '../Components/discount';
-import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material';
+import * as React from 'react';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
-function AddDiscount() {
+export default function AddDiscount(
+    priceActions: string[],
+    setPriceActions: React.Dispatch<React.SetStateAction<string[]>>) {
 
-    const textStyle = { color: 'white' }
+    const [percentage, setPercentage] = React.useState("");
+    const [identifier, setIdentifier] = React.useState("");
+    const [open, setOpen] = React.useState(false);
+    const [name, setName] = React.useState("");
 
-    const location = useLocation();
-    const token = location.state as StoreToken;
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
 
-    let navigate = useNavigate();
-    const routeChange = (path: string, token: token) =>
-        () =>
-            navigate(path, { state: token });
+    const handleClose = () => {
+        setOpen(false);
+    };
 
-    const [category, setCategory] = useState<string>("");
-    const [productId, setProductId] = useState<string>("");
-    const [percentage, setPercentage] = useState<string>("");
-
-    function handleAddDiscount(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<any> {
-        if ((productId === "" && category === "") || (productId !== "" && category !== "")) {
-            alert('Must fill either category name or product ID');
-            return Promise.reject();
-        }
-
-        let percentageNum = Number(percentage);
-        if (percentageNum === NaN || percentageNum < 0 || percentageNum > 100) {
-            alert('Discount Percentage must be a number between 0 and 100');
-            return Promise.reject();
-        }
-
-        let simpleDiscount: SimpleDiscount =
-            category ?
-            makeSimpleDiscount(makeCategoryPriceActionSimple(percentageNum, category)) :
-            makeSimpleDiscount(makeProductPriceActionSimple(percentageNum, Number(productId)));
-
-
-        const baseUrl = "http://localhost:5165/api/discount";
-        const endUrl = category ? "/category" : "/product";
-        const url = baseUrl + endUrl;
-        return fetch(url, {
-            method: 'POST',
-            mode: 'cors',
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                userId: token.userId,
-                memberName: token.membername,
-                storeId: token.storeId,
-                jsonDiscount: simpleDiscount,
-                category: category,
-                productId: productId
-            })
-        }).then(async response => {
-            const data = await response.json();
-            if (!response.ok) {
-                return Promise.reject(data.error);
-            }
-            return Promise.resolve(data);
-        })
-
-        /*
-         * <FormControl>
-                <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel>
-                <RadioGroup
-                    aria-labelledby="demo-radio-buttons-group-label"
-                    defaultValue="female"
-                    name="radio-buttons-group"
-                >
-                    <FormControlLabel value="female" control={<Radio />} label="Female" />
-                    <FormControlLabel value="male" control={<Radio />} label="Male" />
-                    <FormControlLabel value="other" control={<Radio />} label="Other" />
-                </RadioGroup>
-            </FormControl>
-         */ 
-    }
-
-    //<button className="add_discount_back_btn" onClick={routeChange('/member', { userId: token.userId })}> Back to member page </button> 
+    const handleAdd = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setPriceActions([name, ...priceActions]);
+        setName("");
+    };
 
     return (
-        <div className="add_discount">
-            <div className="add_discount_title" style={textStyle}> Add Discount </div>
-            <p className="login_userInput">
-                <div style={textStyle}> Category Name: </div>
-                <input className="add_discount_category_textbox" type="text" onChange={e => setCategory(e.target.value)} />
-                <div style={textStyle}> Product ID: </div>
-                <input className="add_discount_product_textbox" type="number" onChange={e => setProductId(e.target.value)} />
-                <div style={textStyle}> Discount %: </div>
-                <input className="add_discount_percentage" type="number" onChange={e => setPercentage(e.target.value)} />
-            </p>
-            <p className="add_discount_buttons">
-                <button className="add_discount_ok_btn" type="submit"
-                    onClick={e =>
-                        handleAddDiscount(e)
-                            .then(routeChange("/member", { userId: token.userId, membername: token.membername }))
-                            .catch((err) => alert(err))
-                    }> OK </button>
-            </p>
+        <div>
+            <Button onClick={handleClickOpen}>
+                OK
+            </Button>
+            <Dialog open={open} onClose={handleClose}>
+                <DialogTitle>New Store</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Please insert discount details:
+                    </DialogContentText>
+                    <form onSubmit={handleAdd} id="priceActionForm" >
+                        <TextField
+                            value={name}
+                            autoFocus
+                            margin="dense"
+                            id="name"
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => setName(e.target.value)}
+                        />
+                        <TextField
+                            value={percentage}
+                            autoFocus
+                            margin="dense"
+                            id="percentage"
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => setPercentage(e.target.value)}
+                        />
+                        <TextField
+                            value={identifier}
+                            autoFocus
+                            margin="dense"
+                            id="identifier"
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => setIdentifier(e.target.value)}
+                        />
+                    </form>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button variant="contained" type="submit" form="priceActionForm">Add</Button>
+                </DialogActions>
+            </Dialog>
         </div>
-    )
+    );
 }
-
-
-export default AddDiscount;
