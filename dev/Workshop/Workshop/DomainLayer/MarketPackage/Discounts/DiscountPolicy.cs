@@ -194,7 +194,7 @@ namespace Workshop.DomainLayer.MarketPackage
             throw new Exception("Unknown discount term tag: " + tag);
         }
 
-        internal double CalculateDiscount(ShoppingBagDTO shoppingBag)
+        public double CalculateDiscount(ShoppingBagDTO shoppingBag)
         {
             double totalDiscount = 0.0;
             foreach (ProductDTO prod in shoppingBag.products)

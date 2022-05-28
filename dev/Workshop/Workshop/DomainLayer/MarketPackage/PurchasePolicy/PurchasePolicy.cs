@@ -9,7 +9,7 @@ using Workshop.DomainLayer.UserPackage.Shopping;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
-    class PurchasePolicy
+    public class PurchasePolicy
     {
         private Dictionary<int, Term> products_terms;
         private Dictionary<string, Term> category_terms;
