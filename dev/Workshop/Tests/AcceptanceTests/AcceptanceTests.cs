@@ -1134,10 +1134,10 @@ namespace Tests.AcceptanceTests
         }
 
         [DataTestMethod]
-        [DataRow(">", 2)]
+        //[DataRow(">", 2)]
         [DataRow("<", 2)]
-        [DataRow("=", 3)]
-        [DataRow("=", 1)]
+        //[DataRow("=", 3)]
+        //[DataRow("=", 1)]
         public void Test_AddCategoryPurchaseTerm_Bad_BadQuantity(string action, int n)
         {
             string member = "member1";
