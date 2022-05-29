@@ -93,11 +93,11 @@ namespace Workshop.DomainLayer
         {
             return UserController.ReviewProduct(userId, user, productId, review, rating);
         }
-        internal ProductDTO getProductInfo(int userId, string user, int productId)
+        internal ProductDTO GetProductInfo(int userId, string user, int productId)
         {
             return MarketController.getProductInfo(userId, user, productId);
         }
-        internal StoreDTO getStoreInfo(int userId, string user, int storeId)
+        internal StoreDTO GetStoreInfo(int userId, string user, int storeId)
         {
             return MarketController.getStoreInfo(userId, user, storeId);
         }
@@ -105,15 +105,15 @@ namespace Workshop.DomainLayer
         {
             return MarketController.SearchProduct(userId, user, keyWords, category, minPrice, maxPrice, productReview);
         }
-        internal ShoppingBagProduct addToCart(int userId, string user, int productId, int storeId,int quantity)
+        internal ShoppingBagProduct AddToCart(int userId, string user, int productId, int storeId,int quantity)
         {
             return MarketController.addToBag(userId, user, productId, storeId, quantity);
         }
-        internal ShoppingCartDTO viewCart(int userId, string user)
+        internal ShoppingCartDTO ViewCart(int userId, string user)
         {
             return UserController.viewCart(userId, user);
         }
-        internal ShoppingCartDTO editCart(int userId, string user, int productId, int newQuantity)
+        internal ShoppingCartDTO EditCart(int userId, string user, int productId, int newQuantity)
         {
             return UserController.editCart(userId, user, productId, newQuantity);
         }
