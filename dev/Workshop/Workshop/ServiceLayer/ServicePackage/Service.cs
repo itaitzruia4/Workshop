@@ -422,7 +422,7 @@ namespace Workshop.ServiceLayer
         {
             try
             {
-                Product product = new Product(facade.addToCart(userId, user, productId, storeId, quantity));
+                Product product = new Product(facade.AddToCart(userId, user, productId, storeId, quantity));
                 return new Response<Product>(product, userId);
             }
             catch (Exception e)
@@ -435,7 +435,7 @@ namespace Workshop.ServiceLayer
         {
             try
             {
-                ShoppingCart shoppingCart = new ShoppingCart(facade.viewCart(userId, user));
+                ShoppingCart shoppingCart = new ShoppingCart(facade.ViewCart(userId, user));
                 return new Response<ShoppingCart>(shoppingCart, userId);
             }
             catch (Exception e)
@@ -448,7 +448,7 @@ namespace Workshop.ServiceLayer
         {
             try
             {
-                ShoppingCart shoppingCart = new ShoppingCart(facade.editCart(userId, user, productId, newQuantity));
+                ShoppingCart shoppingCart = new ShoppingCart(facade.EditCart(userId, user, productId, newQuantity));
                 return new Response<ShoppingCart>(shoppingCart, userId);
             }
             catch (Exception e)
