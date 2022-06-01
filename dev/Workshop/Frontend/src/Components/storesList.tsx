@@ -57,7 +57,7 @@ export default function StoresList(
                             </div>
                         </ButtonGroup>
                         <List component='li' disablePadding key={store.storeId}>
-                            {[].map((product: Product) => {
+                            {store.products.map( product=> {
                                         return (
                                             <ListItem button key={product.id}>
                                                 <ListItemIcon>

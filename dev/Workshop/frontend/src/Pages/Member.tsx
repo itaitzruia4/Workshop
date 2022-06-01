@@ -37,7 +37,6 @@ function Member() {
 
     useEffect(() => {
         refresh();
-        console.log(stores.length > 0 ? stores[0].products.constructor.name : 0)
     }, [refreshKey])
 
     const addStore = (storeName: string) => {

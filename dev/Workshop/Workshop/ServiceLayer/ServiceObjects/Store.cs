@@ -17,7 +17,7 @@ namespace Workshop.ServiceLayer.ServiceObjects
 
         internal Store(DomainStore domainStore)
         {
-            Products = domainStore.GetProducts().Values.Select(dp => new Product(dp)).ToList();
+            Products = domainStore.GetProducts().Values.Select(p => new Product(p)).ToList();
             Name = domainStore.GetStoreName();
             StoreId = domainStore.GetId();
             Open = domainStore.IsOpen();
