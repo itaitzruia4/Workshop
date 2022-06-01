@@ -19,6 +19,7 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import Rating from '@mui/material/Rating';
 
 import { Product } from '../../Types/product';
+import { Store } from '../../Types/store';
 
 const Transition = React.forwardRef(function Transition(
     props: TransitionProps & {
@@ -29,7 +30,11 @@ const Transition = React.forwardRef(function Transition(
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function ProductDialog(product : Product) {
+export default function ProductDialog(
+    store: Store,
+    product: Product,
+    removeProduct: (storeId: number, productId: number) => void,
+) {
     const [open, setOpen] = React.useState(false);
     const [rating, setRating] = React.useState(0);
 
@@ -40,6 +45,11 @@ export default function ProductDialog(product : Product) {
     const handleClose = () => {
         setOpen(false);
     };
+
+    const handleRemove = () => {
+        removeProduct(store.storeId, product.id);
+        handleClose();
+    }
 
     return (
         <div>
@@ -74,7 +84,7 @@ export default function ProductDialog(product : Product) {
                         <Button autoFocus color="inherit" onClick={handleClose}>
                             Cancel
                         </Button>
-                        <Button variant="contained" color="error">
+                        <Button variant="contained" color="error" onClick={handleRemove}>
                             Delete product
                         </Button>
                     </Toolbar>

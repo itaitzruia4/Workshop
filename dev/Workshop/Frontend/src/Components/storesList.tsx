@@ -75,7 +75,7 @@ export default function StoresList(
                             {store.products.map( product=> {
                                 return (
                                     <ListItem key={product.id} secondaryAction={AddToCartDialog(store, product, addToCart)} >
-                                        {ProductDialog(product)}
+                                        {ProductDialog(store, product, removeProduct)}
                                         </ListItem>
                                         )
                                     })
