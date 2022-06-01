@@ -1,4 +1,4 @@
-import { token, memberToken } from '../Types/roles';
+import { token, memberToken, StoreToken } from '../Types/roles';
 
 
 export function handleGetStores(token: token) {
@@ -78,6 +78,37 @@ export function handleCloseStore(token: memberToken, storeId: number) {
             userId: token.userId,
             membername: token.membername,
             storeId: storeId
+        })
+    }).then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            return Promise.reject(data.error);
+        }
+        return Promise.resolve(data.value)
+    })
+}
+
+export function handleAddDiscount(token: memberToken, storeId: number, discountJson: string) {
+    const url = "http://localhost:5165/api/store/AddDiscount";
+
+    let discount = JSON.parse(discountJson);
+
+    //try {
+    //    let discount = JSON.parse(discountJson);
+    //}
+    //catch {
+    //    return Promise.reject("Invalid discount JSON format input");
+    //}
+
+    return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            userId: token.userId,
+            membername: token.membername,
+            storeId: storeId,
+            discount: discount
         })
     }).then(async response => {
         const data = await response.json();

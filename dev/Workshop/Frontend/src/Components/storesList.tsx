@@ -17,6 +17,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import { useState } from 'react';
 
 import AddProductDialog from '../Components/Dialogs/addProductDialog';
+import AddDiscountDialog from '../Components/Dialogs/AddDiscountDialog';
 
 import { Store } from "../Types/store"
 import { Product } from "../Types/product"
@@ -25,7 +26,8 @@ import { Product } from "../Types/product"
 export default function StoresList(
     stores: Store[],
     addProduct: (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => void,
-    closeStore: (storeId: number) => void
+    closeStore: (storeId: number) => void,
+    addDiscount: (storeId: number, discountJson: string) => void
     )
     {
         const CustomizedListItem: React.FC<{
@@ -52,6 +54,7 @@ export default function StoresList(
                     >
                         <ButtonGroup variant="outlined" aria-label="outlined button group">
                             {AddProductDialog(store.storeId, addProduct)}
+                            {AddDiscountDialog(store.storeId, addDiscount)}
                             <div>
                                 <Button onClick={e => closeStore(store.storeId)}>Close store</Button>
                             </div>
