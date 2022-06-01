@@ -6,28 +6,31 @@ import Member from './Pages/Member'
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Login from './Pages/Login'
 import CssBaseline from '@mui/material/CssBaseline';
+import Grid from '@mui/material/Grid';
 
 
 function App() {
     const darkTheme = createTheme({
         palette: {
-            mode: 'dark',
+            mode: 'light',
         },
     });
 
 
     return (
-            <ThemeProvider theme={darkTheme}>
-            <CssBaseline />
-            <Router>
+        <ThemeProvider theme={darkTheme}>
+            <Grid>
+                
+                <Router>
                 <Routes>
                     <Route path="/" element={<Welcome />} />    
                     <Route path="/register" element={<Register />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/member" element={<Member />} />
                 </Routes>
-            </Router>
-            </ThemeProvider>
+                </Router>
+             </Grid>
+        </ThemeProvider>
     )
 }
 

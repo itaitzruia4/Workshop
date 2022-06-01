@@ -56,7 +56,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-export default function Appbar() {
+export default function Appbar(name: string) {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
         React.useState<null | HTMLElement>(null);
@@ -121,7 +121,7 @@ export default function Appbar() {
             onClose={handleMobileMenuClose}
         >
             <MenuItem>
-                <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+                <IconButton size="large" color="inherit">
                     <Badge badgeContent={4} color="error">
                         <ShoppingCart />
                     </Badge>
@@ -162,7 +162,7 @@ export default function Appbar() {
                         component="div"
                         sx={{ display: { xs: 'none', sm: 'block' } }}
                     >
-                        MUI
+                        { name }
                     </Typography>
                     <Search>
                         <SearchIconWrapper>
@@ -175,8 +175,8 @@ export default function Appbar() {
                     </Search>
                     <Box sx={{ flexGrow: 1 }} />
                     <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-                            <Badge badgeContent={4} color="error">
+                        <IconButton size="large" color="inherit" onClick={e => alert("your mom a hoe") }>
+                            <Badge badgeContent={0} color="error">
                                 <ShoppingCart />
                             </Badge>
                         </IconButton>
@@ -204,8 +204,6 @@ export default function Appbar() {
                     </Box>
                 </Toolbar>
             </AppBar>
-            {renderMobileMenu}
-            {renderMenu}
         </Box>
     );
 }

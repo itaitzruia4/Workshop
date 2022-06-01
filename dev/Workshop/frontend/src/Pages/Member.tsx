@@ -11,7 +11,7 @@ import AddStoreDialog from '../Components/Dialogs/addStoreDialog';
 import { useState, useEffect } from 'react';
 
 import { handleLogout, handleExitMarket } from '../Actions/AuthenticationActions';
-import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleAddDiscount } from '../Actions/StoreActions';
+import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleOpenStore, handleRemoveProduct, handleAddDiscount } from '../Actions/StoreActions';
 
 import { memberToken } from '../Types/roles';
 import { Store } from "../Types/store"
@@ -45,23 +45,29 @@ function Member() {
     const addProduct = (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => {
         handleAddProduct(token, storeId, productName, description, price, quantity, category).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     };
+    const removeProduct = (storeId: number, productId: number) => {
+        handleRemoveProduct(token, storeId, productId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+    };
     const addDiscount = (storeId: number, discountJson: string) => {
         handleAddDiscount(token, storeId, discountJson)
             .catch(error => {
                 alert(error)
             });
-    }
+    };
     const closeStore = (storeId: number) => {
         handleCloseStore(token, storeId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
-    }
-
+    };
+    const openStore = (storeId: number) => {
+        handleOpenStore(token, storeId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+    };
+    
     return (
-            <div>
-            <Appbar />
-            <ButtonGroup variant="outlined" aria-label="outlined button group">
+        <div>
+            {Appbar(token.membername)}
+            <ButtonGroup variant="contained" aria-label="outlined primary button group">
                 {AddStoreDialog(addStore)}
             </ButtonGroup>
-            {StoresList(stores, addProduct, closeStore, addDiscount)}
+            {StoresList(stores, addProduct, closeStore, openStore, removeProduct ,addDiscount)}
             <Stack direction="row" spacing={2}>
                 <Button variant='contained' onClick={e =>
                     handleLogout(token)

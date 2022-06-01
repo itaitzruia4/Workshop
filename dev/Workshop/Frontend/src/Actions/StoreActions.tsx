@@ -88,6 +88,51 @@ export function handleCloseStore(token: memberToken, storeId: number) {
     })
 }
 
+export function handleOpenStore(token: memberToken, storeId: number) {
+    let url = "http://localhost:5165/api/store/openstore";
+
+    return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            userId: token.userId,
+            membername: token.membername,
+            storeId: storeId
+        })
+    }).then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            return Promise.reject(data.error);
+        }
+        return Promise.resolve(data.value)
+    })
+}
+
+export function handleRemoveProduct(token: memberToken, storeId: number, productId: number) {
+    let url = "http://localhost:5165/api/store/removeproduct";
+
+    return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            userId: token.userId,
+            membername: token.membername,
+            storeId: storeId,
+            productId: productId
+        })
+    }).then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            return Promise.reject(data.error);
+        }
+        return Promise.resolve(data.value)
+    })
+}
+
+
+
 export function handleAddDiscount(token: memberToken, storeId: number, discountJson: string) {
     const url = "http://localhost:5165/api/store/AddDiscount";
 

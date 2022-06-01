@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react';
 
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
@@ -14,10 +15,13 @@ import Divider from '@mui/material/Divider';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantityLimits';
 import ListItemButton from '@mui/material/ListItemButton';
-import { useState } from 'react';
+import Popper from '@mui/material/Popper';
+import Box from '@mui/material/Box';
+
 
 import AddProductDialog from '../Components/Dialogs/addProductDialog';
 import AddDiscountDialog from '../Components/Dialogs/AddDiscountDialog';
+import ProductDialog from '../Components/Dialogs/ProductDialog';
 
 import { Store } from "../Types/store"
 import { Product } from "../Types/product"
@@ -27,6 +31,8 @@ export default function StoresList(
     stores: Store[],
     addProduct: (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => void,
     closeStore: (storeId: number) => void,
+    openStore: (storeId: number) => void,
+    removeProduct: (storeId:number, productId: number) => void,
     addDiscount: (storeId: number, discountJson: string) => void
     )
     {
@@ -40,8 +46,9 @@ export default function StoresList(
 
             return (
                 <div>
+                    <Divider />
                     <ListItemButton key={store.storeId} onClick={handleClick}>
-                        <ListItemText primary={<Typography style={{ color: 'white' }}>{store.name}</Typography>} />
+                        <ListItemText primary={<Typography variant="h5" style={{ color: 'black' }}>{store.name}</Typography>} />
                         {open ? <ExpandLess /> : <ExpandMore />}
                         <ListItemIcon>
                             <StorefrontIcon />
@@ -58,16 +65,14 @@ export default function StoresList(
                             <div>
                                 <Button onClick={e => closeStore(store.storeId)}>Close store</Button>
                             </div>
+                            <div>
+                                <Button onClick={e => openStore(store.storeId)}>Open store</Button>
+                            </div>
                         </ButtonGroup>
                         <List component='li' disablePadding key={store.storeId}>
                             {store.products.map( product=> {
                                         return (
-                                            <ListItem button key={product.id}>
-                                                <ListItemIcon>
-                                                    <ProductionQuantityLimitsIcon />
-                                                </ListItemIcon>
-                                                <ListItemText key={product.id} primary={<Typography style={{ color: 'white' }}>{product.name}</Typography>} />
-                                            </ListItem>
+                                                ProductDialog(product)
                                         )
                                     })
                                }
@@ -82,6 +87,7 @@ export default function StoresList(
                 <List component='nav' aria-labelledby='nested-list-subheader'>
                     {stores.map(storeItem => {
                         return (storeItem.open ?
+
                             <CustomizedListItem store={storeItem} />
                          : null)
                     })}

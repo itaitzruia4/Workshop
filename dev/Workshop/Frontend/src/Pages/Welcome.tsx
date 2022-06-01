@@ -8,7 +8,7 @@ import Button from '@mui/material/Button';
 function Welcome() {
 
    
-    const textStyle = { color: 'white' }
+    const textStyle = { color: 'black' }
    
     const [userId, setUserId] = useState(0);
 

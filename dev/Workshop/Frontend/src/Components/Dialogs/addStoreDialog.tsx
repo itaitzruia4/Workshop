@@ -23,7 +23,12 @@ export default function AddStoreDialog(
 
     const handleAdd = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        addStore(name);
+        if (name === "") {
+            alert("Store name cannot be empty")
+        }
+        else {
+            addStore(name);
+        }
         setName("");
         handleClose();
     };
