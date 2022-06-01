@@ -11,7 +11,7 @@ import AddStoreDialog from '../Components/Dialogs/addStoreDialog';
 import { useState, useEffect } from 'react';
 
 import { handleLogout, handleExitMarket } from '../Actions/AuthenticationActions';
-import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore } from '../Actions/StoreActions';
+import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleAddDiscount } from '../Actions/StoreActions';
 
 import { memberToken } from '../Types/roles';
 import { Store } from "../Types/store"
@@ -45,6 +45,12 @@ function Member() {
     const addProduct = (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => {
         handleAddProduct(token, storeId, productName, description, price, quantity, category).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     };
+    const addDiscount = (storeId: number, discountJson: string) => {
+        handleAddDiscount(token, storeId, discountJson)
+            .catch(error => {
+                alert(error)
+            });
+    }
     const closeStore = (storeId: number) => {
         handleCloseStore(token, storeId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     }
@@ -55,7 +61,7 @@ function Member() {
             <ButtonGroup variant="outlined" aria-label="outlined button group">
                 {AddStoreDialog(addStore)}
             </ButtonGroup>
-            {StoresList(stores, addProduct, closeStore)}
+            {StoresList(stores, addProduct, closeStore, addDiscount)}
             <Stack direction="row" spacing={2}>
                 <Button variant='contained' onClick={e =>
                     handleLogout(token)
