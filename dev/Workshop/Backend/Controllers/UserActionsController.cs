@@ -42,7 +42,7 @@ namespace API.Controllers
         [HttpPost("addtocart")]
         public ActionResult<FrontResponse<Product>> AddToCart([FromBody] AddToCartRequest request)
         {
-            Response<Product> response = Service.addToCart(request.UserId, request.Membername, request.ProductId, request.StoreId, request.Quantity);
+            Response<Product> response = Service.AddToCart(request.UserId, request.Membername, request.ProductId, request.StoreId, request.Quantity);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<Product>(response.ErrorMessage));
@@ -53,7 +53,7 @@ namespace API.Controllers
         [HttpPost("viewcart")]
         public ActionResult<FrontResponse<ShoppingCart>> ViewCart([FromBody] MemberRequest request)
         {
-            Response<ShoppingCart> response = Service.viewCart(request.UserId, request.Membername);
+            Response<ShoppingCart> response = Service.ViewCart(request.UserId, request.Membername);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<ShoppingCart>(response.ErrorMessage));
@@ -64,7 +64,7 @@ namespace API.Controllers
         [HttpPost("editcart")]
         public ActionResult<FrontResponse<ShoppingCart>> EditCart([FromBody] EditCartRequest request)
         {
-            Response<ShoppingCart> response = Service.editCart(request.UserId, request.Membername, request.ProductId, request.Quantity);
+            Response<ShoppingCart> response = Service.EditCart(request.UserId, request.Membername, request.ProductId, request.Quantity);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<ShoppingCart>(response.ErrorMessage));
