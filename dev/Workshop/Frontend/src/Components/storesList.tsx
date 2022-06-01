@@ -22,6 +22,7 @@ import Box from '@mui/material/Box';
 import AddProductDialog from '../Components/Dialogs/addProductDialog';
 import AddDiscountDialog from '../Components/Dialogs/AddDiscountDialog';
 import ProductDialog from '../Components/Dialogs/ProductDialog';
+import AddToCartDialog from '../Components/Dialogs/addToCartDialog';
 
 import { Store } from "../Types/store"
 import { Product } from "../Types/product"
@@ -33,7 +34,8 @@ export default function StoresList(
     closeStore: (storeId: number) => void,
     openStore: (storeId: number) => void,
     removeProduct: (storeId:number, productId: number) => void,
-    addDiscount: (storeId: number, discountJson: string) => void
+    addDiscount: (storeId: number, discountJson: string) => void,
+    addToCart: (storeId: number, productId: number, quantity: number ) => void
     )
     {
         const CustomizedListItem: React.FC<{
@@ -71,8 +73,10 @@ export default function StoresList(
                         </ButtonGroup>
                         <List component='li' disablePadding key={store.storeId}>
                             {store.products.map( product=> {
-                                        return (
-                                                ProductDialog(product)
+                                return (
+                                    <ListItem key={product.id} secondaryAction={AddToCartDialog(store, product, addToCart)} >
+                                        {ProductDialog(product)}
+                                        </ListItem>
                                         )
                                     })
                                }

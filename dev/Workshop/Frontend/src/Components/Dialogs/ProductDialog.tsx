@@ -69,10 +69,13 @@ export default function ProductDialog(product : Product) {
                             {product.name}
                         </Typography>
                         <Button autoFocus color="inherit" onClick={handleClose}>
-                            save
+                            Save
                         </Button>
                         <Button autoFocus color="inherit" onClick={handleClose}>
-                            cancel
+                            Cancel
+                        </Button>
+                        <Button variant="contained" color="error">
+                            Delete product
                         </Button>
                     </Toolbar>
                 </AppBar>

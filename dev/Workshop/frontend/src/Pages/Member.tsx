@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react';
 
 import { handleLogout, handleExitMarket } from '../Actions/AuthenticationActions';
 import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleOpenStore, handleRemoveProduct, handleAddDiscount } from '../Actions/StoreActions';
+import { handleAddToCart } from '../Actions/UserActions';
 
 import { memberToken } from '../Types/roles';
 import { Store } from "../Types/store"
@@ -60,6 +61,10 @@ function Member() {
     const openStore = (storeId: number) => {
         handleOpenStore(token, storeId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     };
+
+    const addToCart = (storeId: number, productId: number, quantity: number) => {
+        handleAddToCart(token, storeId, productId, quantity).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+    }
     
     return (
         <div>
@@ -67,7 +72,7 @@ function Member() {
             <ButtonGroup variant="contained" aria-label="outlined primary button group">
                 {AddStoreDialog(addStore)}
             </ButtonGroup>
-            {StoresList(stores, addProduct, closeStore, openStore, removeProduct ,addDiscount)}
+            {StoresList(stores, addProduct, closeStore, openStore, removeProduct, addDiscount, addToCart)}
             <Stack direction="row" spacing={2}>
                 <Button variant='contained' onClick={e =>
                     handleLogout(token)
