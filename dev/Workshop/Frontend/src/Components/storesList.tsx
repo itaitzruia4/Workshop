@@ -17,6 +17,7 @@ import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantity
 import ListItemButton from '@mui/material/ListItemButton';
 import Popper from '@mui/material/Popper';
 import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
 
 
 import AddProductDialog from '../Components/Dialogs/addProductDialog';
@@ -31,9 +32,10 @@ import { Product } from "../Types/product"
 export default function StoresList(
     stores: Store[],
     addProduct: (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => void,
+    removeProduct: (storeId: number, productId: number) => void,
+    updateProduct: (storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => void,
     closeStore: (storeId: number) => void,
     openStore: (storeId: number) => void,
-    removeProduct: (storeId:number, productId: number) => void,
     addDiscount: (storeId: number, discountJson: string) => void,
     addToCart: (storeId: number, productId: number, quantity: number ) => void
     )
@@ -61,6 +63,7 @@ export default function StoresList(
                         timeout='auto'
                         unmountOnExit
                     >
+                        <Paper elevation={12}>
                         <ButtonGroup variant="outlined" aria-label="outlined button group">
                             {AddProductDialog(store.storeId, addProduct)}
                             {AddDiscountDialog(store.storeId, addDiscount)}
@@ -75,12 +78,13 @@ export default function StoresList(
                             {store.products.map( product=> {
                                 return (
                                     <ListItem key={product.id} secondaryAction={AddToCartDialog(store, product, addToCart)} >
-                                        {ProductDialog(store, product, removeProduct)}
+                                        {ProductDialog(store, product, removeProduct, updateProduct)}
                                         </ListItem>
                                         )
                                     })
                                }
-                        </List>
+                            </List>
+                            </Paper>
                     </Collapse>
                     <Divider />
                 </div>

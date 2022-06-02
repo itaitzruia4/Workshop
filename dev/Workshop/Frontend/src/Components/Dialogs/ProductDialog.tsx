@@ -15,11 +15,12 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantityLimits';
 import { TransitionProps } from '@mui/material/transitions';
-import ButtonGroup from '@mui/material/ButtonGroup';
 import Rating from '@mui/material/Rating';
 
 import { Product } from '../../Types/product';
 import { Store } from '../../Types/store';
+
+import InputDialog from './InputDialog' 
 
 const Transition = React.forwardRef(function Transition(
     props: TransitionProps & {
@@ -34,22 +35,40 @@ export default function ProductDialog(
     store: Store,
     product: Product,
     removeProduct: (storeId: number, productId: number) => void,
+    updateProduct: (storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => void
 ) {
     const [open, setOpen] = React.useState(false);
     const [rating, setRating] = React.useState(0);
+    const [name, setName] = React.useState(product.name);
+    const [price, setPrice] = React.useState(product.basePrice);
+    const [quantity, setQuantity] = React.useState(product.quantity);
+    const [category, setCategory] = React.useState(product.category);
+
 
     const handleClickOpen = () => {
+        setName(product.name)
+        setPrice(product.basePrice)
+        setQuantity(product.quantity)
+        setCategory(product.category)
         setOpen(true);
+
     };
 
     const handleClose = () => {
         setOpen(false);
     };
 
+    const handleSave = () => {
+        updateProduct(store.storeId, product.id, name, price, quantity, category);
+        setOpen(false);
+    }
+
     const handleRemove = () => {
         removeProduct(store.storeId, product.id);
         handleClose();
     }
+
+  
 
     return (
         <div>
@@ -78,7 +97,7 @@ export default function ProductDialog(
                         <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
                             {product.name}
                         </Typography>
-                        <Button autoFocus color="inherit" onClick={handleClose}>
+                        <Button autoFocus color="inherit" onClick={handleSave}>
                             Save
                         </Button>
                         <Button autoFocus color="inherit" onClick={handleClose}>
@@ -90,11 +109,7 @@ export default function ProductDialog(
                     </Toolbar>
                 </AppBar>
                 <List>
-                    <ListItem button>
-                        <ListItemText
-                            primary="Product name"
-                            secondary={product.name} />
-                    </ListItem>
+                    {InputDialog("name", name, setName)}
                     <Divider />
                     <ListItem button>
                         <ListItemText
@@ -103,20 +118,11 @@ export default function ProductDialog(
                         />
                     </ListItem>
                     <Divider />
-                    <ListItem button>
-                        <ListItemText
-                            primary="Product category"
-                            secondary={product.category}
-                        />
-                    </ListItem>
+                    {InputDialog("category", category, setCategory)}
                     <Divider />
-                    <ListItem button>
-                        <ListItemText
-                            primary="Product price"
-                            secondary={product.basePrice}
-                        />
-                    </ListItem>
-
+                    {InputDialog("price", price, setPrice)}
+                    <Divider />
+                    {InputDialog("quantity", quantity, setQuantity)}
                     <Typography component="legend">Rate this product</Typography>
                     <Rating
                         size="large"

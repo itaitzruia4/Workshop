@@ -2,7 +2,7 @@ import { token, memberToken } from '../Types/roles';
 
 
 export function handleAddToCart(token: memberToken,storeId : number, productId : number, quantity: number ) {
-    let url = "http://localhost:5165/api/user/addtocart";
+    let url = "http://localhost:5165/api/useractions/addtocart";
 
     return fetch(url, {
         method: 'POST',

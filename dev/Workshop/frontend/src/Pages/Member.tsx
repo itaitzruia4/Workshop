@@ -13,6 +13,7 @@ import { useState, useEffect } from 'react';
 import { handleLogout, handleExitMarket } from '../Actions/AuthenticationActions';
 import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleOpenStore, handleRemoveProduct, handleAddDiscount } from '../Actions/StoreActions';
 import { handleAddToCart } from '../Actions/UserActions';
+import { handleChangeProductCategory, handleChangeProductName, handleChangeProductPrice, handleChangeProductQuantity } from '../Actions/ProductActions';
 
 import { memberToken } from '../Types/roles';
 import { Store } from "../Types/store"
@@ -49,6 +50,14 @@ function Member() {
     const removeProduct = (storeId: number, productId: number) => {
         handleRemoveProduct(token, storeId, productId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     };
+
+    const updateProduct = (storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => {
+        handleChangeProductName(token, storeId, productId, productName).then(() =>
+            handleChangeProductPrice(token, storeId, productId, price).then(() =>
+                handleChangeProductQuantity(token, storeId, productId, quantity).then(() =>
+                    handleChangeProductCategory(token, storeId, productId, category).then(() => setRefreshKey(oldKey => oldKey + 1))))).catch(error => alert(error));
+    };
+
     const addDiscount = (storeId: number, discountJson: string) => {
         handleAddDiscount(token, storeId, discountJson)
             .catch(error => {
@@ -72,7 +81,7 @@ function Member() {
             <ButtonGroup variant="contained" aria-label="outlined primary button group">
                 {AddStoreDialog(addStore)}
             </ButtonGroup>
-            {StoresList(stores, addProduct, closeStore, openStore, removeProduct, addDiscount, addToCart)}
+            {StoresList(stores, addProduct, removeProduct, updateProduct, closeStore, openStore, addDiscount, addToCart)}
             <Stack direction="row" spacing={2}>
                 <Button variant='contained' onClick={e =>
                     handleLogout(token)
