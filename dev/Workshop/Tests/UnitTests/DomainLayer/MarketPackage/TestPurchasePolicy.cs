@@ -216,7 +216,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [DataRow(20)]
         public void TestCanPurchase_true(int age)
         {
-            ShoppingBagDTO shoppingBag = new ShoppingBagDTO(1, new List<ProductDTO>(new ProductDTO[] { new ProductDTO(1, "", "", 100.0, 3, null), new ProductDTO(2, "", "", 200.0, 2, "Cat1"), new ProductDTO(3, "", "", 50.0, 5, "Cat2") }));
+            ShoppingBagDTO shoppingBag = new ShoppingBagDTO(1, new List<ProductDTO>(new ProductDTO[] { new ProductDTO(1, "", "", 100.0, 3, null, 1), new ProductDTO(2, "", "", 200.0, 2, "Cat1", 1), new ProductDTO(3, "", "", 50.0, 5, "Cat2", 1) }));
             string[] product_terms = new string[] { makeSimpleProductPurchaseTerm("p", ">", "200")(1), makeSimpleProductPurchaseTerm("q", "=", "2")(2) };
             string[] category_terms = new string[] { makeSimpleCategoryPurchaseTerm("q", "<", "3")("Cat1"), makeSimpleCategoryPurchaseTerm("q", ">", "4")("Cat2") };
             string[] store_terms = new string[] { makeSimpleBagPurchaseTerm("h", ">", "01:00") };
@@ -249,7 +249,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [DataRow(18)]
         public void TestCanPurchase_false_BadAge(int age)
         {
-            ShoppingBagDTO shoppingBag = new ShoppingBagDTO(1, new List<ProductDTO>(new ProductDTO[] { new ProductDTO(1, "", "", 100.0, 3, null), new ProductDTO(2, "", "", 200.0, 2, "Cat1"), new ProductDTO(3, "", "", 50.0, 5, "Cat2") }));
+            ShoppingBagDTO shoppingBag = new ShoppingBagDTO(1, new List<ProductDTO>(new ProductDTO[] { new ProductDTO(1, "", "", 100.0, 3, null, 1), new ProductDTO(2, "", "", 200.0, 2, "Cat1", 1), new ProductDTO(3, "", "", 50.0, 5, "Cat2", 1) }));
             string[] product_terms = new string[] { makeSimpleProductPurchaseTerm("p", ">", "200")(1), makeSimpleProductPurchaseTerm("q", "=", "2")(2) };
             string[] category_terms = new string[] { makeSimpleCategoryPurchaseTerm("q", "<", "3")("Cat1"), makeSimpleCategoryPurchaseTerm("q", ">", "4")("Cat2") };
             string[] store_terms = new string[] { makeSimpleBagPurchaseTerm("h", ">", "01:00") };
@@ -281,7 +281,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [DataRow(20)]
         public void TestCanPurchase_false_BadQuantity(int age)
         {
-            ShoppingBagDTO shoppingBag = new ShoppingBagDTO(1, new List<ProductDTO>(new ProductDTO[] { new ProductDTO(1, "", "", 100.0, 3, null), new ProductDTO(2, "", "", 200.0, 3, "Cat1"), new ProductDTO(3, "", "", 50.0, 5, "Cat2") }));
+            ShoppingBagDTO shoppingBag = new ShoppingBagDTO(1, new List<ProductDTO>(new ProductDTO[] { new ProductDTO(1, "", "", 100.0, 3, null, 1), new ProductDTO(2, "", "", 200.0, 3, "Cat1", 1), new ProductDTO(3, "", "", 50.0, 5, "Cat2", 1) }));
             string[] product_terms = new string[] { makeSimpleProductPurchaseTerm("p", ">", "200")(1), makeSimpleProductPurchaseTerm("q", "=", "2")(2) };
             string[] category_terms = new string[] { makeSimpleCategoryPurchaseTerm("q", "<", "3")("Cat1"), makeSimpleCategoryPurchaseTerm("q", ">", "4")("Cat2") };
             string[] store_terms = new string[] { makeSimpleBagPurchaseTerm("h", ">", "01:00") };
@@ -313,7 +313,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [DataRow(20)]
         public void TestCanPurchase_false_BadPrice(int age)
         {
-            ShoppingBagDTO shoppingBag = new ShoppingBagDTO(1, new List<ProductDTO>(new ProductDTO[] { new ProductDTO(1, "", "", 100.0, 2, null), new ProductDTO(2, "", "", 200.0, 2, "Cat1"), new ProductDTO(3, "", "", 50.0, 5, "Cat2") }));
+            ShoppingBagDTO shoppingBag = new ShoppingBagDTO(1, new List<ProductDTO>(new ProductDTO[] { new ProductDTO(1, "", "", 100.0, 2, null, 1), new ProductDTO(2, "", "", 200.0, 2, "Cat1", 1), new ProductDTO(3, "", "", 50.0, 5, "Cat2", 1) }));
             string[] product_terms = new string[] { makeSimpleProductPurchaseTerm("p", ">", "200")(1), makeSimpleProductPurchaseTerm("q", "=", "2")(2) };
             string[] category_terms = new string[] { makeSimpleCategoryPurchaseTerm("q", "<", "3")("Cat1"), makeSimpleCategoryPurchaseTerm("q", ">", "4")("Cat2") };
             string[] store_terms = new string[] { makeSimpleBagPurchaseTerm("h", ">", "01:00") };
@@ -345,7 +345,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [DataRow(20)]
         public void TestCanPurchase_false_BadHour(int age)
         {
-            ShoppingBagDTO shoppingBag = new ShoppingBagDTO(1, new List<ProductDTO>(new ProductDTO[] { new ProductDTO(1, "", "", 100.0, 3, null), new ProductDTO(2, "", "", 200.0, 2, "Cat1"), new ProductDTO(3, "", "", 50.0, 5, "Cat2") }));
+            ShoppingBagDTO shoppingBag = new ShoppingBagDTO(1, new List<ProductDTO>(new ProductDTO[] { new ProductDTO(1, "", "", 100.0, 3, null, 1), new ProductDTO(2, "", "", 200.0, 2, "Cat1", 1), new ProductDTO(3, "", "", 50.0, 5, "Cat2", 1) }));
             string[] product_terms = new string[] { makeSimpleProductPurchaseTerm("p", ">", "200")(1), makeSimpleProductPurchaseTerm("q", "=", "2")(2) };
             string[] category_terms = new string[] { makeSimpleCategoryPurchaseTerm("q", "<", "3")("Cat1"), makeSimpleCategoryPurchaseTerm("q", ">", "4")("Cat2") };
             string[] store_terms = new string[] { makeSimpleBagPurchaseTerm("h", "=", "04:04") };
@@ -377,7 +377,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [DataRow(20)]
         public void TestCanPurchase_false_BadDate(int age)
         {
-            ShoppingBagDTO shoppingBag = new ShoppingBagDTO(1, new List<ProductDTO>(new ProductDTO[] { new ProductDTO(1, "", "", 100.0, 3, null), new ProductDTO(2, "", "", 200.0, 2, "Cat1"), new ProductDTO(3, "", "", 50.0, 5, "Cat2") }));
+            ShoppingBagDTO shoppingBag = new ShoppingBagDTO(1, new List<ProductDTO>(new ProductDTO[] { new ProductDTO(1, "", "", 100.0, 3, null, 1), new ProductDTO(2, "", "", 200.0, 2, "Cat1", 1), new ProductDTO(3, "", "", 50.0, 5, "Cat2", 1) }));
             string[] product_terms = new string[] { makeSimpleProductPurchaseTerm("p", ">", "200")(1), makeSimpleProductPurchaseTerm("q", "=", "2")(2) };
             string[] category_terms = new string[] { makeSimpleCategoryPurchaseTerm("q", "<", "3")("Cat1"), makeSimpleCategoryPurchaseTerm("q", ">", "4")("Cat2") };
             string[] store_terms = new string[] { makeSimpleBagPurchaseTerm("h", ">", "01:00"), makeSimpleBagPurchaseTerm("d", "=", "12/12/2030") };

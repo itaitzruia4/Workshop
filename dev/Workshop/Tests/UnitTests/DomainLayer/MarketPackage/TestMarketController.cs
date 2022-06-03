@@ -25,7 +25,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
             userControllerMock.Setup(x => x.IsAuthorized(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action>())).Returns((string user, int storeId, Action action) => !user.Equals("Notallowed Cohen"));
             userControllerMock.Setup(x => x.GetWorkers(It.IsAny<int>())).Returns(new List<Member>(new Member[] {new Member("Worker1", "pass1", DateTime.Parse("Aug 22, 1972")) }));
             userControllerMock.Setup(x => x.GetMember(It.IsAny<string>())).Returns(new Member("StoreFounder1", "pass1", DateTime.Parse("Aug 22, 1972")));
-            userControllerMock.Setup(x => x.addToCart(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<ShoppingBagProduct>(), It.IsAny<int>())).Returns((int id, string membername, ShoppingBagProduct sbp, int storeId) => { return new ShoppingBagProduct(sbp.Id, sbp.Name, sbp.Description, sbp.Price, sbp.Quantity, sbp.Category); });
+            userControllerMock.Setup(x => x.addToCart(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<ShoppingBagProduct>(), It.IsAny<int>())).Returns((int id, string membername, ShoppingBagProduct sbp, int storeId) => { return new ShoppingBagProduct(sbp.Id, sbp.Name, sbp.Description, sbp.Price, sbp.Quantity, sbp.Category, sbp.StoreId); });
            
             Mock<IMarketPaymentService> paymentMock = new Mock<IMarketPaymentService>();
             paymentMock.Setup(x => x.PayAmount(It.IsAny<string>(), It.IsAny<double>())).Callback((string username, double amount) => {});
@@ -143,7 +143,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
             Store st = marketController.CreateNewStore(1, user, "store");
             marketController.AddProductToStore(1, user, st.GetId(), "someName", "someDesc", 10.0, 2, "cat1");
             Assert.ThrowsException<ArgumentException>(() => marketController.addToBag(1, user, productId, storeId, quantity));
-            Product product = new Product(productId, "someName", "someDesc", 10.0, 2, "cat1");
+            Product product = new Product(productId, "someName", "someDesc", 10.0, 2, "cat1", 1);
         }
     }
 }

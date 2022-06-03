@@ -72,7 +72,7 @@ namespace Workshop.DomainLayer.MarketPackage
             ValidatePrice(price);
             ValidateQuantity(quantity);
             ValidateCategory(category);
-            Product newProd = new Product(productId, name, description, price, quantity, category);
+            Product newProd = new Product(productId, name, description, price, quantity, category, id);
             products.Add(productId, newProd);
             return newProd;
         }
@@ -238,7 +238,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             else
             {
-                products.Add(product.Id,new Product(product.Id,product.Name,product.Description,product.Price,product.Quantity, product.Category));
+                products.Add(product.Id,new Product(product.Id,product.Name,product.Description,product.Price,product.Quantity, product.Category, id));
             }
         }
 
