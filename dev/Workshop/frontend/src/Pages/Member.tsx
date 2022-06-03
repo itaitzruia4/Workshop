@@ -2,7 +2,7 @@ import * as React from 'react';
 import ReactDOM from 'react-dom';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
-import Appbar from './Appbar';
+import Appbar from '../Components/Appbar';
 import StoresList from '../Components/storesList'
 import { Stack } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -12,7 +12,7 @@ import { useState, useEffect } from 'react';
 
 import { handleLogout, handleExitMarket } from '../Actions/AuthenticationActions';
 import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleOpenStore, handleRemoveProduct, handleAddDiscount } from '../Actions/StoreActions';
-import { handleAddToCart, handleViewCart } from '../Actions/UserActions';
+import { handleAddToCart, handleViewCart, handleReviewProduct } from '../Actions/UserActions';
 import { handleChangeProductCategory, handleChangeProductName, handleChangeProductPrice, handleChangeProductQuantity } from '../Actions/ProductActions';
 
 import { memberToken } from '../Types/roles';
@@ -62,6 +62,10 @@ function Member() {
                     handleChangeProductCategory(token, storeId, productId, category).then(() => setRefreshKey(oldKey => oldKey + 1))))).catch(error => alert(error));
     };
 
+    const reviewProduct = (productId: number, review: string, rating: number) => {
+        handleReviewProduct(token, productId, review, rating).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+    }
+
     const addDiscount = (storeId: number, discountJson: string) => {
         handleAddDiscount(token, storeId, discountJson)
             .catch(error => {
@@ -87,7 +91,7 @@ function Member() {
             <ButtonGroup variant="contained" aria-label="outlined primary button group">
                 {AddStoreDialog(addStore)}
             </ButtonGroup>
-            {StoresList(stores, addProduct, removeProduct, updateProduct, closeStore, openStore, addDiscount, addToCart)}
+            {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct ,closeStore, openStore, addDiscount, addToCart)}
             <Stack direction="row" spacing={2}>
                 <Button variant='contained' onClick={e =>
                     handleLogout(token)

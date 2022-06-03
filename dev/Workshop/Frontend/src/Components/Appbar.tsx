@@ -16,7 +16,7 @@ import ShoppingCart from '@mui/icons-material/ShoppingCart';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 
-import CartDialog from '../Components/Dialogs/CartDialog'
+import CartDialog from './Dialogs/CartDialog'
 
 import { Store } from "../Types/store"
 import { Product } from "../Types/product"

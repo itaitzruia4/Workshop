@@ -34,6 +34,7 @@ export default function StoresList(
     addProduct: (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => void,
     removeProduct: (storeId: number, productId: number) => void,
     updateProduct: (storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => void,
+    reviewProduct: (productId: number, review: string, rating: number) => void,
     closeStore: (storeId: number) => void,
     openStore: (storeId: number) => void,
     addDiscount: (storeId: number, discountJson: string) => void,
@@ -78,7 +79,7 @@ export default function StoresList(
                             {store.products.map( product=> {
                                 return (
                                     <ListItem key={product.id} secondaryAction={AddToCartDialog(store, product, addToCart)} >
-                                        {ProductDialog(store, product, removeProduct, updateProduct)}
+                                        {ProductDialog(store, product, removeProduct, updateProduct, reviewProduct)}
                                         </ListItem>
                                         )
                                     })
