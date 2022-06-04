@@ -35,10 +35,10 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
 
             userController.Register(1, "member1", "pass1", DateTime.Parse("Aug 22, 1972"));
             userController.Login(1, "member1", "pass1");
-            userController.addToCart(1, "member1", new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1, "cat1"), 1);
+            userController.addToCart(1, "member1", new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1, "cat1", 1), 1);
             
             List<ShoppingBagProduct> member1prods = new List<ShoppingBagProduct>();
-            member1prods.Add(new ShoppingBagProduct(1, "prod1", "desc1", 11.90, 3, "cat1"));
+            member1prods.Add(new ShoppingBagProduct(1, "prod1", "desc1", 11.90, 3, "cat1", 1));
             List<ProductDTO> pdtos1 = new List<ProductDTO>();
             foreach (ShoppingBagProduct sbp in member1prods)
             {
@@ -472,7 +472,7 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         {
             userController.EnterMarket(1);
             userController.Login(1, "member2", "pass2");
-            ShoppingBagProduct product2 = userController.addToCart(1, user, new ShoppingBagProduct(prodId, prodName, desc, price, quantity, category), storeId);
+            ShoppingBagProduct product2 = userController.addToCart(1, user, new ShoppingBagProduct(prodId, prodName, desc, price, quantity, category, storeId), storeId);
             ShoppingCartDTO shoppingCart = userController.viewCart(1, user);
             //Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(preInsertedProduct.GetProductDTO()));
             Assert.AreEqual(shoppingCart.shoppingBags[1].products[0], product2.GetProductDTO());
@@ -485,7 +485,7 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         {
             userController.EnterMarket(1);
             userController.Login(1, "member2", "pass2");
-            ShoppingBagProduct product2 = userController.addToCart(1, "member2", new ShoppingBagProduct(prodId, prodName, desc, price, quantity, category), storeId);
+            ShoppingBagProduct product2 = userController.addToCart(1, "member2", new ShoppingBagProduct(prodId, prodName, desc, price, quantity, category, storeId), storeId);
             Assert.ThrowsException<ArgumentException>(() => userController.viewCart(1, user));
             //Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(preInsertedProduct.GetProductDTO()));
             //Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(product2.GetProductDTO()));
@@ -501,7 +501,7 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         {
             userController.EnterMarket(1);
             userController.Login(1, "member2", "pass2");
-            ShoppingBagProduct product2 = userController.addToCart(1, user, new ShoppingBagProduct(prodId, prodName, desc, price, quantity, category), storeId);
+            ShoppingBagProduct product2 = userController.addToCart(1, user, new ShoppingBagProduct(prodId, prodName, desc, price, quantity, category, storeId), storeId);
             ShoppingCartDTO shoppingCart = userController.editCart(1, user, prodId, newQuantity);
             //Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(preInsertedProduct.GetProductDTO()));
             ProductDTO product = product2.GetProductDTO();
@@ -516,7 +516,7 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         {
             userController.EnterMarket(1);
             userController.Login(1, "member2", "pass2");
-            ShoppingBagProduct product2 = userController.addToCart(1, user, new ShoppingBagProduct(prodId, prodName, desc, price, quantity, category), storeId);
+            ShoppingBagProduct product2 = userController.addToCart(1, user, new ShoppingBagProduct(prodId, prodName, desc, price, quantity, category, storeId), storeId);
             ShoppingCartDTO shoppingCart = userController.editCart(1, user, prodId, newQuantity);
             //Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(preInsertedProduct.GetProductDTO()));
             Assert.IsTrue(shoppingCart.shoppingBags[1].products.Count==0);
@@ -530,7 +530,7 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         {
             userController.EnterMarket(1);
             userController.Login(1, "member2", "pass2");
-            ShoppingBagProduct product2 = userController.addToCart(1, user, new ShoppingBagProduct(1, prodName, desc, price, quantity, category), storeId);
+            ShoppingBagProduct product2 = userController.addToCart(1, user, new ShoppingBagProduct(1, prodName, desc, price, quantity, category, storeId), storeId);
             Assert.ThrowsException<ArgumentException>(() => userController.editCart(1, user, prodId, newQuantity));
         }
     }

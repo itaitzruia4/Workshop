@@ -126,7 +126,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         {
             int storeId = marketController.CreateNewStore(1, user, "store").GetId();
             Product prod1 = marketController.AddProductToStore(1, user, storeId, "someName", "someDesc", 10.0, 5, category);
-            ShoppingBagProduct product2 = userController.addToCart(1, user, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, userQuantity, prod1.Category), storeId);
+            ShoppingBagProduct product2 = userController.addToCart(1, user, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, userQuantity, prod1.Category, storeId), storeId);
             int leftovers = marketController.getStoreInfo(1, user, storeId).products[prod1.Id].Quantity - userQuantity;
             marketController.BuyCart(1, user, address);
             Assert.AreEqual(userController.viewCart(1, user).shoppingBags.Count, 0);
