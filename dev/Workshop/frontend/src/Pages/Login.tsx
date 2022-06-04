@@ -2,8 +2,9 @@ import React, { useState } from 'react'
 import { useNavigate, useLocation } from "react-router-dom";
 import { Grid, Paper, Avatar, TextField, Button, Typography, Link } from '@mui/material/';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { userToken, token } from '../Types/roles';
+import { userToken, token, makeMemberToken } from '../Types/roles';
 import { handleLogin } from '../Actions/AuthenticationActions';
+import { MarketNotification } from '../Types/Notification';
 
 const Login = () => {
 
@@ -33,7 +34,7 @@ const Login = () => {
                 <Button type='submit' color='primary' variant="contained" style={btnstyle} fullWidth
                 onClick={e =>
                     handleLogin(token, membername, password)
-                        .then((data) => routeChange("/member", { userId: token.userId, membername: membername, notifications: data.value }))
+                        .then((data) => routeChange("/member", makeMemberToken(token.userId, membername, []))())
                         .catch(error => {
                             alert(error)
                         })

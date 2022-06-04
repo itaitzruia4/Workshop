@@ -1,5 +1,8 @@
-export interface userToken { userId: number, notifications: string[] };
+import { MarketNotification } from "./Notification";
+
+export interface userToken { userId: number, notifications: MarketNotification[] };
 export interface memberToken extends userToken { userId: number, membername: string }
+export const makeMemberToken = (userId: number, membername: string, notifications: MarketNotification[]): memberToken => ({ userId: userId, membername: membername, notifications: notifications });
 export interface StoreToken extends memberToken {storeId: number}
 export type token = userToken | memberToken | StoreToken
 

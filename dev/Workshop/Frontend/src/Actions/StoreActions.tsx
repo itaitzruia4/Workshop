@@ -134,16 +134,7 @@ export function handleRemoveProduct(token: memberToken, storeId: number, product
 
 
 export function handleAddDiscount(token: memberToken, storeId: number, discountJson: string) {
-    const url = "http://localhost:5165/api/store/AddDiscount";
-
-    let discount = JSON.parse(discountJson);
-
-    //try {
-    //    let discount = JSON.parse(discountJson);
-    //}
-    //catch {
-    //    return Promise.reject("Invalid discount JSON format input");
-    //}
+    const url = "http://localhost:5165/api/discount/addstorediscount";
 
     return fetch(url, {
         method: 'POST',
@@ -153,13 +144,38 @@ export function handleAddDiscount(token: memberToken, storeId: number, discountJ
             userId: token.userId,
             membername: token.membername,
             storeId: storeId,
-            discount: discount
+            JsonDiscount: discountJson
         })
     }).then(async response => {
         const data = await response.json();
         if (!response.ok) {
             return Promise.reject(data.error);
         }
+        alert(`Discount in store ${storeId} has been added successfully`);
+        return Promise.resolve(data.value)
+    })
+}
+
+export function handleAddProductDiscount(token: memberToken, storeId: number, productId: number, discountJson: string) {
+    const url = "http://localhost:5165/api/discount/addproductdiscount";
+
+    return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            userId: token.userId,
+            membername: token.membername,
+            storeId: storeId,
+            JsonDiscount: discountJson,
+            productId: productId
+        })
+    }).then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            return Promise.reject(data.error);
+        }
+        alert(`Product discount for product ${productId} in store ${storeId} has been added successfully`);
         return Promise.resolve(data.value)
     })
 }

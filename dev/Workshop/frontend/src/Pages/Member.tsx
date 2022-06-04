@@ -11,7 +11,7 @@ import AddStoreDialog from '../Components/Dialogs/addStoreDialog';
 import { useState, useEffect } from 'react';
 
 import { handleLogout, handleExitMarket } from '../Actions/AuthenticationActions';
-import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleOpenStore, handleRemoveProduct, handleAddDiscount } from '../Actions/StoreActions';
+import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleOpenStore, handleRemoveProduct, handleAddDiscount, handleAddProductDiscount } from '../Actions/StoreActions';
 import { handleAddToCart, handleViewCart, handleReviewProduct } from '../Actions/UserActions';
 import { handleChangeProductCategory, handleChangeProductName, handleChangeProductPrice, handleChangeProductQuantity } from '../Actions/ProductActions';
 
@@ -72,6 +72,14 @@ function Member() {
                 alert(error)
             });
     };
+
+    const addProductDiscount = (storeId: number, productId: number, discountJson: string) => {
+        handleAddProductDiscount(token, storeId, productId, discountJson)
+            .catch(error => {
+                alert(error)
+            });
+    };
+
     const closeStore = (storeId: number) => {
         handleCloseStore(token, storeId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     };
@@ -91,7 +99,7 @@ function Member() {
             <ButtonGroup variant="contained" aria-label="outlined primary button group">
                 {AddStoreDialog(addStore)}
             </ButtonGroup>
-            {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct ,closeStore, openStore, addDiscount, addToCart)}
+            {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct ,closeStore, openStore, addDiscount, addProductDiscount, addToCart)}
             <Stack direction="row" spacing={2}>
                 <Button variant='contained' onClick={e =>
                     handleLogout(token)
