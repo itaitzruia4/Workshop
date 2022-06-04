@@ -15,10 +15,21 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import Fab from '@mui/material/Fab';
+import Badge, { BadgeProps } from '@mui/material/Badge';
+import { styled } from '@mui/material/styles';
 
 import { Product } from '../../Types/product';
 import { Store } from '../../Types/store';
 
+
+const StyledBadge = styled(Badge)<BadgeProps>(({ theme }) => ({
+    '& .MuiBadge-badge': {
+        right: -5,
+        top: -5,
+        border: `2px solid ${theme.palette.background.paper}`,
+        padding: '0 4px',
+    },
+}));
 
 export default function AddToCartDialog(
     store: Store,
@@ -44,8 +55,10 @@ export default function AddToCartDialog(
     return (
         <div>
         <IconButton onClick={handleClickOpen} edge="end">
-            <Fab size="small">
-                <AddShoppingCartIcon />
+                <Fab size="small">
+                    <StyledBadge badgeContent={product.quantity} color="primary">
+                        <AddShoppingCartIcon />
+                    </StyledBadge >
             </Fab>
         </IconButton>
         <Dialog open={open} onClose={handleClose}>

@@ -16,6 +16,8 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantityLimits';
 import { TransitionProps } from '@mui/material/transitions';
 import Rating from '@mui/material/Rating';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
 
 import { Product } from '../../Types/product';
 import { Store } from '../../Types/store';
@@ -35,10 +37,14 @@ export default function ProductDialog(
     store: Store,
     product: Product,
     removeProduct: (storeId: number, productId: number) => void,
-    updateProduct: (storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => void
+    updateProduct: (storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => void,
+    reviewProduct: (productId: number, review: string, rating: number) => void
 ) {
     const [open, setOpen] = React.useState(false);
     const [rating, setRating] = React.useState(0);
+    const [review, setReview] = React.useState("");
+    const [rated, setRated] = React.useState(false);
+
     const [name, setName] = React.useState(product.name);
     const [price, setPrice] = React.useState(product.basePrice);
     const [quantity, setQuantity] = React.useState(product.quantity);
@@ -60,6 +66,7 @@ export default function ProductDialog(
 
     const handleSave = () => {
         updateProduct(store.storeId, product.id, name, price, quantity, category);
+        if (rated) { reviewProduct(product.id, review, rating); }
         setOpen(false);
     }
 
@@ -130,9 +137,25 @@ export default function ProductDialog(
                         name="simple-controlled"
                         value={rating}
                         onChange={(event, newValue) => {
+                            setRated(true);
                             newValue ? setRating(newValue) : setRating(0);
                         }}
                     />
+                    <Box
+                        sx={{
+                            maxWidth: '100%',
+                        }}
+                    >
+                        <TextField
+                            fullWidth
+                            label="Review"
+                            value={review}
+                            onChange={(e) => {
+                                setRated(true);
+                                setReview(e.target.value);
+                            }}
+                        />
+                    </Box>
                 </List>
             </Dialog>
         </div>
