@@ -14,6 +14,7 @@ namespace Workshop.DataLayer
         {
             Context context = new Context();
             context.Add<Role>(new Role());
+            context.SaveChanges();
             context.Find<Role>(1);
             Console.ReadKey();
         }
