@@ -116,15 +116,15 @@ namespace Workshop.ServiceLayer
                                 break;
                             case "add-to-cart":
                                 if (actualParams.Length != 5) { throw new ArgumentException(); }
-                                facade.addToCart(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]), int.Parse(actualParams[4]));
+                                facade.AddToCart(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]), int.Parse(actualParams[4]));
                                 break;
                             case "view-cart":
                                 if (actualParams.Length != 2) { throw new ArgumentException(); }
-                                facade.viewCart(int.Parse(actualParams[0]), actualParams[1]);
+                                facade.ViewCart(int.Parse(actualParams[0]), actualParams[1]);
                                 break;
                             case "edit-cart":
                                 if (actualParams.Length != 4) { throw new ArgumentException(); }
-                                facade.editCart(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]));
+                                facade.EditCart(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]));
                                 break;
                             case "buy-cart":
                                 if (actualParams.Length != 3) { throw new ArgumentException(); }
