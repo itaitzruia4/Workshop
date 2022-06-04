@@ -36,12 +36,12 @@ const Register = () => {
                 <Button type='submit' color='primary' variant="contained" style={btnstyle} fullWidth
                     onClick={e =>
                         handleRegister(token, membername, password, birthDate)
-                            .then(routeChange("/login", { userId: token.userId, membername: membername }))
+                            .then(routeChange("/login", { userId: token.userId, membername: membername, notifications: [] }))
                             .catch(error => {
                                 alert(error)
                             })
                     } >Sign up</Button>
-                <Button type='submit' color='primary' variant="contained" style={btnstyle} fullWidth onClick={routeChange('/login', { userId: token.userId })}
+                <Button type='submit' color='primary' variant="contained" style={btnstyle} fullWidth onClick={routeChange('/login', { userId: token.userId, notifications: [] })}
                 >Back to login screen</Button>
             </Paper>
         </Grid>

@@ -1,4 +1,4 @@
-export interface userToken { userId: number };
+export interface userToken { userId: number, notifications: string[] };
 export interface memberToken extends userToken { userId: number, membername: string }
 export interface StoreToken extends memberToken {storeId: number}
 export type token = userToken | memberToken | StoreToken

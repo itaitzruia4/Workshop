@@ -33,15 +33,15 @@ const Login = () => {
                 <Button type='submit' color='primary' variant="contained" style={btnstyle} fullWidth
                 onClick={e =>
                     handleLogin(token, membername, password)
-                        .then(routeChange("/member", { userId: token.userId, membername: membername }))
+                        .then((data) => routeChange("/member", { userId: token.userId, membername: membername, notifications: data.value }))
                         .catch(error => {
                             alert(error)
                         })
                 } >Sign in</Button>
                 <Button type='submit' color='primary' variant="contained" style={btnstyle} fullWidth >Continue as guest</Button>
-                <Typography > Dont have an account ? 
+                <Typography > Don't have an account ? 
                     <Link
-                        onClick={routeChange("/register", { userId: token.userId})}>
+                        onClick={routeChange("/register", { userId: token.userId, notifications: []})}>
                         Sign Up
                     </Link>
                 </Typography>
