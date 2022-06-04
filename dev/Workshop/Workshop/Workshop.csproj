@@ -39,6 +39,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Dapper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapper.2.0.123\lib\net461\Dapper.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=2.0.14.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.14\lib\net45\log4net.dll</HintPath>
     </Reference>
@@ -63,6 +66,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataLayer\DataHandler.cs" />
+    <Compile Include="DataLayer\DataObjects\Member.cs" />
+    <Compile Include="DataLayer\DataObjects\Product.cs" />
+    <Compile Include="DataLayer\DataObjects\Role.cs" />
+    <Compile Include="DataLayer\DataObjects\Store.cs" />
     <Compile Include="DomainLayer\UserPackage\ILoginChecker.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\AndDiscount.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\CompositeDiscount.cs" />
