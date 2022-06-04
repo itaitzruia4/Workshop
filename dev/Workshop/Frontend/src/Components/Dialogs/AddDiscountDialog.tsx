@@ -6,17 +6,17 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { makeProductPriceActionSimple, makeSimpleDiscount, SimpleDiscount } from '../../Types/discount';
+import { makeCategoryPriceActionSimple, makeProductPriceActionSimple, makeSimpleDiscount, SimpleDiscount } from '../../Types/discount';
 
 export default function AddDiscountDialog(
     storeId: number,
     addDiscount: (storeId: number, discountJson: string) => void,
-    addProductDiscount: (storeId: number, productId: number, discountJson: string) => void) {
+    addProductDiscount: (storeId: number, productId: number, discountJson: string) => void,
+    addCategoryDiscount: (storeId: number, category: string, discountJson: string) => void) {
 
     const [open, setOpen] = React.useState(false);
     const [productOpen, setProductOpen] = React.useState(false);
     const [categoryOpen, setCategoryOpen] = React.useState(false);
-    const [storeOpen, setStoreOpen] = React.useState(false);
     const [discount, setDiscount] = React.useState("");
     const [percentage, setPercentage] = React.useState(0);
     const [productId, setProductId] = React.useState(0);
@@ -40,6 +40,16 @@ export default function AddDiscountDialog(
         setOpen(true);
     };
 
+    const handleOpenCategoryDiscount = () => {
+        setOpen(false);
+        setCategoryOpen(true);
+    };
+
+    const handleCloseCategoryDiscount = () => {
+        setCategoryOpen(false);
+        setOpen(true);
+    };
+
     const handleAdd = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         addDiscount(storeId, discount);
@@ -55,7 +65,18 @@ export default function AddDiscountDialog(
         addProductDiscount(storeId, productId, JSON.stringify(productDiscount));
         setProductId(0);
         setPercentage(0);
-        handleOpenProductDiscount();
+        handleCloseProductDiscount();
+    };
+
+    const handleAddCategoryDiscount = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const categoryDiscount: SimpleDiscount = makeSimpleDiscount(makeCategoryPriceActionSimple(percentage, category));
+
+        addCategoryDiscount(storeId, category, JSON.stringify(categoryDiscount));
+        setCategory("");
+        setPercentage(0);
+        handleCloseCategoryDiscount();
     };
 
     return (
@@ -67,6 +88,8 @@ export default function AddDiscountDialog(
                 <DialogTitle>Add Discount</DialogTitle>
                 <DialogContent>
                     <Button onClick={handleOpenProductDiscount}>Add Product Discount</Button>
+                    <Button onClick={handleOpenCategoryDiscount}>Add Category Discount</Button>
+                    <br />
                     <DialogContentText>
                         For complex discounts, please insert discount JSON string below:
                     </DialogContentText>
@@ -120,8 +143,44 @@ export default function AddDiscountDialog(
                     </form>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseProductDiscount}>Cancel</Button>
+                    <Button onClick={handleCloseProductDiscount}>Back</Button>
                     <Button variant="contained" type="submit" form="productDiscountForm">Add</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={categoryOpen} onClose={handleOpenCategoryDiscount}>
+                <DialogTitle>Add Category Discount</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Please insert category discount details
+                    </DialogContentText>
+                    <form onSubmit={handleAddCategoryDiscount} id="categoryDiscountForm" >
+                        <TextField
+                            value={category}
+                            autoFocus
+                            margin="dense"
+                            id="category"
+                            label="Category Name"
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => setCategory(e.target.value)}
+                        />
+                        <TextField
+                            value={percentage}
+                            autoFocus
+                            margin="dense"
+                            id="percentage"
+                            label="Discount Percentage"
+                            type="number"
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => setPercentage(Number(e.target.value))}
+                        />
+                    </form>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseCategoryDiscount}>Back</Button>
+                    <Button variant="contained" type="submit" form="categoryDiscountForm">Add</Button>
                 </DialogActions>
             </Dialog>
         </div>

@@ -39,6 +39,7 @@ export default function StoresList(
     openStore: (storeId: number) => void,
     addDiscount: (storeId: number, discountJson: string) => void,
     addProductDiscount: (storeId: number, productId: number, discountJson: string) => void,
+    addCategoryDiscount: (storeId: number, category: string, discountJson: string) => void,
     addToCart: (storeId: number, productId: number, quantity: number ) => void
     )
     {
@@ -68,7 +69,7 @@ export default function StoresList(
                         <Paper elevation={12}>
                         <ButtonGroup variant="outlined" aria-label="outlined button group">
                             {AddProductDialog(store.storeId, addProduct)}
-                            {AddDiscountDialog(store.storeId, addDiscount, addProductDiscount)}
+                            {AddDiscountDialog(store.storeId, addDiscount, addProductDiscount, addCategoryDiscount)}
                             <div>
                                 <Button onClick={e => closeStore(store.storeId)}>Close store</Button>
                             </div>

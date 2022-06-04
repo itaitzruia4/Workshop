@@ -179,3 +179,27 @@ export function handleAddProductDiscount(token: memberToken, storeId: number, pr
         return Promise.resolve(data.value)
     })
 }
+
+export function handleAddCategoryDiscount(token: memberToken, storeId: number, category: string, discountJson: string) {
+    const url = "http://localhost:5165/api/discount/addcategorydiscount";
+
+    return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            userId: token.userId,
+            membername: token.membername,
+            storeId: storeId,
+            JsonDiscount: discountJson,
+            category: category
+        })
+    }).then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            return Promise.reject(data.error);
+        }
+        alert(`Product discount for category ${category} in store ${storeId} has been added successfully`);
+        return Promise.resolve(data.value)
+    })
+}

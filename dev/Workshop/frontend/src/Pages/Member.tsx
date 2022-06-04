@@ -11,7 +11,7 @@ import AddStoreDialog from '../Components/Dialogs/addStoreDialog';
 import { useState, useEffect } from 'react';
 
 import { handleLogout, handleExitMarket } from '../Actions/AuthenticationActions';
-import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleOpenStore, handleRemoveProduct, handleAddDiscount, handleAddProductDiscount } from '../Actions/StoreActions';
+import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleOpenStore, handleRemoveProduct, handleAddDiscount, handleAddProductDiscount, handleAddCategoryDiscount } from '../Actions/StoreActions';
 import { handleAddToCart, handleViewCart, handleReviewProduct } from '../Actions/UserActions';
 import { handleChangeProductCategory, handleChangeProductName, handleChangeProductPrice, handleChangeProductQuantity } from '../Actions/ProductActions';
 
@@ -80,6 +80,13 @@ function Member() {
             });
     };
 
+    const addCategoryDiscount = (storeId: number, category: string, discountJson: string) => {
+        handleAddCategoryDiscount(token, storeId, category, discountJson)
+            .catch(error => {
+                alert(error)
+            });
+    };
+
     const closeStore = (storeId: number) => {
         handleCloseStore(token, storeId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     };
@@ -99,7 +106,7 @@ function Member() {
             <ButtonGroup variant="contained" aria-label="outlined primary button group">
                 {AddStoreDialog(addStore)}
             </ButtonGroup>
-            {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct ,closeStore, openStore, addDiscount, addProductDiscount, addToCart)}
+            {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct ,closeStore, openStore, addDiscount, addProductDiscount, addCategoryDiscount, addToCart)}
             <Stack direction="row" spacing={2}>
                 <Button variant='contained' onClick={e =>
                     handleLogout(token)
