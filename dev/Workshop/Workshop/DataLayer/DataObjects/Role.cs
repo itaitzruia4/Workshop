@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 
 namespace Workshop.DataLayer.DataObjects
 {
@@ -14,7 +15,7 @@ namespace Workshop.DataLayer.DataObjects
         /* Will be Stored as the dec value of the binary representation
          * 1 if Actions is available and 0 if not
          */
-        public int Actions { get; set; }
+        public List<Action> Actions { get; set; }
 
         public override string ToString()
         {

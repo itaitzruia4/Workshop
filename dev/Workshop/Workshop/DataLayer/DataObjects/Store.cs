@@ -13,6 +13,7 @@ namespace Workshop.DataLayer.DataObjects
         public string StoreName { get; set; }
         public string DiscountPolicy { get; set; }
         public string PurchasePolicy { get; set; }
+        public Dictionary<int, Product> products { get; set; }
 
         public override string ToString()
         {
