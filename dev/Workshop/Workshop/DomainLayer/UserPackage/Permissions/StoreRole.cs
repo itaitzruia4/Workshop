@@ -11,7 +11,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
     public class StoreRole: Role
     {
         public int StoreId { get; }
-        private List<StoreRole> nominees;
+        public List<StoreRole> nominees { get; }
 
         public StoreRole(int storeId): base()
         {

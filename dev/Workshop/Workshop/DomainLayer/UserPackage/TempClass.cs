@@ -9,7 +9,7 @@ namespace Workshop.DomainLayer.UserPackage
 {
     internal class TempClass : IMessageHandler
     {
-        void IMessageHandler.SendNotification(User reciver, Notification notification)
+        void IMessageHandler.SendNotification(string reciverName, Notification notification)
         {
             
         }

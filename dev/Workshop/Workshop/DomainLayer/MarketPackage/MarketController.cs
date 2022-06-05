@@ -11,6 +11,7 @@ using Workshop.DomainLayer.UserPackage.Shopping;
 using Workshop.DomainLayer.Loggers;
 using System.Threading;
 using System.Collections.Concurrent;
+using Workshop.DomainLayer.UserPackage.Notifications;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
@@ -63,6 +64,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new ArgumentException("Store ID does not exist");
             }
             StoreOwner storeOwner = userController.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId);
+            
             storesLocks[storeId].ReleaseReaderLock();
             return storeOwner;
         }
@@ -98,7 +100,16 @@ namespace Workshop.DomainLayer.MarketPackage
                     {
                         nominatedMember.RemoveRole(nominatedRole);
                         nominatorRole.RemoveNominee(nominatedRole);
+                        userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
+                        userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("OpenStore" + storeId, "", "MarketController"));
+                        userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("CloseStore" + storeId, "", "MarketController"));
+                        userController.notify(new Event("RemoveStoreOwnerNominationFrom" + nominatedMembername, "Removed store owner nomination from user " + nominatedMembername, "MarketController"));
                         Logger.Instance.LogEvent($"User {userId} with member {nominatorMembername} successfuly removed store owner nomination from {nominatedMembername} in store {storeId}.");
+
+                        foreach (StoreRole newNominated in nominatedRole.nominees)
+                        {
+                            //RemoveStoreOwnerNominationHelper(nominatedMember,newNominated.)
+                        }
                         return nominatedMember;
                     }
                 }
@@ -398,12 +409,18 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             if (!IsAuthorized(userId, membername, storeId, Action.CloseStore))
                 throw new MemberAccessException("This user is not authorized to open this specified store.");
-            if (!IsStoreOpen(userId, membername, storeId)) { stores[storeId].OpenStore(); }
+            if (!IsStoreOpen(userId, membername, storeId)) { 
+                stores[storeId].OpenStore();
+                userController.notify(new Event("OpenStore" + storeId, "store " + storeId + "is open"+"by user "+membername, "marketController"));
+            }
             else
             {
                 throw new ArgumentException($"Store {storeId} is already opened.");
             }
             storesLocks[storeId].ReleaseWriterLock();
+            //userController.RegisterToEvent(userId, new Event("SaleInStore" + storeId, "", "MarketController"));
+            //userController.RegisterToEvent(userId, new Event("OpenStore" + storeId, "", "MarketController"));
+            //userController.RegisterToEvent(userId, new Event("CloseStore" + storeId, "", "MarketController"));
             Logger.Instance.LogEvent($"{membername} successfuly opened store {storeId}.");
         }
 
@@ -420,7 +437,9 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             if (!IsAuthorized(userId, username, storeId, Action.CloseStore))
                 throw new MemberAccessException("This user is not authorized to close this specified store.");
-            if (IsStoreOpen(userId, username, storeId)) { stores[storeId].CloseStore(); }
+            if (IsStoreOpen(userId, username, storeId)) {
+                userController.notify(new Event("CloseStore" + storeId, "store " + storeId + "is close by user" + username, "marketController"));
+                stores[storeId].CloseStore(); }
             else
             {
                 throw new ArgumentException($"Store {storeId} is already closed.");
@@ -456,6 +475,10 @@ namespace Workshop.DomainLayer.MarketPackage
             stores[storeId] = store;
             STORE_COUNT++;
             rwl.ReleaseWriterLock();
+
+            userController.RegisterToEvent(creator, new Event("SaleInStore" + storeId, "", "MarketController"));
+            userController.RegisterToEvent(creator, new Event("OpenStore" + storeId, "", "MarketController"));
+            userController.RegisterToEvent(creator, new Event("CloseStore" + storeId, "", "MarketController"));
             Logger.Instance.LogEvent($"{creator} successfuly created store \"{storeName}\", and received a new store ID: {storeId}.");
             return store;
         }
@@ -584,6 +607,7 @@ namespace Workshop.DomainLayer.MarketPackage
             Dictionary<int, List<ProductDTO>> productsSoFar = new Dictionary<int, List<ProductDTO>>();
             try
             {
+                List<Event> events = new List<Event>();
                 foreach (int storeId in shoppingCart.shoppingBags.Keys)
                 {
                     try
@@ -598,7 +622,14 @@ namespace Workshop.DomainLayer.MarketPackage
                     {
                         int age = userController.GetAge(userId, username);
                         stores[storeId].CheckPurchasePolicy(shoppingCart.shoppingBags[storeId], age);
-                        //stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
+                        //ShoppingBagDTO bag = stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
+                        ShoppingBagDTO bag = new ShoppingBagDTO(storeId, shoppingCart.shoppingBags[storeId].products);
+                        string products = "";
+                        foreach (ProductDTO product in bag.products)
+                        {
+                            products = product.Name + " ";
+                        }
+                        events.Add(new Event("SaleInStore" + storeId, "Prouducts with the name" + products + " were bought from store " + storeId + "by user "+username, "marketController"));
                         productsSoFar.Add(storeId, shoppingCart.shoppingBags[storeId].products);
                         OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetStoreName(), shoppingCart.shoppingBags[storeId].products);
                         orderHandler.addOrder(order, storeId);
@@ -607,6 +638,7 @@ namespace Workshop.DomainLayer.MarketPackage
                     }
                     catch (Exception e)
                     {
+                        //todo add restore prod who tf added this :D
                         storesLocks[storeId].ReleaseWriterLock();
                         throw e;
                     }
@@ -615,6 +647,10 @@ namespace Workshop.DomainLayer.MarketPackage
                 supplyService.supplyToAddress(username, address);
                 double cartPrice = GetCartPrice(shoppingCart);
                 paymentService.PayAmount(username, cartPrice);
+                foreach (Event eventt in events)
+                {
+                    userController.notify(eventt);
+                }
                 userController.ClearUserCart(userId);
                 Logger.Instance.LogEvent($"User {userId} successfuly paid {cartPrice} and purchased his cart.");
                 return cartPrice;

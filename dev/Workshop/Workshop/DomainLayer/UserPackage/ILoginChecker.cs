@@ -10,6 +10,6 @@ namespace Workshop.DomainLayer
 {
     public interface ILoginChecker
     {
-        bool CheckOnlineStatus(User user);
+        bool CheckOnlineStatus(string user);
     }
 }
