@@ -3,13 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Data.SqlClient;
 
-namespace Workshop.DataLayer
+namespace Workshop.DataLayer.DataObjects.Members
 {
-    public class DataHandler
+    public class MarketManager: Role
     {
-        
-      
     }
 }
