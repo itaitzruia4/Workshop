@@ -1,6 +1,7 @@
 ﻿using Workshop.ServiceLayer;
-using WebSocketSharp;
-using WebSocketSharp.Server;
+using System.Net;
+using System.Text;
+using System.IO;
 
 namespace API.Controllers
 {
@@ -11,7 +12,19 @@ namespace API.Controllers
             var builder = WebApplication.CreateBuilder(args);
 
             // Add builder.Services to the container.
-            builder.Services.AddSingleton<IService, Service>();
+            IService service;
+            if (args.Length == 0)
+            {
+                service = new Service();
+            }
+            else
+            {
+                using (StreamReader streamReader = File.OpenText(args[0]))
+                {
+                    service = new Service(streamReader.ReadToEnd());
+                }
+            }
+            builder.Services.AddSingleton(service);
             builder.Services.AddControllers();
             builder.Services.AddCors(options =>
             {
@@ -35,8 +48,6 @@ namespace API.Controllers
             app.MapControllers();
 
             app.Run();
-            WebSocketServer wssv = new WebSocketServer("ws://127.0.0.1:7890");
-            wssv.Start();
         }
     }
 }
