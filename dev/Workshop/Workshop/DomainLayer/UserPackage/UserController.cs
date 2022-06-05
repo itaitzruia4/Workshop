@@ -557,5 +557,18 @@ namespace Workshop.DomainLayer.UserPackage
         {
             return currentUsers.ContainsKey(userId);
         }
+
+        public void RegisterToEvent(int userId, Notifications.Event @event)
+        {
+            notificationHandler.Attach(currentUsers[userId], @event);
+        }
+        public void RemoveRegisterToEvent(Member member, Notifications.Event @event)
+        {
+            notificationHandler.Detach(member, @event);
+        }
+        public void notify(Notifications.Event @event)
+        {
+            notificationHandler.TriggerEvent(@event);
+        }
     }
 }

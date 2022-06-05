@@ -11,6 +11,7 @@ using Workshop.DomainLayer.UserPackage.Shopping;
 using Workshop.DomainLayer.Loggers;
 using System.Threading;
 using System.Collections.Concurrent;
+using Workshop.DomainLayer.UserPackage.Notifications;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
@@ -61,6 +62,9 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new ArgumentException("Store ID does not exist");
             }
             StoreOwner storeOwner = userController.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId);
+            userController.RegisterToEvent(userId,new Event("SaleInStore" + storeId, "", "MarketController"));
+            userController.RegisterToEvent(userId, new Event("OpenStore" + storeId, "", "MarketController"));
+            userController.RegisterToEvent(userId, new Event("CloseStore" + storeId, "", "MarketController"));
             storesLocks[storeId].ReleaseReaderLock();
             return storeOwner;
         }
@@ -78,6 +82,8 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new ArgumentException("Store ID does not exist");
             }
             StoreManager storeManager = userController.NominateStoreManager(userId, nominatorUsername, nominatedUsername, storeId);
+            userController.RegisterToEvent(userId, new Event("OpenStore" + storeId, "", "MarketController"));
+            userController.RegisterToEvent(userId, new Event("CloseStore" + storeId, "", "MarketController"));
             storesLocks[storeId].ReleaseReaderLock();
             return storeManager;
         }
@@ -96,6 +102,9 @@ namespace Workshop.DomainLayer.MarketPackage
                     {
                         nominatedMember.RemoveRole(nominatedRole);
                         nominatorRole.RemoveNominee(nominatedRole);
+                        userController.RemoveRegisterToEvent(nominatorMember, new Event("SaleInStore" + storeId, "", "MarketController"));
+                        userController.RemoveRegisterToEvent(nominatorMember, new Event("OpenStore" + storeId, "", "MarketController"));
+                        userController.RemoveRegisterToEvent(nominatorMember, new Event("CloseStore" + storeId, "", "MarketController"));
                         Logger.Instance.LogEvent($"User {userId} with member {nominatorMembername} successfuly removed store owner nomination from {nominatedMembername} in store {storeId}.");
                         return nominatedMember;
                     }
@@ -396,7 +405,10 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             if (!IsAuthorized(userId, membername, storeId, Action.CloseStore))
                 throw new MemberAccessException("This user is not authorized to open this specified store.");
-            if (!IsStoreOpen(userId, membername, storeId)) { stores[storeId].OpenStore(); }
+            if (!IsStoreOpen(userId, membername, storeId)) { 
+                stores[storeId].OpenStore();
+                userController.notify(new Event("OpenStore" + storeId, "store " + storeId + "is open", "marketController"));
+            }
             else
             {
                 throw new ArgumentException($"Store {storeId} is already opened.");
@@ -418,7 +430,9 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             if (!IsAuthorized(userId, username, storeId, Action.CloseStore))
                 throw new MemberAccessException("This user is not authorized to close this specified store.");
-            if (IsStoreOpen(userId, username, storeId)) { stores[storeId].CloseStore(); }
+            if (IsStoreOpen(userId, username, storeId)) {
+                userController.notify(new Event("CloseStore" + storeId, "store " + storeId + "is close", "marketController"));
+                stores[storeId].CloseStore(); }
             else
             {
                 throw new ArgumentException($"Store {storeId} is already closed.");
@@ -582,6 +596,7 @@ namespace Workshop.DomainLayer.MarketPackage
             Dictionary<int, List<ProductDTO>> productsSoFar = new Dictionary<int, List<ProductDTO>>();
             try
             {
+                List<Event> events = new List<Event>();
                 foreach (int storeId in shoppingCart.shoppingBags.Keys)
                 {
                     try
@@ -596,7 +611,13 @@ namespace Workshop.DomainLayer.MarketPackage
                     {
                         int age = userController.GetAge(userId, username);
                         stores[storeId].CheckPurchasePolicy(shoppingCart.shoppingBags[storeId], age);
-                        stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
+                        ShoppingBagDTO bag = stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
+                        string products = "";
+                        foreach (ProductDTO product in bag.products)
+                        {
+                            products = product.Name + " ";
+                        }
+                        events.Add(new Event("SaleInStore" + storeId, "Prouducts" + storeId + "were bought from store " + storeId, "marketController"));
                         productsSoFar.Add(storeId, shoppingCart.shoppingBags[storeId].products);
                         OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetStoreName(), shoppingCart.shoppingBags[storeId].products);
                         orderHandler.addOrder(order, storeId);
@@ -605,6 +626,7 @@ namespace Workshop.DomainLayer.MarketPackage
                     }
                     catch (Exception e)
                     {
+                        //todo add restore prod who tf added this :D
                         storesLocks[storeId].ReleaseWriterLock();
                         throw e;
                     }
@@ -613,6 +635,10 @@ namespace Workshop.DomainLayer.MarketPackage
                 supplyService.supplyToAddress(username, address);
                 double cartPrice = GetCartPrice(shoppingCart);
                 paymentService.PayAmount(username, cartPrice);
+                foreach (Event eventt in events)
+                {
+                    userController.notify(eventt);
+                }
                 userController.ClearUserCart(userId);
                 Logger.Instance.LogEvent($"User {userId} successfuly paid {cartPrice} and purchased his cart.");
                 return cartPrice;
