@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
+import * as moment from 'moment';
 import { useNavigate, useLocation } from "react-router-dom";
-import './Register.css';
-import { userToken, memeberToken, token } from '../Components/roles';
+import { Grid, Paper, Avatar, TextField, Button, Typography, Link } from '@mui/material/';
+import { userToken, token } from '../Types/roles';
+import { handleRegister } from '../Actions/AuthenticationActions';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 
-const DATE_FORMAT = 'MM/DD/YYYY';
-
-function Register() {
-    const textStyle = { color: 'white' }
+const Register = () => {
 
     const location = useLocation();
     const token = location.state as userToken;
@@ -18,58 +18,34 @@ function Register() {
 
     const [membername, setMembername] = useState("");
     const [password, setPassword] = useState("");
-    const [birthDate, setBirthDate] = useState("");
+    const [birthDate, setBirthDate] = useState("");   
 
-    function handleRegister(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        if (membername === "" || password === "" ||  birthDate == "") {
-            alert('User details must not be empty');
-            return;
-        }
-
-        var date_regex = /\d{1,2}\/\d{1,2}\/\d{4}/;
-        if (!(date_regex.test(birthDate))) {
-            alert("Invalid date format");
-            return false;
-        }
-
-        let url = "http://localhost:5165/api/authentication/register";
-
-        fetch(url, {
-            method: 'POST',
-            mode: 'cors',
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                userId: token.userId,
-                membername: membername,
-                password: password,
-                birthDate: birthDate
-            })
-        }).then((response) =>
-            response.json()
-                .then((data) => response.ok ? null :
-                    alert(data.error))
-                .then(routeChange("/member", { userId: token.userId, membername: membername }))
-        );
-    }
-    
-
+    const paperStyle = { padding: 20, height: '70vh', width: 280, margin: "20px auto" }
+    const avatarStyle = { backgroundColor: 'lightblue' }
+    const btnstyle = { margin: '8px 0' }
     return (
-        <p className="register">
-            <div className="register_title" style={textStyle}> Register </div>
-            <p className="register_userInput">
-                <div style={textStyle}> Username: </div>
-                <input className="register_membername_textbox" type="text" onChange={e => setMembername(e.target.value)} />
-                <div style={textStyle}> Password: </div>
-                <input className="register_password_textbox" type="password" onChange={e => setPassword(e.target.value)} />
-                <div style={textStyle}> Birth Date: </div>
-                <input className="register_date_textbox" type="text" placeholder="dd/mm/yyyy" onChange={e => setBirthDate(e.target.value)} />
-            </p>
-            <p className="register_buttons">
-                <button className="register_register_btn" onClick={e => handleRegister(e)} > Register </button>
-                <button className="login_back_btn" onClick={routeChange('/home', { userId: token.userId })}> Back to home</button>
-            </p>
-        </p>
+        <Grid>
+            <Paper elevation={10} style={paperStyle}>
+                <Grid>
+                    <Avatar style={avatarStyle}><AssignmentIndIcon /></Avatar>
+                    <h2>Sign Up</h2>
+                </Grid>
+                <TextField label='Username' placeholder='Enter username' fullWidth required onChange={e => setMembername(e.target.value)} />
+                <TextField label='Password' placeholder='Enter password' type='password' fullWidth required onChange={e => setPassword(e.target.value)} />
+                <TextField label='Birth Date' placeholder='DD/MM/YYYY' fullWidth required onChange={e => setBirthDate(e.target.value)} />
+                <Button type='submit' color='primary' variant="contained" style={btnstyle} fullWidth
+                    onClick={e =>
+                        handleRegister(token, membername, password, birthDate)
+                            .then(routeChange("/login", { userId: token.userId, membername: membername, notifications: [] }))
+                            .catch(error => {
+                                alert(error)
+                            })
+                    } >Sign up</Button>
+                <Button type='submit' color='primary' variant="contained" style={btnstyle} fullWidth onClick={routeChange('/login', { userId: token.userId, notifications: [] })}
+                >Back to login screen</Button>
+            </Paper>
+        </Grid>
     )
 }
 
-export default Register;
+export default Register

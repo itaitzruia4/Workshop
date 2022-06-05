@@ -418,7 +418,7 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<Product> addToCart(int userId, string user, int productId, int storeId, int quantity)
+        public Response<Product> AddToCart(int userId, string user, int productId, int storeId, int quantity)
         {
             try
             {
@@ -431,7 +431,7 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<ShoppingCart> viewCart(int userId, string user)
+        public Response<ShoppingCart> ViewCart(int userId, string user)
         {
             try
             {
@@ -444,7 +444,7 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<ShoppingCart> editCart(int userId, string user, int productId, int newQuantity)
+        public Response<ShoppingCart> EditCart(int userId, string user, int productId, int newQuantity)
         {
             try
             {
