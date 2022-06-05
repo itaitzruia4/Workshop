@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Workshop.DomainLayer.UserPackage.Shopping;
-using Workshop.DomainLayer.MarketPackage;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
@@ -16,8 +10,8 @@ namespace Workshop.DomainLayer.MarketPackage
         public double Price { get; set; }
         public int Quantity { get; set; }
         public string Category { get; set; }
-
-        public Product(int id, string name, string description, double price, int quantity, string category)
+        public int StoreId { get; set; }
+        public Product(int id, string name, string description, double price, int quantity, string category, int StoreId)
         {
             this.Id = id;
             this.Name = name;
@@ -25,15 +19,16 @@ namespace Workshop.DomainLayer.MarketPackage
             this.Price = price;
             this.Quantity = quantity;
             this.Category = category;
+            this.StoreId = StoreId;
         }
 
         public ProductDTO GetProductDTO()
         {
-            return new ProductDTO(Id,Name,Description,Price,Quantity,Category);
+            return new ProductDTO(Id, Name, Description, Price, Quantity, Category, StoreId);
         }
         public ShoppingBagProduct GetShoppingBagProduct(int quantity)
         {
-            return new ShoppingBagProduct(Id,Name,Description,Price,quantity,Category);
+            return new ShoppingBagProduct(Id, Name, Description, Price, quantity, Category, StoreId);
         }
         public override bool Equals(Object product)
         {
@@ -43,7 +38,8 @@ namespace Workshop.DomainLayer.MarketPackage
                 (this.Price == ((Product)product).Price) &&
                 (this.Quantity == ((Product)product).Quantity) &&
                 (this.Description == ((Product)product).Description) &&
-                (this.Category == ((Product)product).Category);
+                (this.Category == ((Product)product).Category) &&
+                (this.StoreId == ((Product)product).StoreId);
         }
     }
 }

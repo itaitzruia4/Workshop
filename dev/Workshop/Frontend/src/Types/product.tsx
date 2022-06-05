@@ -1,0 +1,3 @@
+export type Product = { tag: "Product", id: number, name: string, basePrice: number, description: string, quantity: number, category : string};
+export const makeProduct = (id: number, name: string, basePrice: number, description: string, quantity: number, category: string): Product =>
+    ({ tag: "Product", id: id, name: name, basePrice: basePrice, description: description, quantity: quantity, category: category });

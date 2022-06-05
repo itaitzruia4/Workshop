@@ -181,7 +181,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         [TestMethod]
         public void TestCalculatePrice_simpleCategoryAndProductsDiscounts()
         {
-            ShoppingBagDTO shoppingBag = new ShoppingBagDTO(1, new List<ProductDTO>(new ProductDTO[] { new ProductDTO(1, "", "", 100.0, 3, null), new ProductDTO(2, "", "", 200.0, 2, "Cat1"), new ProductDTO(3, "", "", 50.0, 5, "Cat2") }));
+            ShoppingBagDTO shoppingBag = new ShoppingBagDTO(1, new List<ProductDTO>(new ProductDTO[] { new ProductDTO(1, "", "", 100.0, 3, null, 1), new ProductDTO(2, "", "", 200.0, 2, "Cat1", 1), new ProductDTO(3, "", "", 50.0, 5, "Cat2", 1) }));
             string[] product_discounts = new string[] { makeSimpleProductDiscount(10)(1), makeSimpleProductDiscount(20)(2) };
             string[] category_discounts = new string[] { makeSimpleCategoryDiscount(50)("Cat1"), makeSimpleCategoryDiscount(10)("Cat2") };
             string[] store_discounts = new string[] { };
@@ -208,7 +208,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         [TestMethod]
         public void TestCalculatePrice_simpleStoreAndProductsDiscounts()
         {
-            ShoppingBagDTO shoppingBag = new ShoppingBagDTO(1, new List<ProductDTO>(new ProductDTO[] { new ProductDTO(1, "", "", 100.0, 3, null), new ProductDTO(2, "", "", 200.0, 2, "Cat1"), new ProductDTO(3, "", "", 50.0, 5, "Cat2") }));
+            ShoppingBagDTO shoppingBag = new ShoppingBagDTO(1, new List<ProductDTO>(new ProductDTO[] { new ProductDTO(1, "", "", 100.0, 3, null, 1), new ProductDTO(2, "", "", 200.0, 2, "Cat1", 1), new ProductDTO(3, "", "", 50.0, 5, "Cat2", 1) }));
             string[] product_discounts = new string[] { makeSimpleProductDiscount(10)(1), makeSimpleProductDiscount(20)(2) };
             string[] category_discounts = new string[] { };
             string[] store_discounts = new string[] { makeSimpleStoreDiscount(10) };
@@ -235,7 +235,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         [TestMethod]
         public void TestCalculatePrice_ConditionalProductDiscounts()
         {
-            ShoppingBagDTO shoppingBag = new ShoppingBagDTO(1, new List<ProductDTO>(new ProductDTO[] { new ProductDTO(1, "", "", 100.0, 3, null), new ProductDTO(2, "", "", 200.0, 2, "Cat1"), new ProductDTO(3, "", "", 50.0, 5, "Cat2") }));
+            ShoppingBagDTO shoppingBag = new ShoppingBagDTO(1, new List<ProductDTO>(new ProductDTO[] { new ProductDTO(1, "", "", 100.0, 3, null, 1), new ProductDTO(2, "", "", 200.0, 2, "Cat1", 1), new ProductDTO(3, "", "", 50.0, 5, "Cat2", 1) }));
             string[] product_discounts = new string[] { makeConditionalProductDiscount(10, 2)(1), makeConditionalProductDiscount(20, 2)(2) };
             string[] category_discounts = new string[] { };
             string[] store_discounts = new string[] { };
@@ -262,7 +262,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         [TestMethod]
         public void TestCalculatePrice_CompositeProductDiscounts()
         {
-            ShoppingBagDTO shoppingBag = new ShoppingBagDTO(1, new List<ProductDTO>(new ProductDTO[] { new ProductDTO(1, "", "", 100.0, 3, null), new ProductDTO(2, "", "", 200.0, 2, "Cat1"), new ProductDTO(3, "", "", 50.0, 5, "Cat2") }));
+            ShoppingBagDTO shoppingBag = new ShoppingBagDTO(1, new List<ProductDTO>(new ProductDTO[] { new ProductDTO(1, "", "", 100.0, 3, null, 1), new ProductDTO(2, "", "", 200.0, 2, "Cat1", 1), new ProductDTO(3, "", "", 50.0, 5, "Cat2", 1) }));
             string[] product_discounts = new string[] { makeAndproductDiscount(10, 20)(1), makeXorproductDiscount(10, 20)(2), makeXorproductDiscount(30, 40)(3) };
             string[] category_discounts = new string[] { };
             string[] store_discounts = new string[] { };

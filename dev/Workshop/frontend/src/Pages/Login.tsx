@@ -1,61 +1,54 @@
-import React, { useState} from 'react';
-import { useNavigate, useLocation} from "react-router-dom";
-import './Login.css';
-import { userToken } from '../Components/roles';
+import React, { useState } from 'react'
+import { useNavigate, useLocation } from "react-router-dom";
+import { Grid, Paper, Avatar, TextField, Button, Typography, Link } from '@mui/material/';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { userToken, token, makeMemberToken } from '../Types/roles';
+import { handleLogin } from '../Actions/AuthenticationActions';
+import { MarketNotification } from '../Types/Notification';
 
-function Login() {
-
-    const textStyle = { color: 'white' }
+const Login = () => {
 
     const location = useLocation();
     const token = location.state as userToken;
 
     let navigate = useNavigate();
-    const routeChange = (path: string, userId: number) =>
+    const routeChange = (path: string, token: token) =>
         () =>
-            navigate(path, { state: { userId: userId } });
+            navigate(path, { state: token });
 
     const [membername, setMembername] = useState("");
     const [password, setPassword] = useState("");
 
-    function handleUserDetails(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        if (membername === "" || password === "") {
-            alert('User details must not be empty');
-            return;
-        }
-
-        let url = "http://localhost:5165/api/authentication/login";
-
-        fetch(url, {
-            method: 'POST',
-            mode: 'cors',
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                userId: token.userId,
-                membername: membername,
-                password: password,
-            })
-        }).then((res) => res.json()
-            .then((data) => res.ok ? null : alert(data.error)))
-            .then(routeChange("/member", token.userId))
-    }
-
+    const paperStyle = { padding: 20, height: '70vh', width: 280, margin: "20px auto" }
+    const avatarStyle = { backgroundColor: 'lightblue' }
+    const btnstyle = { margin: '8px 0' }
     return (
-        <div className="login">
-            <div className="login_title" style={textStyle}> Login </div>
-            <p className="login_userInput">
-                <div style={textStyle}> Username: </div>
-                <input className="login_membername_textbox" type="text" onChange={e => setMembername(e.target.value)} />
-                <div style={textStyle}> Password: </div>
-                <input className="login_password_textbox" type="password" onChange={e => setPassword(e.target.value)} />
-            </p>
-            <p className="login_buttons">
-                <button className="login_login_btn" type="submit" onClick={e => handleUserDetails(e)} > Login </button>
-                <button className="login_back_btn" onClick={routeChange('/home', token.userId)}> Back to home </button>
-            </p>
-        </div>
+        <Grid>
+            <Paper elevation={10} style={paperStyle}>
+                <Grid>
+                    <Avatar style={avatarStyle}><LockOutlinedIcon /></Avatar>
+                    <h2>Sign In</h2>
+                </Grid>
+                <TextField label='Username' placeholder='Enter username' fullWidth required onChange={e => setMembername(e.target.value)} />
+                <TextField label='Password' placeholder='Enter password' type='password' fullWidth required onChange={e => setPassword(e.target.value)} />
+                <Button type='submit' color='primary' variant="contained" style={btnstyle} fullWidth
+                onClick={e =>
+                    handleLogin(token, membername, password)
+                        .then((data) => routeChange("/member", makeMemberToken(token.userId, membername, []))())
+                        .catch(error => {
+                            alert(error)
+                        })
+                } >Sign in</Button>
+                <Button type='submit' color='primary' variant="contained" style={btnstyle} fullWidth >Continue as guest</Button>
+                <Typography > Don't have an account ? 
+                    <Link
+                        onClick={routeChange("/register", { userId: token.userId, notifications: []})}>
+                        Sign Up
+                    </Link>
+                </Typography>
+            </Paper>
+        </Grid>
     )
 }
 
-
-export default Login;
+export default Login
