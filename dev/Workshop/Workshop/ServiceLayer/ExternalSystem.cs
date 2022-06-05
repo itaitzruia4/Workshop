@@ -101,12 +101,12 @@ namespace Workshop.ServiceLayer
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_SERVER_URL);
 
             string postData = "action_type=" + Uri.EscapeDataString("pay");
-            postData += "card_number=" + Uri.EscapeDataString(card_number);
-            postData += "month=" + Uri.EscapeDataString(month);
-            postData += "year=" + Uri.EscapeDataString(year);
-            postData += "holder=" + Uri.EscapeDataString(holder);
-            postData += "ccv=" + Uri.EscapeDataString(ccv);
-            postData += "id=" + Uri.EscapeDataString(id);
+            postData += "\ncard_number=" + Uri.EscapeDataString(card_number);
+            postData += "\nmonth=" + Uri.EscapeDataString(month);
+            postData += "\nyear=" + Uri.EscapeDataString(year);
+            postData += "\nholder=" + Uri.EscapeDataString(holder);
+            postData += "\nccv=" + Uri.EscapeDataString(ccv);
+            postData += "\nid=" + Uri.EscapeDataString(id);
             var data = Encoding.ASCII.GetBytes(postData);
 
             request.Method = "POST";
