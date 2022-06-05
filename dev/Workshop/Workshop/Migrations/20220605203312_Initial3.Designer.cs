@@ -10,8 +10,8 @@ using Workshop.DataLayer.DataObjects;
 namespace Workshop.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20220605184523_Initial")]
-    partial class Initial
+    [Migration("20220605203312_Initial3")]
+    partial class Initial3
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -76,16 +76,68 @@ namespace Workshop.Migrations
                     b.ToTable("userController");
                 });
 
-            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.DiscountPolicy", b =>
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.CategoryTerms", b =>
+                {
+                    b.Property<string>("Category")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("DiscountPolicyId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TermsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Category");
+
+                    b.HasIndex("DiscountPolicyId");
+
+                    b.HasIndex("TermsId");
+
+                    b.ToTable("CategoryTerms");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int?>("store_termsId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("user_termsId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("store_termsId");
+
+                    b.HasIndex("user_termsId");
+
                     b.ToTable("DiscountPolicy");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.ProductTerms", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("DiscountPolicyId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TermsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductId");
+
+                    b.HasIndex("DiscountPolicyId");
+
+                    b.HasIndex("TermsId");
+
+                    b.ToTable("ProductTerms");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Product", b =>
@@ -158,7 +210,29 @@ namespace Workshop.Migrations
                     b.ToTable("ProductDTO");
                 });
 
-            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.PurchasePolicy", b =>
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Purchases.PurchasePolicy", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("firstTermId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("secondTermId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("firstTermId");
+
+                    b.HasIndex("secondTermId");
+
+                    b.ToTable("PurchasePolicy");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Purchases.Term", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -167,7 +241,7 @@ namespace Workshop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PurchasePolicy");
+                    b.ToTable("Term");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.ShoppingBag", b =>
@@ -434,6 +508,75 @@ namespace Workshop.Migrations
                     b.ToTable("OrderHandler<string>");
                 });
 
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.ProductReviews", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReviewHandlerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReviewHandlerId");
+
+                    b.ToTable("ProductReviews");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.ProductToReviewDTO", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReviewId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserReviewsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReviewId");
+
+                    b.HasIndex("UserReviewsId");
+
+                    b.ToTable("ProductToReviewDTO");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.ReviewDTO", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Review")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Reviewer")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ReviewDTO");
+                });
+
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.ReviewHandler", b =>
                 {
                     b.Property<int>("Id")
@@ -444,6 +587,51 @@ namespace Workshop.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ReviewHandler");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.UserReviews", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("ReviewHandlerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Username")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReviewHandlerId");
+
+                    b.ToTable("UserReviews");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.UserToReviewDTO", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("ProductReviewsId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReviewId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Username")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductReviewsId");
+
+                    b.HasIndex("ReviewId");
+
+                    b.ToTable("UserToReviewDTO");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Controllers.MarketController", b =>
@@ -472,6 +660,39 @@ namespace Workshop.Migrations
                         .HasForeignKey("reviewHandlerId");
                 });
 
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.CategoryTerms", b =>
+                {
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy", null)
+                        .WithMany("category_terms")
+                        .HasForeignKey("DiscountPolicyId");
+
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.Term", "Terms")
+                        .WithMany()
+                        .HasForeignKey("TermsId");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy", b =>
+                {
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.Term", "store_terms")
+                        .WithMany()
+                        .HasForeignKey("store_termsId");
+
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.Term", "user_terms")
+                        .WithMany()
+                        .HasForeignKey("user_termsId");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.ProductTerms", b =>
+                {
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy", null)
+                        .WithMany("products_terms")
+                        .HasForeignKey("DiscountPolicyId");
+
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.Term", "Terms")
+                        .WithMany()
+                        .HasForeignKey("TermsId");
+                });
+
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Product", b =>
                 {
                     b.HasOne("Workshop.DataLayer.DataObjects.Market.Store", null)
@@ -484,6 +705,17 @@ namespace Workshop.Migrations
                     b.HasOne("Workshop.DataLayer.DataObjects.Orders.OrderDTO", null)
                         .WithMany("items")
                         .HasForeignKey("OrderDTOid");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Purchases.PurchasePolicy", b =>
+                {
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.Term", "firstTerm")
+                        .WithMany()
+                        .HasForeignKey("firstTermId");
+
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.Term", "secondTerm")
+                        .WithMany()
+                        .HasForeignKey("secondTermId");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.ShoppingBag", b =>
@@ -502,7 +734,7 @@ namespace Workshop.Migrations
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Store", b =>
                 {
-                    b.HasOne("Workshop.DataLayer.DataObjects.Market.DiscountPolicy", "DiscountPolicy")
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy", "DiscountPolicy")
                         .WithMany()
                         .HasForeignKey("DiscountPolicyId");
 
@@ -510,7 +742,7 @@ namespace Workshop.Migrations
                         .WithMany("stores")
                         .HasForeignKey("MarketControllerId");
 
-                    b.HasOne("Workshop.DataLayer.DataObjects.Market.PurchasePolicy", "PurchasePolicy")
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.PurchasePolicy", "PurchasePolicy")
                         .WithMany()
                         .HasForeignKey("PurchasePolicyId");
                 });
@@ -563,6 +795,42 @@ namespace Workshop.Migrations
                     b.HasOne("Workshop.DataLayer.DataObjects.Orders.MemberToOrders<string>", null)
                         .WithMany("orders")
                         .HasForeignKey("MemberToOrders<string>Id");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.ProductReviews", b =>
+                {
+                    b.HasOne("Workshop.DataLayer.DataObjects.Reviews.ReviewHandler", null)
+                        .WithMany("productReviews")
+                        .HasForeignKey("ReviewHandlerId");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.ProductToReviewDTO", b =>
+                {
+                    b.HasOne("Workshop.DataLayer.DataObjects.Reviews.ReviewDTO", "Review")
+                        .WithMany()
+                        .HasForeignKey("ReviewId");
+
+                    b.HasOne("Workshop.DataLayer.DataObjects.Reviews.UserReviews", null)
+                        .WithMany("productToReviewDTOs")
+                        .HasForeignKey("UserReviewsId");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.UserReviews", b =>
+                {
+                    b.HasOne("Workshop.DataLayer.DataObjects.Reviews.ReviewHandler", null)
+                        .WithMany("userReviews")
+                        .HasForeignKey("ReviewHandlerId");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.UserToReviewDTO", b =>
+                {
+                    b.HasOne("Workshop.DataLayer.DataObjects.Reviews.ProductReviews", null)
+                        .WithMany("userToReviewDTOs")
+                        .HasForeignKey("ProductReviewsId");
+
+                    b.HasOne("Workshop.DataLayer.DataObjects.Reviews.ReviewDTO", "Review")
+                        .WithMany()
+                        .HasForeignKey("ReviewId");
                 });
 #pragma warning restore 612, 618
         }

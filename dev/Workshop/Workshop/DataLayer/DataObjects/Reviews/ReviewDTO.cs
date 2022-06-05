@@ -8,6 +8,7 @@ namespace Workshop.DataLayer.DataObjects.Reviews
 {
     public class ReviewDTO
     {
+        public int Id { get; set; }
         public string Review { get; set; }
         public string Reviewer { get; set; }
         public int ProductId { get; set; }

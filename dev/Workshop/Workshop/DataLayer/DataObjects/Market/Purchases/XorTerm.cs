@@ -4,14 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Workshop.DataLayer.DataObjects.Market
+namespace Workshop.DataLayer.DataObjects.Market.Purchases
 {
-    public class DiscountPolicy : DALObject
+    public class XorTerm : CompositeTerm
     {
         public int Id { get; set; }
-        public DiscountPolicy()
-        {
-            
-        }
     }
 }

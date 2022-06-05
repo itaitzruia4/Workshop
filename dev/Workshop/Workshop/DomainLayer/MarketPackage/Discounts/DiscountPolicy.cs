@@ -9,7 +9,7 @@ using Workshop.DomainLayer.MarketPackage.Terms;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using static Workshop.DomainLayer.MarketPackage.Terms.Term;
 using DALObject = Workshop.DataLayer.DALObject;
-using DiscountPolicyDAL = Workshop.DataLayer.DataObjects.Market.DiscountPolicy;
+using DiscountPolicyDAL = Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy;
 
 namespace Workshop.DomainLayer.MarketPackage
 {

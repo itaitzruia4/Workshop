@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Workshop.DataLayer.DataObjects.Reviews
 {
-    public class ReviewHandler
+    public class ProductReviews
     {
         public int Id { get; set; }
-        public List<ProductReviews> productReviews { get; set; }
-        public List<UserReviews> userReviews { get; set; }
+        public int ProductId { get; set; }
+        public List<UserToReviewDTO> userToReviewDTOs { get; set; }
     }
 }

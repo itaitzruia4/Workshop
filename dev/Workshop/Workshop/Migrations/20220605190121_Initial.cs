@@ -68,6 +68,22 @@ namespace Workshop.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ReviewDTO",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Review = table.Column<string>(nullable: true),
+                    Reviewer = table.Column<string>(nullable: true),
+                    ProductId = table.Column<int>(nullable: false),
+                    Rating = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReviewDTO", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ReviewHandler",
                 columns: table => new
                 {
@@ -132,6 +148,26 @@ namespace Workshop.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProductReviews",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductId = table.Column<int>(nullable: false),
+                    ReviewHandlerId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductReviews", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProductReviews_ReviewHandler_ReviewHandlerId",
+                        column: x => x.ReviewHandlerId,
+                        principalTable: "ReviewHandler",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "userController",
                 columns: table => new
                 {
@@ -159,6 +195,26 @@ namespace Workshop.Migrations
                     table.ForeignKey(
                         name: "FK_userController_ReviewHandler_reviewHandlerId",
                         column: x => x.reviewHandlerId,
+                        principalTable: "ReviewHandler",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserReviews",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Username = table.Column<string>(nullable: true),
+                    ReviewHandlerId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserReviews", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserReviews_ReviewHandler_ReviewHandlerId",
+                        column: x => x.ReviewHandlerId,
                         principalTable: "ReviewHandler",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -214,6 +270,33 @@ namespace Workshop.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserToReviewDTO",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Username = table.Column<string>(nullable: true),
+                    ReviewId = table.Column<int>(nullable: true),
+                    ProductReviewsId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserToReviewDTO", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserToReviewDTO_ProductReviews_ProductReviewsId",
+                        column: x => x.ProductReviewsId,
+                        principalTable: "ProductReviews",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserToReviewDTO_ReviewDTO_ReviewId",
+                        column: x => x.ReviewId,
+                        principalTable: "ReviewDTO",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "marketController",
                 columns: table => new
                 {
@@ -264,6 +347,33 @@ namespace Workshop.Migrations
                         name: "FK_Member_userController_UserControllerId",
                         column: x => x.UserControllerId,
                         principalTable: "userController",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductToReviewDTO",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductId = table.Column<int>(nullable: false),
+                    ReviewId = table.Column<int>(nullable: true),
+                    UserReviewsId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductToReviewDTO", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProductToReviewDTO_ReviewDTO_ReviewId",
+                        column: x => x.ReviewId,
+                        principalTable: "ReviewDTO",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ProductToReviewDTO_UserReviews_UserReviewsId",
+                        column: x => x.UserReviewsId,
+                        principalTable: "UserReviews",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -471,6 +581,21 @@ namespace Workshop.Migrations
                 column: "OrderDTOid");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProductReviews_ReviewHandlerId",
+                table: "ProductReviews",
+                column: "ReviewHandlerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductToReviewDTO_ReviewId",
+                table: "ProductToReviewDTO",
+                column: "ReviewId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductToReviewDTO_UserReviewsId",
+                table: "ProductToReviewDTO",
+                column: "UserReviewsId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Role_MemberName",
                 table: "Role",
                 column: "MemberName");
@@ -514,6 +639,21 @@ namespace Workshop.Migrations
                 name: "IX_userController_reviewHandlerId",
                 table: "userController",
                 column: "reviewHandlerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserReviews_ReviewHandlerId",
+                table: "UserReviews",
+                column: "ReviewHandlerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserToReviewDTO_ProductReviewsId",
+                table: "UserToReviewDTO",
+                column: "ProductReviewsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserToReviewDTO_ReviewId",
+                table: "UserToReviewDTO",
+                column: "ReviewId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -528,7 +668,13 @@ namespace Workshop.Migrations
                 name: "ProductDTO");
 
             migrationBuilder.DropTable(
+                name: "ProductToReviewDTO");
+
+            migrationBuilder.DropTable(
                 name: "ShoppingBagProduct");
+
+            migrationBuilder.DropTable(
+                name: "UserToReviewDTO");
 
             migrationBuilder.DropTable(
                 name: "Role");
@@ -540,7 +686,16 @@ namespace Workshop.Migrations
                 name: "OrderDTO");
 
             migrationBuilder.DropTable(
+                name: "UserReviews");
+
+            migrationBuilder.DropTable(
                 name: "ShoppingBag");
+
+            migrationBuilder.DropTable(
+                name: "ProductReviews");
+
+            migrationBuilder.DropTable(
+                name: "ReviewDTO");
 
             migrationBuilder.DropTable(
                 name: "Member");
