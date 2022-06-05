@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DALObject = Workshop.DataLayer.DALObject;
+using MarketManagerDAL = Workshop.DataLayer.DataObjects.Members.MarketManager;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
@@ -15,6 +17,13 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             actions.Add(Action.GetMarketStatistics);
             actions.Add(Action.GetMembersOnlineStats); 
         }
+
+        
+        public override DALObject ToDAL()
+        {
+            return (MarketManagerDAL) base.ToDAL();
+        }
+
         public override bool Equals(object obj)
         {
             if (obj == null)

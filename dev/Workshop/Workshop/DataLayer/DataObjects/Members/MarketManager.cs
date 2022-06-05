@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace Workshop.DataLayer.DataObjects.Members
 {
-    public class MarketManager: Role
+    public class MarketManager : Role
     {
+        public MarketManager(List<Action> actions) : base(actions)
+        {
+        }
     }
 }

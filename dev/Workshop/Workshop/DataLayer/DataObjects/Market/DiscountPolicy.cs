@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace Workshop.DataLayer.DataObjects.Market
 {
-    public class DiscountPolicy
+    public class DiscountPolicy : DALObject
     {
+        public DiscountPolicy()
+        {
+        }
     }
 }

@@ -6,10 +6,16 @@ using System.Threading.Tasks;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using Workshop.DomainLayer.MarketPackage;
 using System.Threading;
+using StoreDAL = Workshop.DataLayer.DataObjects.Market.Store;
+using DALObject = Workshop.DataLayer.DALObject;
+using ProductDAL = Workshop.DataLayer.DataObjects.Market.Product;
+using DiscountPolicyDAL = Workshop.DataLayer.DataObjects.Market.DiscountPolicy;
+using PurchasePolicyDAL = Workshop.DataLayer.DataObjects.Market.PurchasePolicy;
+
 
 namespace Workshop.DomainLayer.MarketPackage
 {
-    public class Store
+    public class Store : IPersistentObject
     {
         private bool open { get; set; }
         private int id { get; set; }
@@ -30,6 +36,20 @@ namespace Workshop.DomainLayer.MarketPackage
             this.rwl = new ReaderWriterLock();
             this.discountPolicy = new DiscountPolicy(this);
             this.purchasePolicy = new PurchasePolicy(this);
+        }
+
+        public DALObject ToDAL()
+        {
+            List<ProductDAL> productsDAL = new List<ProductDAL>();
+            DiscountPolicyDAL dpDAL = (DiscountPolicyDAL)discountPolicy.ToDAL();
+            PurchasePolicyDAL ppDAL = (PurchasePolicyDAL)purchasePolicy.ToDAL();
+
+            foreach (KeyValuePair<int, Product> entry in products)
+            {
+                productsDAL.Add((ProductDAL)entry.Value.ToDAL());
+            }
+
+            return new StoreDAL(id, open, name, dpDAL, ppDAL, productsDAL);
         }
 
         public ReaderWriterLock getLock()

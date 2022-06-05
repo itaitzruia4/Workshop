@@ -1,8 +1,10 @@
 ﻿using System;
+using ProductDAL = Workshop.DataLayer.DataObjects.Market.Product;
+using DALObject = Workshop.DataLayer.DALObject;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
-    public class Product
+    public class Product : IPersistentObject
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -20,6 +22,11 @@ namespace Workshop.DomainLayer.MarketPackage
             this.Quantity = quantity;
             this.Category = category;
             this.StoreId = StoreId;
+        }
+
+        public DALObject ToDAL()
+        {
+            return new ProductDAL(Id, StoreId, Name, Description, Price, Quantity, Category);
         }
 
         public ProductDTO GetProductDTO()

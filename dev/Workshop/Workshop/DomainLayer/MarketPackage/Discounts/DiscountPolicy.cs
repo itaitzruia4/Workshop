@@ -8,10 +8,12 @@ using Workshop.DomainLayer.MarketPackage.Discounts;
 using Workshop.DomainLayer.MarketPackage.Terms;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using static Workshop.DomainLayer.MarketPackage.Terms.Term;
+using DALObject = Workshop.DataLayer.DALObject;
+using DiscountPolicyDAL = Workshop.DataLayer.DataObjects.Market.DiscountPolicy;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
-    public class DiscountPolicy
+    public class DiscountPolicy : IPersistentObject
     {
         private Dictionary<int, Discount> products_discounts;
         private Dictionary<string, Discount> category_discounts;
@@ -38,6 +40,11 @@ namespace Workshop.DomainLayer.MarketPackage
             category_discounts = new Dictionary<string, Discount>();
             store_discount = null;
             this.store = store;
+        }
+
+        public DALObject ToDAL()
+        {
+            return new DiscountPolicyDAL();
         }
 
         public void AddProductDiscount(string json_discount, int product_id)

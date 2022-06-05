@@ -4,10 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using memberDAL = Workshop.DataLayer.DataObjects.Members.Member;
+using DALObject = Workshop.DataLayer.DALObject;
+using RoleDAL = Workshop.DataLayer.DataObjects.Members.Role;
+using ShoppingCartDAL = Workshop.DataLayer.DataObjects.Market.ShoppingCart;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
-    public class Member : User
+    public class Member : User, IPersistentObject
     {
         public string Username { get; }
         internal string Password { get; }
@@ -26,6 +30,18 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             Birthdate = birthdate;
             roles = new List<Role>();
             this.rwl = new ReaderWriterLock();
+        }
+
+        public DALObject ToDAL()
+        {
+            List<RoleDAL> rolesDAL = new List<RoleDAL>();
+
+            foreach(Role role in roles)
+            {
+                rolesDAL.Add((RoleDAL)role.ToDAL());
+            }
+
+            return new memberDAL(Password, Username, Birthdate, rolesDAL, (ShoppingCartDAL)shoppingCart.ToDAL());
         }
 
         public IReadOnlyList<Role> GetAllRoles()

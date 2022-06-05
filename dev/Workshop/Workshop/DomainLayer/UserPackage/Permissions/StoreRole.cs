@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.MarketPackage;
+using DALObject = Workshop.DataLayer.DALObject;
+using ActionDAL = Workshop.DataLayer.DataObjects.Members.Action;
+using StoreRoleDAL = Workshop.DataLayer.DataObjects.Members.StoreRole;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
@@ -17,6 +20,23 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         {
             this.StoreId = storeId;
             this.nominees = new List<StoreRole>();
+        }
+
+        public override DALObject ToDAL()
+        {
+            List<ActionDAL> actionsDAL = new List<ActionDAL>();
+            List<StoreRoleDAL> nomineesDAL = new List<StoreRoleDAL>();
+
+            foreach (Action action in actions)
+            {
+                actionsDAL.Add(new ActionDAL(((int)action)));
+            }
+            foreach (StoreRole storeRole in nominees)
+            {
+                nomineesDAL.Add((StoreRoleDAL)storeRole.ToDAL());
+            }
+
+            return new StoreRoleDAL(StoreId, actionsDAL, nomineesDAL);
         }
         
         public IReadOnlyList<StoreRole> GetAllNominees()

@@ -3,15 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DomainLayer;
+using DALObject = Workshop.DataLayer.DALObject;
+using ActionDAL = Workshop.DataLayer.DataObjects.Members.Action;
+using RoleDAL = Workshop.DataLayer.DataObjects.Members.Role;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
-    public abstract class Role
+    public abstract class Role : IPersistentObject
     {
         protected HashSet<Action> actions;
         public Role() 
         {
             actions = new HashSet<Action>();
+        }
+
+        public virtual DALObject ToDAL()
+        {
+            List<ActionDAL> actionsDAL = new List<ActionDAL>();
+            foreach (Action action in actions)
+            {
+                actionsDAL.Add(new ActionDAL(((int)action)));
+            }
+            return new RoleDAL(actionsDAL);
         }
 
         public IReadOnlyCollection<Action> GetAllActions()

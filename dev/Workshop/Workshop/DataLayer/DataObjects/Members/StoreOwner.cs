@@ -8,6 +8,8 @@ namespace Workshop.DataLayer.DataObjects.Members
 {
     public class StoreOwner: StoreRole
     {
-        public List<StoreRole> nominees { get; set; }
+        public StoreOwner(int StoreId, List<Action> actions, List<StoreRole> nominees) : base(StoreId, actions, nominees)
+        {
+        }
     }
 }

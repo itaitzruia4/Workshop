@@ -1,6 +1,10 @@
-﻿namespace Workshop.DomainLayer.MarketPackage
+﻿using ShoppingBagProductDAL = Workshop.DataLayer.DataObjects.Market.ShoppingBagProduct;
+using DALObject = Workshop.DataLayer.DALObject;
+
+
+namespace Workshop.DomainLayer.MarketPackage
 {
-    public class ShoppingBagProduct
+    public class ShoppingBagProduct : IPersistentObject
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -20,6 +24,12 @@
             this.Category = category;
             this.StoreId = StoreId;
         }
+
+        public DALObject ToDAL()
+        {
+            return new ShoppingBagProductDAL(Name, Price, Quantity, Description, Category);
+        }
+
         public ProductDTO GetProductDTO()
         {
             return new ProductDTO(Id, Name, Description, Price, Quantity, Category, StoreId);

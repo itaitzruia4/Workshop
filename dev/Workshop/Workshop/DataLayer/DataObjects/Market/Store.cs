@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Workshop.DataLayer.DataObjects.Market
 {
-    public class Store
+    public class Store : DALObject
     {
         public int Id { get; set; }
         public bool Open { get; set; }
@@ -14,9 +14,15 @@ namespace Workshop.DataLayer.DataObjects.Market
         public DiscountPolicy DiscountPolicy { get; set; }
         public PurchasePolicy PurchasePolicy { get; set; }
         public List<Product> Products { get; set; }
-        /*public override string ToString()
+
+        public Store(int id, bool open, string storeName, DiscountPolicy discountPolicy, PurchasePolicy purchasePolicy, List<Product> products)
         {
-            return $"{Id} {Open} {StoreName} {DiscountPolicy} {PurchasePolicy}";
-        }*/
+            Id = id;
+            Open = open;
+            StoreName = storeName;
+            DiscountPolicy = discountPolicy;
+            PurchasePolicy = purchasePolicy;
+            Products = products;
+        }
     }
 }

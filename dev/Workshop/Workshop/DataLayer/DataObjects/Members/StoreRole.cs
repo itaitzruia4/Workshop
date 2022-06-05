@@ -10,5 +10,11 @@ namespace Workshop.DataLayer.DataObjects.Members
     {
         public int StoreId { get; set; }
         public List<StoreRole> nominees { get; set; }
+
+        public StoreRole(int StoreId, List<Action> actions, List<StoreRole> nominees) : base(actions)
+        {
+            this.StoreId = StoreId;
+            this.nominees = nominees;
+        }
     }
 }

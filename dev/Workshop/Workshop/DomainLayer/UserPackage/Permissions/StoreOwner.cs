@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DataLayer;
 using Workshop.DomainLayer.MarketPackage;
 using static Workshop.DomainLayer.UserPackage.Permissions.Role;
+using StoreOwnerDAl = Workshop.DataLayer.DataObjects.Members.StoreOwner;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
     public class StoreOwner: StoreRole
     {
-        List<StoreRole> nominees;
         public StoreOwner(int storeId): base(storeId)
         {
-            this.nominees = new List<StoreRole>();
             actions.Add(Action.AddProduct);
             actions.Add(Action.RemoveProduct);
             actions.Add(Action.ChangeProductName);
@@ -29,6 +29,11 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             actions.Add(Action.NominateStoreManager);
             actions.Add(Action.AddDiscount);
             actions.Add(Action.AddPurchaseTerm);
+        }
+
+        public override DALObject ToDAL()
+        {
+            return (StoreOwnerDAl)base.ToDAL();
         }
     }
 }

@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace Workshop.DataLayer.DataObjects.Members
 {
-    public class Role
+    public class Role : DALObject
     {
-        public int RoleId { get; set; }
         public List<Action> Actions { get; set; }
 
-        /*public override string ToString()
+        public Role(List<Action> actions)
         {
-            return $"{Id} {RoleName} {Actions}";
-        }*/
+            Actions = actions;
+        }
     }
 }

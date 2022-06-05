@@ -5,16 +5,30 @@ using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.MarketPackage;
 using Workshop.DomainLayer.UserPackage.Shopping;
+using ShoppingCartDAL = Workshop.DataLayer.DataObjects.Market.ShoppingCart;
+using DALObject = Workshop.DataLayer.DALObject;
+using ShoppingBagDAL = Workshop.DataLayer.DataObjects.Market.ShoppingBag;
 
 namespace Workshop.DomainLayer.UserPackage.Shopping
 {
-    public class ShoppingCart
+    public class ShoppingCart : IPersistentObject
     {
         private Dictionary<int,ShoppingBag> shoppingBags { get; set; }
 
         public ShoppingCart()
         {
             shoppingBags = new Dictionary<int,ShoppingBag>();
+        }
+
+        public DALObject ToDAL()
+        {
+            List<ShoppingBagDAL> shoppingBagsDAL = new List<ShoppingBagDAL>();
+            foreach(KeyValuePair<int, ShoppingBag> entry in shoppingBags)
+            {
+                shoppingBagsDAL.Add((ShoppingBagDAL)entry.Value.ToDAL());
+            }
+
+            return new ShoppingCartDAL(shoppingBagsDAL);
         }
 
         public ShoppingBagProduct addToCart(ShoppingBagProduct product, int storeId)

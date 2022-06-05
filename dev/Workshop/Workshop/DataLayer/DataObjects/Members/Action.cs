@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace Workshop.DataLayer.DataObjects.Members
 {
-    public class Action
+    public class Action : DALObject
     {
-        public int ActionId { get; set; }
+        public int Id { get; set; }
+        public Action(int Id)
+        {
+            this.Id = Id;
+        }
     }
 }

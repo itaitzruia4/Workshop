@@ -6,10 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.MarketPackage.Terms;
 using Workshop.DomainLayer.UserPackage.Shopping;
+using DALObject = Workshop.DataLayer.DALObject;
+using DALPurchasePolicy = Workshop.DataLayer.DataObjects.Market.PurchasePolicy;
+
+
 
 namespace Workshop.DomainLayer.MarketPackage
 {
-    public class PurchasePolicy
+    public class PurchasePolicy : IPersistentObject
     {
         private Dictionary<int, Term> products_terms;
         private Dictionary<string, Term> category_terms;
@@ -28,6 +32,11 @@ namespace Workshop.DomainLayer.MarketPackage
             this.store = store;
             this.products_terms = new Dictionary<int, Term>();
             this.category_terms = new Dictionary<string, Term>();
+        }
+
+        public DALObject ToDAL()
+        {
+            return new DALPurchasePolicy();
         }
 
         public bool CanPurchase(ShoppingBagDTO shoppingBag, int age)

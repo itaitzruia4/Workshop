@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Workshop.DataLayer.DataObjects.Market
 {
-    public class Product
+    public class Product : DALObject
     {
         public int Id { get; set; }
         public int Store { get; set; }
@@ -15,5 +15,16 @@ namespace Workshop.DataLayer.DataObjects.Market
         public double Price { get; set; }
         public int Quantity { get; set; }
         public string Category { get; set; }
+
+        public Product(int id, int store, string name, string description, double price, int quantity, string category)
+        {
+            Id = id;
+            Store = store;
+            Name = name;
+            Description = description;
+            Price = price;
+            Quantity = quantity;
+            Category = category;
+        }
     }
 }

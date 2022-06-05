@@ -7,22 +7,21 @@ using Workshop.DataLayer.DataObjects.Market;
 
 namespace Workshop.DataLayer.DataObjects.Members
 {
-    public class Member
+    public class Member : DALObject
     {
-        public int Id { get; set; }
         public string Password { get; set; }
         public string MemberName { get; set; }
         public DateTime Birthdate { get; set; }
         public List<Role> Roles { get; set; }
         public ShoppingCart ShoppingCart { get; set; }
 
-
-        /*public override string ToString()
+        public Member(string password, string memberName, DateTime birthdate, List<Role> roles, ShoppingCart shoppingCart)
         {
-            string rolesStr = "";
-            foreach (Role role in Roles)
-                rolesStr += $"{role}";
-            return $"{Id} {Password} {MemberName} {Birthdate} {rolesStr}";
-        }*/
+            Password = password;
+            MemberName = memberName;
+            Birthdate = birthdate;
+            Roles = roles;
+            ShoppingCart = shoppingCart;
+        }
     }
 }

@@ -10,7 +10,7 @@ namespace Workshop.DomainLayer.UserPackage
 {
     public class User
     {
-        private ShoppingCart shoppingCart;
+        protected ShoppingCart shoppingCart;
 
         public User()
         {
