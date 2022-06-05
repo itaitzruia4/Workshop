@@ -30,7 +30,7 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
                 productsDAL.Add((ShoppingBagProductDAL)entry.Value.ToDAL());
             }
 
-            return new ShoppingBagDAL(-1, storeId, productsDAL);
+            return new ShoppingBagDAL(storeId, productsDAL);
         }
 
         public ShoppingBagProduct addToBag(ShoppingBagProduct product)
