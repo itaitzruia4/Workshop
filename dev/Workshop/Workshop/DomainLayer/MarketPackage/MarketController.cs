@@ -22,8 +22,8 @@ namespace Workshop.DomainLayer.MarketPackage
         private ConcurrentDictionary<int, ReaderWriterLock> storesLocks;
         private IMarketPaymentService paymentService;
         private IMarketSupplyService supplyService;
-        private static int STORE_COUNT = 0;
-        private static int PRODUCT_COUNT = 0;
+        private int STORE_COUNT = 0;
+        private int PRODUCT_COUNT = 1;
         public MarketController(IUserController userController, IMarketPaymentService paymentService, IMarketSupplyService supplyService)
         {
             this.userController = userController;
@@ -32,7 +32,9 @@ namespace Workshop.DomainLayer.MarketPackage
             this.supplyService = supplyService;
             this.stores = new ConcurrentDictionary<int, Store>();
             this.storesLocks = new ConcurrentDictionary<int, ReaderWriterLock>();
-        }
+            STORE_COUNT = 0;
+            PRODUCT_COUNT = 1;
+    }
 
         public void InitializeSystem()
         {
@@ -596,7 +598,7 @@ namespace Workshop.DomainLayer.MarketPackage
                     {
                         int age = userController.GetAge(userId, username);
                         stores[storeId].CheckPurchasePolicy(shoppingCart.shoppingBags[storeId], age);
-                        stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
+                        //stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
                         productsSoFar.Add(storeId, shoppingCart.shoppingBags[storeId].products);
                         OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetStoreName(), shoppingCart.shoppingBags[storeId].products);
                         orderHandler.addOrder(order, storeId);
