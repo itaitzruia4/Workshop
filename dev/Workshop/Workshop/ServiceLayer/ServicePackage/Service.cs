@@ -14,10 +14,11 @@ using DomainStoreOwner = Workshop.DomainLayer.UserPackage.Permissions.StoreOwner
 using DomainStoreFounder = Workshop.DomainLayer.UserPackage.Permissions.StoreFounder;
 using DomainStore = Workshop.DomainLayer.MarketPackage.Store;
 using DomainNotification = Workshop.DomainLayer.UserPackage.Notifications.Notification;
-
+using Newtonsoft.Json;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.Loggers;
 using System.Globalization;
+using System.IO;
 
 namespace Workshop.ServiceLayer
 {
@@ -32,9 +33,23 @@ namespace Workshop.ServiceLayer
             WasInitializedWithFile = false;
         }
 
-        public Service(string initializationState)
+        public Service(string conf)
         {
-            this.facade = new Facade();
+            ConfigTemplate config;
+            string initializationState = "";
+            try
+            {
+                config = JsonConvert.DeserializeObject<ConfigTemplate>(conf);
+                using (StreamReader streamReader = File.OpenText(config.StartingStateFile))
+                {
+                    initializationState = streamReader.ReadToEnd();
+                }
+            }
+            catch
+            {
+                Logger.Instance.LogError("Config file was not in correct format, or starting state file does not exist");
+            }
+            facade = new Facade();
             try
             {
                 foreach (string command in initializationState.Split('\n'))

@@ -1,13 +1,13 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Threading;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
+using Workshop.DomainLayer.Reviews;
 using Workshop.ServiceLayer;
 using Workshop.ServiceLayer.ServiceObjects;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Workshop.DomainLayer.Reviews;
+using Newtonsoft.Json;
 
 namespace Tests.AcceptanceTests
 {
@@ -1792,10 +1792,15 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_InitializeFromFile_Good()
         {
-            Service service = new Service("enter-market(1)\n" +
+            string FileName = "Test_InitializeFromFile_Good";
+            StreamWriter file = File.CreateText(FileName);
+            file.Write("enter-market(1)\n" +
                 "register(1,user1,pass1,22/08/1972)\n" +
                 "login(1,user1,pass1)\n" +
                 "create-new-store(1,user1,store1)");
+            file.Flush();
+            file.Close();
+            Service service = new Service(JsonConvert.SerializeObject(new ConfigTemplate { StartingStateFile = FileName }));
             Assert.IsTrue(service.WasInitializedWithFile);
             Assert.IsTrue(service.EnterMarket(1).ErrorOccured);
             Assert.IsTrue(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1815,9 +1820,14 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_InitializeFromFile_Bad_IllegalOrderOfActions()
         {
-            Service service = new Service("enter-market(1)\n" +
+            string FileName = "Test_InitializeFromFile_Bad_IllegalOrderOfActions";
+            StreamWriter file = File.CreateText(FileName);
+            file.Write("enter-market(1)\n" +
                 "login(1,user1,pass1\n" +
                 "create-new-store(1,user1,store1)");
+            file.Flush();
+            file.Close();
+            Service service = new Service(JsonConvert.SerializeObject(new ConfigTemplate { StartingStateFile = FileName }));
             // Expecting error: need to register before logging in
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1).ErrorOccured); // Make sure nothing happend after it failed
@@ -1829,11 +1839,16 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_InitializeFromFile_Bad_UnrecognizedCommand()
         {
-            Service service = new Service("enter-market(1)\n" +
+            string FileName = "Test_InitializeFromFile_Bad_UnrecognizedCommand";
+            StreamWriter file = File.CreateText(FileName);
+            file.Write("enter-market(1)\n" +
                 "register(1,user1,pass1,22/08/1972)\n" +
                 "login(1,user1,pass1)\n" +
                 "create-new-store(1,user1,store1)\n" +
                 "blah-blah(1,user1,pass1,store1)");
+            file.Flush();
+            file.Close();
+            Service service = new Service(JsonConvert.SerializeObject(new ConfigTemplate { StartingStateFile = FileName }));
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1844,10 +1859,15 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_InitializeFromFile_Bad_BadArgumentsForCommand_Overshoot()
         {
-            Service service = new Service("enter-market(1)\n" +
+            string FileName = "Test_InitializeFromFile_Bad_BadArgumentsForCommand_Overshoot";
+            StreamWriter file = File.CreateText(FileName);
+            file.Write("enter-market(1)\n" +
                 "register(1,user1,pass1,22/08/1972)\n" +
                 "login(1,user1,pass1)\n" +
                 "create-new-store(1,user1,store1,failureInLife1)");
+            file.Flush();
+            file.Close();
+            Service service = new Service(JsonConvert.SerializeObject(new ConfigTemplate { StartingStateFile = FileName }));
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1858,10 +1878,15 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_InitializeFromFile_Bad_BadArgumentsForCommand_Undershoot()
         {
-            Service service = new Service("enter-market(1)\n" +
+            string FileName = "Test_InitializeFromFile_Bad_BadArgumentsForCommand_Undershoot";
+            StreamWriter file = File.CreateText(FileName);
+            file.Write("enter-market(1)\n" +
                 "register(1,user1,pass1,22/08/1972)\n" +
                 "login(1,user1,pass1)\n" +
                 "create-new-store(1,user1)");
+            file.Flush();
+            file.Close();
+            Service service = new Service(JsonConvert.SerializeObject(new ConfigTemplate { StartingStateFile = FileName }));
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1872,10 +1897,15 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_InitializeFromFile_Bad_BadArgumentsForCommand_WrongType()
         {
-            Service service = new Service("enter-market(1)\n" +
+            string FileName = "Test_InitializeFromFile_Bad_BadArgumentsForCommand_WrongType";
+            StreamWriter file = File.CreateText(FileName);
+            file.Write("enter-market(1)\n" +
                 "register(1,user1,pass1,22/08/1972)\n" +
                 "login(1,user1,pass1)\n" +
                 "create-new-store(FAILME,user1,store1)");
+            file.Flush();
+            file.Close();
+            Service service = new Service(JsonConvert.SerializeObject(new ConfigTemplate { StartingStateFile = FileName }));
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
