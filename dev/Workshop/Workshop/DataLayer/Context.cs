@@ -17,7 +17,7 @@ namespace Workshop.DataLayer.DataObjects
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             
-            optionsBuilder.UseSqlServer("Data Source = 34.107.89.228,1433; Integrated Security = False; User Id = sqlserver; Password = workshop; Encrypt = True; TrustServerCertificate = True; MultipleActiveResultSets = True");
+            optionsBuilder.UseSqlServer("Data Source = 34.107.89.228;Initial Catalog=WorkshopDB; Integrated Security = False; User Id = sqlserver; Password = workshop; Encrypt = True; TrustServerCertificate = True; MultipleActiveResultSets = True");
         }
 
     }
