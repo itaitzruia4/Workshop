@@ -1,7 +1,4 @@
 ﻿using Workshop.ServiceLayer;
-using System.Net;
-using System.Text;
-using System.IO;
 
 namespace API.Controllers
 {
@@ -15,13 +12,13 @@ namespace API.Controllers
             IService service;
             if (args.Length == 0)
             {
-                service = new Service();
+                service = new Service(new ExternalSystem());
             }
             else
             {
                 using (StreamReader streamReader = File.OpenText(args[0]))
                 {
-                    service = new Service(streamReader.ReadToEnd());
+                    service = new Service(new ExternalSystem(), streamReader.ReadToEnd());
                 }
             }
             builder.Services.AddSingleton(service);

@@ -63,6 +63,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DomainLayer\MarketPackage\CreditCard.cs" />
+    <Compile Include="DomainLayer\MarketPackage\SupplyAddress.cs" />
+    <Compile Include="ServiceLayer\ExternalSystem.cs" />
     <Compile Include="DomainLayer\UserPackage\ILoginChecker.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\AndDiscount.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\CompositeDiscount.cs" />
@@ -95,16 +98,6 @@
     <Compile Include="DomainLayer\Loggers\Logger.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\Discount.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\DiscountPolicy.cs" />
-    <Compile Include="DomainLayer\MarketPackage\ExternalServices\Payment\IMarketPaymentService.cs" />
-    <Compile Include="DomainLayer\MarketPackage\ExternalServices\Payment\IPaymentExternalService.cs" />
-    <Compile Include="DomainLayer\MarketPackage\ExternalServices\Payment\PaymentAdapter.cs" />
-    <Compile Include="DomainLayer\MarketPackage\ExternalServices\Payment\PaymentExternalService.cs" />
-    <Compile Include="DomainLayer\MarketPackage\ExternalServices\Payment\ProxyPaymentExternalService.cs" />
-    <Compile Include="DomainLayer\MarketPackage\ExternalServices\Supply\IMarketSupplyService.cs" />
-    <Compile Include="DomainLayer\MarketPackage\ExternalServices\Supply\ISupplyExternalService.cs" />
-    <Compile Include="DomainLayer\MarketPackage\ExternalServices\Supply\ProxySupplyExternalService.cs" />
-    <Compile Include="DomainLayer\MarketPackage\ExternalServices\Supply\SupplyAdapter.cs" />
-    <Compile Include="DomainLayer\MarketPackage\ExternalServices\Supply\SupplyExternalService.cs" />
     <Compile Include="DomainLayer\MarketPackage\IMarketController.cs" />
     <Compile Include="DomainLayer\MarketPackage\MarketController.cs" />
     <Compile Include="DomainLayer\MarketPackage\Product.cs" />
@@ -136,6 +129,7 @@
     <Compile Include="DomainLayer\UserPackage\Shopping\ShoppingCartDTO.cs" />
     <Compile Include="DomainLayer\UserPackage\User.cs" />
     <Compile Include="DomainLayer\UserPackage\UserController.cs" />
+    <Compile Include="ServiceLayer\IExternalSystem.cs" />
     <Compile Include="ServiceLayer\Response.cs" />
     <Compile Include="ServiceLayer\ResponseT.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\ConfigTemplate.cs" />

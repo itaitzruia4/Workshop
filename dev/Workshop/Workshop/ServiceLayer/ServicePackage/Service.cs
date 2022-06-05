@@ -14,6 +14,8 @@ using DomainStoreOwner = Workshop.DomainLayer.UserPackage.Permissions.StoreOwner
 using DomainStoreFounder = Workshop.DomainLayer.UserPackage.Permissions.StoreFounder;
 using DomainStore = Workshop.DomainLayer.MarketPackage.Store;
 using DomainNotification = Workshop.DomainLayer.UserPackage.Notifications.Notification;
+using CreditCard = Workshop.DomainLayer.MarketPackage.CreditCard;
+using SupplyAddress = Workshop.DomainLayer.MarketPackage.SupplyAddress;
 using Newtonsoft.Json;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.Loggers;
@@ -27,13 +29,13 @@ namespace Workshop.ServiceLayer
         private Facade facade;
         public readonly bool WasInitializedWithFile;
 
-        public Service()
+        public Service(IExternalSystem externalSystem)
         {
-            this.facade = new Facade();
+            this.facade = new Facade(externalSystem);
             WasInitializedWithFile = false;
         }
 
-        public Service(string conf)
+        public Service(IExternalSystem externalSystem, string conf)
         {
             ConfigTemplate config;
             string initializationState = "";
@@ -49,7 +51,7 @@ namespace Workshop.ServiceLayer
             {
                 Logger.Instance.LogError("Config file was not in correct format, or starting state file does not exist");
             }
-            facade = new Facade();
+            facade = new Facade(externalSystem);
             try
             {
                 foreach (string command in initializationState.Split('\n'))
@@ -143,7 +145,9 @@ namespace Workshop.ServiceLayer
                                 break;
                             case "buy-cart":
                                 if (actualParams.Length != 3) { throw new ArgumentException(); }
-                                facade.BuyCart(int.Parse(actualParams[0]), actualParams[1], actualParams[2]);
+                                CreditCard cc = new CreditCard(actualParams[2], actualParams[3], actualParams[4], actualParams[5], actualParams[6], actualParams[7]);
+                                SupplyAddress address = new SupplyAddress(actualParams[8], actualParams[9], actualParams[10], actualParams[11], actualParams[12]);
+                                facade.BuyCart(int.Parse(actualParams[0]), actualParams[1], cc, address);
                                 break;
                             case "add-product-discount":
                                 if (actualParams.Length != 5) { throw new ArgumentException(); }
@@ -210,7 +214,7 @@ namespace Workshop.ServiceLayer
             }
             catch (Exception ex)
             {
-                this.facade = new Facade();
+                this.facade = new Facade(externalSystem);
                 Logger.Instance.LogError($"Initialization from file failed: \n{ex.Message}.\nSystem is in default condition.");
                 WasInitializedWithFile = false;
             }
@@ -472,11 +476,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<double> BuyCart(int userId, string user, string address)
+        public Response<double> BuyCart(int userId, string user, CreditCard cc, SupplyAddress address)
         {
             try
             {
-                return new Response<double>(facade.BuyCart(userId, user, address), userId);
+                return new Response<double>(facade.BuyCart(userId, user, cc, address), userId);
             }
             catch (Exception e)
             {

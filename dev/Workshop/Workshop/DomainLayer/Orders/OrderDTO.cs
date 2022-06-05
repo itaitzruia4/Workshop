@@ -11,11 +11,11 @@ namespace Workshop.DomainLayer.Orders
     {
         public int id { get; set; }
         public string clientName { get; set; }
-        public string address { get; set; }
+        public SupplyAddress address { get; set; }
         public string storeName { get; set; }
         public List<ProductDTO> items { get; set; }
 
-        public OrderDTO(int id, string clientName, string address, string storeName, List<ProductDTO> items)
+        public OrderDTO(int id, string clientName, SupplyAddress address, string storeName, List<ProductDTO> items)
         {
             this.id = id;
             this.clientName = clientName;

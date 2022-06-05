@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Workshop.DomainLayer.MarketPackage;
-using Workshop.DomainLayer.MarketPackage.ExternalServices.Payment;
-using Workshop.DomainLayer.MarketPackage.ExternalServices.Supply;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Security;
 using Workshop.DomainLayer.UserPackage.Shopping;
+using Workshop.ServiceLayer;
 using Notification = Workshop.DomainLayer.UserPackage.Notifications.Notification;
 
 
@@ -18,16 +17,10 @@ namespace Workshop.DomainLayer
         private IUserController UserController;
         private IMarketController MarketController;
 
-        internal Facade()
+        internal Facade(IExternalSystem externalSystem)
         {
-            IPaymentExternalService paymentExternalService = new ProxyPaymentExternalService(null);
-            IMarketPaymentService paymentService = new PaymentAdapter(paymentExternalService);
-
-            ISupplyExternalService supplyExternalService = new ProxySupplyExternalService(null);
-            IMarketSupplyService supplyService = new SupplyAdapter(supplyExternalService);
-
             UserController = new UserController(new HashSecurityHandler(), new ReviewHandler());
-            MarketController = new MarketController(UserController, paymentService, supplyService);
+            MarketController = new MarketController(UserController, externalSystem);
         }
 
         public User EnterMarket(int userId)
@@ -127,9 +120,9 @@ namespace Workshop.DomainLayer
         {
             return UserController.editCart(userId, user, productId, newQuantity);
         }
-        internal double BuyCart(int userId, string user, string address)
+        internal double BuyCart(int userId, string user, CreditCard cc, SupplyAddress address)
         {
-            return MarketController.BuyCart(userId, user, address);
+            return MarketController.BuyCart(userId, user, cc, address);
         }
 
         public void AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId)
