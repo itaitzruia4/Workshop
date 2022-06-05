@@ -13,8 +13,9 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
         internal string Name { get; }
         internal string Sender { get; }
 
-        public Event(string Name, string message, string sender)
+        public Event(string name, string message, string sender)
         {
+            Name = name;
             Message = message;
             Sender = sender;
         }

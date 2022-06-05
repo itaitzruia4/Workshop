@@ -35,20 +35,31 @@ namespace Workshop.DomainLayer.UserPackage
             notificationHandler = new NotificationHandler(new TempClass(), this);
         }
 
-        public bool CheckOnlineStatus(User u)
+        public bool CheckOnlineStatus(string u)
         {
-            return currentUsers.Values.Contains(u);
+
+            foreach (User member in currentUsers.Values) {
+                if (member is Member)
+                {
+                    if (((Member)member).Username == u)
+                    {
+                        return true;
+                    }
+                }
+
+            }
+            return false;
         }
 
-        //*************************************************************************************************************
-        // System Actions:
-        //*************************************************************************************************************
+            //*************************************************************************************************************
+            // System Actions:
+            //*************************************************************************************************************
 
-        /// <summary>
-        /// Load all members of the system
-        /// </summary>
-        /// 
-        public void InitializeSystem()
+            /// <summary>
+            /// Load all members of the system
+            /// </summary>
+            /// 
+            public void InitializeSystem()
         {
             Logger.Instance.LogEvent("Starting initializing the system - User Controller");
             Member admin = new Member("admin", securityHandler.Encrypt("admin"), DateTime.Parse("Aug 22, 1972"));
@@ -149,8 +160,8 @@ namespace Workshop.DomainLayer.UserPackage
 
             currentUsers[userId] = member;
             Logger.Instance.LogEvent($"Successfuly logged in user {userId} as member {username}");
-            List<Notification> userNotifications = notificationHandler.GetNotifications(member);
-            notificationHandler.RemoveNotifications(member);
+            List<Notification> userNotifications = notificationHandler.GetNotifications(member.Username);
+            notificationHandler.RemoveNotifications(member.Username);
             return new KeyValuePair<Member, List<Notification>>(member, userNotifications);
         }
 
@@ -241,6 +252,11 @@ namespace Workshop.DomainLayer.UserPackage
             // Add the new manager to the nominator's nominees list
             StoreRole nominatorStoreOwner = nominatorStoreRoles.Last();
             nominatorStoreOwner.AddNominee(newRole);
+
+            RegisterToEvent(nominated.Username, new Event("RemoveStoreOwnerNominationFrom" + nominatedUsername,"", "MarketController"));
+            RegisterToEvent(nominated.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
+            RegisterToEvent(nominated.Username, new Event("OpenStore" + storeId, "", "MarketController"));
+            RegisterToEvent(nominated.Username, new Event("CloseStore" + storeId, "", "MarketController"));
             Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} successfuly nominated member {nominatedUsername} as a store owner of store {storeId}");
             return newRole;
         }
@@ -279,6 +295,9 @@ namespace Workshop.DomainLayer.UserPackage
             // Add the new manager to the nominator's nominees list
             StoreRole nominatorStoreRole = nominatorStoreRoles.Last();
             nominatorStoreRole.AddNominee(newRole);
+
+            RegisterToEvent(nominated.Username, new Event("OpenStore" + storeId, "", "MarketController"));
+            RegisterToEvent(nominated.Username, new Event("CloseStore" + storeId, "", "MarketController"));
             Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} successfuly nominated member {nominatedUsername} as a store manager of store {storeId}");
             return newRole;
         }
@@ -558,11 +577,11 @@ namespace Workshop.DomainLayer.UserPackage
             return currentUsers.ContainsKey(userId);
         }
 
-        public void RegisterToEvent(int userId, Notifications.Event @event)
+        public void RegisterToEvent(string user, Notifications.Event @event)
         {
-            notificationHandler.Attach(currentUsers[userId], @event);
+            notificationHandler.Attach(user, @event);
         }
-        public void RemoveRegisterToEvent(Member member, Notifications.Event @event)
+        public void RemoveRegisterToEvent(string member, Notifications.Event @event)
         {
             notificationHandler.Detach(member, @event);
         }

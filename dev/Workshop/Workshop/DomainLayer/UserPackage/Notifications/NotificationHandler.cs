@@ -10,32 +10,36 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
 {
     class NotificationHandler
     {
-        private ConcurrentDictionary<SysUser, List<Notification>>  Notifications { get; }
+        private ConcurrentDictionary<string, List<Notification>>  Notifications { get; }
         private IMessageHandler MessageHandler;
-        private ConcurrentDictionary<Event, HashSet<SysUser>> observers;
+        private ConcurrentDictionary<string, HashSet<string>> observers;
+        private ConcurrentDictionary<string, Event> eventsnames;
         private ILoginChecker LoginChecker;
 
         public NotificationHandler(IMessageHandler messageHandler, ILoginChecker loginChecker)
         {
-            this.Notifications = new ConcurrentDictionary<SysUser, List<Notification>>();
-            observers = new ConcurrentDictionary<Event, HashSet<SysUser>>();
+            this.Notifications = new ConcurrentDictionary<string, List<Notification>>();
+            observers = new ConcurrentDictionary<string, HashSet<string>>();
+            eventsnames = new ConcurrentDictionary<string, Event>();
             this.MessageHandler = messageHandler;
             this.LoginChecker = loginChecker;
         }
 
         // The subscription management methods.
-        public void Attach(SysUser observer, Event eventt)
+        public void Attach(string observer_name, Event eventt)
         {
-            observers.TryAdd(eventt, new HashSet<SysUser>());
-            this.observers[eventt].Add(observer);
+            eventsnames.TryAdd(eventt.Name, eventt);
+            observers.TryAdd(eventt.Name, new HashSet<string>());
+            
+            this.observers[eventt.Name].Add(observer_name);
         }
 
-        public void Detach(SysUser observer, Event eventt)
+        public void Detach(string observer_name, Event eventt)
         {
-            HashSet<SysUser> subs;
-            if (observers.TryGetValue(eventt, out subs))
+            HashSet<string> subs;
+            if (observers.TryGetValue(eventt.Name, out subs))
             {
-                subs.Remove(observer);
+                subs.Remove(observer_name);
             }
             else
             {
@@ -47,23 +51,26 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
         public void TriggerEvent(Event eventt)
         {
             DateTime time = DateTime.Now;
-            foreach(SysUser observer in this.observers[eventt])
+            if(this.eventsnames.ContainsKey(eventt.Name))
             {
-                if (this.LoginChecker.CheckOnlineStatus(observer))
-                    MessageHandler.SendNotification(observer, new Notification(eventt, time));
-                else
+                foreach (string observer in this.observers[eventt.Name])
                 {
-                    this.Notifications.TryAdd(observer, new List<Notification>());
-                    List<Notification> notis;
-                    if (this.Notifications.TryGetValue(observer, out notis))
+                    if (this.LoginChecker.CheckOnlineStatus(observer))
+                        MessageHandler.SendNotification(observer, new Notification(eventt, time));
+                    else
                     {
-                        notis.Add(new Notification(eventt, time));
+                        this.Notifications.TryAdd(observer, new List<Notification>());
+                        List<Notification> notis;
+                        if (this.Notifications.TryGetValue(observer, out notis))
+                        {
+                            notis.Add(new Notification(eventt, time));
+                        }
                     }
                 }
             }
         }
 
-        public List<Notification> GetNotifications(SysUser user)
+        public List<Notification> GetNotifications(string user)
         {
             List<Notification> notis;
             if (this.Notifications.TryGetValue(user, out notis))
@@ -73,7 +80,7 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
             return new List<Notification>();
         }
 
-        public void RemoveNotifications(SysUser user)
+        public void RemoveNotifications(string user)
         {
             this.Notifications.AddOrUpdate(user, new List<Notification>(), (u, old) => new List<Notification>());
         }
