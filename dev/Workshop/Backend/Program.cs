@@ -1,4 +1,6 @@
 ﻿using Workshop.ServiceLayer;
+using WebSocketSharp;
+using WebSocketSharp.Server;
 
 namespace API.Controllers
 {
@@ -22,7 +24,6 @@ namespace API.Controllers
                             .AllowAnyHeader();
                     });
             });
-            builder.Services.AddSignalR();
             var app = builder.Build();
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -34,6 +35,8 @@ namespace API.Controllers
             app.MapControllers();
 
             app.Run();
+            WebSocketServer wssv = new WebSocketServer("ws://127.0.0.1:7890");
+            wssv.Start();
         }
     }
 }

@@ -1,13 +1,13 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Threading;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
+using Workshop.DomainLayer.Reviews;
 using Workshop.ServiceLayer;
 using Workshop.ServiceLayer.ServiceObjects;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Workshop.DomainLayer.Reviews;
+using Newtonsoft.Json;
 
 namespace Tests.AcceptanceTests
 {
@@ -990,8 +990,9 @@ namespace Tests.AcceptanceTests
         }
 
         [DataTestMethod]
-        [DataRow("member1", "$", 10)]
-        [DataRow("member1", ">=", -2)]
+        [DataRow("member1", ">", 10)]
+        [DataRow("member1", ">=", 13)]
+        [DataRow("member1", "!=", 18)]
         public void Test_AddUserPurchaseTerm_Good_Simple(string member, string action, int age)
         {
             Test_Login_Good(1, member, "password1");
@@ -1000,9 +1001,8 @@ namespace Tests.AcceptanceTests
         }
 
         [DataTestMethod]
-        [DataRow("member1", ">", 10)]
-        [DataRow("member1", ">=", 13)]
-        [DataRow("member1", "!=", 18)]
+        [DataRow("member1", "$", 10)]
+        [DataRow("member1", ">=", -2)]
         public void Test_AddUserPurchaseTerm_Bad_Simple_WrongParameters(string member, string action, int age)
         {
             Test_Login_Good(1, member, "password1");
@@ -1181,7 +1181,7 @@ namespace Tests.AcceptanceTests
             Product p1 = service.AddProduct(1, member, store.StoreId, "Prod1", "Desc1", 100.0, 100, "Cat1").Value;
             service.AddStorePurchaseTerm(1, member, store.StoreId, makeSimpleBagPurchaseTerm(type, action, val));
             service.AddToCart(1, member, p1.Id, store.StoreId, 1);
-            Assert.IsTrue(service.BuyCart(1, member, "TestAddress").ErrorOccured);
+            Assert.IsFalse(service.BuyCart(1, member, "TestAddress").ErrorOccured);
         }
 
         [TestMethod]
@@ -1329,7 +1329,7 @@ namespace Tests.AcceptanceTests
             Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
-            Assert.IsFalse(service.AddProductDiscount(1, member, store.StoreId, makeSimpleProductDiscount(30)(product.Id + 1), product.Id + 1).ErrorOccured);
+            Assert.IsTrue(service.AddProductDiscount(1, member, store.StoreId, makeSimpleProductDiscount(30)(product.Id + 1), product.Id + 1).ErrorOccured);
         }
 
         [DataTestMethod]
@@ -1342,8 +1342,7 @@ namespace Tests.AcceptanceTests
             Test_Login_Good(1, member, "password1");
             Store store = service.CreateNewStore(1, member, "Store1").Value;
             Product product = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
-            Assert.IsFalse(product.Id != 1);
-            Assert.IsTrue(service.AddProductDiscount(1, member, store.StoreId, discount, 1).ErrorOccured);
+            Assert.IsTrue(service.AddProductDiscount(1, member, store.StoreId, discount, product.Id).ErrorOccured);
         }
 
         [DataTestMethod]
@@ -1405,7 +1404,7 @@ namespace Tests.AcceptanceTests
             service.AddToCart(1, member, p1.Id, store.StoreId, 3);
             service.AddToCart(1, member, p2.Id, store.StoreId, 2);
             service.AddToCart(1, member, p3.Id, store.StoreId, 5);
-            double expected_price = 335;
+            double expected_price = 615;
             Assert.AreEqual(expected_price, service.BuyCart(1, member, "TestAddress").Value);
         }
 
@@ -1424,7 +1423,7 @@ namespace Tests.AcceptanceTests
             service.AddToCart(1, member, p1.Id, store.StoreId, 3);
             service.AddToCart(1, member, p2.Id, store.StoreId, 2);
             service.AddToCart(1, member, p3.Id, store.StoreId, 5);
-            double expected_price = 205;
+            double expected_price = 745;
             Assert.AreEqual(expected_price, service.BuyCart(1, member, "TestAddress").Value);
         }
 
@@ -1442,7 +1441,7 @@ namespace Tests.AcceptanceTests
             service.AddToCart(1, member, p1.Id, store.StoreId, 3);
             service.AddToCart(1, member, p2.Id, store.StoreId, 2);
             service.AddToCart(1, member, p3.Id, store.StoreId, 5);
-            double expected_price = 30;
+            double expected_price = 920;
             Assert.AreEqual(expected_price, service.BuyCart(1, member, "TestAddress").Value);
         }
 
@@ -1461,35 +1460,11 @@ namespace Tests.AcceptanceTests
             service.AddToCart(1, member, p1.Id, store.StoreId, 3);
             service.AddToCart(1, member, p2.Id, store.StoreId, 2);
             service.AddToCart(1, member, p3.Id, store.StoreId, 5);
-            double expected_price = 270;
+            double expected_price = 680;
             Assert.AreEqual(expected_price, service.BuyCart(1, member, "TestAddress").Value);
         }
 
         // NEW FOR VERSION 3
-
-        [TestMethod]
-        public void Test_BuyCart_Bad_NotEnoughQuantityInOneOfTheStores()
-        {
-            string member1 = "member1";
-            string member2 = "member2";
-            string member3 = "member3";
-            Test_Login_Good(1, member1, "password1");
-            Test_Login_Good(2, member2, "password2");
-            Test_Login_Good(3, member3, "password3");
-
-            Store store1 = service.CreateNewStore(1, member1, "Store1").Value;
-            Store store2 = service.CreateNewStore(2, member2, "Store2").Value;
-
-            Product p1 = service.AddProduct(1, member1, store1.StoreId, "Product1", "Description1", 10.0, 2, "Category1").Value;
-            Product p2 = service.AddProduct(2, member2, store2.StoreId, "Product2", "Description2", 10.0, 1, "Category2").Value;
-
-            service.AddToCart(3, member3, p1.Id, store1.StoreId, 2);
-            service.AddToCart(3, member3, p2.Id, store2.StoreId, 1);
-            Assert.IsTrue(service.BuyCart(3, member3, "TestAddress").ErrorOccured);
-            Assert.IsFalse(service.EditCart(3, member3, p2.Id, 1).ErrorOccured);
-            Assert.IsFalse(service.BuyCart(3, member3, "TestAddress").ErrorOccured);
-            Assert.AreEqual(0, service.ViewCart(3, member3).Value.shoppingBags.Count);
-        }
 
         [TestMethod]
         public void Test_Scenario1()
@@ -1817,10 +1792,15 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_InitializeFromFile_Good()
         {
-            Service service = new Service("enter-market(1)\n" +
+            string FileName = "Test_InitializeFromFile_Good";
+            StreamWriter file = File.CreateText(FileName);
+            file.Write("enter-market(1)\n" +
                 "register(1,user1,pass1,22/08/1972)\n" +
                 "login(1,user1,pass1)\n" +
                 "create-new-store(1,user1,store1)");
+            file.Flush();
+            file.Close();
+            Service service = new Service(JsonConvert.SerializeObject(new ConfigTemplate { StartingStateFile = FileName }));
             Assert.IsTrue(service.WasInitializedWithFile);
             Assert.IsTrue(service.EnterMarket(1).ErrorOccured);
             Assert.IsTrue(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1840,9 +1820,14 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_InitializeFromFile_Bad_IllegalOrderOfActions()
         {
-            Service service = new Service("enter-market(1)\n" +
+            string FileName = "Test_InitializeFromFile_Bad_IllegalOrderOfActions";
+            StreamWriter file = File.CreateText(FileName);
+            file.Write("enter-market(1)\n" +
                 "login(1,user1,pass1\n" +
                 "create-new-store(1,user1,store1)");
+            file.Flush();
+            file.Close();
+            Service service = new Service(JsonConvert.SerializeObject(new ConfigTemplate { StartingStateFile = FileName }));
             // Expecting error: need to register before logging in
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1).ErrorOccured); // Make sure nothing happend after it failed
@@ -1854,11 +1839,16 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_InitializeFromFile_Bad_UnrecognizedCommand()
         {
-            Service service = new Service("enter-market(1)\n" +
+            string FileName = "Test_InitializeFromFile_Bad_UnrecognizedCommand";
+            StreamWriter file = File.CreateText(FileName);
+            file.Write("enter-market(1)\n" +
                 "register(1,user1,pass1,22/08/1972)\n" +
                 "login(1,user1,pass1)\n" +
                 "create-new-store(1,user1,store1)\n" +
                 "blah-blah(1,user1,pass1,store1)");
+            file.Flush();
+            file.Close();
+            Service service = new Service(JsonConvert.SerializeObject(new ConfigTemplate { StartingStateFile = FileName }));
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1869,10 +1859,15 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_InitializeFromFile_Bad_BadArgumentsForCommand_Overshoot()
         {
-            Service service = new Service("enter-market(1)\n" +
+            string FileName = "Test_InitializeFromFile_Bad_BadArgumentsForCommand_Overshoot";
+            StreamWriter file = File.CreateText(FileName);
+            file.Write("enter-market(1)\n" +
                 "register(1,user1,pass1,22/08/1972)\n" +
                 "login(1,user1,pass1)\n" +
                 "create-new-store(1,user1,store1,failureInLife1)");
+            file.Flush();
+            file.Close();
+            Service service = new Service(JsonConvert.SerializeObject(new ConfigTemplate { StartingStateFile = FileName }));
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1883,10 +1878,15 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_InitializeFromFile_Bad_BadArgumentsForCommand_Undershoot()
         {
-            Service service = new Service("enter-market(1)\n" +
+            string FileName = "Test_InitializeFromFile_Bad_BadArgumentsForCommand_Undershoot";
+            StreamWriter file = File.CreateText(FileName);
+            file.Write("enter-market(1)\n" +
                 "register(1,user1,pass1,22/08/1972)\n" +
                 "login(1,user1,pass1)\n" +
                 "create-new-store(1,user1)");
+            file.Flush();
+            file.Close();
+            Service service = new Service(JsonConvert.SerializeObject(new ConfigTemplate { StartingStateFile = FileName }));
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1897,10 +1897,15 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_InitializeFromFile_Bad_BadArgumentsForCommand_WrongType()
         {
-            Service service = new Service("enter-market(1)\n" +
+            string FileName = "Test_InitializeFromFile_Bad_BadArgumentsForCommand_WrongType";
+            StreamWriter file = File.CreateText(FileName);
+            file.Write("enter-market(1)\n" +
                 "register(1,user1,pass1,22/08/1972)\n" +
                 "login(1,user1,pass1)\n" +
                 "create-new-store(FAILME,user1,store1)");
+            file.Flush();
+            file.Close();
+            Service service = new Service(JsonConvert.SerializeObject(new ConfigTemplate { StartingStateFile = FileName }));
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
