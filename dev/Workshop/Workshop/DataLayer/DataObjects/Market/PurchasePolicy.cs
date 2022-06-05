@@ -8,6 +8,7 @@ namespace Workshop.DataLayer.DataObjects.Market
 {
     public class PurchasePolicy : DALObject
     {
+        public int Id { get; set; }
         public PurchasePolicy()
         {
         }

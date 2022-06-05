@@ -15,6 +15,8 @@ namespace Workshop.DataLayer.DataObjects.Market
         public PurchasePolicy PurchasePolicy { get; set; }
         public List<Product> Products { get; set; }
 
+        public Store()
+        { }
         public Store(int id, bool open, string storeName, DiscountPolicy discountPolicy, PurchasePolicy purchasePolicy, List<Product> products)
         {
             Id = id;

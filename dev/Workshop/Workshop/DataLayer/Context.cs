@@ -7,12 +7,14 @@ using System.Text;
 using System.Threading.Tasks;
 using Workshop.DataLayer.DataObjects.Market;
 using Workshop.DataLayer.DataObjects.Members;
+using Workshop.DataLayer.DataObjects.Controllers;
 
 namespace Workshop.DataLayer.DataObjects
 {
     public class Context: DbContext
     {
-        DbSet<Member> Members { get; set; }
+        DbSet<MarketController> marketController { get; set; }
+        DbSet<UserController> userController { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

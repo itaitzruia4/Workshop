@@ -10,8 +10,12 @@ namespace Workshop.DataLayer.DataObjects.Market
     
     public class ShoppingBag : DALObject
     {
+        public int Id { get; set; }
         public int StoreId { get; set; }
         public List<ShoppingBagProduct> Products { get; set; }
+
+        public ShoppingBag()
+        {}
 
         public ShoppingBag(int storeId, List<ShoppingBagProduct> products)
         {

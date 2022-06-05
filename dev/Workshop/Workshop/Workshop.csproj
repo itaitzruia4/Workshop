@@ -265,7 +265,12 @@
     <Compile Include="DataLayer\DALObject.cs" />
     <Compile Include="DataLayer\DataHandler.cs" />
     <Compile Include="DataLayer\Context.cs" />
+    <Compile Include="DataLayer\DataObjects\Controllers\MarketController.cs" />
+    <Compile Include="DataLayer\DataObjects\Notifications\Notification.cs" />
+    <Compile Include="DataLayer\DataObjects\Notifications\NotificationHandler.cs" />
+    <Compile Include="DataLayer\DataObjects\Controllers\UserController.cs" />
     <Compile Include="DataLayer\DataObjects\Market\DiscountPolicy.cs" />
+    <Compile Include="DataLayer\DataObjects\Market\ProductDTO.cs" />
     <Compile Include="DataLayer\DataObjects\Members\Action.cs" />
     <Compile Include="DataLayer\DataObjects\Members\MarketManager.cs" />
     <Compile Include="DataLayer\DataObjects\Members\Member.cs" />
@@ -280,6 +285,12 @@
     <Compile Include="DataLayer\DataObjects\Members\StoreManager.cs" />
     <Compile Include="DataLayer\DataObjects\Members\StoreOwner.cs" />
     <Compile Include="DataLayer\DataObjects\Members\StoreRole.cs" />
+    <Compile Include="DataLayer\DataObjects\Notifications\Event.cs" />
+    <Compile Include="DataLayer\DataObjects\Orders\MemberToOrders.cs" />
+    <Compile Include="DataLayer\DataObjects\Orders\OrderDTO.cs" />
+    <Compile Include="DataLayer\DataObjects\Orders\OrderHandler.cs" />
+    <Compile Include="DataLayer\DataObjects\Reviews\ReviewDTO.cs" />
+    <Compile Include="DataLayer\DataObjects\Reviews\ReviewHandler.cs" />
     <Compile Include="DataLayer\Test.cs" />
     <Compile Include="DomainLayer\IPersistentObject.cs" />
     <Compile Include="DomainLayer\UserPackage\ILoginChecker.cs" />
@@ -309,13 +320,9 @@
     <Compile Include="DomainLayer\UserPackage\Notifications\NotificationHandler.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\MemberDTO.cs" />
     <Compile Include="DomainLayer\UserPackage\TempClass.cs" />
-    <Compile Include="Migrations\20220604125041_Initial.cs" />
-    <Compile Include="Migrations\20220604125041_Initial.designer.cs">
-      <DependentUpon>20220604125041_Initial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\20220604132435_Initial1.cs" />
-    <Compile Include="Migrations\20220604132435_Initial1.designer.cs">
-      <DependentUpon>20220604132435_Initial1.cs</DependentUpon>
+    <Compile Include="Migrations\20220605184523_Initial.cs" />
+    <Compile Include="Migrations\20220605184523_Initial.designer.cs">
+      <DependentUpon>20220605184523_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\ContextModelSnapshot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
