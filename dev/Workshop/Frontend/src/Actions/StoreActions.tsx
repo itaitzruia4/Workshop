@@ -203,3 +203,72 @@ export function handleAddCategoryDiscount(token: memberToken, storeId: number, c
         return Promise.resolve(data.value)
     })
 }
+
+export function handleNominateStoreOwner(token: memberToken, storeId: number, nominee: string) {
+    const url = "http://localhost:5165/api/store/nominateowner";
+
+    return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            userId: token.userId,
+            membername: token.membername,
+            storeId: storeId,
+            nominee: nominee
+        })
+    }).then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            return Promise.reject(data.error);
+        }
+        alert(`${nominee} is now Store Owner of store ${storeId}`);
+        return Promise.resolve(data.value)
+    })
+}
+
+export function handleNominateStoreManager(token: memberToken, storeId: number, nominee: string) {
+    const url = "http://localhost:5165/api/store/nominatemanager";
+
+    return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            userId: token.userId,
+            membername: token.membername,
+            storeId: storeId,
+            nominee: nominee
+        })
+    }).then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            return Promise.reject(data.error);
+        }
+        alert(`${nominee} is now Store Manager of store ${storeId}`);
+        return Promise.resolve(data.value)
+    })
+}
+
+export function handleRemoveStoreOwnerNomination(token: memberToken, storeId: number, nominee: string) {
+    const url = "http://localhost:5165/api/store/removeownernomination";
+
+    return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            userId: token.userId,
+            membername: token.membername,
+            storeId: storeId,
+            nominee: nominee
+        })
+    }).then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            return Promise.reject(data.error);
+        }
+        alert(`${nominee} is no longer Store Owner of store ${storeId}`);
+        return Promise.resolve(data.value)
+    })
+}

@@ -82,6 +82,18 @@ function Guest() {
         alert("Permission Denied");
     };
 
+    const nominateStoreOwner = (storeId: number, nominee: string) => {
+        alert("Permission Denied");
+    }
+
+    const nominateStoreManager = (storeId: number, nominee: string) => {
+        alert("Permission Denied");
+    }
+
+    const removeStoreOwnerNomination = (storeId: number, nominee: string) => {
+        alert("Permission Denied");
+    }
+
     //cart actions 
 
     const addToCart = (storeId: number, productId: number, quantity: number) => {
@@ -91,7 +103,8 @@ function Guest() {
     return (
         <div>
             {Appbar(token, "guest", stores, cart, [])}
-            {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct, closeStore, openStore, addDiscount, addProductDiscount, addCategoryDiscount, addToCart)}
+            {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct, closeStore, openStore, addDiscount,
+                addProductDiscount, addCategoryDiscount, addToCart, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
             <Stack direction="row" spacing={2}>
                 <Button variant='contained' onClick={e =>
                     handleExitMarket(token)

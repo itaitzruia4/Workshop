@@ -11,7 +11,7 @@ import AddStoreDialog from '../Components/Dialogs/addStoreDialog';
 import { useState, useEffect } from 'react';
 
 import { handleLogout, handleExitMarket } from '../Actions/AuthenticationActions';
-import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleOpenStore, handleRemoveProduct, handleAddDiscount, handleAddProductDiscount, handleAddCategoryDiscount } from '../Actions/StoreActions';
+import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleOpenStore, handleRemoveProduct, handleAddDiscount, handleAddProductDiscount, handleAddCategoryDiscount, handleNominateStoreOwner, handleNominateStoreManager, handleRemoveStoreOwnerNomination } from '../Actions/StoreActions';
 import { handleAddToCart, handleViewCart, handleReviewProduct, handleUpdateNotifications } from '../Actions/UserActions';
 import { handleChangeProductCategory, handleChangeProductName, handleChangeProductPrice, handleChangeProductQuantity } from '../Actions/ProductActions';
 
@@ -97,6 +97,27 @@ function Member() {
         handleOpenStore(token, storeId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     };
 
+    const nominateStoreOwner = (storeId: number, nominee: string) => {
+        handleNominateStoreOwner(token, storeId, nominee)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
+    const nominateStoreManager = (storeId: number, nominee: string) => {
+        handleNominateStoreManager(token, storeId, nominee)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
+    const removeStoreOwnerNomination = (storeId: number, nominee: string) => {
+        handleRemoveStoreOwnerNomination(token, storeId, nominee)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
     //cart actions 
 
     const addToCart = (storeId: number, productId: number, quantity: number) => {
@@ -109,7 +130,9 @@ function Member() {
             <ButtonGroup variant="contained" aria-label="outlined primary button group">
                 {AddStoreDialog(addStore)}
             </ButtonGroup>
-            {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct ,closeStore, openStore, addDiscount, addProductDiscount, addCategoryDiscount, addToCart)}
+            {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct, closeStore, openStore,
+                addDiscount, addProductDiscount, addCategoryDiscount, addToCart,
+                nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
             <Stack direction="row" spacing={2}>
                 <Button variant='contained' onClick={e =>
                     handleLogout(token)
