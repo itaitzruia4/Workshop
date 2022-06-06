@@ -31,8 +31,8 @@ namespace Workshop.DomainLayer.UserPackage
             this.reviewHandler = reviewHandler;
             members = new ConcurrentDictionary<string, Member>();
             this.orderHandler = new OrderHandler<string>();
-            // TODO Find out how to actually implement IMessageSender, Look at Github Issues!
             notificationHandler = new NotificationHandler(this);
+            InitializeSystem();
         }
 
         public bool CheckOnlineStatus(string u)
@@ -64,6 +64,7 @@ namespace Workshop.DomainLayer.UserPackage
             Logger.Instance.LogEvent("Starting initializing the system - User Controller");
             Member admin = new Member("admin", securityHandler.Encrypt("admin"), DateTime.Parse("Aug 22, 1972"));
             admin.AddRole(new MarketManager());
+            members.TryAdd("admin", admin);
             Logger.Instance.LogEvent("Finished initializing the system - User Controller");
         }
 
@@ -542,7 +543,6 @@ namespace Workshop.DomainLayer.UserPackage
             // Check that the nominated member is indeed a member
             EnsureMemberExists(canceledUsername);
 
-
             Member actor = members[actingUsername], canceled = members[canceledUsername];
 
             // Check that the canceled member has a role
@@ -554,7 +554,11 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new MemberAccessException($"User {actingUsername} is not allowed to cancel members.");
 
             //cancel member
-            members.TryRemove(canceledUsername,out canceled);
+            if (!members.TryRemove(canceledUsername,out canceled))
+            {
+                throw new ArgumentException($"Could not cancel member {canceledUsername}");
+            }
+            Logger.Instance.LogEvent($"User {userId} with member {actingUsername} successfuly canceled member {canceledUsername}");
         }
 
         public Dictionary<Member, bool> GetMembersOnlineStats(int userId, string actingUsername)
@@ -573,7 +577,7 @@ namespace Workshop.DomainLayer.UserPackage
             Dictionary<Member, bool> OnlineStats = new Dictionary<Member, bool>();
             foreach( Member member in members.Values)
             {
-                OnlineStats.Add(member, currentUsers.ContainsKey(userId));
+                OnlineStats.Add(member, CheckOnlineStatus(member.Username));
             }
             return OnlineStats;
         }

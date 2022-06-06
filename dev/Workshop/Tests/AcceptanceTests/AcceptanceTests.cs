@@ -490,7 +490,7 @@ namespace Tests.AcceptanceTests
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             Response<List<Product>> searchResult = service.SearchProduct(1, "Worong", "", -1, -1, -1);
             Assert.IsFalse(searchResult.ErrorOccured);
-            if(searchResult.Value.Count > 0)
+            if (searchResult.Value.Count > 0)
                 AssertProductsNotEqual(prod, searchResult.Value.First());
         }
 
@@ -1564,7 +1564,7 @@ namespace Tests.AcceptanceTests
             service.NominateStoreManager(0, "Member1", "Member3", store1.StoreId);
 
             service.Login(1, "Member2", "Password2");
-            service.Login(2, "Member3", "Password3");  
+            service.Login(2, "Member3", "Password3");
             service.Logout(1, "Member2");
             service.Logout(2, "Member3");
             service.CloseStore(0, "Member1", store1.StoreId);
@@ -1586,7 +1586,7 @@ namespace Tests.AcceptanceTests
         {
             Test_Login_Good(0, "Member1", "Password1");
             Response<Store> resp1 = service.CreateNewStore(0, "Member1", "Store1");
-            Assert.IsFalse (resp1.ErrorOccured);
+            Assert.IsFalse(resp1.ErrorOccured);
             Store store1 = resp1.Value;
             Assert.IsNotNull(store1);
             Response resp2 = service.CloseStore(0, "Member1", store1.StoreId);
@@ -2079,6 +2079,70 @@ namespace Tests.AcceptanceTests
             Assert.IsFalse(resp1.ErrorOccured);
             Assert.IsNotNull(resp1.Value);
             Assert.AreEqual(0, resp1.Value.Count);
+        }
+
+        [TestMethod]
+        public void Test_CancelMember_Success()
+        {
+            service.EnterMarket(0);
+            Assert.IsFalse(service.Login(0, "admin", "admin").ErrorOccured);
+            Test_Register_Good(1, "member", "pass");
+            Assert.IsFalse(service.CancelMember(0, "admin", "member").ErrorOccured);
+            Assert.IsFalse(service.Register(1, "member", "pass", DateTime.Parse("Aug 22, 1972")).ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_CancelMember_Failure_NoSuchMember()
+        {
+            service.EnterMarket(0);
+            service.EnterMarket(1);
+            Assert.IsFalse(service.Login(0, "admin", "admin").ErrorOccured);
+            Assert.IsTrue(service.CancelMember(0, "admin", "member").ErrorOccured);
+            Assert.IsFalse(service.Register(1, "member", "pass", DateTime.Parse("Aug 22, 1972")).ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_CancelMember_Failure_NoPermissions()
+        {
+            Test_Login_Good(0, "member1", "pass1");
+            Test_Register_Good(1, "member2", "pass2");
+            service.CreateNewStore(0, "member1", "Store1");
+            Assert.IsTrue(service.CancelMember(0, "member1", "member2").ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_GetMembersOnlineStats_Success()
+        {
+            service.EnterMarket(0);
+            service.Login(0, "admin", "admin");
+            Test_Register_Good(1, "member1", "pass1");
+            Test_Register_Good(2, "member2", "pass2");
+            Test_Login_Good(3, "member3", "pass3");
+            Response<Dictionary<Member, bool>> resp = service.GetMembersOnlineStats(0, "admin");
+            Assert.IsFalse(resp.ErrorOccured);
+            Assert.AreEqual(4, resp.Value.Count);
+            foreach (Member m in resp.Value.Keys)
+            {
+                if (m.Username.Equals("member3") || m.Username.Equals("admin"))
+                {
+                    Assert.IsTrue(resp.Value[m]);
+                }
+                else if (m.Username.Equals("member1") || m.Username.Equals("member2"))
+                {
+                    Assert.IsFalse(resp.Value[m]);
+                }
+                else
+                {
+                    Assert.Fail();
+                }
+            }
+        }
+
+        [TestMethod]
+        public void Test_GetMembersOnlineStats_Failure_NoPermission()
+        {
+            Test_Login_Good(3, "member3", "pass3");
+            Assert.IsTrue(service.GetMembersOnlineStats(3, "member3").ErrorOccured);
         }
     }
 }
