@@ -549,7 +549,7 @@ namespace Workshop.DomainLayer.UserPackage
             if (canceled.HasRoles())
                 throw new MemberAccessException($"User {canceledUsername} has roles so he cannot be canceled.");
 
-            // Check that the nominator is authorized to nominate a store owner
+            // Check that the nominator is authorized to do it
             if (!actor.IsAuthorized(Action.CancelMember))
                 throw new MemberAccessException($"User {actingUsername} is not allowed to cancel members.");
 
