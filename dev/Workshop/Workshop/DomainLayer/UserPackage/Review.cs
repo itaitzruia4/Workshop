@@ -7,10 +7,12 @@ using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Security;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
+using ReviewDAL = Workshop.DataLayer.DataObjects.Market.Review;
+using DALObject = Workshop.DataLayer.DALObject;
 
 namespace Workshop.DomainLayer.UserPackage
 {
-    public class Review
+    public class Review : IPersistentObject
     {
         string review { get; set; }
         string reviewer { get; set; }
@@ -22,6 +24,11 @@ namespace Workshop.DomainLayer.UserPackage
             this.reviewer = user;
             this.review = review;
             this.productId = productId;
+        }
+
+        public DALObject ToDAL()
+        {
+            return new ReviewDAL(review, reviewer, productId);
         }
 
         private void ValidateReviewContent(string review){

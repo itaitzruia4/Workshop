@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DataLayer.DataObjects.Market.Discounts;
 
 namespace Workshop.DataLayer.DataObjects.Market
 {

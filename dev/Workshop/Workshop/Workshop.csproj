@@ -265,7 +265,11 @@
     <Compile Include="DataLayer\DALObject.cs" />
     <Compile Include="DataLayer\DataHandler.cs" />
     <Compile Include="DataLayer\Context.cs" />
-    <Compile Include="DataLayer\DataObjects\Market\DiscountPolicy.cs" />
+    <Compile Include="DataLayer\DataObjects\Market\Discounts\ConcreteDiscount.cs" />
+    <Compile Include="DataLayer\DataObjects\Market\Discounts\Discount.cs" />
+    <Compile Include="DataLayer\DataObjects\Market\Discounts\DiscountPolicy.cs" />
+    <Compile Include="DataLayer\DataObjects\Market\Discounts\PriceAction.cs" />
+    <Compile Include="DataLayer\DataObjects\Market\Review.cs" />
     <Compile Include="DataLayer\DataObjects\Members\Action.cs" />
     <Compile Include="DataLayer\DataObjects\Members\MarketManager.cs" />
     <Compile Include="DataLayer\DataObjects\Members\Member.cs" />

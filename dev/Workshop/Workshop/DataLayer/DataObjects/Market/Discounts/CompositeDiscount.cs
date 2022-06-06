@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Workshop.DomainLayer.UserPackage.Shopping;
-using DALObject = Workshop.DataLayer.DALObject;
 
-namespace Workshop.DomainLayer.MarketPackage.Discounts
+namespace Workshop.DataLayer.DataObjects.Market.Discounts
 {
-    public abstract class CompositeDiscount: Discount
+    internal class CompositeDiscount
     {
         protected Discount firstDiscount;
         protected Discount secondDiscount;
@@ -18,9 +16,5 @@ namespace Workshop.DomainLayer.MarketPackage.Discounts
             this.firstDiscount = firstDiscount;
             this.secondDiscount = secondDiscount;
         }
-        public abstract DALObject ToDAL();
-        public abstract double CalculateDiscountValue(ShoppingBagDTO shoppingBag);
-
-        public abstract bool IsEligible(ShoppingBagDTO shoppingBag);
     }
 }
