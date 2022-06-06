@@ -19,9 +19,9 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         }
 
         
-        public override DALObject ToDAL()
+        public override MarketManagerDAL ToDAL()
         {
-            return (MarketManagerDAL) base.ToDAL();
+            return base.ToDAL();
         }
 
         public override bool Equals(object obj)

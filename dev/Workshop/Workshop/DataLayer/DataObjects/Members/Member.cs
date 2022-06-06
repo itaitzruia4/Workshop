@@ -10,9 +10,9 @@ namespace Workshop.DataLayer.DataObjects.Members
 {
     public class Member : DALObject
     {
-        public string Password { get; set; }
         [Key]
         public string MemberName { get; set; }
+        public string Password { get; set; }
         public DateTime Birthdate { get; set; }
         public List<Role> Roles { get; set; }
         public ShoppingCart ShoppingCart { get; set; }

@@ -13,7 +13,7 @@ using DALPurchasePolicy = Workshop.DataLayer.DataObjects.Market.Purchases.Purcha
 
 namespace Workshop.DomainLayer.MarketPackage
 {
-    public class PurchasePolicy : IPersistentObject
+    public class PurchasePolicy : IPersistentObject<DALPurchasePolicy>
     {
         private Dictionary<int, Term> products_terms;
         private Dictionary<string, Term> category_terms;
@@ -34,7 +34,7 @@ namespace Workshop.DomainLayer.MarketPackage
             this.category_terms = new Dictionary<string, Term>();
         }
 
-        public DALObject ToDAL()
+        public DALPurchasePolicy ToDAL()
         {
             return new DALPurchasePolicy();
         }

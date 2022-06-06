@@ -9,14 +9,16 @@ using Workshop.DomainLayer.UserPackage.Security;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 using ReviewDAL = Workshop.DataLayer.DataObjects.Reviews.Review;
 using DALObject = Workshop.DataLayer.DALObject;
+using DataHandler = Workshop.DataLayer.DataHandler;
 
 namespace Workshop.DomainLayer.UserPackage
 {
-    public class Review : IPersistentObject
+    public class Review : IPersistentObject<ReviewDAL>
     {
         string review { get; set; }
         string reviewer { get; set; }
         int productId { get; set; }
+
 
         public Review(string user, int productId, string review)
         {
@@ -24,9 +26,17 @@ namespace Workshop.DomainLayer.UserPackage
             this.reviewer = user;
             this.review = review;
             this.productId = productId;
+            DataHandler.getDBHandler().save(ToDAL());
         }
 
-        public DALObject ToDAL()
+        public Review(ReviewDAL reviewDAL)
+        {
+            this.reviewer = reviewDAL.reviewer;
+            this.review = reviewDAL.review;
+            this.productId = reviewDAL.productId;
+        }
+
+        public ReviewDAL ToDAL()
         {
             return new ReviewDAL(review, reviewer, productId);
         }

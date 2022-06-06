@@ -7,8 +7,8 @@ using DALObject = Workshop.DataLayer.DALObject;
 
 namespace Workshop.DomainLayer
 {
-    public interface IPersistentObject
+    public interface IPersistentObject<T> where T : DALObject
     {
-        DALObject ToDAL();
+        T ToDAL();
     }
 }

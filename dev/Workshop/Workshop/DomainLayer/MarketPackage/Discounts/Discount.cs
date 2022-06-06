@@ -10,12 +10,12 @@ using DALObject = Workshop.DataLayer.DALObject;
 
 namespace Workshop.DomainLayer.MarketPackage.Discounts
 {
-    public abstract class Discount : IPersistentObject
+    public abstract class Discount : IPersistentObject<DALDiscount>
     {
         public string json_discount { get; set; }
         public abstract double CalculateDiscountValue(ShoppingBagDTO shoppingBag);
         public abstract bool IsEligible(ShoppingBagDTO shoppingBag);
-        public DALObject ToDAL()
+        public DALDiscount ToDAL()
         {
             return new DALDiscount(json_discount);
         }

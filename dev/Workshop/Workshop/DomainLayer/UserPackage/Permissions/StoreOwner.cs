@@ -31,9 +31,9 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             actions.Add(Action.AddPurchaseTerm);
         }
 
-        public override DALObject ToDAL()
+        public override StoreOwnerDAl ToDAL()
         {
-            return (StoreOwnerDAl)base.ToDAL();
+            return base.ToDAL();
         }
     }
 }

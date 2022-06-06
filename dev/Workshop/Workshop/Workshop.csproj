@@ -328,6 +328,10 @@
     <Compile Include="Migrations\20220606102225_Initial.designer.cs">
       <DependentUpon>20220606102225_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20220606122158_initial1.cs" />
+    <Compile Include="Migrations\20220606122158_initial1.designer.cs">
+      <DependentUpon>20220606122158_initial1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\ContextModelSnapshot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DomainLayer\Facade.cs" />

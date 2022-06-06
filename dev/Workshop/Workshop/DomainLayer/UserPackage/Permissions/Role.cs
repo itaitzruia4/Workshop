@@ -10,7 +10,7 @@ using RoleDAL = Workshop.DataLayer.DataObjects.Members.Role;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
-    public abstract class Role : IPersistentObject
+    public abstract class Role : IPersistentObject<RoleDAL>
     {
         protected HashSet<Action> actions;
         public Role() 
@@ -18,7 +18,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             actions = new HashSet<Action>();
         }
 
-        public virtual DALObject ToDAL()
+        public virtual RoleDAL ToDAL()
         {
             List<ActionDAL> actionsDAL = new List<ActionDAL>();
             foreach (Action action in actions)

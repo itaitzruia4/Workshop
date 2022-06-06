@@ -12,13 +12,15 @@ using Workshop.DataLayer.DataObjects.Market.Discounts;
 using Workshop.DataLayer.DataObjects.Controllers;
 using Workshop.DataLayer.DataObjects.Market.Purchases;
 using Workshop.DataLayer.DataObjects.Reviews;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Workshop.DomainLayer.Loggers;
 
 namespace Workshop.DataLayer
 {
     public class Context: DbContext
     {
-        DbSet<MarketController> marketController { get; set; }
-        DbSet<UserController> userController { get; set; }
+        public DbSet<MarketController> marketController { get; set; }
+        public DbSet<UserController> userController { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -28,6 +30,7 @@ namespace Workshop.DataLayer
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            /*
             modelBuilder.Entity<DiscountPolicy>();
             modelBuilder.Entity<Product>();
             modelBuilder.Entity<PurchasePolicy>();
@@ -39,6 +42,19 @@ namespace Workshop.DataLayer
             modelBuilder.Entity<Action>();
             modelBuilder.Entity<Member>();
             modelBuilder.Entity<Role>();
+            */
+        }
+
+        public override EntityEntry<TEntity> Update<TEntity>(TEntity entity)
+        {
+            Logger.Instance.LogEvent($"Updating {entity} in the cache");
+            return base.Update(entity);
+        }
+
+        public override EntityEntry<TEntity> Add<TEntity>(TEntity entity)
+        {
+            Logger.Instance.LogEvent($"Adding {entity} to the cache");
+            return base.Add(entity);
         }
 
     }

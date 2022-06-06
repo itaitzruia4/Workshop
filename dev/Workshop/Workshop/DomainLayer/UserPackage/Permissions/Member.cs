@@ -11,7 +11,7 @@ using ShoppingCartDAL = Workshop.DataLayer.DataObjects.Market.ShoppingCart;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
-    public class Member : User, IPersistentObject
+    public class Member : User, IPersistentObject<memberDAL>
     {
         public string Username { get; }
         internal string Password { get; }
@@ -32,7 +32,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             this.rwl = new ReaderWriterLock();
         }
 
-        public DALObject ToDAL()
+        public memberDAL ToDAL()
         {
             List<RoleDAL> rolesDAL = new List<RoleDAL>();
 

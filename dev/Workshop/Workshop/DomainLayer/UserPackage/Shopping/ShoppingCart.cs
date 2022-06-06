@@ -8,27 +8,36 @@ using Workshop.DomainLayer.UserPackage.Shopping;
 using ShoppingCartDAL = Workshop.DataLayer.DataObjects.Market.ShoppingCart;
 using DALObject = Workshop.DataLayer.DALObject;
 using ShoppingBagDAL = Workshop.DataLayer.DataObjects.Market.ShoppingBag;
+using DataHandler = Workshop.DataLayer.DataHandler;
+using ShoppingBagProductDAL = Workshop.DataLayer.DataObjects.Market.ShoppingBagProduct;
 
 namespace Workshop.DomainLayer.UserPackage.Shopping
 {
-    public class ShoppingCart : IPersistentObject
+    public class ShoppingCart : IPersistentObject<ShoppingCartDAL>
     {
         private Dictionary<int,ShoppingBag> shoppingBags { get; set; }
+        ShoppingCartDAL shoppingCartDAL;
 
         public ShoppingCart()
         {
-            shoppingBags = new Dictionary<int,ShoppingBag>();
+            this.shoppingBags = new Dictionary<int,ShoppingBag>();
+            shoppingCartDAL = new ShoppingCartDAL(new List<ShoppingBagDAL>());
+            DataHandler.getDBHandler().save(shoppingCartDAL);
         }
 
-        public DALObject ToDAL()
+        public ShoppingCart(ShoppingCartDAL shoppingCartDAL)
         {
-            List<ShoppingBagDAL> shoppingBagsDAL = new List<ShoppingBagDAL>();
-            foreach(KeyValuePair<int, ShoppingBag> entry in shoppingBags)
+            shoppingBags = new Dictionary<int, ShoppingBag>();
+            foreach(ShoppingBagDAL shoppingBagDAL in shoppingCartDAL.ShoppingBags)
             {
-                shoppingBagsDAL.Add((ShoppingBagDAL)entry.Value.ToDAL());
+                shoppingBags.Add(shoppingBagDAL.StoreId, new ShoppingBag(shoppingBagDAL));
             }
+            this.shoppingCartDAL = shoppingCartDAL;
+        }
 
-            return new ShoppingCartDAL(shoppingBagsDAL);
+        public ShoppingCartDAL ToDAL()
+        {
+            return shoppingCartDAL;
         }
 
         public ShoppingBagProduct addToCart(ShoppingBagProduct product, int storeId)
@@ -36,8 +45,12 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
             if(!checkIfStoreHasBag(storeId))
             {
                 shoppingBags.Add(storeId,new ShoppingBag(storeId));
+                shoppingCartDAL.ShoppingBags.Add(new ShoppingBagDAL(storeId, new List<ShoppingBagProductDAL>()));
             }
-            return shoppingBags[storeId].addToBag(product);
+
+            ShoppingBagProduct productRet = shoppingBags[storeId].addToBag(product);
+            DataHandler.getDBHandler().update(shoppingCartDAL);
+            return productRet;
         }
         public ShoppingCartDTO getShoppingCartDTO()
         {
@@ -68,6 +81,15 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
         internal void Clear()
         {
             shoppingBags.Clear();
+            foreach(ShoppingBagDAL sbDAL in shoppingCartDAL.ShoppingBags)
+            {
+                foreach(ShoppingBagProductDAL sbpDAL in sbDAL.Products)
+                {
+                    DataHandler.getDBHandler().remove(sbpDAL);
+                }
+                DataHandler.getDBHandler().remove(sbDAL);
+            }
+            shoppingCartDAL.ShoppingBags = new List<ShoppingBagDAL>();
         }
 
         internal void deleteProduct(int productId, int bagNum)
@@ -76,7 +98,7 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
         }
         internal void changeQuantity(int productId,int newQuantity, int bagNum)
         {
-            shoppingBags[bagNum].changeQuantity(productId,newQuantity);
+            shoppingBags[bagNum].changeQuantity(productId, newQuantity);
         }
     }
 }

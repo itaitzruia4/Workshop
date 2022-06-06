@@ -11,15 +11,14 @@ namespace Workshop.DataLayer
 {
     public class DataHandler
     {
-        Context cache;
-        public static DataHandler Instance = null;
-        Object lck;
+        private Context cache;
+        private static DataHandler Instance = null;
+
 
         private DataHandler()
         {
             cache = new Context();
             new Thread(() => upload(20)).Start();
-            lck = new Object();
         }
 
         public static DataHandler getDBHandler()
@@ -32,24 +31,25 @@ namespace Workshop.DataLayer
         
         public void save<T>(T toSave) where T : class, DALObject
         {
-            lock (lck)
-            {
-                cache.Add<T>(toSave);
-            }
+            cache.Add(toSave);
+        }
+
+        public void update<T>(T toUpdate) where T : class, DALObject
+        {
+            cache.Update(toUpdate);
+        }
+
+        public void remove<T>(T toRemove) where T : class, DALObject
+        {
+            cache.Remove(toRemove);
         }
 
         private void upload(int timeOutInSeconds)
         {
-            Context oldContext = null;
             while (true)
             {
-                lock (lck)
-                {
-                    oldContext = cache;
-                    cache = new Context();
-                }
-                oldContext.SaveChanges();
                 Thread.Sleep(timeOutInSeconds * 1000);
+                cache.SaveChanges();
             }
         }
 

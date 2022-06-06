@@ -14,7 +14,7 @@ using StoreDAL = Workshop.DataLayer.DataObjects.Market.Store;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
-    public class DiscountPolicy : IPersistentObject
+    public class DiscountPolicy : IPersistentObject<DiscountPolicyDAL>
     {
         private Dictionary<int, Discount> products_discounts;
         private Dictionary<string, Discount> category_discounts;
@@ -43,7 +43,7 @@ namespace Workshop.DomainLayer.MarketPackage
             this.store = store;
         }
 
-        public DALObject ToDAL()
+        public DiscountPolicyDAL ToDAL()
         {
             return new DiscountPolicyDAL(null, null, null);
         }

@@ -15,7 +15,7 @@ using PurchasePolicyDAL = Workshop.DataLayer.DataObjects.Market.Purchases.Purcha
 
 namespace Workshop.DomainLayer.MarketPackage
 {
-    public class Store : IPersistentObject
+    public class Store : IPersistentObject<StoreDAL>
     {
         private bool open { get; set; }
         private int id { get; set; }
@@ -38,7 +38,7 @@ namespace Workshop.DomainLayer.MarketPackage
             this.purchasePolicy = new PurchasePolicy(this);
         }
 
-        public DALObject ToDAL()
+        public StoreDAL ToDAL()
         {
             List<ProductDAL> productsDAL = new List<ProductDAL>();
             DiscountPolicyDAL dpDAL = (DiscountPolicyDAL)discountPolicy.ToDAL();

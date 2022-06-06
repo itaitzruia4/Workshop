@@ -22,7 +22,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             this.nominees = new List<StoreRole>();
         }
 
-        public override DALObject ToDAL()
+        public override StoreRoleDAL ToDAL()
         {
             List<ActionDAL> actionsDAL = new List<ActionDAL>();
             List<StoreRoleDAL> nomineesDAL = new List<StoreRoleDAL>();

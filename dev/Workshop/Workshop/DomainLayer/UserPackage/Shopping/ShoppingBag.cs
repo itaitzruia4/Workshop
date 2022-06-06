@@ -8,40 +8,49 @@ using Workshop.DomainLayer.UserPackage.Shopping;
 using ShoppingBagDAL = Workshop.DataLayer.DataObjects.Market.ShoppingBag;
 using DALObject = Workshop.DataLayer.DALObject;
 using ShoppingBagProductDAL = Workshop.DataLayer.DataObjects.Market.ShoppingBagProduct;
+using DataHandler = Workshop.DataLayer.DataHandler;
 
 namespace Workshop.DomainLayer.UserPackage.Shopping
 {
-    public class ShoppingBag : IPersistentObject
+    public class ShoppingBag : IPersistentObject<ShoppingBagDAL>
     {
         private int storeId;
         private Dictionary<int, ShoppingBagProduct> products;
+        private ShoppingBagDAL shoppingBagDAL;
 
         public ShoppingBag(int storeId)
         {
             this.storeId = storeId;
             products = new Dictionary<int,ShoppingBagProduct>();
+            shoppingBagDAL = new ShoppingBagDAL(storeId, new List<ShoppingBagProductDAL>());
         }
 
-        public DALObject ToDAL()
+        public ShoppingBag(ShoppingBagDAL shoppingBagDAL)
         {
-            List<ShoppingBagProductDAL> productsDAL = new List<ShoppingBagProductDAL>();
-            foreach (KeyValuePair<int, ShoppingBagProduct> entry in products)
-            {
-                productsDAL.Add((ShoppingBagProductDAL)entry.Value.ToDAL());
-            }
+            this.storeId = shoppingBagDAL.StoreId;
+            products = new Dictionary<int, ShoppingBagProduct>(); //TODO: futher implement
+            this.shoppingBagDAL = shoppingBagDAL;
+        }
 
-            return new ShoppingBagDAL(storeId, productsDAL);
+        public ShoppingBagDAL ToDAL()
+        {
+            return shoppingBagDAL;
         }
 
         public ShoppingBagProduct addToBag(ShoppingBagProduct product)
         {
-            if(!products.ContainsKey(product.Id))
+            if (!products.ContainsKey(product.Id))
             {
-                products.Add(product.Id,product);
+                products.Add(product.Id, product);
+                shoppingBagDAL.Products.Add(product.ToDAL());
+                DataHandler.getDBHandler().update(shoppingBagDAL);
             }
-            else products[product.Id].Quantity +=product.Quantity;
+            else 
+                changeQuantity(product.Id, products[product.Id].Quantity + product.Quantity);
+            
             return product;
         }
+
         internal ShoppingBagDTO GetShoppingBagDTO()
         {
             List<ProductDTO> productsDTOs = new List<ProductDTO>();
@@ -57,7 +66,10 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
         }
         internal void deleteProduct(int productId)
         {
+            shoppingBagDAL.Products.Remove(products[productId].ToDAL());
+            DataHandler.getDBHandler().remove(products[productId].ToDAL());
             products.Remove(productId);
+            DataHandler.getDBHandler().update(shoppingBagDAL);
         }
         internal void changeQuantity(int productId,int newQuantity)
         {
