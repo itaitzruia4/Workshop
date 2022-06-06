@@ -212,7 +212,7 @@ namespace Workshop.DomainLayer.UserPackage
         // Being called only from MarketController
         public StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId)
         {
-            Logger.Instance.LogEvent($"User {userId} with member {nominatedUsername} is trying to nominate {nominatedUsername} as a store owner of store {storeId}");
+            Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} is trying to nominate {nominatedUsername} as a store owner of store {storeId}");
             // Check that nominator is the logged in member
             AssertCurrentUser(userId, nominatorUsername);
 
@@ -264,7 +264,7 @@ namespace Workshop.DomainLayer.UserPackage
         // Being called only from MarketController
         public StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId)
         {
-            Logger.Instance.LogEvent($"User {userId} with member {nominatedUsername} is trying to nominate {nominatedUsername} as a store manager of store {storeId}");
+            Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} is trying to nominate {nominatedUsername} as a store manager of store {storeId}");
             // Check that nominator is the logged in member
             AssertCurrentUser(userId, nominatorUsername);
 
