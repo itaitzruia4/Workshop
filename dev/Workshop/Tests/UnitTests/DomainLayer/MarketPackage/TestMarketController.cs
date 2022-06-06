@@ -6,8 +6,7 @@ using Workshop.DomainLayer.UserPackage;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 using System.Collections.Generic;
 using Workshop.DomainLayer.UserPackage.Permissions;
-using Workshop.DomainLayer.MarketPackage.ExternalServices.Payment;
-using Workshop.DomainLayer.MarketPackage.ExternalServices.Supply;
+using Workshop.ServiceLayer;
 
 namespace Tests.UnitTests.DomainLayer.MarketPackage
 {
@@ -26,14 +25,8 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
             userControllerMock.Setup(x => x.GetWorkers(It.IsAny<int>())).Returns(new List<Member>(new Member[] {new Member("Worker1", "pass1", DateTime.Parse("Aug 22, 1972")) }));
             userControllerMock.Setup(x => x.GetMember(It.IsAny<string>())).Returns(new Member("StoreFounder1", "pass1", DateTime.Parse("Aug 22, 1972")));
             userControllerMock.Setup(x => x.addToCart(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<ShoppingBagProduct>(), It.IsAny<int>())).Returns((int id, string membername, ShoppingBagProduct sbp, int storeId) => { return new ShoppingBagProduct(sbp.Id, sbp.Name, sbp.Description, sbp.Price, sbp.Quantity, sbp.Category, sbp.StoreId); });
-           
-            Mock<IMarketPaymentService> paymentMock = new Mock<IMarketPaymentService>();
-            paymentMock.Setup(x => x.PayAmount(It.IsAny<string>(), It.IsAny<double>())).Callback((string username, double amount) => {});
-
-            Mock<IMarketSupplyService> supplyMock = new Mock<IMarketSupplyService>();
-            supplyMock.Setup(x => x.supplyToAddress(It.IsAny<string>(), It.IsAny<string>())).Callback((string username, string address) => { });
-
-            marketController = new MarketController(userControllerMock.Object, paymentMock.Object, supplyMock.Object);
+            Mock<IExternalSystem> externalSystem = new Mock<IExternalSystem>();
+            marketController = new MarketController(userControllerMock.Object, externalSystem.Object);
             marketController.InitializeSystem();
         }
 

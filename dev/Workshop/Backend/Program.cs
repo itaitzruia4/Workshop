@@ -9,7 +9,19 @@ namespace API.Controllers
             var builder = WebApplication.CreateBuilder(args);
 
             // Add builder.Services to the container.
-            builder.Services.AddSingleton<IService, Service>();
+            IService service;
+            if (args.Length == 0)
+            {
+                service = new Service(new ExternalSystem());
+            }
+            else
+            {
+                using (StreamReader streamReader = File.OpenText(args[0]))
+                {
+                    service = new Service(new ExternalSystem(), streamReader.ReadToEnd());
+                }
+            }
+            builder.Services.AddSingleton(service);
             builder.Services.AddControllers();
             builder.Services.AddCors(options =>
             {
@@ -22,7 +34,6 @@ namespace API.Controllers
                             .AllowAnyHeader();
                     });
             });
-            builder.Services.AddSignalR();
             var app = builder.Build();
             //app.UseHttpsRedirection();
             app.UseStaticFiles();

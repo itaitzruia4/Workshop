@@ -222,6 +222,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 if(products.ContainsKey(product.Id) && products[product.Id].Quantity >= product.Quantity)
                 {
                     //products[product.Id].Quantity -= product.Quantity;
+                    //todo does it impact thred
                 }
                 else {
                     throw new ArgumentException($"store {id} doesn't has enough {product.Name} in stock");
@@ -259,7 +260,7 @@ namespace Workshop.DomainLayer.MarketPackage
             double price = 0;
             foreach (ProductDTO productDTO in shoppingBag.products)
             {
-                price += productDTO.Price;
+                price += productDTO.Price*productDTO.Quantity;
             }
             return Math.Max(price - discount, 0);
         }

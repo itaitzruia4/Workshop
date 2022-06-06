@@ -37,5 +37,8 @@ namespace Workshop.DomainLayer.UserPackage
         ShoppingCartDTO editCart(int userId, string user, int productId, int newQuantity);
         void ClearUserCart(int userId);
         double GetProductRating(int productId);
+        void RegisterToEvent(string user, Notifications.Event @event);
+        void RemoveRegisterToEvent(string MemberName, Notifications.Event @event);
+        void notify(Notifications.Event @event);
     }
 }

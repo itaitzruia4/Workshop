@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Workshop.DomainLayer.MarketPackage;
-using Workshop.DomainLayer.MarketPackage.ExternalServices.Payment;
-using Workshop.DomainLayer.MarketPackage.ExternalServices.Supply;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Security;
 using Workshop.DomainLayer.UserPackage.Shopping;
+using Workshop.ServiceLayer;
 
 namespace Tests.IntegrationTests.DomainLayer.MarketPackage
 {
@@ -17,20 +17,16 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
     {
         private UserController userController;
         private MarketController marketController;
-
+        private SupplyAddress address = new SupplyAddress("Ronmi", "Mayor 1", "Ashkelon", "Israel", "784112");
+        private CreditCard cc = new CreditCard("001122334455667788", "11", "26", "LeBron Michal", "555", "208143751");
         [TestInitialize]
         public void Setup()
         {
             ISecurityHandler security = new HashSecurityHandler();
             IReviewHandler review = new ReviewHandler();
-            IPaymentExternalService paymentExternalService = new ProxyPaymentExternalService(null);
-            IMarketPaymentService paymentService = new PaymentAdapter(paymentExternalService);
-
-            ISupplyExternalService supplyExternalService = new ProxySupplyExternalService(null);
-            IMarketSupplyService supplyService = new SupplyAdapter(supplyExternalService);
-
             userController = new UserController(security, review);
-            marketController = new MarketController(userController, paymentService, supplyService);
+            Mock<IExternalSystem> externalSystem = new Mock<IExternalSystem>();
+            marketController = new MarketController(userController, externalSystem.Object);
             userController.InitializeSystem();
             marketController.InitializeSystem();
 
@@ -120,15 +116,15 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         /// Tests for MarketController.BuyCart method
         /// <see cref="MarketController.BuyCart"/>
         [DataTestMethod]
-        [DataRow("member1", "here", 3, "cat1")]
-        [DataRow("member1", "here", 4, "cat1")]
-        public void TestBuyCart_Success(string user, string address, int userQuantity, string category)
+        [DataRow("member1", 3, "cat1")]
+        [DataRow("member1", 4, "cat1")]
+        public void TestBuyCart_Success(string user, int userQuantity, string category)
         {
             int storeId = marketController.CreateNewStore(1, user, "store").GetId();
             Product prod1 = marketController.AddProductToStore(1, user, storeId, "someName", "someDesc", 10.0, 5, category);
             ShoppingBagProduct product2 = userController.addToCart(1, user, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, userQuantity, prod1.Category, storeId), storeId);
-            int leftovers = marketController.getStoreInfo(1, user, storeId).products[prod1.Id].Quantity - userQuantity;
-            marketController.BuyCart(1, user, address);
+            int leftovers = marketController.getStoreInfo(1, user, storeId).products[prod1.Id].Quantity;
+            marketController.BuyCart(1, user, cc, address);
             Assert.AreEqual(userController.viewCart(1, user).shoppingBags.Count, 0);
             Assert.IsTrue(marketController.getStoreInfo(1, user, storeId).products[prod1.Id].Quantity == leftovers);
         }
