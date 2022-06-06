@@ -10,7 +10,7 @@ using Workshop.DataLayer.DataObjects.Reviews;
 
 namespace Workshop.DataLayer.DataObjects.Controllers
 {
-    public class UserController
+    public class UserController: DALObject
     {
         public int Id { get; set; }
         public ReviewHandler reviewHandler { get; set; }
@@ -20,6 +20,14 @@ namespace Workshop.DataLayer.DataObjects.Controllers
 
         public UserController()
         {
+        }
+
+        public UserController(ReviewHandler reviewHandler, NotificationHandler notificationHandler, OrderHandler<string> orderHandler, List<Member> members)
+        {
+            this.reviewHandler = reviewHandler;
+            this.notificationHandler = notificationHandler;
+            this.orderHandler = orderHandler;
+            this.members = members;
         }
     }
 }

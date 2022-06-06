@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Workshop.DataLayer.DataObjects.Reviews
 {
-    public class ReviewHandler
+    public class ReviewHandler: DALObject
     {
         public int Id { get; set; }
         public List<ProductReviews> productReviews { get; set; }

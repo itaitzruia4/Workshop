@@ -18,15 +18,17 @@ namespace Workshop.DomainLayer.UserPackage
         string review { get; set; }
         string reviewer { get; set; }
         int productId { get; set; }
+        ReviewDAL reviewDAL { get; set; }
 
 
-        public Review(string user, int productId, string review)
+        public Review(string reviewer, int productId, string review)
         {
             ValidateReviewContent(review);
-            this.reviewer = user;
+            this.reviewer = reviewer;
             this.review = review;
             this.productId = productId;
-            DataHandler.getDBHandler().save(ToDAL());
+            reviewDAL = new ReviewDAL(review, reviewer, productId);
+            DataHandler.getDBHandler().save(reviewDAL);
         }
 
         public Review(ReviewDAL reviewDAL)
@@ -34,11 +36,12 @@ namespace Workshop.DomainLayer.UserPackage
             this.reviewer = reviewDAL.reviewer;
             this.review = reviewDAL.review;
             this.productId = reviewDAL.productId;
+            this.reviewDAL = reviewDAL;
         }
 
         public ReviewDAL ToDAL()
         {
-            return new ReviewDAL(review, reviewer, productId);
+            return reviewDAL;
         }
 
         private void ValidateReviewContent(string review){

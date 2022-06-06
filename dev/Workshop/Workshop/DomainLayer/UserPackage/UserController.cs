@@ -13,10 +13,13 @@ using Workshop.DomainLayer.UserPackage.Shopping;
 using Workshop.DomainLayer.Loggers;
 using System.Collections.Concurrent;
 using Workshop.DomainLayer.UserPackage.Notifications;
+using UserControllerDAL = Workshop.DataLayer.DataObjects.Controllers.UserController;
+using MemberDAL = Workshop.DataLayer.DataObjects.Members.Member;
+using DataHandler = Workshop.DataLayer.DataHandler;
 
 namespace Workshop.DomainLayer.UserPackage
 {
-    public class UserController : IUserController, ILoginChecker
+    public class UserController : IUserController, ILoginChecker, IPersistentObject<UserControllerDAL>
     {
         private ISecurityHandler securityHandler;
         private IReviewHandler reviewHandler;
@@ -24,6 +27,8 @@ namespace Workshop.DomainLayer.UserPackage
         private OrderHandler<string> orderHandler;
         private ConcurrentDictionary<string, Member> members;
         private ConcurrentDictionary<int, User> currentUsers;
+
+        public UserControllerDAL userControllerDAL { get; set; }
         public UserController(ISecurityHandler securityHandler, IReviewHandler reviewHandler)
         {
             this.securityHandler = securityHandler;
@@ -33,6 +38,13 @@ namespace Workshop.DomainLayer.UserPackage
             this.orderHandler = new OrderHandler<string>();
             // TODO Find out how to actually implement IMessageSender, Look at Github Issues!
             notificationHandler = new NotificationHandler(new TempClass(), this);
+            userControllerDAL = new UserControllerDAL(reviewHandler.ToDAL(), notificationHandler.ToDAL(), orderHandler.ToDAL(), new List<MemberDAL>());
+            DataHandler.getDBHandler().save(userControllerDAL);
+        }
+
+        public UserControllerDAL ToDAL()
+        {
+            return userControllerDAL;
         }
 
         public bool CheckOnlineStatus(string u)
@@ -120,7 +132,10 @@ namespace Workshop.DomainLayer.UserPackage
             string encryptedPassword = securityHandler.Encrypt(password);
             Member newMember = new Member(username, encryptedPassword, birthdate);
             if (members.TryAdd(username, newMember))
+            {
+                DataHandler.getDBHandler().update(userControllerDAL);
                 Logger.Instance.LogEvent($"User {userId} has successfuly registered user {username}");
+            }
             else
                 throw new ArgumentException($"Username {username} already exists");
             
@@ -555,7 +570,11 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new MemberAccessException($"User {actingUsername} is not allowed to cancel members.");
 
             //cancel member
-            members.TryRemove(canceledUsername,out canceled);
+            if(members.TryRemove(canceledUsername,out canceled))
+            {
+                userControllerDAL.members.Remove(canceled.ToDAL());
+                DataHandler.getDBHandler().save(userControllerDAL);
+            }
         }
 
         public Dictionary<MemberDTO, bool> GetMembersOnlineStats(int userId, string actingUsername)
@@ -619,5 +638,7 @@ namespace Workshop.DomainLayer.UserPackage
             notificationHandler.RemoveNotifications(membername);
             return retme;
         }
+
+        
     }
 }

@@ -8,6 +8,13 @@ using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Security;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
+using ReviewHandlerDAL = Workshop.DataLayer.DataObjects.Reviews.ReviewHandler;
+using ProductReviewesDAL = Workshop.DataLayer.DataObjects.Reviews.ProductReviews;
+using UserReviewesDAL = Workshop.DataLayer.DataObjects.Reviews.UserReviews;
+using DataHandler = Workshop.DataLayer.DataHandler;
+using UserToReviewDTO =  Workshop.DataLayer.DataObjects.Reviews.UserToReviewDTO;
+using ProductToReviewDTO = Workshop.DataLayer.DataObjects.Reviews.ProductToReviewDTO;
+using Workshop.DomainLayer.UserPackage;
 
 namespace Workshop.DomainLayer.Reviews
 {
@@ -15,11 +22,45 @@ namespace Workshop.DomainLayer.Reviews
     {
         ConcurrentDictionary<int, ConcurrentDictionary<string, ReviewDTO>> productReviews;
         ConcurrentDictionary<string, ConcurrentDictionary<int, ReviewDTO>> userReviews;
+        public ReviewHandlerDAL reviewHandlerDAL { get; set; }
 
         public ReviewHandler()
         {
             productReviews = new ConcurrentDictionary<int, ConcurrentDictionary<string, ReviewDTO>>();
             userReviews = new ConcurrentDictionary<string, ConcurrentDictionary<int, ReviewDTO>>();
+            reviewHandlerDAL = new ReviewHandlerDAL(new List<ProductReviewesDAL>(), new List<UserReviewesDAL>());
+            DataHandler.getDBHandler().save(reviewHandlerDAL);
+        }
+
+        public ReviewHandler(ReviewHandlerDAL reviewHandlerDAL)
+        {
+            productReviews = new ConcurrentDictionary<int, ConcurrentDictionary<string, ReviewDTO>>();
+            userReviews = new ConcurrentDictionary<string, ConcurrentDictionary<int, ReviewDTO>>();
+            foreach(ProductReviewesDAL prDAL in reviewHandlerDAL.productReviews)
+            {
+                ConcurrentDictionary<string, ReviewDTO> prDict = new ConcurrentDictionary<string, ReviewDTO>();
+                foreach(UserToReviewDTO urtDTO in prDAL.userToReviewDTOs)
+                {
+                    prDict.TryAdd(urtDTO.Username, new ReviewDTO(urtDTO.Review));
+                }
+                productReviews.TryAdd(prDAL.ProductId, prDict);
+            }
+            foreach (UserReviewesDAL urDAL in reviewHandlerDAL.userReviews)
+            {
+                ConcurrentDictionary<int, ReviewDTO> prDict = new ConcurrentDictionary<int, ReviewDTO>();
+                foreach (ProductToReviewDTO prtDTO in urDAL.productToReviewDTOs)
+                {
+                    prDict.TryAdd(prtDTO.ProductId, new ReviewDTO(prtDTO.Review));
+                }
+                userReviews.TryAdd(urDAL.Username, prDict);
+            }
+            this.reviewHandlerDAL = reviewHandlerDAL;
+
+        }
+
+        public ReviewHandlerDAL ToDAL()
+        {
+            return reviewHandlerDAL;
         }
 
         public ReviewDTO AddReview(string user, int productId, string review, int rating)
@@ -64,5 +105,7 @@ namespace Workshop.DomainLayer.Reviews
             }
             return -1;
         }
+
+        
     }
 }
