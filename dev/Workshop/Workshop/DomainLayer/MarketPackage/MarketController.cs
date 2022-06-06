@@ -11,6 +11,7 @@ using System.Threading;
 using System.Collections.Concurrent;
 using Workshop.DomainLayer.UserPackage.Notifications;
 using Workshop.ServiceLayer;
+using User = Workshop.DomainLayer.UserPackage.User;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
@@ -87,32 +88,52 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             Logger.Instance.LogEvent($"User {userId} with member {nominatorMembername} is trying to remove store owner nomination from {nominatedMembername} in store {storeId}.");
             userController.AssertCurrentUser(userId, nominatorMembername);
-            Member nominatorMember = userController.GetMember(nominatorMembername);
-            Member nominatedMember = userController.GetMember(nominatedMembername);
+            return RemoveStoreOwnerNominationHelper(nominatorMembername, nominatedMembername, storeId);
+        }
+
+        private Member RemoveStoreOwnerNominationHelper(string nominator, string nominated, int storeId)
+        {
+            Logger.Instance.LogEvent($"Member {nominator} is trying to remove store owner nomination from {nominated} in store {storeId}.");
+            Member nominatorMember = userController.GetMember(nominator);
+            Member nominatedMember = userController.GetMember(nominated);
+            StoreRole FOUND_NOMINATOR_ROLE = null;
+            StoreRole FOUND_NOMINATED_ROLE = null;
             foreach (StoreRole nominatedRole in nominatedMember.GetStoreRoles(storeId))
             {
                 foreach (StoreRole nominatorRole in nominatorMember.GetStoreRoles(storeId))
                 {
-                    if (nominatedRole is StoreOwner && (nominatorRole is StoreManager || nominatorRole is StoreOwner) && nominatorRole.ContainsNominee(nominatedRole))
+                    if ((nominatedRole is StoreOwner || nominatedRole is StoreManager) && (nominatorRole is StoreManager || nominatorRole is StoreOwner) && nominatorRole.ContainsNominee(nominatedRole))
                     {
-                        nominatedMember.RemoveRole(nominatedRole);
-                        nominatorRole.RemoveNominee(nominatedRole);
-                        userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
-                        userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("OpenStore" + storeId, "", "MarketController"));
-                        userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("CloseStore" + storeId, "", "MarketController"));
-                        userController.notify(new Event("RemoveStoreOwnerNominationFrom" + nominatedMembername, "Removed store owner nomination from user " + nominatedMembername, "MarketController"));
-                        Logger.Instance.LogEvent($"User {userId} with member {nominatorMembername} successfuly removed store owner nomination from {nominatedMembername} in store {storeId}.");
-
-                        foreach (StoreRole newNominated in nominatedRole.nominees)
-                        {
-                            //RemoveStoreOwnerNominationHelper(nominatedMember,newNominated.)
-                        }
-                        return nominatedMember;
+                        FOUND_NOMINATED_ROLE = nominatedRole;
+                        FOUND_NOMINATOR_ROLE = nominatorRole;
                     }
+                    break;
+                }
+                if (FOUND_NOMINATED_ROLE != null)
+                {
+                    break;
                 }
             }
-            throw new ArgumentException($"User {userId} with member {nominatorMembername} FAILED to remove store owner nomination from {nominatedMembername} in store {storeId}.");
+            if (FOUND_NOMINATED_ROLE == null)
+            {
+                throw new ArgumentException($"{nominator} did not nominate {nominated} to be a store owner in store {storeId}");
+            }
+
+            List<string> to_remove = FOUND_NOMINATED_ROLE.nominees.Keys.ToList();
+            foreach (string k in to_remove)
+            {
+                RemoveStoreOwnerNominationHelper(nominated, k, storeId);
+            }
+            nominatedMember.RemoveRole(FOUND_NOMINATED_ROLE);
+            FOUND_NOMINATOR_ROLE.RemoveNominee(FOUND_NOMINATED_ROLE);
+            userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
+            userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("OpenStore" + storeId, "", "MarketController"));
+            userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("CloseStore" + storeId, "", "MarketController"));
+            userController.notify(new Event("RemoveStoreOwnerNominationFrom" + nominated, "Removed store owner nomination from member " + nominated, "MarketController"));
+            Logger.Instance.LogEvent($"Member {nominator} successfuly removed store owner nomination from {nominated} in store {storeId}.");
+            return nominatedMember;
         }
+
         public void AddActionToManager(int userId, string owner, string manager, int storeId, string action)
         {
             Logger.Instance.LogEvent($"{owner} is trying to add action {action} to manager {manager} in store {storeId}.");
@@ -529,9 +550,9 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             throw new ArgumentException($"Product with ID {productId} does not exist in the market.");
         }
-        public List<ProductDTO> SearchProduct(int userId, string username, string keyWords, string category, double minPrice, double maxPrice, double productReview)
+        public List<ProductDTO> SearchProduct(int userId, string keyWords, string category, double minPrice, double maxPrice, double productReview)
         {
-            userController.AssertCurrentUser(userId, username);
+            userController.AssertUserEnteredMarket(userId);
             IEnumerable<IEnumerable<Product>> allProducts = stores.Values.Select(s => s.GetProducts().Values);
             IEnumerable<Product> products = allProducts.SelectMany(lp => lp);
             if (keyWords != "")
@@ -597,10 +618,10 @@ namespace Workshop.DomainLayer.MarketPackage
 
             return porduct;
         }
-        public double BuyCart(int userId, string username, CreditCard cc, SupplyAddress address)
+        public double BuyCart(int userId, CreditCard cc, SupplyAddress address)
         {
-            Logger.Instance.LogEvent($"User {username} is trying to buy his cart.");
-            ShoppingCartDTO shoppingCart = userController.viewCart(userId, username);
+            Logger.Instance.LogEvent($"User {userId} is trying to buy his cart.");
+            ShoppingCartDTO shoppingCart = userController.viewCart(userId);
             if (shoppingCart.IsEmpty())
             {
                 throw new InvalidOperationException("Can't buy an empty shopping cart");
@@ -619,7 +640,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 }
                 try
                 {
-                    int age = userController.GetAge(userId, username);
+                    int age = userController.GetAge(userId);
                     stores[storeId].CheckPurchasePolicy(shoppingCart.shoppingBags[storeId], age);
                     //ShoppingBagDTO bag = stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
                     ShoppingBagDTO bag = new ShoppingBagDTO(storeId, shoppingCart.shoppingBags[storeId].products);
@@ -628,7 +649,9 @@ namespace Workshop.DomainLayer.MarketPackage
                     {
                         products = product.Name + " ";
                     }
-                    events.Add(new Event("SaleInStore" + storeId, "Prouducts with the name" + products + " were bought from store " + storeId + "by user " + username, "marketController"));
+                    User currentUser = userController.GetUser(userId);
+                    string username = currentUser is Member ? ((Member)currentUser).Username : "A guest";
+                    events.Add(new Event("SaleInStore" + storeId, $"Prouducts with the name {products} were bought from store {storeId} by {username}", "marketController"));
                     productsSoFar.Add(storeId, shoppingCart.shoppingBags[storeId].products);
                     OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetStoreName(), shoppingCart.shoppingBags[storeId].products);
                     orderHandler.addOrder(order, storeId);
@@ -677,9 +700,9 @@ namespace Workshop.DomainLayer.MarketPackage
         return price;
     }
 
-    public ShoppingBagProduct addToBag(int userId, string user, int productId, int storeId, int quantity)
+    public ShoppingBagProduct addToBag(int userId, int productId, int storeId, int quantity)
     {
-        return userController.addToCart(userId, user, getProductForSale(productId, storeId, quantity), storeId);
+        return userController.addToCart(userId, getProductForSale(productId, storeId, quantity), storeId);
     }
 
     public void AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId)

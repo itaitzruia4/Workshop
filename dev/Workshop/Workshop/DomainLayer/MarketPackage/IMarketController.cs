@@ -46,13 +46,13 @@ namespace Workshop.DomainLayer.MarketPackage
 
         StoreDTO getStoreInfo(int userId, string user, int storeId);
 
-        List<ProductDTO> SearchProduct(int userId, string user, string keyWords, string catagory, double minPrice, double maxPrice, double productReview);
+        List<ProductDTO> SearchProduct(int userId, string keyWords, string catagory, double minPrice, double maxPrice, double productReview);
 
-        double BuyCart(int userId, string user, CreditCard cc, SupplyAddress address);
+        double BuyCart(int userId, CreditCard cc, SupplyAddress address);
 
         ShoppingBagProduct getProductForSale(int productId, int storeId, int quantity);
 
-        ShoppingBagProduct addToBag(int userId, string user, int productId, int storeId, int quantity);
+        ShoppingBagProduct addToBag(int userId, int productId, int storeId, int quantity);
 
         void AddProductDiscount(int userId, string user, int storeId ,string jsonDiscount, int productId);
 

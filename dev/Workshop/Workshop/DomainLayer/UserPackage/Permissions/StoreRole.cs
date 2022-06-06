@@ -8,20 +8,20 @@ using Workshop.DomainLayer.MarketPackage;
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
 
-    public class StoreRole: Role
+    public class StoreRole : Role
     {
         public int StoreId { get; }
-        public List<StoreRole> nominees { get; }
+        public Dictionary<string, StoreRole> nominees { get; }
 
         public StoreRole(int storeId): base()
         {
             this.StoreId = storeId;
-            this.nominees = new List<StoreRole>();
+            this.nominees = new Dictionary<string, StoreRole>();
         }
         
-        public IReadOnlyList<StoreRole> GetAllNominees()
+        public Dictionary<string, StoreRole> GetAllNominees()
         {
-            return new List<StoreRole>(nominees);
+            return new Dictionary<string, StoreRole>(nominees);
         }
 
         public override bool IsAuthorized(int storeID, Action action)
@@ -37,14 +37,26 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             return obj is StoreRole && StoreId == ((StoreRole)obj).StoreId;
         }
 
-        public void AddNominee(StoreRole nominee)
+        public void AddNominee(string membername, StoreRole nominee)
         {
-            this.nominees.Add(nominee);
+            this.nominees.Add(membername, nominee);
         }
 
         public void RemoveNominee(StoreRole nominee)
         {
-            this.nominees.Remove(nominee);
+            string key_to_remove = null;
+            foreach (string membername in this.nominees.Keys)
+            {
+                if (this.nominees[membername].Equals(nominee))
+                {
+                    key_to_remove = membername;
+                    break;
+                }
+            }
+            if (key_to_remove != null)
+            {
+                this.nominees.Remove(key_to_remove);
+            }
         }
 
         /// <summary>
@@ -54,7 +66,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         /// <returns>True if the candidate is already a nominee of this StoreRole, false otherwise</returns>
         public bool ContainsNominee(StoreRole candidate)
         {
-            foreach(StoreRole nominee in this.nominees)
+            foreach(StoreRole nominee in this.nominees.Values)
             {
                 if (nominee.Equals(candidate) || nominee.ContainsNominee(candidate))
                     return true;

@@ -23,7 +23,7 @@ namespace Workshop.ServiceLayer
         Response Logout(int userId, string username);
 
         Response<Product> AddProduct(int userId, string username, int storeId, string productName, string description, double price, int quantity, string category);
-
+        Response<List<Notification>> TakeNotifications(int userId, string membername);
         Response<StoreManager> NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId);
 
         Response<StoreOwner> NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId);
@@ -40,17 +40,17 @@ namespace Workshop.ServiceLayer
 
         Response<ReviewDTO> ReviewProduct(int userId, string user, int productId, string review, int rating);
 
-        Response<List<Product>> SearchProduct(int userId, string user, string keyWords, string catagory, double minPrice, double maxPrice, double productReview);
+        Response<List<Product>> SearchProduct(int userId, string keyWords, string catagory, double minPrice, double maxPrice, double productReview);
 
         Response<List<Store>> GetAllStores(int userId);
 
-        Response<Product> AddToCart(int userId, string user, int productId, int storeId, int quantity);
+        Response<Product> AddToCart(int userId, int productId, int storeId, int quantity);
 
-        Response<ShoppingCart> ViewCart(int userId, string user);
+        Response<ShoppingCart> ViewCart(int userId);
 
-        Response<ShoppingCart> EditCart(int userId, string user, int productId, int newQuantity);
+        Response<ShoppingCart> EditCart(int userId, int productId, int newQuantity);
 
-        Response<double> BuyCart(int userId, string user, CreditCard cc, SupplyAddress address);
+        Response<double> BuyCart(int userId, CreditCard cc, SupplyAddress address);
 
         Response AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId);
 

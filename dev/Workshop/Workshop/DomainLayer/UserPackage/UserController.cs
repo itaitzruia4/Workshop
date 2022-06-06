@@ -212,7 +212,7 @@ namespace Workshop.DomainLayer.UserPackage
         // Being called only from MarketController
         public StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId)
         {
-            Logger.Instance.LogEvent($"User {userId} with member {nominatedUsername} is trying to nominate {nominatedUsername} as a store owner of store {storeId}");
+            Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} is trying to nominate {nominatedUsername} as a store owner of store {storeId}");
             // Check that nominator is the logged in member
             AssertCurrentUser(userId, nominatorUsername);
 
@@ -251,7 +251,7 @@ namespace Workshop.DomainLayer.UserPackage
 
             // Add the new manager to the nominator's nominees list
             StoreRole nominatorStoreOwner = nominatorStoreRoles.Last();
-            nominatorStoreOwner.AddNominee(newRole);
+            nominatorStoreOwner.AddNominee(nominatedUsername, newRole);
 
             RegisterToEvent(nominated.Username, new Event("RemoveStoreOwnerNominationFrom" + nominatedUsername,"", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
@@ -264,7 +264,7 @@ namespace Workshop.DomainLayer.UserPackage
         // Being called only from MarketController
         public StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId)
         {
-            Logger.Instance.LogEvent($"User {userId} with member {nominatedUsername} is trying to nominate {nominatedUsername} as a store manager of store {storeId}");
+            Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} is trying to nominate {nominatedUsername} as a store manager of store {storeId}");
             // Check that nominator is the logged in member
             AssertCurrentUser(userId, nominatorUsername);
 
@@ -294,8 +294,10 @@ namespace Workshop.DomainLayer.UserPackage
 
             // Add the new manager to the nominator's nominees list
             StoreRole nominatorStoreRole = nominatorStoreRoles.Last();
-            nominatorStoreRole.AddNominee(newRole);
+            nominatorStoreRole.AddNominee(nominatedUsername, newRole);
 
+            RegisterToEvent(nominated.Username, new Event("RemoveStoreOwnerNominationFrom" + nominatedUsername, "", "MarketController"));
+            RegisterToEvent(nominated.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("OpenStore" + storeId, "", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("CloseStore" + storeId, "", "MarketController"));
             Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} successfuly nominated member {nominatedUsername} as a store manager of store {storeId}");
@@ -433,17 +435,19 @@ namespace Workshop.DomainLayer.UserPackage
             throw new ArgumentException($"Username {username} is not a member");
         }
 
-        public int GetAge(int userId, string membername)
+        public int GetAge(int userId)
         {
-            if (IsMember(membername))
+            User user = null;
+            AssertUserEnteredMarket(userId);
+            if (currentUsers.TryGetValue(userId, out user))
             {
-                return (int)(DateTime.Now.Subtract(GetMember(membername).Birthdate).TotalDays / 365);
-            }
-            if (currentUsers.ContainsKey(userId))
-            {
+                if (user is Member)
+                {
+                    return (int)(DateTime.Now.Subtract(((Member)user).Birthdate).TotalDays / 365);
+                }
                 return -1;
             }
-            throw new ArgumentException($"No such user: {userId} or member: {membername}");
+            return -1;
         }
 
         public ReviewDTO ReviewProduct(int userId, string user, int productId, string review, int rating)
@@ -470,27 +474,36 @@ namespace Workshop.DomainLayer.UserPackage
         }
 
 
-        public ShoppingBagProduct addToCart(int userId, string username, ShoppingBagProduct product, int storeId)
+        public ShoppingBagProduct addToCart(int userId, ShoppingBagProduct product, int storeId)
         {
             //ShoppingBagProduct 
-            Logger.Instance.LogEvent("User " + username + " is trying to add a product to his cart from store " + storeId);
-            AssertCurrentUser(userId, username);
+            Logger.Instance.LogEvent("User " + userId + " is trying to add a product to his cart from store " + storeId);
+            AssertUserEnteredMarket(userId);
             return this.currentUsers[userId].addToCart(product,storeId);
         }
 
-        public ShoppingCartDTO viewCart(int userId, string user)
+        public ShoppingCartDTO viewCart(int userId)
         {
-            Logger.Instance.LogEvent("User " + user + " is trying to view his cart");
-            AssertCurrentUser(userId, user);
+            Logger.Instance.LogEvent($"User {userId} is trying to view his cart");
+            AssertUserEnteredMarket(userId);
             return currentUsers[userId].viewShopingCart();
         }
-        public ShoppingCartDTO editCart(int userId, string user, int productId, int newQuantity)
+        
+        public void AssertUserEnteredMarket(int userId)
         {
-            Logger.Instance.LogEvent("User " + user + " is trying to edit the quantity of " + productId + " in his cart");
-            AssertCurrentUser(userId, user);
+            if (!currentUsers.ContainsKey(userId))
+            {
+                throw new ArgumentException($"User {userId} has not entered market");
+            }
+        }
+
+        public ShoppingCartDTO editCart(int userId, int productId, int newQuantity)
+        {
+            Logger.Instance.LogEvent("User " + userId + " is trying to edit the quantity of " + productId + " in his cart");
+            AssertUserEnteredMarket(userId);
             if(newQuantity < 0)
             {
-                Logger.Instance.LogEvent("User " + user + " failed to edit the quantity of " + productId + " in his cart");
+                Logger.Instance.LogEvent("User " + userId + " failed to edit the quantity of " + productId + " in his cart");
                 throw new ArgumentException($"Quantity {newQuantity} can not be a negtive number");
             }
             if(newQuantity == 0)
@@ -501,7 +514,7 @@ namespace Workshop.DomainLayer.UserPackage
             {
                 currentUsers[userId].changeQuantityInCart(productId,newQuantity);
             }
-            Logger.Instance.LogEvent("User " + user + " successfuly edited the quantity of " + productId + " in his cart");
+            Logger.Instance.LogEvent("User " + userId + " successfuly edited the quantity of " + productId + " in his cart");
             return currentUsers[userId].viewShopingCart();
         }
 
@@ -517,7 +530,6 @@ namespace Workshop.DomainLayer.UserPackage
         public void AddOrder(int userId, OrderDTO order, string username)
         {
             Logger.Instance.LogEvent($"User {userId} with member {username} is trying to add new order with ID {order.id}");
-            AssertCurrentUser(userId, username);
             orderHandler.addOrder(order, username);
             Logger.Instance.LogEvent($"User {userId} with member {username} added new order with ID {order.id}");
         }
@@ -585,9 +597,27 @@ namespace Workshop.DomainLayer.UserPackage
         {
             notificationHandler.Detach(member, @event);
         }
-        public void notify(Notifications.Event @event)
+        public void notify(Event @event)
         {
             notificationHandler.TriggerEvent(@event);
+        }
+
+        public User GetUser(int userId)
+        {
+            User u = null;
+            if (currentUsers.TryGetValue(userId, out u))
+            {
+                return u;
+            }
+            throw new ArgumentException($"User {userId} has not entered market");
+        }
+
+        public List<Notification> TakeNotifications(int userId, string membername)
+        {
+            AssertCurrentUser(userId, membername);
+            List<Notification> retme = notificationHandler.GetNotifications(membername);
+            notificationHandler.RemoveNotifications(membername);
+            return retme;
         }
     }
 }

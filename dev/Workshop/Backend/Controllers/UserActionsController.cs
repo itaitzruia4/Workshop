@@ -19,6 +19,17 @@ namespace API.Controllers
             Service = service;
         }
 
+        [HttpPost("takenotifications")]
+        public ActionResult<FrontResponse<List<Notification>>> TakeNotifications([FromBody] MemberRequest request)
+        {
+            Response<List<Notification>> response = Service.TakeNotifications(request.UserId, request.Membername);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<List<Notification>>(response.ErrorMessage));
+            }
+            return Ok(new FrontResponse<List<Notification>>(response.Value));
+        }
+
         [HttpPost("reviewproduct")]
         public ActionResult<FrontResponse<ReviewDTO>> ReviewProduct([FromBody] ProductReviewRequest request)
         {
@@ -33,7 +44,7 @@ namespace API.Controllers
         [HttpPost("searchproduct")]
         public ActionResult<FrontResponse<List<Product>>> SearchProduct([FromBody] ProductSearchRequest request)
         {
-            Response<List<Product>> response = Service.SearchProduct(request.UserId, request.Membername, request.Keywords, request.Category, request.MinPrice, request.MaxPrice, request.ProductReview);
+            Response<List<Product>> response = Service.SearchProduct(request.UserId, request.Keywords, request.Category, request.MinPrice, request.MaxPrice, request.ProductReview);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<List<Product>>(response.ErrorMessage));
@@ -44,7 +55,7 @@ namespace API.Controllers
         [HttpPost("addtocart")]
         public ActionResult<FrontResponse<Product>> AddToCart([FromBody] AddToCartRequest request)
         {
-            Response<Product> response = Service.AddToCart(request.UserId, request.Membername, request.ProductId, request.StoreId, request.Quantity);
+            Response<Product> response = Service.AddToCart(request.UserId, request.ProductId, request.StoreId, request.Quantity);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<Product>(response.ErrorMessage));
@@ -53,9 +64,9 @@ namespace API.Controllers
         }
 
         [HttpPost("viewcart")]
-        public ActionResult<FrontResponse<ShoppingCart>> ViewCart([FromBody] MemberRequest request)
+        public ActionResult<FrontResponse<ShoppingCart>> ViewCart([FromBody] BaseRequest request)
         {
-            Response<ShoppingCart> response = Service.ViewCart(request.UserId, request.Membername);
+            Response<ShoppingCart> response = Service.ViewCart(request.UserId);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<ShoppingCart>(response.ErrorMessage));
@@ -66,7 +77,7 @@ namespace API.Controllers
         [HttpPost("editcart")]
         public ActionResult<FrontResponse<ShoppingCart>> EditCart([FromBody] EditCartRequest request)
         {
-            Response<ShoppingCart> response = Service.EditCart(request.UserId, request.Membername, request.ProductId, request.Quantity);
+            Response<ShoppingCart> response = Service.EditCart(request.UserId, request.ProductId, request.Quantity);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<ShoppingCart>(response.ErrorMessage));
@@ -77,13 +88,7 @@ namespace API.Controllers
         [HttpPost("buycart")]
         public ActionResult<FrontResponse<double>> BuyCart([FromBody] BuyCartRequest request)
         {
-            // TODO RONMI FIXME!!!!!!!!!!!!!!!!
-            Response<double> response = Service.BuyCart(
-                request.UserId, 
-                "we shouldn't send a membername",   // TODO FIX THIS!!!!!!!!!!!!!! BUYCART IS ALSO A GUEST ACTION!
-                new CreditCard("123", "March", "2024", "ronmi", "123", "123456789"),
-                new SupplyAddress("ronmi", request.Address, "Ashkelon", "israel", "8502500")
-                );
+            Response<double> response = Service.BuyCart(request.UserId, new CreditCard(request.Card_number, request.Month, request.Year, request.Holder, request.Ccv, request.Id), new SupplyAddress(request.Name, request.Address, request.City, request.Country, request.Zip));
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<double>(response.ErrorMessage));
