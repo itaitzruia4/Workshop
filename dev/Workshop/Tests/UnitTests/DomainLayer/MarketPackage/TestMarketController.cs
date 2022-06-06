@@ -99,7 +99,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
             int storeId = st.GetId();
             Product p1 = marketController.AddProductToStore(1, "User1", storeId, "prod1", "desc1", 10.0, 2, "cat1");
             Product p2 = marketController.AddProductToStore(1, "User1", storeId, "prod2", "desc2", 9.6, 2, "cat2");
-            List<ProductDTO> searchedProducts = marketController.SearchProduct(1, "User1", "", "", 8.7, 10.0, -1);
+            List<ProductDTO> searchedProducts = marketController.SearchProduct(1, "", "", 8.7, 10.0, -1);
             Assert.IsTrue(searchedProducts.Count == 2);
             Assert.IsTrue(p1.GetProductDTO().Equals(searchedProducts[0]) || p1.GetProductDTO().Equals(searchedProducts[1]));
             Assert.IsTrue(p2.GetProductDTO().Equals(searchedProducts[0]) || p2.GetProductDTO().Equals(searchedProducts[1]));
@@ -113,7 +113,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         {
             Store st = marketController.CreateNewStore(1, user, "store");
             marketController.AddProductToStore(1, user, st.GetId(), "someName", "someDesc", 10.0, 2, "cat1");
-            Assert.AreEqual(marketController.SearchProduct(1, user, keyWords, catagory, minPrice, maxPrice, productReview).Count, 0);
+            Assert.AreEqual(marketController.SearchProduct(1, keyWords, catagory, minPrice, maxPrice, productReview).Count, 0);
         }
 
         /// Tests for MarketController.addToBag method

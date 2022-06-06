@@ -124,8 +124,8 @@ namespace Workshop.ServiceLayer
                                 facade.ReviewProduct(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), actualParams[3], int.Parse(actualParams[4]));
                                 break;
                             case "search-product":
-                                if (actualParams.Length != 7) { throw new ArgumentException(); }
-                                facade.SearchProduct(int.Parse(actualParams[0]), actualParams[1], actualParams[2], actualParams[3], double.Parse(actualParams[4]), double.Parse(actualParams[5]), double.Parse(actualParams[6]));
+                                if (actualParams.Length != 6) { throw new ArgumentException(); }
+                                facade.SearchProduct(int.Parse(actualParams[0]), actualParams[1], actualParams[2], double.Parse(actualParams[3]), double.Parse(actualParams[4]), double.Parse(actualParams[5]));
                                 break;
                             case "get-all-stores":
                                 if (actualParams.Length != 1) { throw new ArgumentException(); }
@@ -423,11 +423,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<List<Product>> SearchProduct(int userId, string user, string keyWords, string category, double minPrice, double maxPrice, double productReview)
+        public Response<List<Product>> SearchProduct(int userId, string keyWords, string category, double minPrice, double maxPrice, double productReview)
         {
             try
             {
-                List<DomainProductDTO> products = facade.SearchProduct(userId, user, keyWords, category, minPrice, maxPrice, productReview);
+                List<DomainProductDTO> products = facade.SearchProduct(userId, keyWords, category, minPrice, maxPrice, productReview);
                 List<Product> returnProducts = products.Select(x => new Product(x)).ToList();
                 return new Response<List<Product>>(returnProducts, userId);
             }
@@ -450,7 +450,7 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<ShoppingCart> ViewCart(int userId, string user)
+        public Response<ShoppingCart> ViewCart(int userId)
         {
             try
             {

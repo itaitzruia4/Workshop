@@ -46,7 +46,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
         StoreDTO getStoreInfo(int userId, string user, int storeId);
 
-        List<ProductDTO> SearchProduct(int userId, string user, string keyWords, string catagory, double minPrice, double maxPrice, double productReview);
+        List<ProductDTO> SearchProduct(int userId, string keyWords, string catagory, double minPrice, double maxPrice, double productReview);
 
         double BuyCart(int userId, CreditCard cc, SupplyAddress address);
 

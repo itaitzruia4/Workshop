@@ -40,13 +40,13 @@ namespace Workshop.ServiceLayer
 
         Response<ReviewDTO> ReviewProduct(int userId, string user, int productId, string review, int rating);
 
-        Response<List<Product>> SearchProduct(int userId, string user, string keyWords, string catagory, double minPrice, double maxPrice, double productReview);
+        Response<List<Product>> SearchProduct(int userId, string keyWords, string catagory, double minPrice, double maxPrice, double productReview);
 
         Response<List<Store>> GetAllStores(int userId);
 
         Response<Product> AddToCart(int userId, int productId, int storeId, int quantity);
 
-        Response<ShoppingCart> ViewCart(int userId, string user);
+        Response<ShoppingCart> ViewCart(int userId);
 
         Response<ShoppingCart> EditCart(int userId, string user, int productId, int newQuantity);
 

@@ -530,9 +530,9 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             throw new ArgumentException($"Product with ID {productId} does not exist in the market.");
         }
-        public List<ProductDTO> SearchProduct(int userId, string username, string keyWords, string category, double minPrice, double maxPrice, double productReview)
+        public List<ProductDTO> SearchProduct(int userId, string keyWords, string category, double minPrice, double maxPrice, double productReview)
         {
-            userController.AssertCurrentUser(userId, username);
+            userController.AssertUserEnteredMarket(userId);
             IEnumerable<IEnumerable<Product>> allProducts = stores.Values.Select(s => s.GetProducts().Values);
             IEnumerable<Product> products = allProducts.SelectMany(lp => lp);
             if (keyWords != "")

@@ -455,7 +455,7 @@ namespace Tests.AcceptanceTests
         public void Test_SearchProduct_Good_SpecificProduct(string username, string password)
         {
             Product prod = Test_AddProduct_Good(username, password, product);
-            Response<List<Product>> searchResult = service.SearchProduct(1, username, prod.Name, "", -1, -1, -1);
+            Response<List<Product>> searchResult = service.SearchProduct(1, prod.Name, "", -1, -1, -1);
             Assert.IsFalse(searchResult.ErrorOccured);
             AssertProductsEqual(prod, searchResult.Value.First());
         }
@@ -465,7 +465,7 @@ namespace Tests.AcceptanceTests
         public void Test_SearchProduct_Good_SearchForEveryProduct(string username, string password, string product)
         {
             Product prod = Test_AddProduct_Good(username, password, product);
-            Response<List<Product>> searchResult = service.SearchProduct(1, username, "", "", -1, -1, -1);
+            Response<List<Product>> searchResult = service.SearchProduct(1, "", "", -1, -1, -1);
             Assert.IsFalse(searchResult.ErrorOccured);
             Assert.IsTrue(searchResult.Value.Count() > 0);
         }
@@ -476,7 +476,7 @@ namespace Tests.AcceptanceTests
         {
             Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Response<List<Product>> searchResult = service.SearchProduct(1, username, "", "", -1, -1, -1);
+            Response<List<Product>> searchResult = service.SearchProduct(1, "", "", -1, -1, -1);
             Assert.IsFalse(searchResult.ErrorOccured);
             Assert.AreEqual(0, searchResult.Value.Count());
         }
@@ -488,7 +488,7 @@ namespace Tests.AcceptanceTests
             Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
-            Response<List<Product>> searchResult = service.SearchProduct(1, username, "Worong", "", -1, -1, -1);
+            Response<List<Product>> searchResult = service.SearchProduct(1, "Worong", "", -1, -1, -1);
             Assert.IsFalse(searchResult.ErrorOccured);
             if(searchResult.Value.Count > 0)
                 AssertProductsNotEqual(prod, searchResult.Value.First());
@@ -546,7 +546,7 @@ namespace Tests.AcceptanceTests
             Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
-            Response<ShoppingCart> resSC = service.ViewCart(1, username);
+            Response<ShoppingCart> resSC = service.ViewCart(1);
             Assert.IsFalse(resSC.ErrorOccured);
             Assert.AreEqual(0, resSC.Value.shoppingBags.Count);
         }
@@ -559,7 +559,7 @@ namespace Tests.AcceptanceTests
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             service.AddToCart(1, prod.Id, storeId, 1);
-            Response<ShoppingCart> resSC = service.ViewCart(1, username);
+            Response<ShoppingCart> resSC = service.ViewCart(1);
             Assert.IsFalse(resSC.ErrorOccured);
             Assert.AreEqual(1, resSC.Value.shoppingBags.Count);
             Assert.AreEqual(1, resSC.Value.shoppingBags[storeId].products.Count);
@@ -1504,7 +1504,7 @@ namespace Tests.AcceptanceTests
             service.ExitMarket(2);
             service.EnterMarket(55);
             service.Login(55, member2, "Password2");
-            ShoppingCart cart = service.ViewCart(55, member2).Value;
+            ShoppingCart cart = service.ViewCart(55).Value;
             Assert.AreEqual(1, cart.shoppingBags.Count);
             Assert.AreEqual(2, cart.shoppingBags[store.StoreId].products.Count);
             Assert.AreEqual("Product1", cart.shoppingBags[store.StoreId].products[0].Name);

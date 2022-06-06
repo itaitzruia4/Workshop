@@ -487,7 +487,7 @@ namespace Workshop.DomainLayer.UserPackage
             return currentUsers[userId].viewShopingCart();
         }
         
-        private void AssertUserEnteredMarket(int userId)
+        public void AssertUserEnteredMarket(int userId)
         {
             if (!currentUsers.ContainsKey(userId))
             {
