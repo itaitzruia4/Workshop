@@ -77,5 +77,9 @@ namespace Workshop.ServiceLayer
         Response AddUserPurchaseTerm(int userId, string user, int storeId, string jsonTerm);
 
         Response AddActionToManager(int userId, string owner, string manager, int storeId, string action);
+
+        Response CancelMember(int userId, string actingUsername, string canceledUsername);
+
+        Response<Dictionary<Member, bool>> GetMembersOnlineStats(int userId, string actingUsername);
     }
 }

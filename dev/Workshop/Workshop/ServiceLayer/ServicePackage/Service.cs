@@ -206,6 +206,14 @@ namespace Workshop.ServiceLayer
                                 if (actualParams.Length != 2) { throw new ArgumentException(); }
                                 facade.TakeNotifications(int.Parse(actualParams[0]), actualParams[1]);
                                 break;
+                            case "get-members-online-stats":
+                                if (actualParams.Length != 2) { throw new ArgumentException(); }
+                                facade.GetMembersOnlineStats(int.Parse(actualParams[0]), actualParams[1]);
+                                break;
+                            case "cancel-member":
+                                if (actualParams.Length != 3) { throw new ArgumentException(); }
+                                facade.CancelMember(int.Parse(actualParams[0]), actualParams[1], actualParams[2]);
+                                break;
                             default:
                                 throw new ArgumentException();
                         }
@@ -685,7 +693,6 @@ namespace Workshop.ServiceLayer
             {
                 Dictionary<DomainMember, bool> members = facade.GetMembersOnlineStats(userId, actingUsername);
                 Dictionary<Member, bool> returnMembers = members.Keys.ToDictionary(keySelector: g => new Member(g), elementSelector: g => members[g]);
-
                 return new Response<Dictionary<Member, bool>>(returnMembers, userId);
             }
             catch (Exception e)
