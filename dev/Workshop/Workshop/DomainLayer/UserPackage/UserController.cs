@@ -62,8 +62,13 @@ namespace Workshop.DomainLayer.UserPackage
             public void InitializeSystem()
         {
             Logger.Instance.LogEvent("Starting initializing the system - User Controller");
-            Member admin = new Member("admin", securityHandler.Encrypt("admin"), DateTime.Parse("Aug 22, 1972"));
+            //Member admin = new Member("admin", securityHandler.Encrypt("admin"), DateTime.Parse("Aug 22, 1972"));
+            //admin.AddRole(new MarketManager());
+            EnterMarket(0);
+            Register(0, "admin", securityHandler.Encrypt("admin"), DateTime.Parse("Aug 22, 1972"));
+            Member admin = members["admin"];
             admin.AddRole(new MarketManager());
+            ExitMarket(0);
             Logger.Instance.LogEvent("Finished initializing the system - User Controller");
         }
 
@@ -549,7 +554,7 @@ namespace Workshop.DomainLayer.UserPackage
             if (canceled.HasRoles())
                 throw new MemberAccessException($"User {canceledUsername} has roles so he cannot be canceled.");
 
-            // Check that the nominator is authorized to nominate a store owner
+            // Check that the nominator is authorized to do it
             if (!actor.IsAuthorized(Action.CancelMember))
                 throw new MemberAccessException($"User {actingUsername} is not allowed to cancel members.");
 
@@ -573,7 +578,18 @@ namespace Workshop.DomainLayer.UserPackage
             Dictionary<Member, bool> OnlineStats = new Dictionary<Member, bool>();
             foreach( Member member in members.Values)
             {
-                OnlineStats.Add(member, currentUsers.ContainsKey(userId));
+                bool online_flag = false;
+                foreach (User user in currentUsers.Values) {
+                    try
+                    {
+                        Member tempMember = (Member)user;
+                        if (tempMember.Username == member.Username)
+                            online_flag = true;
+                    }
+                    catch { }
+                    
+                }
+                OnlineStats.Add(member, online_flag);
             }
             return OnlineStats;
         }
