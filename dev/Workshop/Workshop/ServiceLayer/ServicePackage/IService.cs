@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.Reviews;
 using Workshop.ServiceLayer.ServiceObjects;
+using CreditCard = Workshop.DomainLayer.MarketPackage.CreditCard;
+using SupplyAddress = Workshop.DomainLayer.MarketPackage.SupplyAddress;
 
 namespace Workshop.ServiceLayer
 {
@@ -48,7 +50,7 @@ namespace Workshop.ServiceLayer
 
         Response<ShoppingCart> EditCart(int userId, string user, int productId, int newQuantity);
 
-        Response<double> BuyCart(int userId, string user, string address);
+        Response<double> BuyCart(int userId, string user, CreditCard cc, SupplyAddress address);
 
         Response AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId);
 

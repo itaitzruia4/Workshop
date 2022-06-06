@@ -9,6 +9,5 @@ namespace Workshop.ServiceLayer.ServiceObjects
     public class ConfigTemplate
     {
         public string StartingStateFile { get; set; }
-        public string ExternalSystemsAddress { get; set; }
     }
 }
