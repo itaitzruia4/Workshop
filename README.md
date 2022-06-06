@@ -11,11 +11,14 @@ When starting the system, you can choose to pass the path to a config file as a 
 The current format is a json format, of the form:
 
 {
+
   StartingStateFile: # PATH TO THE FILE
+  
 }
 
 # The Starting State file
 The starting state file will be a file from which you can initialize the system. The file will contain multiple commands, each seperated by a newline character. A command will be of the format:
+
 command(argument1,argument2,argument3,...)
 
 Note, it is important that the arguments are seperated by commas, and without a space between the commas.
