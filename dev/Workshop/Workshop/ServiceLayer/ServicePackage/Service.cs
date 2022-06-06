@@ -7,6 +7,7 @@ using Workshop.DomainLayer;
 using Workshop.ServiceLayer.ServiceObjects;
 using DomainUser = Workshop.DomainLayer.UserPackage.User;
 using DomainMember = Workshop.DomainLayer.UserPackage.Permissions.Member;
+using DomainMemberDTO = Workshop.DomainLayer.UserPackage.Permissions.MemberDTO;
 using DomainProduct = Workshop.DomainLayer.MarketPackage.Product;
 using DomainProductDTO = Workshop.DomainLayer.MarketPackage.ProductDTO;
 using DomainStoreManager = Workshop.DomainLayer.UserPackage.Permissions.StoreManager;
@@ -671,6 +672,34 @@ namespace Workshop.ServiceLayer
             catch (Exception e)
             {
                 return new Response<List<Notification>>(e.Message, userId);
+            }
+        }
+
+        public Response<Dictionary<Member, bool>> GetMembersOnlineStats(int userId, string actingUsername)
+        {
+            try
+            {
+                Dictionary<DomainMember, bool> members = facade.GetMembersOnlineStats(userId, actingUsername);
+                Dictionary<Member, bool> returnMembers = members.Keys.ToDictionary(keySelector: g => new Member(g), elementSelector: g => members[g]);
+
+                return new Response<Dictionary<Member, bool>>(returnMembers, userId);
+            }
+            catch (Exception e)
+            {
+                return new Response<Dictionary<Member, bool>>(e.Message, userId);
+            }
+        }
+
+        public Response CancelMember(int userId, string actingUsername, string canceledUsername)
+        {
+            try
+            {
+                facade.CancelMember(userId, actingUsername, canceledUsername);
+                return new Response(userId);
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message, userId);
             }
         }
     }

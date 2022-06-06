@@ -43,5 +43,7 @@ namespace Workshop.DomainLayer.UserPackage
         void notify(Notifications.Event @event);
         User GetUser(int userId);
         List<Notification> TakeNotifications(int userId, string membername);
+        Dictionary<Member, bool> GetMembersOnlineStats(int userId, string actingUsername);
+        void CancelMember(int userId, string actingUsername, string canceledUsername);
     }
 }

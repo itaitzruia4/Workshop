@@ -558,7 +558,7 @@ namespace Workshop.DomainLayer.UserPackage
             members.TryRemove(canceledUsername,out canceled);
         }
 
-        public Dictionary<MemberDTO, bool> GetMembersOnlineStats(int userId, string actingUsername)
+        public Dictionary<Member, bool> GetMembersOnlineStats(int userId, string actingUsername)
         {
             Logger.Instance.LogEvent($"User {userId} with member {actingUsername} is trying to get members online stats");
             // Check that nominator is the logged in member
@@ -571,10 +571,10 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new MemberAccessException($"User {actingUsername} is not allowed to get members online stats.");
 
             //get online members stats
-            Dictionary<MemberDTO, bool> OnlineStats = new Dictionary<MemberDTO, bool>();
+            Dictionary<Member, bool> OnlineStats = new Dictionary<Member, bool>();
             foreach( Member member in members.Values)
             {
-                OnlineStats.Add(member.GetMemberDTO(), currentUsers.ContainsKey(userId));
+                OnlineStats.Add(member, currentUsers.ContainsKey(userId));
             }
             return OnlineStats;
         }
