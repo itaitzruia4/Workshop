@@ -4,14 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using memberDAL = Workshop.DataLayer.DataObjects.Members.Member;
+using MemberDAL = Workshop.DataLayer.DataObjects.Members.Member;
 using DALObject = Workshop.DataLayer.DALObject;
 using RoleDAL = Workshop.DataLayer.DataObjects.Members.Role;
 using ShoppingCartDAL = Workshop.DataLayer.DataObjects.Market.ShoppingCart;
+using DataHandler = Workshop.DataLayer.DataHandler;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
-    public class Member : User, IPersistentObject<memberDAL>
+    public class Member : User, IPersistentObject<MemberDAL>
     {
         public string Username { get; }
         internal string Password { get; }
@@ -20,6 +21,8 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         private List<Role> roles;
 
         private ReaderWriterLock rwl;
+
+        private MemberDAL memberDAL;
 
         public Member(string username, string password, DateTime birthdate)
         {
@@ -30,18 +33,13 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             Birthdate = birthdate;
             roles = new List<Role>();
             this.rwl = new ReaderWriterLock();
+
+            memberDAL = new MemberDAL(password, username, birthdate, new List<RoleDAL>(), shoppingCart.ToDAL());
         }
 
-        public memberDAL ToDAL()
+        public MemberDAL ToDAL()
         {
-            List<RoleDAL> rolesDAL = new List<RoleDAL>();
-
-            foreach(Role role in roles)
-            {
-                rolesDAL.Add((RoleDAL)role.ToDAL());
-            }
-
-            return new memberDAL(Password, Username, Birthdate, rolesDAL, (ShoppingCartDAL)shoppingCart.ToDAL());
+            return memberDAL;
         }
 
         public IReadOnlyList<Role> GetAllRoles()
@@ -92,6 +90,8 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             }
             LockCookie lc = rwl.UpgradeToWriterLock(Timeout.Infinite);
             roles.Add(role);
+            memberDAL.Roles.Add(role.ToDAL());
+            DataHandler.getDBHandler().update(memberDAL);
             rwl.DowngradeFromWriterLock(ref lc);
             rwl.ReleaseReaderLock();
         }
@@ -105,11 +105,14 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
                 {
                     LockCookie lc = rwl.UpgradeToWriterLock(Timeout.Infinite);
                     roles.Remove(role2);
+                    memberDAL.Roles.Remove(role2.ToDAL());
+                    DataHandler.getDBHandler().update(memberDAL);
                     rwl.DowngradeFromWriterLock(ref lc);
                     rwl.ReleaseReaderLock();
                     return;
                 }
             }
+            
             rwl.ReleaseReaderLock();
             throw new InvalidOperationException($"Member {this.Username} does not have the requested role.");
         }

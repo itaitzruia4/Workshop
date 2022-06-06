@@ -242,6 +242,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 if(products.ContainsKey(product.Id) && products[product.Id].Quantity >= product.Quantity)
                 {
                     //products[product.Id].Quantity -= product.Quantity;
+                    //todo does it impact thred
                 }
                 else {
                     throw new ArgumentException($"store {id} doesn't has enough {product.Name} in stock");

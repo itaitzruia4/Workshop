@@ -23,6 +23,7 @@ namespace Workshop.DataLayer.DataObjects.Members
             this.StoreId = StoreId;
             this.Actions = actions;
             this.RoleType = RoleType;
+            Actions = new List<Action>();
         }
 
         // Consructor for non-store role
@@ -33,6 +34,7 @@ namespace Workshop.DataLayer.DataObjects.Members
             this.RoleType = RoleType;
             this.StoreId = StoreId;
             this.nominees = nominees;
+            Actions = new List<Action>();
         }
     }
 }

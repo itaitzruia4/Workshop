@@ -11,15 +11,16 @@ namespace Workshop.ServiceLayer.ServiceObjects
     public class StoreRole : Role
     {
         public int StoreId { get; set; }
-        public List<StoreRole> Nominees { get; set; }
+        public Dictionary<string, StoreRole> Nominees { get; set; }
 
         public StoreRole(DomainStoreRole dsr) : base(dsr)
         {
             StoreId = dsr.StoreId;
-            Nominees = new List<StoreRole>();
-            foreach (DomainStoreRole dstr in dsr.GetAllNominees())
+            Nominees = new Dictionary<string, StoreRole>();
+            Dictionary<string, DomainStoreRole> domain_roles = dsr.GetAllNominees();
+            foreach (string s in domain_roles.Keys)
             {
-                Nominees.Add(new StoreRole(dstr));
+                Nominees.Add(s, new StoreRole(domain_roles[s]));
             }
         }
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DataHandler = Workshop.DataLayer.DataHandler;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
@@ -10,6 +11,9 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
     {
         public StoreManager(int storeId) : base(storeId)
         {
+            roleDAL.RoleType = "StoreManager";
+
+            DataHandler.getDBHandler().update(roleDAL);
         }
     }
 }

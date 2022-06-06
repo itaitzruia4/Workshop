@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Workshop.DataLayer.DataObjects;
 using Workshop.DataLayer.DataObjects.Members;
 using ActionDAL = Workshop.DataLayer.DataObjects.Members.Action;
-
+using Role = Workshop.DataLayer.DataObjects.Members.Role;
 namespace Workshop.DataLayer
 {
     public class Test

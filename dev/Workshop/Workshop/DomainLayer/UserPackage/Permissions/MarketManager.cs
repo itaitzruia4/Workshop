@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using DALObject = Workshop.DataLayer.DALObject;
 using MarketManagerDAL = Workshop.DataLayer.DataObjects.Members.Role;
+using ActionDAL = Workshop.DataLayer.DataObjects.Members.Action;
+using DataHandler = Workshop.DataLayer.DataHandler;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
@@ -15,7 +17,13 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             actions.Add(Action.ViewClosedStore);
             actions.Add(Action.CancelMember);
             actions.Add(Action.GetMarketStatistics);
-            actions.Add(Action.GetMembersOnlineStats); 
+            actions.Add(Action.GetMembersOnlineStats);
+
+            roleDAL.RoleType = "MarketManager";
+            foreach (var action in actions)
+                roleDAL.Actions.Add(new ActionDAL((int)action));
+
+            DataHandler.getDBHandler().update(roleDAL);
         }
 
         

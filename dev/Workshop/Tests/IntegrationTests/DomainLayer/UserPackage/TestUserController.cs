@@ -15,6 +15,8 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
     {
         private UserController userController;
         private int member2StoreId = 1;
+        private SupplyAddress address = new SupplyAddress("Ronmi", "Mayor 1", "Ashkelon", "Israel", "784112");
+        private CreditCard cc = new CreditCard("001122334455667788", "11", "26", "LeBron Michal", "555", "208143751");
 
         [TestInitialize]
         public void Setup()
@@ -29,7 +31,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
             userController.Register(1, "member1", "pass1", DateTime.Parse("Aug 22, 1972"));
             userController.Login(1, "member1", "pass1");
-            userController.addToCart(1, "member1", new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1, "cat1", 1), 1);
+            userController.addToCart(1, new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1, "cat1", 1), 1);
 
             List<ShoppingBagProduct> member1prods = new List<ShoppingBagProduct>();
             member1prods.Add(new ShoppingBagProduct(1, "prod1", "desc1", 11.90, 3, "cat1", 1));
@@ -38,7 +40,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             {
                 pdtos1.Add(sbp.GetProductDTO());
             }
-            userController.AddOrder(1, new OrderDTO(1, "member1", "whatever", "blasToysRus", pdtos1), "member1");
+            userController.AddOrder(1, new OrderDTO(1, "member1", address, "blasToysRus", pdtos1), "member1");
             userController.Logout(1, "member1");
 
             userController.Register(1, "member3", "pass3", DateTime.Parse("Aug 22, 1972"));

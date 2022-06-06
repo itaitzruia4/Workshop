@@ -7,6 +7,8 @@ using Workshop.DataLayer;
 using Workshop.DomainLayer.MarketPackage;
 using static Workshop.DomainLayer.UserPackage.Permissions.Role;
 using StoreOwnerDAl = Workshop.DataLayer.DataObjects.Members.Role;
+using ActionDAL = Workshop.DataLayer.DataObjects.Members.Action;
+using DataHandler = Workshop.DataLayer.DataHandler;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
@@ -29,6 +31,12 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             actions.Add(Action.NominateStoreManager);
             actions.Add(Action.AddDiscount);
             actions.Add(Action.AddPurchaseTerm);
+
+            roleDAL.RoleType = "StoreOwner";
+            foreach(var action in actions)
+                roleDAL.Actions.Add(new ActionDAL((int)action));
+
+            DataHandler.getDBHandler().update(roleDAL);
         }
 
         public override StoreOwnerDAl ToDAL()

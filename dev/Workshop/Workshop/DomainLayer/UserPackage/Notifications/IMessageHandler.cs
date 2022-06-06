@@ -9,6 +9,6 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
 {
     public interface IMessageHandler
     {
-        void SendNotification(UserPackage.User reciver, Notification notification);
+        void SendNotification(string reciverName, Notification notification);
     }
 }

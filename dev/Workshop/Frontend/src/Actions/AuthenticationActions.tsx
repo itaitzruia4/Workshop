@@ -71,7 +71,7 @@ export function handleLogin(token: token, membername: string, password: string):
         if (!response.ok) {
             return Promise.reject(data.error);
         }
-        return Promise.resolve(data.value)
+        return Promise.resolve(data)
     })
 }
 

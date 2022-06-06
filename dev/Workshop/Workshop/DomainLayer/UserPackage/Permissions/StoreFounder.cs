@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Workshop.DataLayer;
 using StoreOwnerDAl = Workshop.DataLayer.DataObjects.Members.Role;
+using ActionDAL = Workshop.DataLayer.DataObjects.Members.Action;
+using DataHandler = Workshop.DataLayer.DataHandler;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
@@ -13,6 +15,12 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         public StoreFounder(int storeId) : base(storeId)
         {
             actions.Add(Action.CloseStore);
+
+            roleDAL.RoleType = "StoreFounder";
+            foreach (var action in actions)
+                roleDAL.Actions.Add(new ActionDAL((int)action));
+
+            DataHandler.getDBHandler().update(roleDAL);
         }
 
         public override StoreOwnerDAl ToDAL()

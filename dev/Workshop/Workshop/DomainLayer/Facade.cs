@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Workshop.DomainLayer.MarketPackage;
-using Workshop.DomainLayer.MarketPackage.ExternalServices.Payment;
-using Workshop.DomainLayer.MarketPackage.ExternalServices.Supply;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Security;
 using Workshop.DomainLayer.UserPackage.Shopping;
+using Workshop.ServiceLayer;
 using Notification = Workshop.DomainLayer.UserPackage.Notifications.Notification;
 
 
@@ -18,16 +17,10 @@ namespace Workshop.DomainLayer
         private IUserController UserController;
         private IMarketController MarketController;
 
-        internal Facade()
+        internal Facade(IExternalSystem externalSystem)
         {
-            IPaymentExternalService paymentExternalService = new ProxyPaymentExternalService(null);
-            IMarketPaymentService paymentService = new PaymentAdapter(paymentExternalService);
-
-            ISupplyExternalService supplyExternalService = new ProxySupplyExternalService(null);
-            IMarketSupplyService supplyService = new SupplyAdapter(supplyExternalService);
-
             UserController = new UserController(new HashSecurityHandler(), new ReviewHandler());
-            MarketController = new MarketController(UserController, paymentService, supplyService);
+            MarketController = new MarketController(UserController, externalSystem);
         }
 
         public User EnterMarket(int userId)
@@ -111,25 +104,25 @@ namespace Workshop.DomainLayer
         {
             return MarketController.getStoreInfo(userId, user, storeId);
         }
-        internal List<ProductDTO> SearchProduct(int userId, string user, string keyWords, string category, double minPrice, double maxPrice, double productReview)
+        internal List<ProductDTO> SearchProduct(int userId, string keyWords, string category, double minPrice, double maxPrice, double productReview)
         {
-            return MarketController.SearchProduct(userId, user, keyWords, category, minPrice, maxPrice, productReview);
+            return MarketController.SearchProduct(userId, keyWords, category, minPrice, maxPrice, productReview);
         }
-        internal ShoppingBagProduct AddToCart(int userId, string user, int productId, int storeId,int quantity)
+        internal ShoppingBagProduct AddToCart(int userId, int productId, int storeId,int quantity)
         {
-            return MarketController.addToBag(userId, user, productId, storeId, quantity);
+            return MarketController.addToBag(userId, productId, storeId, quantity);
         }
-        internal ShoppingCartDTO ViewCart(int userId, string user)
+        internal ShoppingCartDTO ViewCart(int userId)
         {
-            return UserController.viewCart(userId, user);
+            return UserController.viewCart(userId);
         }
-        internal ShoppingCartDTO EditCart(int userId, string user, int productId, int newQuantity)
+        internal ShoppingCartDTO EditCart(int userId, int productId, int newQuantity)
         {
-            return UserController.editCart(userId, user, productId, newQuantity);
+            return UserController.editCart(userId, productId, newQuantity);
         }
-        internal double BuyCart(int userId, string user, string address)
+        internal double BuyCart(int userId, CreditCard cc, SupplyAddress address)
         {
-            return MarketController.BuyCart(userId, user, address);
+            return MarketController.BuyCart(userId, cc, address);
         }
 
         public void AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId)
@@ -195,6 +188,11 @@ namespace Workshop.DomainLayer
         internal List<Store> GetAllStores(int userId)
         {
             return MarketController.GetAllStores(userId);
+        }
+
+        internal List<Notification> TakeNotifications(int userId, string membername)
+        {
+            return UserController.TakeNotifications(userId, membername);
         }
     }
 }

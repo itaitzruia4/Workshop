@@ -14,6 +14,8 @@ using DomainStoreOwner = Workshop.DomainLayer.UserPackage.Permissions.StoreOwner
 using DomainStoreFounder = Workshop.DomainLayer.UserPackage.Permissions.StoreFounder;
 using DomainStore = Workshop.DomainLayer.MarketPackage.Store;
 using DomainNotification = Workshop.DomainLayer.UserPackage.Notifications.Notification;
+using CreditCard = Workshop.DomainLayer.MarketPackage.CreditCard;
+using SupplyAddress = Workshop.DomainLayer.MarketPackage.SupplyAddress;
 using Newtonsoft.Json;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.Loggers;
@@ -27,13 +29,13 @@ namespace Workshop.ServiceLayer
         private Facade facade;
         public readonly bool WasInitializedWithFile;
 
-        public Service()
+        public Service(IExternalSystem externalSystem)
         {
-            this.facade = new Facade();
+            this.facade = new Facade(externalSystem);
             WasInitializedWithFile = false;
         }
 
-        public Service(string conf)
+        public Service(IExternalSystem externalSystem, string conf)
         {
             ConfigTemplate config;
             string initializationState = "";
@@ -49,7 +51,7 @@ namespace Workshop.ServiceLayer
             {
                 Logger.Instance.LogError("Config file was not in correct format, or starting state file does not exist");
             }
-            facade = new Facade();
+            facade = new Facade(externalSystem);
             try
             {
                 foreach (string command in initializationState.Split('\n'))
@@ -122,28 +124,30 @@ namespace Workshop.ServiceLayer
                                 facade.ReviewProduct(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), actualParams[3], int.Parse(actualParams[4]));
                                 break;
                             case "search-product":
-                                if (actualParams.Length != 7) { throw new ArgumentException(); }
-                                facade.SearchProduct(int.Parse(actualParams[0]), actualParams[1], actualParams[2], actualParams[3], double.Parse(actualParams[4]), double.Parse(actualParams[5]), double.Parse(actualParams[6]));
+                                if (actualParams.Length != 6) { throw new ArgumentException(); }
+                                facade.SearchProduct(int.Parse(actualParams[0]), actualParams[1], actualParams[2], double.Parse(actualParams[3]), double.Parse(actualParams[4]), double.Parse(actualParams[5]));
                                 break;
                             case "get-all-stores":
                                 if (actualParams.Length != 1) { throw new ArgumentException(); }
                                 facade.GetAllStores(int.Parse(actualParams[0]));
                                 break;
                             case "add-to-cart":
-                                if (actualParams.Length != 5) { throw new ArgumentException(); }
-                                facade.AddToCart(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]), int.Parse(actualParams[4]));
+                                if (actualParams.Length != 4) { throw new ArgumentException(); }
+                                facade.AddToCart(int.Parse(actualParams[0]), int.Parse(actualParams[2]), int.Parse(actualParams[3]), int.Parse(actualParams[4]));
                                 break;
                             case "view-cart":
-                                if (actualParams.Length != 2) { throw new ArgumentException(); }
-                                facade.ViewCart(int.Parse(actualParams[0]), actualParams[1]);
+                                if (actualParams.Length != 1) { throw new ArgumentException(); }
+                                facade.ViewCart(int.Parse(actualParams[0]));
                                 break;
                             case "edit-cart":
-                                if (actualParams.Length != 4) { throw new ArgumentException(); }
-                                facade.EditCart(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]));
+                                if (actualParams.Length != 3) { throw new ArgumentException(); }
+                                facade.EditCart(int.Parse(actualParams[0]), int.Parse(actualParams[1]), int.Parse(actualParams[2]));
                                 break;
                             case "buy-cart":
-                                if (actualParams.Length != 3) { throw new ArgumentException(); }
-                                facade.BuyCart(int.Parse(actualParams[0]), actualParams[1], actualParams[2]);
+                                if (actualParams.Length != 12) { throw new ArgumentException(); }
+                                CreditCard cc = new CreditCard(actualParams[1], actualParams[2], actualParams[3], actualParams[4], actualParams[5], actualParams[6]);
+                                SupplyAddress address = new SupplyAddress(actualParams[7], actualParams[8], actualParams[9], actualParams[10], actualParams[11]);
+                                facade.BuyCart(int.Parse(actualParams[0]), cc, address);
                                 break;
                             case "add-product-discount":
                                 if (actualParams.Length != 5) { throw new ArgumentException(); }
@@ -210,7 +214,7 @@ namespace Workshop.ServiceLayer
             }
             catch (Exception ex)
             {
-                this.facade = new Facade();
+                this.facade = new Facade(externalSystem);
                 Logger.Instance.LogError($"Initialization from file failed: \n{ex.Message}.\nSystem is in default condition.");
                 WasInitializedWithFile = false;
             }
@@ -419,11 +423,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<List<Product>> SearchProduct(int userId, string user, string keyWords, string category, double minPrice, double maxPrice, double productReview)
+        public Response<List<Product>> SearchProduct(int userId, string keyWords, string category, double minPrice, double maxPrice, double productReview)
         {
             try
             {
-                List<DomainProductDTO> products = facade.SearchProduct(userId, user, keyWords, category, minPrice, maxPrice, productReview);
+                List<DomainProductDTO> products = facade.SearchProduct(userId, keyWords, category, minPrice, maxPrice, productReview);
                 List<Product> returnProducts = products.Select(x => new Product(x)).ToList();
                 return new Response<List<Product>>(returnProducts, userId);
             }
@@ -433,11 +437,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<Product> AddToCart(int userId, string user, int productId, int storeId, int quantity)
+        public Response<Product> AddToCart(int userId, int productId, int storeId, int quantity)
         {
             try
             {
-                Product product = new Product(facade.AddToCart(userId, user, productId, storeId, quantity));
+                Product product = new Product(facade.AddToCart(userId, productId, storeId, quantity));
                 return new Response<Product>(product, userId);
             }
             catch (Exception e)
@@ -446,11 +450,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<ShoppingCart> ViewCart(int userId, string user)
+        public Response<ShoppingCart> ViewCart(int userId)
         {
             try
             {
-                ShoppingCart shoppingCart = new ShoppingCart(facade.ViewCart(userId, user));
+                ShoppingCart shoppingCart = new ShoppingCart(facade.ViewCart(userId));
                 return new Response<ShoppingCart>(shoppingCart, userId);
             }
             catch (Exception e)
@@ -459,11 +463,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<ShoppingCart> EditCart(int userId, string user, int productId, int newQuantity)
+        public Response<ShoppingCart> EditCart(int userId, int productId, int newQuantity)
         {
             try
             {
-                ShoppingCart shoppingCart = new ShoppingCart(facade.EditCart(userId, user, productId, newQuantity));
+                ShoppingCart shoppingCart = new ShoppingCart(facade.EditCart(userId, productId, newQuantity));
                 return new Response<ShoppingCart>(shoppingCart, userId);
             }
             catch (Exception e)
@@ -472,11 +476,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<double> BuyCart(int userId, string user, string address)
+        public Response<double> BuyCart(int userId, CreditCard cc, SupplyAddress address)
         {
             try
             {
-                return new Response<double>(facade.BuyCart(userId, user, address), userId);
+                return new Response<double>(facade.BuyCart(userId, cc, address), userId);
             }
             catch (Exception e)
             {
@@ -655,6 +659,18 @@ namespace Workshop.ServiceLayer
             catch (Exception e)
             {
                 return new Response<List<Store>>(e.Message, userId);
+            }
+        }
+
+        public Response<List<Notification>> TakeNotifications(int userId, string membername)
+        {
+            try
+            {
+                return new Response<List<Notification>>(facade.TakeNotifications(userId, membername).Select(x => new Notification(x)).ToList(), userId);
+            }
+            catch (Exception e)
+            {
+                return new Response<List<Notification>>(e.Message, userId);
             }
         }
     }

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate, useLocation } from "react-router-dom";
 import { Grid, Paper, Avatar, TextField, Button, Typography, Link } from '@mui/material/';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { userToken, token, makeMemberToken } from '../Types/roles';
+import { userToken, token, makeMemberToken, makeUserToken } from '../Types/roles';
 import { handleLogin } from '../Actions/AuthenticationActions';
 import { MarketNotification } from '../Types/Notification';
 
@@ -34,7 +34,8 @@ const Login = () => {
                 <Button type='submit' color='primary' variant="contained" style={btnstyle} fullWidth
                 onClick={e =>
                     handleLogin(token, membername, password)
-                        .then((data) => routeChange("/member", makeMemberToken(token.userId, membername, []))())
+                        .then((data) => { console.log(JSON.stringify(data)); return data; })
+                        .then((data) => routeChange("/member", makeMemberToken(token.userId, membername, data.notifications))())
                         .catch(error => {
                             alert(error)
                         })
@@ -42,7 +43,7 @@ const Login = () => {
                 <Button type='submit' color='primary' variant="contained" style={btnstyle} fullWidth >Continue as guest</Button>
                 <Typography > Don't have an account ? 
                     <Link
-                        onClick={routeChange("/register", { userId: token.userId, notifications: []})}>
+                        onClick={routeChange("/register", makeUserToken(token.userId))}>
                         Sign Up
                     </Link>
                 </Typography>
