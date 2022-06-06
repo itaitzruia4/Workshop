@@ -33,7 +33,7 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
 
         public ShoppingBagProduct addToCart(ShoppingBagProduct product, int storeId)
         {
-            if(checkIfHasBag(storeId) == -1)
+            if(!checkIfStoreHasBag(storeId))
             {
                 shoppingBags.Add(storeId,new ShoppingBag(storeId));
             }
@@ -58,6 +58,11 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
                 }
             }
             return -1;
+        }
+
+        public bool checkIfStoreHasBag(int StoreId)
+        {
+            return shoppingBags.ContainsKey(StoreId);
         }
 
         internal void Clear()

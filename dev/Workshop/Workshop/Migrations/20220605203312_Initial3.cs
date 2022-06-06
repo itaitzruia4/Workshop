@@ -2,7 +2,7 @@
 
 namespace Workshop.Migrations
 {
-    public partial class Initial1 : Migration
+    public partial class Initial3 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

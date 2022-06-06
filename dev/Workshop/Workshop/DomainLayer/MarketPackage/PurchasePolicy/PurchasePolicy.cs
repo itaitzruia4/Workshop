@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Workshop.DomainLayer.MarketPackage.Terms;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using DALObject = Workshop.DataLayer.DALObject;
-using DALPurchasePolicy = Workshop.DataLayer.DataObjects.Market.PurchasePolicy;
+using DALPurchasePolicy = Workshop.DataLayer.DataObjects.Market.Purchases.PurchasePolicy;
 
 
 

@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Workshop.DataLayer.DataObjects.Market.Discounts;
+<<<<<<< HEAD
+=======
+using Workshop.DataLayer.DataObjects.Market.Purchases;
+>>>>>>> a435401cdcd8cb032971602a6846e124fbc1c81b
 
 namespace Workshop.DataLayer.DataObjects.Market
 {
@@ -16,6 +20,8 @@ namespace Workshop.DataLayer.DataObjects.Market
         public PurchasePolicy PurchasePolicy { get; set; }
         public List<Product> Products { get; set; }
 
+        public Store()
+        { }
         public Store(int id, bool open, string storeName, DiscountPolicy discountPolicy, PurchasePolicy purchasePolicy, List<Product> products)
         {
             Id = id;

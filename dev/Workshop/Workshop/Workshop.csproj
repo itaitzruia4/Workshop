@@ -265,16 +265,33 @@
     <Compile Include="DataLayer\DALObject.cs" />
     <Compile Include="DataLayer\DataHandler.cs" />
     <Compile Include="DataLayer\Context.cs" />
+<<<<<<< HEAD
     <Compile Include="DataLayer\DataObjects\Market\Discounts\ConcreteDiscount.cs" />
     <Compile Include="DataLayer\DataObjects\Market\Discounts\Discount.cs" />
     <Compile Include="DataLayer\DataObjects\Market\Discounts\DiscountPolicy.cs" />
     <Compile Include="DataLayer\DataObjects\Market\Discounts\PriceAction.cs" />
     <Compile Include="DataLayer\DataObjects\Market\Review.cs" />
+=======
+    <Compile Include="DataLayer\DataObjects\Controllers\MarketController.cs" />
+    <Compile Include="DataLayer\DataObjects\Market\Discounts\CategoryTerms.cs" />
+    <Compile Include="DataLayer\DataObjects\Market\Discounts\ProductTerms.cs" />
+    <Compile Include="DataLayer\DataObjects\Market\Purchases\AndTerm.cs" />
+    <Compile Include="DataLayer\DataObjects\Market\Purchases\CompositeTerm.cs" />
+    <Compile Include="DataLayer\DataObjects\Market\Purchases\OrTerm.cs" />
+    <Compile Include="DataLayer\DataObjects\Market\Purchases\SimpleTerm.cs" />
+    <Compile Include="DataLayer\DataObjects\Market\Purchases\Term.cs" />
+    <Compile Include="DataLayer\DataObjects\Market\Purchases\XorTerm.cs" />
+    <Compile Include="DataLayer\DataObjects\Notifications\Notification.cs" />
+    <Compile Include="DataLayer\DataObjects\Notifications\NotificationHandler.cs" />
+    <Compile Include="DataLayer\DataObjects\Controllers\UserController.cs" />
+    <Compile Include="DataLayer\DataObjects\Market\Discounts\DiscountPolicy.cs" />
+    <Compile Include="DataLayer\DataObjects\Market\ProductDTO.cs" />
+>>>>>>> a435401cdcd8cb032971602a6846e124fbc1c81b
     <Compile Include="DataLayer\DataObjects\Members\Action.cs" />
     <Compile Include="DataLayer\DataObjects\Members\MarketManager.cs" />
     <Compile Include="DataLayer\DataObjects\Members\Member.cs" />
     <Compile Include="DataLayer\DataObjects\Market\Product.cs" />
-    <Compile Include="DataLayer\DataObjects\Market\PurchasePolicy.cs" />
+    <Compile Include="DataLayer\DataObjects\Market\Purchases\PurchasePolicy.cs" />
     <Compile Include="DataLayer\DataObjects\Members\Role.cs" />
     <Compile Include="DataLayer\DataObjects\Market\ShoppingBag.cs" />
     <Compile Include="DataLayer\DataObjects\Market\ShoppingBagProduct.cs" />
@@ -284,6 +301,16 @@
     <Compile Include="DataLayer\DataObjects\Members\StoreManager.cs" />
     <Compile Include="DataLayer\DataObjects\Members\StoreOwner.cs" />
     <Compile Include="DataLayer\DataObjects\Members\StoreRole.cs" />
+    <Compile Include="DataLayer\DataObjects\Notifications\Event.cs" />
+    <Compile Include="DataLayer\DataObjects\Orders\MemberToOrders.cs" />
+    <Compile Include="DataLayer\DataObjects\Orders\OrderDTO.cs" />
+    <Compile Include="DataLayer\DataObjects\Orders\OrderHandler.cs" />
+    <Compile Include="DataLayer\DataObjects\Reviews\ProductReviews.cs" />
+    <Compile Include="DataLayer\DataObjects\Reviews\ProductToReviewDTO.cs" />
+    <Compile Include="DataLayer\DataObjects\Reviews\ReviewDTO.cs" />
+    <Compile Include="DataLayer\DataObjects\Reviews\ReviewHandler.cs" />
+    <Compile Include="DataLayer\DataObjects\Reviews\UserReviews.cs" />
+    <Compile Include="DataLayer\DataObjects\Reviews\UserToReviewDTO.cs" />
     <Compile Include="DataLayer\Test.cs" />
     <Compile Include="DomainLayer\IPersistentObject.cs" />
     <Compile Include="DomainLayer\UserPackage\ILoginChecker.cs" />
@@ -313,13 +340,17 @@
     <Compile Include="DomainLayer\UserPackage\Notifications\NotificationHandler.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\MemberDTO.cs" />
     <Compile Include="DomainLayer\UserPackage\TempClass.cs" />
-    <Compile Include="Migrations\20220604125041_Initial.cs" />
-    <Compile Include="Migrations\20220604125041_Initial.designer.cs">
-      <DependentUpon>20220604125041_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\20220605190121_Initial.cs" />
+    <Compile Include="Migrations\20220605190121_Initial.designer.cs">
+      <DependentUpon>20220605190121_Initial.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\20220604132435_Initial1.cs" />
-    <Compile Include="Migrations\20220604132435_Initial1.designer.cs">
-      <DependentUpon>20220604132435_Initial1.cs</DependentUpon>
+    <Compile Include="Migrations\20220605201440_Initial2.cs" />
+    <Compile Include="Migrations\20220605201440_Initial2.designer.cs">
+      <DependentUpon>20220605201440_Initial2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20220605203312_Initial3.cs" />
+    <Compile Include="Migrations\20220605203312_Initial3.designer.cs">
+      <DependentUpon>20220605203312_Initial3.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\ContextModelSnapshot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -370,6 +401,7 @@
     <Compile Include="DomainLayer\UserPackage\UserController.cs" />
     <Compile Include="ServiceLayer\Response.cs" />
     <Compile Include="ServiceLayer\ResponseT.cs" />
+    <Compile Include="ServiceLayer\ServiceObjects\ConfigTemplate.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\MarketManager.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Member.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Notification.cs" />

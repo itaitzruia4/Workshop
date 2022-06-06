@@ -9,8 +9,8 @@ using System.Threading;
 using StoreDAL = Workshop.DataLayer.DataObjects.Market.Store;
 using DALObject = Workshop.DataLayer.DALObject;
 using ProductDAL = Workshop.DataLayer.DataObjects.Market.Product;
-using DiscountPolicyDAL = Workshop.DataLayer.DataObjects.Market.DiscountPolicy;
-using PurchasePolicyDAL = Workshop.DataLayer.DataObjects.Market.PurchasePolicy;
+using DiscountPolicyDAL = Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy;
+using PurchasePolicyDAL = Workshop.DataLayer.DataObjects.Market.Purchases.PurchasePolicy;
 
 
 namespace Workshop.DomainLayer.MarketPackage
@@ -279,7 +279,7 @@ namespace Workshop.DomainLayer.MarketPackage
             double price = 0;
             foreach (ProductDTO productDTO in shoppingBag.products)
             {
-                price += productDTO.Price;
+                price += productDTO.Price*productDTO.Quantity;
             }
             return Math.Max(price - discount, 0);
         }
