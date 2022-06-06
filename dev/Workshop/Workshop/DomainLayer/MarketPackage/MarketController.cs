@@ -11,6 +11,7 @@ using System.Threading;
 using System.Collections.Concurrent;
 using Workshop.DomainLayer.UserPackage.Notifications;
 using Workshop.ServiceLayer;
+using User = Workshop.DomainLayer.UserPackage.User;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
@@ -597,10 +598,10 @@ namespace Workshop.DomainLayer.MarketPackage
 
             return porduct;
         }
-        public double BuyCart(int userId, string username, CreditCard cc, SupplyAddress address)
+        public double BuyCart(int userId, CreditCard cc, SupplyAddress address)
         {
-            Logger.Instance.LogEvent($"User {username} is trying to buy his cart.");
-            ShoppingCartDTO shoppingCart = userController.viewCart(userId, username);
+            Logger.Instance.LogEvent($"User {userId} is trying to buy his cart.");
+            ShoppingCartDTO shoppingCart = userController.viewCart(userId);
             if (shoppingCart.IsEmpty())
             {
                 throw new InvalidOperationException("Can't buy an empty shopping cart");
@@ -619,7 +620,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 }
                 try
                 {
-                    int age = userController.GetAge(userId, username);
+                    int age = userController.GetAge(userId);
                     stores[storeId].CheckPurchasePolicy(shoppingCart.shoppingBags[storeId], age);
                     //ShoppingBagDTO bag = stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
                     ShoppingBagDTO bag = new ShoppingBagDTO(storeId, shoppingCart.shoppingBags[storeId].products);
@@ -628,7 +629,9 @@ namespace Workshop.DomainLayer.MarketPackage
                     {
                         products = product.Name + " ";
                     }
-                    events.Add(new Event("SaleInStore" + storeId, "Prouducts with the name" + products + " were bought from store " + storeId + "by user " + username, "marketController"));
+                    User currentUser = userController.GetUser(userId);
+                    string username = currentUser is Member ? ((Member)currentUser).Username : "A guest";
+                    events.Add(new Event("SaleInStore" + storeId, $"Prouducts with the name {products} were bought from store {storeId} by {username}", "marketController"));
                     productsSoFar.Add(storeId, shoppingCart.shoppingBags[storeId].products);
                     OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetStoreName(), shoppingCart.shoppingBags[storeId].products);
                     orderHandler.addOrder(order, storeId);
@@ -677,9 +680,9 @@ namespace Workshop.DomainLayer.MarketPackage
         return price;
     }
 
-    public ShoppingBagProduct addToBag(int userId, string user, int productId, int storeId, int quantity)
+    public ShoppingBagProduct addToBag(int userId, int productId, int storeId, int quantity)
     {
-        return userController.addToCart(userId, user, getProductForSale(productId, storeId, quantity), storeId);
+        return userController.addToCart(userId, getProductForSale(productId, storeId, quantity), storeId);
     }
 
     public void AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId)

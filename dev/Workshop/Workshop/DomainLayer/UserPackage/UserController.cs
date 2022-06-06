@@ -433,17 +433,19 @@ namespace Workshop.DomainLayer.UserPackage
             throw new ArgumentException($"Username {username} is not a member");
         }
 
-        public int GetAge(int userId, string membername)
+        public int GetAge(int userId)
         {
-            if (IsMember(membername))
+            User user = null;
+            AssertUserEnteredMarket(userId);
+            if (currentUsers.TryGetValue(userId, out user))
             {
-                return (int)(DateTime.Now.Subtract(GetMember(membername).Birthdate).TotalDays / 365);
-            }
-            if (currentUsers.ContainsKey(userId))
-            {
+                if (user is Member)
+                {
+                    return (int)(DateTime.Now.Subtract(((Member)user).Birthdate).TotalDays / 365);
+                }
                 return -1;
             }
-            throw new ArgumentException($"No such user: {userId} or member: {membername}");
+            return -1;
         }
 
         public ReviewDTO ReviewProduct(int userId, string user, int productId, string review, int rating)
@@ -470,20 +472,29 @@ namespace Workshop.DomainLayer.UserPackage
         }
 
 
-        public ShoppingBagProduct addToCart(int userId, string username, ShoppingBagProduct product, int storeId)
+        public ShoppingBagProduct addToCart(int userId, ShoppingBagProduct product, int storeId)
         {
             //ShoppingBagProduct 
-            Logger.Instance.LogEvent("User " + username + " is trying to add a product to his cart from store " + storeId);
-            AssertCurrentUser(userId, username);
+            Logger.Instance.LogEvent("User " + userId + " is trying to add a product to his cart from store " + storeId);
+            AssertUserEnteredMarket(userId);
             return this.currentUsers[userId].addToCart(product,storeId);
         }
 
-        public ShoppingCartDTO viewCart(int userId, string user)
+        public ShoppingCartDTO viewCart(int userId)
         {
-            Logger.Instance.LogEvent("User " + user + " is trying to view his cart");
-            AssertCurrentUser(userId, user);
+            Logger.Instance.LogEvent($"User {userId} is trying to view his cart");
+            AssertUserEnteredMarket(userId);
             return currentUsers[userId].viewShopingCart();
         }
+        
+        private void AssertUserEnteredMarket(int userId)
+        {
+            if (!currentUsers.ContainsKey(userId))
+            {
+                throw new ArgumentException($"User {userId} has not entered market");
+            }
+        }
+
         public ShoppingCartDTO editCart(int userId, string user, int productId, int newQuantity)
         {
             Logger.Instance.LogEvent("User " + user + " is trying to edit the quantity of " + productId + " in his cart");
@@ -517,7 +528,6 @@ namespace Workshop.DomainLayer.UserPackage
         public void AddOrder(int userId, OrderDTO order, string username)
         {
             Logger.Instance.LogEvent($"User {userId} with member {username} is trying to add new order with ID {order.id}");
-            AssertCurrentUser(userId, username);
             orderHandler.addOrder(order, username);
             Logger.Instance.LogEvent($"User {userId} with member {username} added new order with ID {order.id}");
         }
@@ -585,9 +595,19 @@ namespace Workshop.DomainLayer.UserPackage
         {
             notificationHandler.Detach(member, @event);
         }
-        public void notify(Notifications.Event @event)
+        public void notify(Event @event)
         {
             notificationHandler.TriggerEvent(@event);
+        }
+
+        public User GetUser(int userId)
+        {
+            User u = null;
+            if (currentUsers.TryGetValue(userId, out u))
+            {
+                return u;
+            }
+            throw new ArgumentException($"User {userId} has not entered market");
         }
     }
 }

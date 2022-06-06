@@ -21,7 +21,7 @@ namespace Workshop.DomainLayer.UserPackage
         void Register(int userId, string username, string password, DateTime birthdate);
         bool IsMember(string username);
         Member GetMember(string username);
-        int GetAge(int userId, string membername);
+        int GetAge(int userId);
         KeyValuePair<Member, List<Notification>> Login(int userId, string username, string password);
         void Logout(int userId, string username);
         StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId);
@@ -30,8 +30,8 @@ namespace Workshop.DomainLayer.UserPackage
         void AssertCurrentUser(int userId, string username);
         List<Member> GetWorkers(int storeId);
         ReviewDTO ReviewProduct(int userId, string user, int productId, string review, int rating);
-        ShoppingBagProduct addToCart(int userId, string user, ShoppingBagProduct shoppingBagProduct, int storeId);
-        ShoppingCartDTO viewCart(int userId, string user);
+        ShoppingBagProduct addToCart(int userId, ShoppingBagProduct shoppingBagProduct, int storeId);
+        ShoppingCartDTO viewCart(int userId);
         void AddStoreFounder(string username, int storeId);
         void AddOrder(int userId, OrderDTO order, string username);
         ShoppingCartDTO editCart(int userId, string user, int productId, int newQuantity);
@@ -40,5 +40,6 @@ namespace Workshop.DomainLayer.UserPackage
         void RegisterToEvent(string user, Notifications.Event @event);
         void RemoveRegisterToEvent(string MemberName, Notifications.Event @event);
         void notify(Notifications.Event @event);
+        User GetUser(int userId);
     }
 }

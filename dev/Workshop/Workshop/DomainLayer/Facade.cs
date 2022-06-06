@@ -108,21 +108,21 @@ namespace Workshop.DomainLayer
         {
             return MarketController.SearchProduct(userId, user, keyWords, category, minPrice, maxPrice, productReview);
         }
-        internal ShoppingBagProduct AddToCart(int userId, string user, int productId, int storeId,int quantity)
+        internal ShoppingBagProduct AddToCart(int userId, int productId, int storeId,int quantity)
         {
-            return MarketController.addToBag(userId, user, productId, storeId, quantity);
+            return MarketController.addToBag(userId, productId, storeId, quantity);
         }
-        internal ShoppingCartDTO ViewCart(int userId, string user)
+        internal ShoppingCartDTO ViewCart(int userId)
         {
-            return UserController.viewCart(userId, user);
+            return UserController.viewCart(userId);
         }
         internal ShoppingCartDTO EditCart(int userId, string user, int productId, int newQuantity)
         {
             return UserController.editCart(userId, user, productId, newQuantity);
         }
-        internal double BuyCart(int userId, string user, CreditCard cc, SupplyAddress address)
+        internal double BuyCart(int userId, CreditCard cc, SupplyAddress address)
         {
-            return MarketController.BuyCart(userId, user, cc, address);
+            return MarketController.BuyCart(userId, cc, address);
         }
 
         public void AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId)

@@ -44,13 +44,13 @@ namespace Workshop.ServiceLayer
 
         Response<List<Store>> GetAllStores(int userId);
 
-        Response<Product> AddToCart(int userId, string user, int productId, int storeId, int quantity);
+        Response<Product> AddToCart(int userId, int productId, int storeId, int quantity);
 
         Response<ShoppingCart> ViewCart(int userId, string user);
 
         Response<ShoppingCart> EditCart(int userId, string user, int productId, int newQuantity);
 
-        Response<double> BuyCart(int userId, string user, CreditCard cc, SupplyAddress address);
+        Response<double> BuyCart(int userId, CreditCard cc, SupplyAddress address);
 
         Response AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId);
 

@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Workshop.DomainLayer.Reviews;
 using Workshop.ServiceLayer;
 using Workshop.ServiceLayer.ServiceObjects;
+using CreditCard = Workshop.DomainLayer.MarketPackage.CreditCard;
+using SupplyAddress = Workshop.DomainLayer.MarketPackage.SupplyAddress;
 
 namespace API.Controllers
 {
@@ -42,7 +44,7 @@ namespace API.Controllers
         [HttpPost("addtocart")]
         public ActionResult<FrontResponse<Product>> AddToCart([FromBody] AddToCartRequest request)
         {
-            Response<Product> response = Service.AddToCart(request.UserId, request.Membername, request.ProductId, request.StoreId, request.Quantity);
+            Response<Product> response = Service.AddToCart(request.UserId, request.ProductId, request.StoreId, request.Quantity);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<Product>(response.ErrorMessage));
@@ -75,7 +77,7 @@ namespace API.Controllers
         [HttpPost("buycart")]
         public ActionResult<FrontResponse<double>> BuyCart([FromBody] BuyCartRequest request)
         {
-            Response<double> response = Service.BuyCart(request.UserId, request.Membername, request.Address);
+            Response<double> response = Service.BuyCart(request.UserId, new CreditCard(request.Card_number, request.Month, request.Year, request.Holder, request.Ccv, request.Id), new SupplyAddress(request.Name, request.Address, request.City, request.Country, request.Zip));
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<double>(response.ErrorMessage));

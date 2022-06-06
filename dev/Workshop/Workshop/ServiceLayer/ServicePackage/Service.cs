@@ -132,22 +132,22 @@ namespace Workshop.ServiceLayer
                                 facade.GetAllStores(int.Parse(actualParams[0]));
                                 break;
                             case "add-to-cart":
-                                if (actualParams.Length != 5) { throw new ArgumentException(); }
-                                facade.AddToCart(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]), int.Parse(actualParams[4]));
+                                if (actualParams.Length != 4) { throw new ArgumentException(); }
+                                facade.AddToCart(int.Parse(actualParams[0]), int.Parse(actualParams[2]), int.Parse(actualParams[3]), int.Parse(actualParams[4]));
                                 break;
                             case "view-cart":
-                                if (actualParams.Length != 2) { throw new ArgumentException(); }
-                                facade.ViewCart(int.Parse(actualParams[0]), actualParams[1]);
+                                if (actualParams.Length != 1) { throw new ArgumentException(); }
+                                facade.ViewCart(int.Parse(actualParams[0]));
                                 break;
                             case "edit-cart":
                                 if (actualParams.Length != 4) { throw new ArgumentException(); }
                                 facade.EditCart(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]));
                                 break;
                             case "buy-cart":
-                                if (actualParams.Length != 3) { throw new ArgumentException(); }
-                                CreditCard cc = new CreditCard(actualParams[2], actualParams[3], actualParams[4], actualParams[5], actualParams[6], actualParams[7]);
-                                SupplyAddress address = new SupplyAddress(actualParams[8], actualParams[9], actualParams[10], actualParams[11], actualParams[12]);
-                                facade.BuyCart(int.Parse(actualParams[0]), actualParams[1], cc, address);
+                                if (actualParams.Length != 12) { throw new ArgumentException(); }
+                                CreditCard cc = new CreditCard(actualParams[1], actualParams[2], actualParams[3], actualParams[4], actualParams[5], actualParams[6]);
+                                SupplyAddress address = new SupplyAddress(actualParams[7], actualParams[8], actualParams[9], actualParams[10], actualParams[11]);
+                                facade.BuyCart(int.Parse(actualParams[0]), cc, address);
                                 break;
                             case "add-product-discount":
                                 if (actualParams.Length != 5) { throw new ArgumentException(); }
@@ -437,11 +437,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<Product> AddToCart(int userId, string user, int productId, int storeId, int quantity)
+        public Response<Product> AddToCart(int userId, int productId, int storeId, int quantity)
         {
             try
             {
-                Product product = new Product(facade.AddToCart(userId, user, productId, storeId, quantity));
+                Product product = new Product(facade.AddToCart(userId, productId, storeId, quantity));
                 return new Response<Product>(product, userId);
             }
             catch (Exception e)
@@ -454,7 +454,7 @@ namespace Workshop.ServiceLayer
         {
             try
             {
-                ShoppingCart shoppingCart = new ShoppingCart(facade.ViewCart(userId, user));
+                ShoppingCart shoppingCart = new ShoppingCart(facade.ViewCart(userId));
                 return new Response<ShoppingCart>(shoppingCart, userId);
             }
             catch (Exception e)
@@ -476,11 +476,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<double> BuyCart(int userId, string user, CreditCard cc, SupplyAddress address)
+        public Response<double> BuyCart(int userId, CreditCard cc, SupplyAddress address)
         {
             try
             {
-                return new Response<double>(facade.BuyCart(userId, user, cc, address), userId);
+                return new Response<double>(facade.BuyCart(userId, cc, address), userId);
             }
             catch (Exception e)
             {
