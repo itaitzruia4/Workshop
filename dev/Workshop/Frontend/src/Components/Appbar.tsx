@@ -66,7 +66,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-export default function Appbar(token: token, name: string,stores : Store[], cart: Cart ) {
+export default function Appbar(token: token, name: string,stores : Store[], cart: Cart, nots: MarketNotification[] ) {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
         React.useState<null | HTMLElement>(null);
@@ -75,7 +75,7 @@ export default function Appbar(token: token, name: string,stores : Store[], cart
         React.useState<null | HTMLElement>(null);
     
     const [notifications, setNotifications] =
-        React.useState<MarketNotification[]>(isMemberToken(token) ? token.notifications : []);
+        React.useState<MarketNotification[]>(nots);
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);

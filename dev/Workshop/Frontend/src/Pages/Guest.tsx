@@ -90,7 +90,7 @@ function Guest() {
 
     return (
         <div>
-            {Appbar(token, "guest", stores, cart)}
+            {Appbar(token, "guest", stores, cart, [])}
             {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct, closeStore, openStore, addDiscount, addProductDiscount, addCategoryDiscount, addToCart)}
             <Stack direction="row" spacing={2}>
                 <Button variant='contained' onClick={e =>

@@ -12,13 +12,14 @@ import { useState, useEffect } from 'react';
 
 import { handleLogout, handleExitMarket } from '../Actions/AuthenticationActions';
 import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleOpenStore, handleRemoveProduct, handleAddDiscount, handleAddProductDiscount, handleAddCategoryDiscount } from '../Actions/StoreActions';
-import { handleAddToCart, handleViewCart, handleReviewProduct } from '../Actions/UserActions';
+import { handleAddToCart, handleViewCart, handleReviewProduct, handleUpdateNotifications } from '../Actions/UserActions';
 import { handleChangeProductCategory, handleChangeProductName, handleChangeProductPrice, handleChangeProductQuantity } from '../Actions/ProductActions';
 
 import { makeUserToken, memberToken } from '../Types/roles';
 import { Store } from "../Types/store"
 import { Product } from "../Types/product"
 import { Cart, Bag } from '../Types/shopping';
+import { MarketNotification } from '../Types/Notification';
 
 
 function Member() {
@@ -33,12 +34,14 @@ function Member() {
             navigate(path, { state: token });
 
     const [stores, setStores] = useState<Store[]>([])
-    const [cart, setCart] = useState<Cart>({ shoppingBags: []})
+    const [cart, setCart] = useState<Cart>({ shoppingBags: [] })
+    const [notifications, setNotifications] = useState<MarketNotification[]>([]);
 
 
     const refresh = () => {
         handleGetStores(token).then(value => setStores(value as Store[])).catch(error => alert(error));
-        handleViewCart(makeUserToken(token.userId)).then(value => setCart(value as Cart)).catch (error => alert(error));
+        handleViewCart(makeUserToken(token.userId)).then(value => setCart(value as Cart)).catch(error => alert(error));
+        handleUpdateNotifications(token).then(value => setNotifications(value as MarketNotification[])).catch(error => alert(error));
     };
 
     useEffect(() => {
@@ -102,7 +105,7 @@ function Member() {
    
     return (
         <div>
-            {Appbar(token, token.membername, stores, cart)}
+            {Appbar(token, token.membername, stores, cart, notifications)}
             <ButtonGroup variant="contained" aria-label="outlined primary button group">
                 {AddStoreDialog(addStore)}
             </ButtonGroup>
