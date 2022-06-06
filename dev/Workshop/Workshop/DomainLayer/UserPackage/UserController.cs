@@ -32,7 +32,7 @@ namespace Workshop.DomainLayer.UserPackage
             members = new ConcurrentDictionary<string, Member>();
             this.orderHandler = new OrderHandler<string>();
             // TODO Find out how to actually implement IMessageSender, Look at Github Issues!
-            notificationHandler = new NotificationHandler(new TempClass(), this);
+            notificationHandler = new NotificationHandler(this);
         }
 
         public bool CheckOnlineStatus(string u)
@@ -302,7 +302,6 @@ namespace Workshop.DomainLayer.UserPackage
             nominatorStoreRole.AddNominee(nominatedUsername, newRole);
 
             RegisterToEvent(nominated.Username, new Event("RemoveStoreOwnerNominationFrom" + nominatedUsername, "", "MarketController"));
-            RegisterToEvent(nominated.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("OpenStore" + storeId, "", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("CloseStore" + storeId, "", "MarketController"));
             Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} successfuly nominated member {nominatedUsername} as a store manager of store {storeId}");

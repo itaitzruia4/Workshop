@@ -2051,5 +2051,34 @@ namespace Tests.AcceptanceTests
             Assert.IsTrue(!(PAY_FLAG ^ CANCEL_PAY_FLAG));
             Assert.IsTrue(!(CANCEL_SUPPLY_FLAG ^ SUPPLY_FLAG));
         }
+
+        [TestMethod]
+        public void Test_TakeNotifications_Success_Empty()
+        {
+            Test_Login_Good(1, "Member1", "Password1");
+            Response<List<Notification>> resp = service.TakeNotifications(1, "Member1");
+            Assert.IsFalse(resp.ErrorOccured);
+            Assert.AreEqual(0, resp.Value.Count);
+        }
+
+        [TestMethod]
+        public void Test_TakeNotifications_Success_NonEmpty()
+        {
+            // Store owners and managers need to get a notification when their nomination is removed
+            Test_Login_Good(0, "Member1", "Password1");
+            Test_Login_Good(1, "Member2", "Password2");
+            Store store1 = service.CreateNewStore(0, "Member1", "Store1").Value;
+            service.NominateStoreOwner(0, "Member1", "Member2", store1.StoreId);
+            service.RemoveStoreOwnerNomination(0, "Member1", "Member2", store1.StoreId);
+
+            Response<List<Notification>> resp = service.TakeNotifications(1, "Member2");
+            Assert.IsFalse(resp.ErrorOccured);
+            Assert.IsNotNull(resp.Value);
+            Assert.AreEqual(1, resp.Value.Count);
+            Response<List<Notification>> resp1 = service.TakeNotifications(1, "Member2");
+            Assert.IsFalse(resp1.ErrorOccured);
+            Assert.IsNotNull(resp1.Value);
+            Assert.AreEqual(0, resp1.Value.Count);
+        }
     }
 }

@@ -27,6 +27,7 @@ import AddToCartDialog from '../Components/Dialogs/addToCartDialog';
 
 import { Store } from "../Types/store"
 import { Product } from "../Types/product"
+import StoreRolesDialog from './Dialogs/StoreRolesDialog';
 
 
 export default function StoresList(
@@ -40,9 +41,11 @@ export default function StoresList(
     addDiscount: (storeId: number, discountJson: string) => void,
     addProductDiscount: (storeId: number, productId: number, discountJson: string) => void,
     addCategoryDiscount: (storeId: number, category: string, discountJson: string) => void,
-    addToCart: (storeId: number, productId: number, quantity: number ) => void
-    )
-    {
+    addToCart: (storeId: number, productId: number, quantity: number) => void,
+    nominateStoreOwner: (storeId: number, nominee: string) => void,
+    nominateStoreManager: (storeId: number, nominee: string) => void,
+    removeStoreOwnerNomination: (storeId: number, nominee: string) => void
+    ){
         const CustomizedListItem: React.FC<{
             store: Store
         }> = ({ store }) => {
@@ -70,6 +73,7 @@ export default function StoresList(
                         <ButtonGroup variant="outlined" aria-label="outlined button group">
                             {AddProductDialog(store.storeId, addProduct)}
                             {AddDiscountDialog(store.storeId, addDiscount, addProductDiscount, addCategoryDiscount)}
+                            {StoreRolesDialog(store.storeId, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
                             <div>
                                 <Button onClick={e => closeStore(store.storeId)}>Close store</Button>
                             </div>
