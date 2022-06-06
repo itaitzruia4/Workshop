@@ -66,7 +66,7 @@ namespace API.Controllers
         [HttpPost("editcart")]
         public ActionResult<FrontResponse<ShoppingCart>> EditCart([FromBody] EditCartRequest request)
         {
-            Response<ShoppingCart> response = Service.EditCart(request.UserId, request.Membername, request.ProductId, request.Quantity);
+            Response<ShoppingCart> response = Service.EditCart(request.UserId, request.ProductId, request.Quantity);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<ShoppingCart>(response.ErrorMessage));

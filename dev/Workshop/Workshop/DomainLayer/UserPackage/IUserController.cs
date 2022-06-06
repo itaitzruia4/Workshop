@@ -35,7 +35,7 @@ namespace Workshop.DomainLayer.UserPackage
         ShoppingCartDTO viewCart(int userId);
         void AddStoreFounder(string username, int storeId);
         void AddOrder(int userId, OrderDTO order, string username);
-        ShoppingCartDTO editCart(int userId, string user, int productId, int newQuantity);
+        ShoppingCartDTO editCart(int userId, int productId, int newQuantity);
         void ClearUserCart(int userId);
         double GetProductRating(int productId);
         void RegisterToEvent(string user, Notifications.Event @event);

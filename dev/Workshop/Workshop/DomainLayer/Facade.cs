@@ -116,9 +116,9 @@ namespace Workshop.DomainLayer
         {
             return UserController.viewCart(userId);
         }
-        internal ShoppingCartDTO EditCart(int userId, string user, int productId, int newQuantity)
+        internal ShoppingCartDTO EditCart(int userId, int productId, int newQuantity)
         {
-            return UserController.editCart(userId, user, productId, newQuantity);
+            return UserController.editCart(userId, productId, newQuantity);
         }
         internal double BuyCart(int userId, CreditCard cc, SupplyAddress address)
         {

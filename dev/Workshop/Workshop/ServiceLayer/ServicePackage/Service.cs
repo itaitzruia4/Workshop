@@ -140,8 +140,8 @@ namespace Workshop.ServiceLayer
                                 facade.ViewCart(int.Parse(actualParams[0]));
                                 break;
                             case "edit-cart":
-                                if (actualParams.Length != 4) { throw new ArgumentException(); }
-                                facade.EditCart(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]));
+                                if (actualParams.Length != 3) { throw new ArgumentException(); }
+                                facade.EditCart(int.Parse(actualParams[0]), int.Parse(actualParams[1]), int.Parse(actualParams[2]));
                                 break;
                             case "buy-cart":
                                 if (actualParams.Length != 12) { throw new ArgumentException(); }
@@ -463,11 +463,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<ShoppingCart> EditCart(int userId, string user, int productId, int newQuantity)
+        public Response<ShoppingCart> EditCart(int userId, int productId, int newQuantity)
         {
             try
             {
-                ShoppingCart shoppingCart = new ShoppingCart(facade.EditCart(userId, user, productId, newQuantity));
+                ShoppingCart shoppingCart = new ShoppingCart(facade.EditCart(userId, productId, newQuantity));
                 return new Response<ShoppingCart>(shoppingCart, userId);
             }
             catch (Exception e)

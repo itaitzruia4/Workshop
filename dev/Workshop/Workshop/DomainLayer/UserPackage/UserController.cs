@@ -495,13 +495,13 @@ namespace Workshop.DomainLayer.UserPackage
             }
         }
 
-        public ShoppingCartDTO editCart(int userId, string user, int productId, int newQuantity)
+        public ShoppingCartDTO editCart(int userId, int productId, int newQuantity)
         {
-            Logger.Instance.LogEvent("User " + user + " is trying to edit the quantity of " + productId + " in his cart");
-            AssertCurrentUser(userId, user);
+            Logger.Instance.LogEvent("User " + userId + " is trying to edit the quantity of " + productId + " in his cart");
+            AssertUserEnteredMarket(userId);
             if(newQuantity < 0)
             {
-                Logger.Instance.LogEvent("User " + user + " failed to edit the quantity of " + productId + " in his cart");
+                Logger.Instance.LogEvent("User " + userId + " failed to edit the quantity of " + productId + " in his cart");
                 throw new ArgumentException($"Quantity {newQuantity} can not be a negtive number");
             }
             if(newQuantity == 0)
@@ -512,7 +512,7 @@ namespace Workshop.DomainLayer.UserPackage
             {
                 currentUsers[userId].changeQuantityInCart(productId,newQuantity);
             }
-            Logger.Instance.LogEvent("User " + user + " successfuly edited the quantity of " + productId + " in his cart");
+            Logger.Instance.LogEvent("User " + userId + " successfuly edited the quantity of " + productId + " in his cart");
             return currentUsers[userId].viewShopingCart();
         }
 

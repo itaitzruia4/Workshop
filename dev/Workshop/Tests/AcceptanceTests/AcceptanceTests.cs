@@ -574,10 +574,10 @@ namespace Tests.AcceptanceTests
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
             service.AddToCart(1, prod.Id, storeId, 1);
-            Response<ShoppingCart> resSC = service.EditCart(1, username, prod.Id, 5);
+            Response<ShoppingCart> resSC = service.EditCart(1, prod.Id, 5);
             Assert.IsFalse(resSC.ErrorOccured);
             Assert.AreEqual(5, resSC.Value.shoppingBags[storeId].products.First().Quantity);
-            resSC = service.EditCart(1, username, prod.Id, 1);
+            resSC = service.EditCart(1, prod.Id, 1);
             Assert.IsFalse(resSC.ErrorOccured);
             Assert.AreEqual(1, resSC.Value.shoppingBags[storeId].products.First().Quantity);
         }

@@ -491,7 +491,7 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             userController.EnterMarket(1);
             userController.Login(1, "member2", "pass2");
             ShoppingBagProduct product2 = userController.addToCart(1, new ShoppingBagProduct(prodId, prodName, desc, price, quantity, category, storeId), storeId);
-            ShoppingCartDTO shoppingCart = userController.editCart(1, user, prodId, newQuantity);
+            ShoppingCartDTO shoppingCart = userController.editCart(1, prodId, newQuantity);
             //Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(preInsertedProduct.GetProductDTO()));
             ProductDTO product = product2.GetProductDTO();
             product.Quantity = newQuantity;
@@ -506,7 +506,7 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             userController.EnterMarket(1);
             userController.Login(1, "member2", "pass2");
             ShoppingBagProduct product2 = userController.addToCart(1, new ShoppingBagProduct(prodId, prodName, desc, price, quantity, category, storeId), storeId);
-            ShoppingCartDTO shoppingCart = userController.editCart(1, user, prodId, newQuantity);
+            ShoppingCartDTO shoppingCart = userController.editCart(1, prodId, newQuantity);
             //Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(preInsertedProduct.GetProductDTO()));
             Assert.IsTrue(shoppingCart.shoppingBags[1].products.Count==0);
         }
@@ -520,7 +520,7 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             userController.EnterMarket(1);
             userController.Login(1, "member2", "pass2");
             ShoppingBagProduct product2 = userController.addToCart(1, new ShoppingBagProduct(1, prodName, desc, price, quantity, category, storeId), storeId);
-            Assert.ThrowsException<ArgumentException>(() => userController.editCart(1, user, prodId, newQuantity));
+            Assert.ThrowsException<ArgumentException>(() => userController.editCart(1, prodId, newQuantity));
         }
     }
 }
