@@ -42,14 +42,15 @@ namespace API.Controllers
         }
 
         [HttpPost("login")]
-        public ActionResult<FrontResponse<KeyValuePair<Member, List<Notification>>>> Login([FromBody] AuthenticationRequest request)
+        public ActionResult<LoginResponse> Login([FromBody] AuthenticationRequest request)
         {
             Response<KeyValuePair<Member, List<Notification>>> response = Service.Login(request.UserId, request.Membername, request.Password);
             if (response.ErrorOccured)
             {
-                return BadRequest(new FrontResponse<KeyValuePair<Member, List<Notification>>>(response.ErrorMessage));
+                return BadRequest(new LoginResponse(response.ErrorMessage));
             }
-            return Ok(new FrontResponse<KeyValuePair<Member, List<Notification>>>(response.Value));
+
+            return Ok(new LoginResponse(response.Value.Key, response.Value.Value));
         }
 
         [HttpPost("logout")]

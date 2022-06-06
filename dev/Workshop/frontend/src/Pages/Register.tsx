@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import * as moment from 'moment';
 import { useNavigate, useLocation } from "react-router-dom";
 import { Grid, Paper, Avatar, TextField, Button, Typography, Link } from '@mui/material/';
-import { userToken, token } from '../Types/roles';
+import { userToken, token, makeMemberToken, makeUserToken } from '../Types/roles';
 import { handleRegister } from '../Actions/AuthenticationActions';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 
@@ -36,16 +36,16 @@ const Register = () => {
                 <Button type='submit' color='primary' variant="contained" style={btnstyle} fullWidth
                     onClick={e =>
                         handleRegister(token, membername, password, birthDate)
-                            .then(routeChange("/login", { userId: token.userId, membername: membername, notifications: [] }))
+                            .then(routeChange("/login", makeMemberToken(token.userId, membername, [])))
                             .catch(error => {
                                 alert(error)
                             })
                     } >Sign up</Button>
-                <Button type='submit' color='primary' variant="contained" style={btnstyle} fullWidth onClick={routeChange('/login', { userId: token.userId, notifications: [] })}
+                <Button type='submit' color='primary' variant="contained" style={btnstyle} fullWidth onClick={routeChange('/login', makeUserToken(token.userId))}
                 >Back to login screen</Button>
             </Paper>
         </Grid>
     )
 }
 
-export default Register
+export default Register;
