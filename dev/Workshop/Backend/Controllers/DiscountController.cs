@@ -48,6 +48,5 @@ namespace API.Controllers
             }
             return Ok(new FrontResponse<bool>(true));
         }
-
     }
 }
