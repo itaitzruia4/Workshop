@@ -23,7 +23,7 @@ namespace Workshop.ServiceLayer
         Response Logout(int userId, string username);
 
         Response<Product> AddProduct(int userId, string username, int storeId, string productName, string description, double price, int quantity, string category);
-
+        Response<List<Notification>> TakeNotifications(int userId, string membername);
         Response<StoreManager> NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId);
 
         Response<StoreOwner> NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId);

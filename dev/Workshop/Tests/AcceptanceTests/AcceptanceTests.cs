@@ -1758,8 +1758,8 @@ namespace Tests.AcceptanceTests
             Store store1 = service.CreateNewStore(0, "Member1", "Store1").Value;
             service.NominateStoreOwner(0, "Member1", "Member4", store1.StoreId);
             service.NominateStoreOwner(3, "Member4", "Member2", store1.StoreId);
-            service.Logout(3, "Member4");
             service.NominateStoreManager(3, "Member4", "Member3", store1.StoreId);
+            service.Logout(3, "Member4");
             service.RemoveStoreOwnerNomination(0, "Member1", "Member4", store1.StoreId);
 
             Response<KeyValuePair<Member, List<Notification>>> response3 = service.Login(3, "Member4", "Password4");

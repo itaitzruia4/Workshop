@@ -661,5 +661,17 @@ namespace Workshop.ServiceLayer
                 return new Response<List<Store>>(e.Message, userId);
             }
         }
+
+        public Response<List<Notification>> TakeNotifications(int userId, string membername)
+        {
+            try
+            {
+                return new Response<List<Notification>>(facade.TakeNotifications(userId, membername).Select(x => new Notification(x)).ToList(), userId);
+            }
+            catch (Exception e)
+            {
+                return new Response<List<Notification>>(e.Message, userId);
+            }
+        }
     }
 }

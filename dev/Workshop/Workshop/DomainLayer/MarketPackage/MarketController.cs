@@ -93,6 +93,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
         private Member RemoveStoreOwnerNominationHelper(string nominator, string nominated, int storeId)
         {
+            Logger.Instance.LogEvent($"Member {nominator} is trying to remove store owner nomination from {nominated} in store {storeId}.");
             Member nominatorMember = userController.GetMember(nominator);
             Member nominatedMember = userController.GetMember(nominated);
             StoreRole FOUND_NOMINATOR_ROLE = null;
@@ -101,7 +102,7 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 foreach (StoreRole nominatorRole in nominatorMember.GetStoreRoles(storeId))
                 {
-                    if (nominatedRole is StoreOwner && (nominatorRole is StoreManager || nominatorRole is StoreOwner) && nominatorRole.ContainsNominee(nominatedRole))
+                    if ((nominatedRole is StoreOwner || nominatedRole is StoreManager) && (nominatorRole is StoreManager || nominatorRole is StoreOwner) && nominatorRole.ContainsNominee(nominatedRole))
                     {
                         FOUND_NOMINATED_ROLE = nominatedRole;
                         FOUND_NOMINATOR_ROLE = nominatorRole;
@@ -118,14 +119,11 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new ArgumentException($"{nominator} did not nominate {nominated} to be a store owner in store {storeId}");
             }
 
-            foreach (StoreRole role in nominatedMember.GetStoreRoles(storeId))
+            List<string> to_remove = FOUND_NOMINATED_ROLE.nominees.Keys.ToList();
+            foreach (string k in to_remove)
             {
-                foreach (string OldNominated in role.nominees.Keys)
-                {
-                    RemoveStoreOwnerNominationHelper(nominated, OldNominated, storeId);
-                }
+                RemoveStoreOwnerNominationHelper(nominated, k, storeId);
             }
-
             nominatedMember.RemoveRole(FOUND_NOMINATED_ROLE);
             FOUND_NOMINATOR_ROLE.RemoveNominee(FOUND_NOMINATED_ROLE);
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("SaleInStore" + storeId, "", "MarketController"));

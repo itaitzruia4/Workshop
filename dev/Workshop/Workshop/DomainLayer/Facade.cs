@@ -189,5 +189,10 @@ namespace Workshop.DomainLayer
         {
             return MarketController.GetAllStores(userId);
         }
+
+        internal List<Notification> TakeNotifications(int userId, string membername)
+        {
+            return UserController.TakeNotifications(userId, membername);
+        }
     }
 }

@@ -609,5 +609,13 @@ namespace Workshop.DomainLayer.UserPackage
             }
             throw new ArgumentException($"User {userId} has not entered market");
         }
+
+        public List<Notification> TakeNotifications(int userId, string membername)
+        {
+            AssertCurrentUser(userId, membername);
+            List<Notification> retme = notificationHandler.GetNotifications(membername);
+            notificationHandler.RemoveNotifications(membername);
+            return retme;
+        }
     }
 }

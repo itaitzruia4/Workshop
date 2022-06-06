@@ -19,6 +19,17 @@ namespace API.Controllers
             Service = service;
         }
 
+        [HttpPost("takenotifications")]
+        public ActionResult<FrontResponse<List<Notification>>> TakeNotifications([FromBody] MemberRequest request)
+        {
+            Response<List<Notification>> response = Service.TakeNotifications(request.UserId, request.Membername);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<List<Notification>>(response.ErrorMessage));
+            }
+            return Ok(new FrontResponse<List<Notification>>(response.Value));
+        }
+
         [HttpPost("reviewproduct")]
         public ActionResult<FrontResponse<ReviewDTO>> ReviewProduct([FromBody] ProductReviewRequest request)
         {

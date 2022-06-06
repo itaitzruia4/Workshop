@@ -42,5 +42,6 @@ namespace Workshop.DomainLayer.UserPackage
         void RemoveRegisterToEvent(string MemberName, Notifications.Event @event);
         void notify(Notifications.Event @event);
         User GetUser(int userId);
+        List<Notification> TakeNotifications(int userId, string membername);
     }
 }
