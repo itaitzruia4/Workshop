@@ -15,7 +15,7 @@ import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, ha
 import { handleAddToCart, handleViewCart, handleReviewProduct } from '../Actions/UserActions';
 import { handleChangeProductCategory, handleChangeProductName, handleChangeProductPrice, handleChangeProductQuantity } from '../Actions/ProductActions';
 
-import { memberToken } from '../Types/roles';
+import { makeUserToken, memberToken } from '../Types/roles';
 import { Store } from "../Types/store"
 import { Product } from "../Types/product"
 import { Cart, Bag } from '../Types/shopping';
@@ -38,7 +38,7 @@ function Member() {
 
     const refresh = () => {
         handleGetStores(token).then(value => setStores(value as Store[])).catch(error => alert(error));
-        handleViewCart(token).then(value => setCart(value as Cart)).catch (error => alert(error));
+        handleViewCart(makeUserToken(token.userId)).then(value => setCart(value as Cart)).catch (error => alert(error));
     };
 
     useEffect(() => {
@@ -97,12 +97,12 @@ function Member() {
     //cart actions 
 
     const addToCart = (storeId: number, productId: number, quantity: number) => {
-        handleAddToCart(token, storeId, productId, quantity).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+        handleAddToCart(makeUserToken(token.userId), storeId, productId, quantity).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     }
    
     return (
         <div>
-            {Appbar(token.membername, stores, cart)}
+            {Appbar(token, token.membername, stores, cart)}
             <ButtonGroup variant="contained" aria-label="outlined primary button group">
                 {AddStoreDialog(addStore)}
             </ButtonGroup>

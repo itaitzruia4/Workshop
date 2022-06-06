@@ -21,6 +21,9 @@ import CartDialog from './Dialogs/CartDialog'
 import { Store } from "../Types/store"
 import { Product } from "../Types/product"
 import { Cart, Bag } from '../Types/shopping';
+import { isMemberToken, token } from '../Types/roles';
+import { MarketNotification } from '../Types/Notification';
+import { NotificationsList } from './NotificationsList';
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -63,10 +66,16 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-export default function Appbar(name: string,stores : Store[], cart: Cart ) {
+export default function Appbar(token: token, name: string,stores : Store[], cart: Cart ) {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
         React.useState<null | HTMLElement>(null);
+
+    const [notificationsAnchorElem, setNotificationsAnchorElem] =
+        React.useState<null | HTMLElement>(null);
+    
+    const [notifications, setNotifications] =
+        React.useState<MarketNotification[]>(isMemberToken(token) ? token.notifications : []);
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -79,17 +88,26 @@ export default function Appbar(name: string,stores : Store[], cart: Cart ) {
         setMobileMoreAnchorEl(null);
     };
 
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-        handleMobileMenuClose();
-    };
-
     const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         setMobileMoreAnchorEl(event.currentTarget);
     };
 
+    const openNotifications = Boolean(notificationsAnchorElem);
+
+    const handleCloseNotifications = () => {
+        setNotificationsAnchorElem(null);
+        setNotifications([]);
+    }
+
+    const handleOpenNotifications = (event: React.MouseEvent<HTMLElement>) => {
+        if (notifications.length > 0) {
+            setNotificationsAnchorElem(event.currentTarget);
+        }
+    }
+
     const menuId = 'primary-search-account-menu';
     const mobileMenuId = 'primary-search-account-menu-mobile';
+    console.log(notifications);
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static">
@@ -123,15 +141,20 @@ export default function Appbar(name: string,stores : Store[], cart: Cart ) {
                     <Box sx={{ flexGrow: 1 }} />
                     <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
                         {CartDialog()}
+
                         <IconButton
                             size="large"
-                            aria-label="show 17 new notifications"
+                            aria-label="show notifications"
                             color="inherit"
+                            onClick={handleOpenNotifications}
+                            aria-hashpopup="true"
                         >
-                            <Badge badgeContent={17} color="error">
+                            <Badge badgeContent={notifications.length} color="error">
                                 <NotificationsIcon />
                             </Badge>
                         </IconButton>
+
+                        {NotificationsList(notifications, openNotifications, handleCloseNotifications, notificationsAnchorElem) }
                     </Box>
                     <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
                         <IconButton
