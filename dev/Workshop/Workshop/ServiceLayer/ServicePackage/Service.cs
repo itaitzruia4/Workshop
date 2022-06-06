@@ -201,6 +201,10 @@ namespace Workshop.ServiceLayer
                                 if (actualParams.Length != 5) { throw new ArgumentException(); }
                                 facade.AddActionToManager(int.Parse(actualParams[0]), actualParams[1], actualParams[2], int.Parse(actualParams[3]), actualParams[4]);
                                 break;
+                            case "take-notifications":
+                                if (actualParams.Length != 2) { throw new ArgumentException(); }
+                                facade.TakeNotifications(int.Parse(actualParams[0]), actualParams[1]);
+                                break;
                             default:
                                 throw new ArgumentException();
                         }
