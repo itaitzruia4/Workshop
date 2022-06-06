@@ -45,22 +45,42 @@ function Guest() {
         refresh();
     }, [refreshKey])
 
-    const addStore = (storeName: string) => {};
-    const addProduct = (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => {};
-    const removeProduct = (storeId: number, productId: number) => {};
+    const addStore = (storeName: string) => {
+        alert("Permission Denied");
+    };
+    const addProduct = (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => {
+        alert("Permission Denied");
+    };
+    const removeProduct = (storeId: number, productId: number) => {
+        alert("Permission Denied");
+    };
 
-    const updateProduct = (storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => {};
+    const updateProduct = (storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => {
+        alert("Permission Denied");
+    };
 
-    const reviewProduct = (productId: number, review: string, rating: number) => { };
+    const reviewProduct = (productId: number, review: string, rating: number) => {
+        alert("Permission Denied");
+    };
 
-    const addDiscount = (storeId: number, discountJson: string) => {};
+    const addDiscount = (storeId: number, discountJson: string) => {
+        alert("Permission Denied");
+    };
 
-    const addProductDiscount = (storeId: number, productId: number, discountJson: string) => {};
+    const addProductDiscount = (storeId: number, productId: number, discountJson: string) => {
+        alert("Permission Denied");
+};
 
-    const addCategoryDiscount = (storeId: number, category: string, discountJson: string) => {};
+    const addCategoryDiscount = (storeId: number, category: string, discountJson: string) => {
+        alert("Permission Denied");
+};
 
-    const closeStore = (storeId: number) => {};
-    const openStore = (storeId: number) => {};
+    const closeStore = (storeId: number) => {
+        alert("Permission Denied");
+    };
+    const openStore = (storeId: number) => {
+        alert("Permission Denied");
+    };
 
     //cart actions 
 

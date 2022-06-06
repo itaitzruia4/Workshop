@@ -40,10 +40,11 @@ const Login = () => {
                             alert(error)
                         })
                 } >Sign in</Button>
-                <Button type='submit' color='primary' variant="contained" style={btnstyle} fullWidth >Continue as guest</Button>
+                <Button type='submit' color='primary' variant="contained" style={btnstyle}
+                    onClick={routeChange("/guest", token)} fullWidth >Continue as guest</Button>
                 <Typography > Don't have an account ? 
                     <Link
-                        onClick={routeChange("/register", makeUserToken(token.userId))}>
+                        onClick={routeChange("/register", token)}>
                         Sign Up
                     </Link>
                 </Typography>
