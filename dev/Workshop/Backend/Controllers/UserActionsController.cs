@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Workshop.DomainLayer.Reviews;
 using Workshop.ServiceLayer;
 using Workshop.ServiceLayer.ServiceObjects;
+using CreditCard = Workshop.DomainLayer.MarketPackage.CreditCard;
+using SupplyAddress = Workshop.DomainLayer.MarketPackage.SupplyAddress;
 
 namespace API.Controllers
 {
@@ -75,7 +77,13 @@ namespace API.Controllers
         [HttpPost("buycart")]
         public ActionResult<FrontResponse<double>> BuyCart([FromBody] BuyCartRequest request)
         {
-            Response<double> response = Service.BuyCart(request.UserId, request.Membername, request.Address);
+            // TODO RONMI FIXME!!!!!!!!!!!!!!!!
+            Response<double> response = Service.BuyCart(
+                request.UserId, 
+                "we shouldn't send a membername",   // TODO FIX THIS!!!!!!!!!!!!!! BUYCART IS ALSO A GUEST ACTION!
+                new CreditCard("123", "March", "2024", "ronmi", "123", "123456789"),
+                new SupplyAddress("ronmi", request.Address, "Ashkelon", "israel", "8502500")
+                );
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<double>(response.ErrorMessage));
