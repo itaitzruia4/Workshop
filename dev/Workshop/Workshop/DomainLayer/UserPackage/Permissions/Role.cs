@@ -25,7 +25,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             {
                 actionsDAL.Add(new ActionDAL(((int)action)));
             }
-            return new RoleDAL(actionsDAL);
+            return new RoleDAL(1, actionsDAL,"");
         }
 
         public IReadOnlyCollection<Action> GetAllActions()

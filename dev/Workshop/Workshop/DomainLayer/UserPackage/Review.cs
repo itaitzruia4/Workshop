@@ -7,7 +7,7 @@ using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Security;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
-using ReviewDAL = Workshop.DataLayer.DataObjects.Market.Review;
+using ReviewDAL = Workshop.DataLayer.DataObjects.Reviews.Review;
 using DALObject = Workshop.DataLayer.DALObject;
 
 namespace Workshop.DomainLayer.UserPackage

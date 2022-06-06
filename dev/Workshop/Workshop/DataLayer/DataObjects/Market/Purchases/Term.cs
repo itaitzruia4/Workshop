@@ -9,5 +9,15 @@ namespace Workshop.DataLayer.DataObjects.Market.Purchases
     public class Term
     {
         public int Id { get; set; }
+        public string TermJson { get; set; }
+
+        public Term()
+        {
+        }
+
+        public Term(string TermJson)
+        {
+            this.TermJson = TermJson;
+        }
     }
 }

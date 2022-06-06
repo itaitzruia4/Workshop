@@ -9,9 +9,10 @@ namespace Workshop.DataLayer.DataObjects.Members
     public class Action : DALObject
     {
         public int Id { get; set; }
-        public Action(int Id)
+        public int ActionType { get; set; }
+        public Action(int ActionType)
         {
-            this.Id = Id;
+            this.ActionType = ActionType;
         }
     }
 }

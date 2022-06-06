@@ -15,6 +15,10 @@ namespace Workshop.DataLayer.DataObjects.Market
         public string Description { get; set; }
         public string Category { get; set; }
 
+        public ShoppingBagProduct()
+        {
+        }
+
         public ShoppingBagProduct(string name, double price, int quantity, string description, string category)
         {
             Name = name;

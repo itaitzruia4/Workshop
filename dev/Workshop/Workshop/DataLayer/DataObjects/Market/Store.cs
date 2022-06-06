@@ -4,10 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Workshop.DataLayer.DataObjects.Market.Discounts;
-<<<<<<< HEAD
-=======
 using Workshop.DataLayer.DataObjects.Market.Purchases;
->>>>>>> a435401cdcd8cb032971602a6846e124fbc1c81b
+
 
 namespace Workshop.DataLayer.DataObjects.Market
 {

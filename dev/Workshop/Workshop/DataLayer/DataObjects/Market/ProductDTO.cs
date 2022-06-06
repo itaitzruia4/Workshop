@@ -15,5 +15,9 @@ namespace Workshop.DataLayer.DataObjects.Market
         public int Quantity { get; set; }
         public string Category { get; set; }
         public int StoreId { get; set; }
+
+        public ProductDTO()
+        {
+        }
     }
 }

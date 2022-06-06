@@ -11,5 +11,15 @@ namespace Workshop.DataLayer.DataObjects.Orders
         public int Id { get; set; }
         public List<MemberToOrders<T>> MemberToOrders { get; set; }
         public static int CURR_ID { get; set; }
+
+        public OrderHandler()
+        {
+        }
+
+        public OrderHandler(int id, List<MemberToOrders<T>> memberToOrders)
+        {
+            Id = id;
+            MemberToOrders = memberToOrders;
+        }
     }
 }

@@ -14,7 +14,7 @@ namespace Workshop.DataLayer
         public static void Main(string[] args)
         {
             Context context = new Context();
-            context.Add<Role>(new Role(new List<ActionDAL>()));
+            context.Add<Role>(new Role(1, new List<ActionDAL>(), ""));
             context.SaveChanges();
             context.Find<Role>(1);
             Console.ReadKey();

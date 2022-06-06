@@ -10,10 +10,7 @@ using Workshop.DomainLayer.UserPackage.Shopping;
 using static Workshop.DomainLayer.MarketPackage.Terms.Term;
 using DALObject = Workshop.DataLayer.DALObject;
 using DiscountPolicyDAL = Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy;
-<<<<<<< HEAD
 using StoreDAL = Workshop.DataLayer.DataObjects.Market.Store;
-=======
->>>>>>> a435401cdcd8cb032971602a6846e124fbc1c81b
 
 namespace Workshop.DomainLayer.MarketPackage
 {
@@ -48,7 +45,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
         public DALObject ToDAL()
         {
-            return new DiscountPolicyDAL(null, null, null, (StoreDAL)store.ToDAL());
+            return new DiscountPolicyDAL(null, null, null);
         }
 
         public void AddProductDiscount(string json_discount, int product_id)

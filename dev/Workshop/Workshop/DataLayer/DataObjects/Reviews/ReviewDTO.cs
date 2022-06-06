@@ -13,5 +13,18 @@ namespace Workshop.DataLayer.DataObjects.Reviews
         public string Reviewer { get; set; }
         public int ProductId { get; set; }
         public int Rating { get; set; }
+
+        public ReviewDTO()
+        {
+        }
+
+        public ReviewDTO(int id, string review, string reviewer, int productId, int rating)
+        {
+            Id = id;
+            Review = review;
+            Reviewer = reviewer;
+            ProductId = productId;
+            Rating = rating;
+        }
     }
 }

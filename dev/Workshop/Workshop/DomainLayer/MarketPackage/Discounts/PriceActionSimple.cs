@@ -21,7 +21,7 @@ namespace Workshop.DomainLayer.MarketPackage.Discounts
             this.filter = filter;
         }
 
-        public double CalculatePriceAction(ShoppingBagDTO shoppingBag)
+        public override double CalculatePriceAction(ShoppingBagDTO shoppingBag)
         {
             double discount = 0;
             foreach (ProductDTO item in shoppingBag.products)

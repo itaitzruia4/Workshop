@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.UserPackage.Shopping;
-using DALObject = Workshop.DataLayer.DALObject;
-using ConcreteDiscountDAL = Workshop.DataLayer.DataObjects.Market.Discounts.ConcreteDiscount;
 
 namespace Workshop.DomainLayer.MarketPackage.Discounts
 {
@@ -18,11 +16,9 @@ namespace Workshop.DomainLayer.MarketPackage.Discounts
             this.priceAction = priceAction;
         }
 
-        public abstract DALObject ToDAL();
+        public abstract override double CalculateDiscountValue(ShoppingBagDTO shoppingBag);
 
-        public abstract double CalculateDiscountValue(ShoppingBagDTO shoppingBag);
-
-        public abstract bool IsEligible(ShoppingBagDTO shoppingBag);
+        public abstract override bool IsEligible(ShoppingBagDTO shoppingBag);
         
     }
 }

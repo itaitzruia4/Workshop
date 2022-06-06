@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Workshop.DataLayer.DataObjects;
+using Workshop.DataLayer;
 
 namespace Workshop.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20220605203312_Initial3")]
-    partial class Initial3
+    [Migration("20220606102225_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -76,24 +76,29 @@ namespace Workshop.Migrations
                     b.ToTable("userController");
                 });
 
-            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.CategoryTerms", b =>
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.Discount", b =>
                 {
-                    b.Property<string>("Category")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int?>("DiscountPolicyId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TermsId")
+                    b.Property<int?>("DiscountPolicyId1")
                         .HasColumnType("int");
 
-                    b.HasKey("Category");
+                    b.Property<string>("discountJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("DiscountPolicyId");
 
-                    b.HasIndex("TermsId");
+                    b.HasIndex("DiscountPolicyId1");
 
-                    b.ToTable("CategoryTerms");
+                    b.ToTable("Discount");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy", b =>
@@ -103,41 +108,14 @@ namespace Workshop.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("store_termsId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("user_termsId")
+                    b.Property<int?>("store_discountId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("store_termsId");
-
-                    b.HasIndex("user_termsId");
+                    b.HasIndex("store_discountId");
 
                     b.ToTable("DiscountPolicy");
-                });
-
-            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.ProductTerms", b =>
-                {
-                    b.Property<int>("ProductId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("DiscountPolicyId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TermsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProductId");
-
-                    b.HasIndex("DiscountPolicyId");
-
-                    b.HasIndex("TermsId");
-
-                    b.ToTable("ProductTerms");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Product", b =>
@@ -217,17 +195,17 @@ namespace Workshop.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("firstTermId")
+                    b.Property<int?>("store_termsId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("secondTermId")
+                    b.Property<int?>("user_termsId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("firstTermId");
+                    b.HasIndex("store_termsId");
 
-                    b.HasIndex("secondTermId");
+                    b.HasIndex("user_termsId");
 
                     b.ToTable("PurchasePolicy");
                 });
@@ -239,7 +217,20 @@ namespace Workshop.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int?>("PurchasePolicyId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PurchasePolicyId1")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TermJson")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("PurchasePolicyId");
+
+                    b.HasIndex("PurchasePolicyId1");
 
                     b.ToTable("Term");
                 });
@@ -348,6 +339,9 @@ namespace Workshop.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("ActionType")
+                        .HasColumnType("int");
+
                     b.Property<int?>("RoleId")
                         .HasColumnType("int");
 
@@ -366,6 +360,9 @@ namespace Workshop.Migrations
                     b.Property<DateTime>("Birthdate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("EventObserversId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Password")
                         .HasColumnType("nvarchar(max)");
 
@@ -376,6 +373,8 @@ namespace Workshop.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("MemberName");
+
+                    b.HasIndex("EventObserversId");
 
                     b.HasIndex("ShoppingCartId");
 
@@ -394,11 +393,113 @@ namespace Workshop.Migrations
                     b.Property<string>("MemberName")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int?>("RoleId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RoleType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StoreId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("MemberName");
 
+                    b.HasIndex("RoleId");
+
                     b.ToTable("Role");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Notifications.Event", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Sender")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Event");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Notifications.EventObservers", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NotificationHandlerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("NotificationHandlerId");
+
+                    b.ToTable("EventObservers");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Notifications.MemberNotifications", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("MemberName")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("NotificationHandlerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MemberName");
+
+                    b.HasIndex("NotificationHandlerId");
+
+                    b.ToTable("MemberNotifications");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Notifications.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("MemberNotificationsId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Sender")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("TimeOfEvent")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MemberNotificationsId");
+
+                    b.ToTable("Notification");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Notifications.NotificationHandler", b =>
@@ -553,6 +654,27 @@ namespace Workshop.Migrations
                     b.ToTable("ProductToReviewDTO");
                 });
 
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.Review", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("productId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("review")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("reviewer")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Review");
+                });
+
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.ReviewDTO", b =>
                 {
                     b.Property<int>("Id")
@@ -660,37 +782,22 @@ namespace Workshop.Migrations
                         .HasForeignKey("reviewHandlerId");
                 });
 
-            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.CategoryTerms", b =>
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.Discount", b =>
                 {
                     b.HasOne("Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy", null)
-                        .WithMany("category_terms")
+                        .WithMany("category_discounts")
                         .HasForeignKey("DiscountPolicyId");
 
-                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.Term", "Terms")
-                        .WithMany()
-                        .HasForeignKey("TermsId");
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy", null)
+                        .WithMany("products_discounts")
+                        .HasForeignKey("DiscountPolicyId1");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy", b =>
                 {
-                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.Term", "store_terms")
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Discounts.Discount", "store_discount")
                         .WithMany()
-                        .HasForeignKey("store_termsId");
-
-                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.Term", "user_terms")
-                        .WithMany()
-                        .HasForeignKey("user_termsId");
-                });
-
-            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.ProductTerms", b =>
-                {
-                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy", null)
-                        .WithMany("products_terms")
-                        .HasForeignKey("DiscountPolicyId");
-
-                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.Term", "Terms")
-                        .WithMany()
-                        .HasForeignKey("TermsId");
+                        .HasForeignKey("store_discountId");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Product", b =>
@@ -709,13 +816,24 @@ namespace Workshop.Migrations
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Purchases.PurchasePolicy", b =>
                 {
-                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.Term", "firstTerm")
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.Term", "store_terms")
                         .WithMany()
-                        .HasForeignKey("firstTermId");
+                        .HasForeignKey("store_termsId");
 
-                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.Term", "secondTerm")
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.Term", "user_terms")
                         .WithMany()
-                        .HasForeignKey("secondTermId");
+                        .HasForeignKey("user_termsId");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Purchases.Term", b =>
+                {
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.PurchasePolicy", null)
+                        .WithMany("category_terms")
+                        .HasForeignKey("PurchasePolicyId");
+
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.PurchasePolicy", null)
+                        .WithMany("products_terms")
+                        .HasForeignKey("PurchasePolicyId1");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.ShoppingBag", b =>
@@ -756,6 +874,10 @@ namespace Workshop.Migrations
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Members.Member", b =>
                 {
+                    b.HasOne("Workshop.DataLayer.DataObjects.Notifications.EventObservers", null)
+                        .WithMany("Observers")
+                        .HasForeignKey("EventObserversId");
+
                     b.HasOne("Workshop.DataLayer.DataObjects.Market.ShoppingCart", "ShoppingCart")
                         .WithMany()
                         .HasForeignKey("ShoppingCartId");
@@ -770,6 +892,39 @@ namespace Workshop.Migrations
                     b.HasOne("Workshop.DataLayer.DataObjects.Members.Member", null)
                         .WithMany("Roles")
                         .HasForeignKey("MemberName");
+
+                    b.HasOne("Workshop.DataLayer.DataObjects.Members.Role", null)
+                        .WithMany("nominees")
+                        .HasForeignKey("RoleId");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Notifications.EventObservers", b =>
+                {
+                    b.HasOne("Workshop.DataLayer.DataObjects.Notifications.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId");
+
+                    b.HasOne("Workshop.DataLayer.DataObjects.Notifications.NotificationHandler", null)
+                        .WithMany("observers")
+                        .HasForeignKey("NotificationHandlerId");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Notifications.MemberNotifications", b =>
+                {
+                    b.HasOne("Workshop.DataLayer.DataObjects.Members.Member", "Member")
+                        .WithMany()
+                        .HasForeignKey("MemberName");
+
+                    b.HasOne("Workshop.DataLayer.DataObjects.Notifications.NotificationHandler", null)
+                        .WithMany("Notifications")
+                        .HasForeignKey("NotificationHandlerId");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Notifications.Notification", b =>
+                {
+                    b.HasOne("Workshop.DataLayer.DataObjects.Notifications.MemberNotifications", null)
+                        .WithMany("Notifications")
+                        .HasForeignKey("MemberNotificationsId");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Orders.MemberToOrders<int>", b =>

@@ -8,7 +8,10 @@ namespace Workshop.DataLayer.DataObjects.Market.Discounts
 {
     public class Discount : DALObject
     {
+        public int Id { get; set; }
         public string discountJson { get; set; }
+        public Discount()
+        { }
 
         public Discount(string discountJson)
         {

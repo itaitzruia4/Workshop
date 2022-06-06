@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Workshop.DataLayer;
 using Workshop.DomainLayer.MarketPackage;
 using static Workshop.DomainLayer.UserPackage.Permissions.Role;
-using StoreOwnerDAl = Workshop.DataLayer.DataObjects.Members.StoreOwner;
+using StoreOwnerDAl = Workshop.DataLayer.DataObjects.Members.Role;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {

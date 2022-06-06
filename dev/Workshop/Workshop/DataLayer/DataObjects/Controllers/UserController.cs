@@ -17,5 +17,9 @@ namespace Workshop.DataLayer.DataObjects.Controllers
         public NotificationHandler notificationHandler { get; set; }
         public OrderHandler<string> orderHandler { get; set; }
         public List<Member> members { get; set; }
+
+        public UserController()
+        {
+        }
     }
 }

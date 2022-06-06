@@ -18,9 +18,8 @@ namespace Workshop.DomainLayer.MarketPackage.Discounts
             this.firstDiscount = firstDiscount;
             this.secondDiscount = secondDiscount;
         }
-        public abstract DALObject ToDAL();
-        public abstract double CalculateDiscountValue(ShoppingBagDTO shoppingBag);
+        public abstract override double CalculateDiscountValue(ShoppingBagDTO shoppingBag);
 
-        public abstract bool IsEligible(ShoppingBagDTO shoppingBag);
+        public abstract override bool IsEligible(ShoppingBagDTO shoppingBag);
     }
 }

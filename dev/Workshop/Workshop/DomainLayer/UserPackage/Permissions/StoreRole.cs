@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Workshop.DomainLayer.MarketPackage;
 using DALObject = Workshop.DataLayer.DALObject;
 using ActionDAL = Workshop.DataLayer.DataObjects.Members.Action;
-using StoreRoleDAL = Workshop.DataLayer.DataObjects.Members.StoreRole;
+using StoreRoleDAL = Workshop.DataLayer.DataObjects.Members.Role;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
@@ -36,7 +36,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
                 nomineesDAL.Add((StoreRoleDAL)storeRole.ToDAL());
             }
 
-            return new StoreRoleDAL(StoreId, actionsDAL, nomineesDAL);
+            return new StoreRoleDAL(StoreId, actionsDAL, "RoleType",nomineesDAL);
         }
         
         public IReadOnlyList<StoreRole> GetAllNominees()

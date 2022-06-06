@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DALObject = Workshop.DataLayer.DALObject;
-using MarketManagerDAL = Workshop.DataLayer.DataObjects.Members.MarketManager;
+using MarketManagerDAL = Workshop.DataLayer.DataObjects.Members.Role;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Workshop.DataLayer;
-using StoreOwnerDAl = Workshop.DataLayer.DataObjects.Members.StoreOwner;
+using StoreOwnerDAl = Workshop.DataLayer.DataObjects.Members.Role;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {

@@ -7,12 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Workshop.DataLayer.DataObjects.Market;
 using Workshop.DataLayer.DataObjects.Members;
-<<<<<<< HEAD
 using Action = Workshop.DataLayer.DataObjects.Members.Action;
 using Workshop.DataLayer.DataObjects.Market.Discounts;
-=======
 using Workshop.DataLayer.DataObjects.Controllers;
->>>>>>> a435401cdcd8cb032971602a6846e124fbc1c81b
+using Workshop.DataLayer.DataObjects.Market.Purchases;
+using Workshop.DataLayer.DataObjects.Reviews;
 
 namespace Workshop.DataLayer
 {
@@ -38,13 +37,8 @@ namespace Workshop.DataLayer
             modelBuilder.Entity<ShoppingCart>();
             modelBuilder.Entity<Store>();
             modelBuilder.Entity<Action>();
-            modelBuilder.Entity<MarketManager>();
             modelBuilder.Entity<Member>();
             modelBuilder.Entity<Role>();
-            modelBuilder.Entity<StoreFounder>();
-            modelBuilder.Entity<StoreManager>();
-            modelBuilder.Entity<StoreOwner>();
-            modelBuilder.Entity<StoreRole>();
         }
 
     }

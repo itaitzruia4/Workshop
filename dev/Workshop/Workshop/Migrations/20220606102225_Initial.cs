@@ -8,15 +8,18 @@ namespace Workshop.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "DiscountPolicy",
+                name: "Event",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1")
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Message = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(nullable: true),
+                    Sender = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DiscountPolicy", x => x.Id);
+                    table.PrimaryKey("PK_Event", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -56,15 +59,18 @@ namespace Workshop.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PurchasePolicy",
+                name: "Review",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1")
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    review = table.Column<string>(nullable: true),
+                    reviewer = table.Column<string>(nullable: true),
+                    productId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PurchasePolicy", x => x.Id);
+                    table.PrimaryKey("PK_Review", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -105,6 +111,32 @@ namespace Workshop.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ShoppingCart", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EventObservers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EventId = table.Column<int>(nullable: true),
+                    NotificationHandlerId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EventObservers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EventObservers_Event_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Event",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EventObservers_NotificationHandler_NotificationHandlerId",
+                        column: x => x.NotificationHandlerId,
+                        principalTable: "NotificationHandler",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -332,11 +364,18 @@ namespace Workshop.Migrations
                     Password = table.Column<string>(nullable: true),
                     Birthdate = table.Column<DateTime>(nullable: false),
                     ShoppingCartId = table.Column<int>(nullable: true),
+                    EventObserversId = table.Column<int>(nullable: true),
                     UserControllerId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Member", x => x.MemberName);
+                    table.ForeignKey(
+                        name: "FK_Member_EventObservers_EventObserversId",
+                        column: x => x.EventObserversId,
+                        principalTable: "EventObservers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Member_ShoppingCart_ShoppingCartId",
                         column: x => x.ShoppingCartId,
@@ -428,6 +467,142 @@ namespace Workshop.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MemberNotifications",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MemberName = table.Column<string>(nullable: true),
+                    NotificationHandlerId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MemberNotifications", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MemberNotifications_Member_MemberName",
+                        column: x => x.MemberName,
+                        principalTable: "Member",
+                        principalColumn: "MemberName",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MemberNotifications_NotificationHandler_NotificationHandlerId",
+                        column: x => x.NotificationHandlerId,
+                        principalTable: "NotificationHandler",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Role",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleType = table.Column<string>(nullable: true),
+                    StoreId = table.Column<int>(nullable: false),
+                    MemberName = table.Column<string>(nullable: true),
+                    RoleId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Role", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Role_Member_MemberName",
+                        column: x => x.MemberName,
+                        principalTable: "Member",
+                        principalColumn: "MemberName",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Role_Role_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "Role",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Notification",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Message = table.Column<string>(nullable: true),
+                    Sender = table.Column<string>(nullable: true),
+                    TimeOfEvent = table.Column<DateTime>(nullable: false),
+                    MemberNotificationsId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notification", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notification_MemberNotifications_MemberNotificationsId",
+                        column: x => x.MemberNotificationsId,
+                        principalTable: "MemberNotifications",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Action",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ActionType = table.Column<int>(nullable: false),
+                    RoleId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Action", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Action_Role_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "Role",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DiscountPolicy",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    store_discountId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DiscountPolicy", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Discount",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    discountJson = table.Column<string>(nullable: true),
+                    DiscountPolicyId = table.Column<int>(nullable: true),
+                    DiscountPolicyId1 = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Discount", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Discount_DiscountPolicy_DiscountPolicyId",
+                        column: x => x.DiscountPolicyId,
+                        principalTable: "DiscountPolicy",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Discount_DiscountPolicy_DiscountPolicyId1",
+                        column: x => x.DiscountPolicyId1,
+                        principalTable: "DiscountPolicy",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Store",
                 columns: table => new
                 {
@@ -453,31 +628,6 @@ namespace Workshop.Migrations
                         column: x => x.MarketControllerId,
                         principalTable: "marketController",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Store_PurchasePolicy_PurchasePolicyId",
-                        column: x => x.PurchasePolicyId,
-                        principalTable: "PurchasePolicy",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Role",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    MemberName = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Role", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Role_Member_MemberName",
-                        column: x => x.MemberName,
-                        principalTable: "Member",
-                        principalColumn: "MemberName",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -507,20 +657,42 @@ namespace Workshop.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Action",
+                name: "Term",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    RoleId = table.Column<int>(nullable: true)
+                    TermJson = table.Column<string>(nullable: true),
+                    PurchasePolicyId = table.Column<int>(nullable: true),
+                    PurchasePolicyId1 = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Action", x => x.Id);
+                    table.PrimaryKey("PK_Term", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PurchasePolicy",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    user_termsId = table.Column<int>(nullable: true),
+                    store_termsId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PurchasePolicy", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Action_Role_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "Role",
+                        name: "FK_PurchasePolicy_Term_store_termsId",
+                        column: x => x.store_termsId,
+                        principalTable: "Term",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_PurchasePolicy_Term_user_termsId",
+                        column: x => x.user_termsId,
+                        principalTable: "Term",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -529,6 +701,31 @@ namespace Workshop.Migrations
                 name: "IX_Action_RoleId",
                 table: "Action",
                 column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Discount_DiscountPolicyId",
+                table: "Discount",
+                column: "DiscountPolicyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Discount_DiscountPolicyId1",
+                table: "Discount",
+                column: "DiscountPolicyId1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DiscountPolicy_store_discountId",
+                table: "DiscountPolicy",
+                column: "store_discountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventObservers_EventId",
+                table: "EventObservers",
+                column: "EventId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventObservers_NotificationHandlerId",
+                table: "EventObservers",
+                column: "NotificationHandlerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_marketController_orderHandlerId",
@@ -541,6 +738,11 @@ namespace Workshop.Migrations
                 column: "userControllerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Member_EventObserversId",
+                table: "Member",
+                column: "EventObserversId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Member_ShoppingCartId",
                 table: "Member",
                 column: "ShoppingCartId");
@@ -551,6 +753,16 @@ namespace Workshop.Migrations
                 column: "UserControllerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MemberNotifications_MemberName",
+                table: "MemberNotifications",
+                column: "MemberName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MemberNotifications_NotificationHandlerId",
+                table: "MemberNotifications",
+                column: "NotificationHandlerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_MemberToOrders<int>_OrderHandler<int>Id",
                 table: "MemberToOrders<int>",
                 column: "OrderHandler<int>Id");
@@ -559,6 +771,11 @@ namespace Workshop.Migrations
                 name: "IX_MemberToOrders<string>_OrderHandler<string>Id",
                 table: "MemberToOrders<string>",
                 column: "OrderHandler<string>Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notification_MemberNotificationsId",
+                table: "Notification",
+                column: "MemberNotificationsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderDTO_MemberToOrders<int>Id",
@@ -596,9 +813,24 @@ namespace Workshop.Migrations
                 column: "UserReviewsId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PurchasePolicy_store_termsId",
+                table: "PurchasePolicy",
+                column: "store_termsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PurchasePolicy_user_termsId",
+                table: "PurchasePolicy",
+                column: "user_termsId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Role_MemberName",
                 table: "Role",
                 column: "MemberName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Role_RoleId",
+                table: "Role",
+                column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ShoppingBag_ShoppingCartId",
@@ -624,6 +856,16 @@ namespace Workshop.Migrations
                 name: "IX_Store_PurchasePolicyId",
                 table: "Store",
                 column: "PurchasePolicyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Term_PurchasePolicyId",
+                table: "Term",
+                column: "PurchasePolicyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Term_PurchasePolicyId1",
+                table: "Term",
+                column: "PurchasePolicyId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_userController_notificationHandlerId",
@@ -654,12 +896,63 @@ namespace Workshop.Migrations
                 name: "IX_UserToReviewDTO_ReviewId",
                 table: "UserToReviewDTO",
                 column: "ReviewId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DiscountPolicy_Discount_store_discountId",
+                table: "DiscountPolicy",
+                column: "store_discountId",
+                principalTable: "Discount",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Store_PurchasePolicy_PurchasePolicyId",
+                table: "Store",
+                column: "PurchasePolicyId",
+                principalTable: "PurchasePolicy",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Term_PurchasePolicy_PurchasePolicyId",
+                table: "Term",
+                column: "PurchasePolicyId",
+                principalTable: "PurchasePolicy",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Term_PurchasePolicy_PurchasePolicyId1",
+                table: "Term",
+                column: "PurchasePolicyId1",
+                principalTable: "PurchasePolicy",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Discount_DiscountPolicy_DiscountPolicyId",
+                table: "Discount");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Discount_DiscountPolicy_DiscountPolicyId1",
+                table: "Discount");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_PurchasePolicy_Term_store_termsId",
+                table: "PurchasePolicy");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_PurchasePolicy_Term_user_termsId",
+                table: "PurchasePolicy");
+
             migrationBuilder.DropTable(
                 name: "Action");
+
+            migrationBuilder.DropTable(
+                name: "Notification");
 
             migrationBuilder.DropTable(
                 name: "Product");
@@ -671,6 +964,9 @@ namespace Workshop.Migrations
                 name: "ProductToReviewDTO");
 
             migrationBuilder.DropTable(
+                name: "Review");
+
+            migrationBuilder.DropTable(
                 name: "ShoppingBagProduct");
 
             migrationBuilder.DropTable(
@@ -678,6 +974,9 @@ namespace Workshop.Migrations
 
             migrationBuilder.DropTable(
                 name: "Role");
+
+            migrationBuilder.DropTable(
+                name: "MemberNotifications");
 
             migrationBuilder.DropTable(
                 name: "Store");
@@ -701,19 +1000,16 @@ namespace Workshop.Migrations
                 name: "Member");
 
             migrationBuilder.DropTable(
-                name: "DiscountPolicy");
-
-            migrationBuilder.DropTable(
                 name: "marketController");
-
-            migrationBuilder.DropTable(
-                name: "PurchasePolicy");
 
             migrationBuilder.DropTable(
                 name: "MemberToOrders<int>");
 
             migrationBuilder.DropTable(
                 name: "MemberToOrders<string>");
+
+            migrationBuilder.DropTable(
+                name: "EventObservers");
 
             migrationBuilder.DropTable(
                 name: "ShoppingCart");
@@ -725,6 +1021,9 @@ namespace Workshop.Migrations
                 name: "OrderHandler<int>");
 
             migrationBuilder.DropTable(
+                name: "Event");
+
+            migrationBuilder.DropTable(
                 name: "NotificationHandler");
 
             migrationBuilder.DropTable(
@@ -732,6 +1031,18 @@ namespace Workshop.Migrations
 
             migrationBuilder.DropTable(
                 name: "ReviewHandler");
+
+            migrationBuilder.DropTable(
+                name: "DiscountPolicy");
+
+            migrationBuilder.DropTable(
+                name: "Discount");
+
+            migrationBuilder.DropTable(
+                name: "Term");
+
+            migrationBuilder.DropTable(
+                name: "PurchasePolicy");
         }
     }
 }

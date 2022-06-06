@@ -10,13 +10,29 @@ namespace Workshop.DataLayer.DataObjects.Members
     {
         public int Id { get; set; }
         public List<Action> Actions { get; set; }
+        public string RoleType { get; set; }
+        public int StoreId { get; set; }
+        public List<Role> nominees { get; set; }
 
         public Role()
         { }
 
-        public Role(List<Action> actions)
+        // Consructor for non-store role
+        public Role(int StoreId, List<Action> actions, string RoleType)
         {
-            Actions = actions;
+            this.StoreId = StoreId;
+            this.Actions = actions;
+            this.RoleType = RoleType;
+        }
+
+        // Consructor for non-store role
+        public Role(int StoreId, List<Action> actions, string RoleType, List<Role> nominees)
+        {
+            this.StoreId=StoreId;
+            this.Actions = actions;
+            this.RoleType = RoleType;
+            this.StoreId = StoreId;
+            this.nominees = nominees;
         }
     }
 }

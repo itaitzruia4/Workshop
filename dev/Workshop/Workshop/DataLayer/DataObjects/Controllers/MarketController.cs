@@ -16,5 +16,9 @@ namespace Workshop.DataLayer.DataObjects.Controllers
         public List<Store> stores { get; set; }
         public int STORE_COUNT { get; set; }
         public int PRODUCT_COUNT { get; set; }
+
+        public MarketController()
+        {
+        }
     }
 }
