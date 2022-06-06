@@ -2036,5 +2036,33 @@ namespace Tests.AcceptanceTests
             service.AddToCart(1, username, prod.Id, storeId, 1);
             Assert.AreEqual(!externalSystem.IsExternalSystemOnline(), service.BuyCart(1, username, cc, address).ErrorOccured);
         }
+
+        [TestMethod]
+        public void Test_ExternalSystem_NoPaymentAndSupplyIfBuyingFails()
+        {
+            Mock<IExternalSystem> externalSystem = new Mock<IExternalSystem>();
+            bool SUPPLY_FLAG = false;
+            bool CANCEL_SUPPLY_FLAG = false;
+            bool PAY_FLAG = false;
+            bool CANCEL_PAY_FLAG = false;
+            externalSystem.Setup(x => x.Supply(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Callback((string s1, string s2, string s3, string s4, string s5) => SUPPLY_FLAG = true).Returns(150000);
+            externalSystem.Setup(x => x.Cancel_Supply(It.IsAny<int>())).Callback((int n1) => CANCEL_SUPPLY_FLAG = true).Returns(1);
+            externalSystem.Setup(x => x.Pay(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Callback((string s1, string s2, string s3, string s4, string s5, string s6) => PAY_FLAG = true).Returns(8688);
+            externalSystem.Setup(x => x.Cancel_Pay(It.IsAny<int>())).Callback((int n1) => CANCEL_PAY_FLAG = true).Returns(1);
+            externalSystem.Setup(x => x.IsExternalSystemOnline()).Returns(true);
+            service = new Service(externalSystem.Object);
+
+            Test_Login_Good(1, username, password);
+            Store store = service.CreateNewStore(1, username, "RandomStore").Value;
+            Product prod = service.AddProduct(1, username, store.StoreId, product, "Good", 1.0, 2, "cat1").Value;
+            service.AddStorePurchaseTerm(1, username, store.StoreId, makeSimpleBagPurchaseTerm("h", "=", "04:04"));
+            service.EnterMarket(2);
+            service.Register(2, "member2", "password2", DateTime.Now);
+            service.Login(2, "member2", "password2");
+            service.AddToCart(2, "member2", prod.Id, store.StoreId, 1);
+            Assert.IsTrue(service.BuyCart(1, username, cc, address).ErrorOccured);
+            Assert.IsTrue(!(PAY_FLAG ^ CANCEL_PAY_FLAG));
+            Assert.IsTrue(!(CANCEL_SUPPLY_FLAG ^ SUPPLY_FLAG));
+        }
     }
 }
