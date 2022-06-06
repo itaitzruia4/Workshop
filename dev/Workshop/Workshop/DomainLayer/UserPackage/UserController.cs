@@ -251,7 +251,7 @@ namespace Workshop.DomainLayer.UserPackage
 
             // Add the new manager to the nominator's nominees list
             StoreRole nominatorStoreOwner = nominatorStoreRoles.Last();
-            nominatorStoreOwner.AddNominee(newRole);
+            nominatorStoreOwner.AddNominee(nominatedUsername, newRole);
 
             RegisterToEvent(nominated.Username, new Event("RemoveStoreOwnerNominationFrom" + nominatedUsername,"", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
@@ -294,7 +294,7 @@ namespace Workshop.DomainLayer.UserPackage
 
             // Add the new manager to the nominator's nominees list
             StoreRole nominatorStoreRole = nominatorStoreRoles.Last();
-            nominatorStoreRole.AddNominee(newRole);
+            nominatorStoreRole.AddNominee(nominatedUsername, newRole);
 
             RegisterToEvent(nominated.Username, new Event("OpenStore" + storeId, "", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("CloseStore" + storeId, "", "MarketController"));

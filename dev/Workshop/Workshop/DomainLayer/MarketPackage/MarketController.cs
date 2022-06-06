@@ -88,32 +88,54 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             Logger.Instance.LogEvent($"User {userId} with member {nominatorMembername} is trying to remove store owner nomination from {nominatedMembername} in store {storeId}.");
             userController.AssertCurrentUser(userId, nominatorMembername);
-            Member nominatorMember = userController.GetMember(nominatorMembername);
-            Member nominatedMember = userController.GetMember(nominatedMembername);
+            return RemoveStoreOwnerNominationHelper(nominatorMembername, nominatedMembername, storeId);
+        }
+
+        private Member RemoveStoreOwnerNominationHelper(string nominator, string nominated, int storeId)
+        {
+            Member nominatorMember = userController.GetMember(nominator);
+            Member nominatedMember = userController.GetMember(nominated);
+            StoreRole FOUND_NOMINATOR_ROLE = null;
+            StoreRole FOUND_NOMINATED_ROLE = null;
             foreach (StoreRole nominatedRole in nominatedMember.GetStoreRoles(storeId))
             {
                 foreach (StoreRole nominatorRole in nominatorMember.GetStoreRoles(storeId))
                 {
                     if (nominatedRole is StoreOwner && (nominatorRole is StoreManager || nominatorRole is StoreOwner) && nominatorRole.ContainsNominee(nominatedRole))
                     {
-                        nominatedMember.RemoveRole(nominatedRole);
-                        nominatorRole.RemoveNominee(nominatedRole);
-                        userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
-                        userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("OpenStore" + storeId, "", "MarketController"));
-                        userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("CloseStore" + storeId, "", "MarketController"));
-                        userController.notify(new Event("RemoveStoreOwnerNominationFrom" + nominatedMembername, "Removed store owner nomination from user " + nominatedMembername, "MarketController"));
-                        Logger.Instance.LogEvent($"User {userId} with member {nominatorMembername} successfuly removed store owner nomination from {nominatedMembername} in store {storeId}.");
-
-                        foreach (StoreRole newNominated in nominatedRole.nominees)
-                        {
-                            //RemoveStoreOwnerNominationHelper(nominatedMember,newNominated.)
-                        }
-                        return nominatedMember;
+                        FOUND_NOMINATED_ROLE = nominatedRole;
+                        FOUND_NOMINATOR_ROLE = nominatorRole;
                     }
+                    break;
+                }
+                if (FOUND_NOMINATED_ROLE != null)
+                {
+                    break;
                 }
             }
-            throw new ArgumentException($"User {userId} with member {nominatorMembername} FAILED to remove store owner nomination from {nominatedMembername} in store {storeId}.");
+            if (FOUND_NOMINATED_ROLE == null)
+            {
+                throw new ArgumentException($"{nominator} did not nominate {nominated} to be a store owner in store {storeId}");
+            }
+
+            foreach (StoreRole role in nominatedMember.GetStoreRoles(storeId))
+            {
+                foreach (string OldNominated in role.nominees.Keys)
+                {
+                    RemoveStoreOwnerNominationHelper(nominated, OldNominated, storeId);
+                }
+            }
+
+            nominatedMember.RemoveRole(FOUND_NOMINATED_ROLE);
+            FOUND_NOMINATOR_ROLE.RemoveNominee(FOUND_NOMINATED_ROLE);
+            userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
+            userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("OpenStore" + storeId, "", "MarketController"));
+            userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("CloseStore" + storeId, "", "MarketController"));
+            userController.notify(new Event("RemoveStoreOwnerNominationFrom" + nominated, "Removed store owner nomination from member " + nominated, "MarketController"));
+            Logger.Instance.LogEvent($"Member {nominator} successfuly removed store owner nomination from {nominated} in store {storeId}.");
+            return nominatedMember;
         }
+
         public void AddActionToManager(int userId, string owner, string manager, int storeId, string action)
         {
             Logger.Instance.LogEvent($"{owner} is trying to add action {action} to manager {manager} in store {storeId}.");

@@ -10,10 +10,8 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
 {
     public class StoreOwner: StoreRole
     {
-        List<StoreRole> nominees;
         public StoreOwner(int storeId): base(storeId)
         {
-            this.nominees = new List<StoreRole>();
             actions.Add(Action.AddProduct);
             actions.Add(Action.RemoveProduct);
             actions.Add(Action.ChangeProductName);
