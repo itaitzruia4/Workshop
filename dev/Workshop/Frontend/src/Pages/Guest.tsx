@@ -10,7 +10,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import AddStoreDialog from '../Components/Dialogs/addStoreDialog';
 import { useState, useEffect } from 'react';
 
-import { handleLogout, handleExitMarket } from '../Actions/AuthenticationActions';
 import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleOpenStore, handleRemoveProduct, handleAddDiscount, handleAddProductDiscount, handleAddCategoryDiscount } from '../Actions/StoreActions';
 import { handleAddToCart, handleViewCart, handleReviewProduct } from '../Actions/UserActions';
 import { handleChangeProductCategory, handleChangeProductName, handleChangeProductPrice, handleChangeProductQuantity } from '../Actions/ProductActions';
@@ -19,6 +18,7 @@ import { userToken } from '../Types/roles';
 import { Store } from "../Types/store"
 import { Product } from "../Types/product"
 import { Cart, Bag } from '../Types/shopping';
+import { handleExitMarket } from '../Actions/AuthenticationActions';
 
 
 function Guest() {

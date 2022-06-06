@@ -41,7 +41,12 @@ function Member() {
     const refresh = () => {
         handleGetStores(token).then(value => setStores(value as Store[])).catch(error => alert(error));
         handleViewCart(makeUserToken(token.userId)).then(value => setCart(value as Cart)).catch(error => alert(error));
-        handleUpdateNotifications(token).then(value => setNotifications(value as MarketNotification[])).catch(error => alert(error));
+        handleUpdateNotifications(token)
+            .then(value => {
+                console.log("refresh nots:", JSON.stringify(value));
+                setNotifications(value as MarketNotification[]);
+            })
+            .catch(error => alert(error));
     };
 
     useEffect(() => {
