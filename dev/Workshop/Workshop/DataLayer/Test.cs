@@ -14,11 +14,8 @@ namespace Workshop.DataLayer
         public static void Main(string[] args)
         {
             Context context = new Context();
-            Role role = new Role(1, new List<ActionDAL>(), "");
-            context.Add(role);
-            context.SaveChanges();
-            role.StoreId = 2;
-            context.Update(role);
+            Member member = new Member("pass", "name1", DateTime.Now, new List<Role>(), new DataObjects.Market.ShoppingCart());
+            context.Add(member);
             context.SaveChanges();
             //context.Find<Role>(1);
             Console.ReadKey();
