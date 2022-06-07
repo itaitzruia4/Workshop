@@ -81,9 +81,6 @@ export default function Appbar(
 
     const [notificationsAnchorElem, setNotificationsAnchorElem] =
         React.useState<null | HTMLElement>(null);
-    
-    const [notifications, setNotifications] =
-        React.useState<MarketNotification[]>(nots);
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -104,7 +101,6 @@ export default function Appbar(
 
     const handleCloseNotifications = () => {
         setNotificationsAnchorElem(null);
-        setNotifications([]);
     }
 
     const handleOpenNotifications = (event: React.MouseEvent<HTMLElement>) => {
@@ -115,7 +111,6 @@ export default function Appbar(
 
     const menuId = 'primary-search-account-menu';
     const mobileMenuId = 'primary-search-account-menu-mobile';
-    console.log(notifications);
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static">

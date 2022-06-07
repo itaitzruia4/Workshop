@@ -10,18 +10,16 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
 {
     class NotificationHandler
     {
-        private ConcurrentDictionary<string, List<Notification>>  Notifications { get; }
-        private IMessageHandler MessageHandler;
+        private ConcurrentDictionary<string, List<Notification>> Notifications { get; }
         private ConcurrentDictionary<string, HashSet<string>> observers;
         private ConcurrentDictionary<string, Event> eventsnames;
         private ILoginChecker LoginChecker;
 
-        public NotificationHandler(IMessageHandler messageHandler, ILoginChecker loginChecker)
+        public NotificationHandler(ILoginChecker loginChecker)
         {
             this.Notifications = new ConcurrentDictionary<string, List<Notification>>();
             observers = new ConcurrentDictionary<string, HashSet<string>>();
             eventsnames = new ConcurrentDictionary<string, Event>();
-            this.MessageHandler = messageHandler;
             this.LoginChecker = loginChecker;
         }
 
@@ -30,7 +28,7 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
         {
             eventsnames.TryAdd(eventt.Name, eventt);
             observers.TryAdd(eventt.Name, new HashSet<string>());
-            
+
             this.observers[eventt.Name].Add(observer_name);
         }
 
@@ -51,21 +49,17 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
         public void TriggerEvent(Event eventt)
         {
             DateTime time = DateTime.Now;
-            if(this.eventsnames.ContainsKey(eventt.Name))
+            if (this.eventsnames.ContainsKey(eventt.Name))
             {
                 foreach (string observer in this.observers[eventt.Name])
                 {
-                    if (this.LoginChecker.CheckOnlineStatus(observer))
-                        MessageHandler.SendNotification(observer, new Notification(eventt, time));
-                    else
+                    this.Notifications.TryAdd(observer, new List<Notification>());
+                    List<Notification> notis;
+                    if (this.Notifications.TryGetValue(observer, out notis))
                     {
-                        this.Notifications.TryAdd(observer, new List<Notification>());
-                        List<Notification> notis;
-                        if (this.Notifications.TryGetValue(observer, out notis))
-                        {
-                            notis.Add(new Notification(eventt, time));
-                        }
+                        notis.Add(new Notification(eventt, time));
                     }
+
                 }
             }
         }

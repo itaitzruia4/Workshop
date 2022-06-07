@@ -194,5 +194,13 @@ namespace Workshop.DomainLayer
         {
             return UserController.TakeNotifications(userId, membername);
         }
+        internal Dictionary<Member, bool> GetMembersOnlineStats(int userId, string actingUsername)
+        {
+            return UserController.GetMembersOnlineStats(userId, actingUsername);
+        }
+        internal void CancelMember(int userId, string actingUsername, string canceledUsername)
+        {
+            UserController.CancelMember(userId, actingUsername, canceledUsername);
+        }
     }
 }

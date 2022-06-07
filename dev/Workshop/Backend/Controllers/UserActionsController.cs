@@ -96,5 +96,26 @@ namespace API.Controllers
             return Ok(new FrontResponse<double>(response.Value));
         }
 
+        [HttpPost("cancelmember")]
+        public ActionResult<FrontResponse<string>> CancelMember([FromBody] CancelMemberRequest request)
+        {
+            Response response = Service.CancelMember(request.UserId, request.Membername, request.MemberToCancel);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<string>(response.ErrorMessage));
+            }
+            return Ok(new FrontResponse<string>(request.MemberToCancel));
+        }
+
+        [HttpPost("getmembersonlinestats")]
+        public ActionResult<FrontResponse<Dictionary<Member, bool>>> GetMembersOnlineStats([FromBody] MemberRequest request)
+        {
+            Response<Dictionary<Member, bool>> response = Service.GetMembersOnlineStats(request.UserId, request.Membername);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<Dictionary<Member, bool>>(response.ErrorMessage));
+            }
+            return Ok(new FrontResponse<Dictionary<Member, bool>>(response.Value));
+        }
     }
 }
