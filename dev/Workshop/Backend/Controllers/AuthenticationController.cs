@@ -51,9 +51,7 @@ namespace API.Controllers
             }
 
             List<Notification> nots = new List<Notification>();
-            nots.Add(new Notification("test", "ronmi", DateTime.Now));
-            return Ok(new LoginResponse(response.Value.Key, nots));
-            //return Ok(new LoginResponse(response.Value.Key, response.Value.Value));
+            return Ok(new LoginResponse(response.Value.Key, response.Value.Value));
         }
 
         [HttpPost("logout")]
