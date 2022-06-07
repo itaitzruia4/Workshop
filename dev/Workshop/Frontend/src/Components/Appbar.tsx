@@ -66,7 +66,15 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-export default function Appbar(token: token, name: string,stores : Store[], cart: Cart, nots: MarketNotification[] ) {
+export default function Appbar(
+    token: token,
+    name: string,
+    stores: Store[],
+    cart: Cart,
+    nots: MarketNotification[],
+    buyCart: (number: string, year: string, month: string, ccv: string, holder: string, id: string, name: string, address: string,
+        city: string, country: string, zip: string) => void
+) {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
         React.useState<null | HTMLElement>(null);
@@ -140,7 +148,7 @@ export default function Appbar(token: token, name: string,stores : Store[], cart
                     </Search>
                     <Box sx={{ flexGrow: 1 }} />
                     <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                        {CartDialog()}
+                        {CartDialog(buyCart)}
 
                         <IconButton
                             size="large"
