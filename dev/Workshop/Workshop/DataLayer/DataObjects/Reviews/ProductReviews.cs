@@ -16,9 +16,8 @@ namespace Workshop.DataLayer.DataObjects.Reviews
         {
         }
 
-        public ProductReviews(int id, int productId, List<UserToReviewDTO> userToReviewDTOs)
+        public ProductReviews(int productId, List<UserToReviewDTO> userToReviewDTOs)
         {
-            this.Id = id;
             this.ProductId = productId;
             this.userToReviewDTOs = userToReviewDTOs;
         }

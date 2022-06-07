@@ -55,7 +55,6 @@ namespace Workshop.DomainLayer.Reviews
                 userReviews.TryAdd(urDAL.Username, prDict);
             }
             this.reviewHandlerDAL = reviewHandlerDAL;
-
         }
 
         public ReviewHandlerDAL ToDAL()
@@ -82,6 +81,30 @@ namespace Workshop.DomainLayer.Reviews
                 temp.TryGetValue(user, out oldReview);
                 temp.TryUpdate(user, review, oldReview);
             }
+
+            ProductReviewesDAL prDAL = reviewHandlerDAL.productReviews.Find(x => x.ProductId == productId);
+            if (prDAL == null)
+            {
+                prDAL = new ProductReviewesDAL(productId, new List<UserToReviewDTO>());
+                reviewHandlerDAL.productReviews.Add(prDAL);
+                UserToReviewDTO urtDTO = new UserToReviewDTO(user, review.ToDAL());
+                prDAL.userToReviewDTOs.Add(urtDTO);
+            }
+            else
+            {
+                UserToReviewDTO urtDTO = prDAL.userToReviewDTOs.Find(t => t.Username == user);
+                if (urtDTO == null)
+                {
+                    urtDTO = new UserToReviewDTO(user, review.ToDAL());
+                    prDAL.userToReviewDTOs.Add(urtDTO);
+                }
+                else
+                {
+                    urtDTO.Review = review.ToDAL();
+                }
+                
+            }
+            DataHandler.getDBHandler().update(reviewHandlerDAL);//TODO figure it out with Nirdan
         }
         private void AddToUserReviews(string user, int productId, ReviewDTO review)
         {
@@ -94,6 +117,30 @@ namespace Workshop.DomainLayer.Reviews
                 temp.TryGetValue(productId, out oldReview);
                 temp.TryUpdate(productId, review, oldReview);
             }
+
+            UserReviewesDAL prDAL = reviewHandlerDAL.userReviews.Find(x => x.Username == user);
+            if (prDAL == null)
+            {
+                prDAL = new UserReviewesDAL(user, new List<ProductToReviewDTO>());
+                reviewHandlerDAL.userReviews.Add(prDAL);
+                ProductToReviewDTO ptrDTO = new ProductToReviewDTO(productId, review.ToDAL());
+                prDAL.productToReviewDTOs.Add(ptrDTO);
+            }
+            else
+            {
+                ProductToReviewDTO ptrDTO = prDAL.productToReviewDTOs.Find(t => t.Id == productId);
+                if (ptrDTO == null)
+                {
+                    ptrDTO = new ProductToReviewDTO(productId, review.ToDAL());
+                    prDAL.productToReviewDTOs.Add(ptrDTO);
+                }
+                else
+                {
+                    ptrDTO.Review = review.ToDAL();
+                }
+
+            }
+            DataHandler.getDBHandler().update(reviewHandlerDAL);//TODO figure it out with Nirdan
         }
 
         public double GetProductRating(int productId)
@@ -105,7 +152,5 @@ namespace Workshop.DomainLayer.Reviews
             }
             return -1;
         }
-
-        
     }
 }

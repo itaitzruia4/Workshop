@@ -11,6 +11,7 @@ using static Workshop.DomainLayer.MarketPackage.Terms.Term;
 using DALObject = Workshop.DataLayer.DALObject;
 using DiscountPolicyDAL = Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy;
 using StoreDAL = Workshop.DataLayer.DataObjects.Market.Store;
+using DataHandler = Workshop.DataLayer.DataHandler;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
@@ -41,6 +42,11 @@ namespace Workshop.DomainLayer.MarketPackage
             category_discounts = new Dictionary<string, Discount>();
             store_discount = null;
             this.store = store;
+        }
+
+        public DiscountPolicy(DiscountPolicyDAL discountPolicyDAL)
+        {
+            throw new NotImplementedException();
         }
 
         public DiscountPolicyDAL ToDAL()

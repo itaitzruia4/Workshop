@@ -16,9 +16,8 @@ namespace Workshop.DataLayer.DataObjects.Reviews
         {
         }
 
-        public ReviewHandler(int id, List<ProductReviews> productReviews, List<UserReviews> userReviews)
+        public ReviewHandler(List<ProductReviews> productReviews, List<UserReviews> userReviews)
         {
-            this.Id = id;
             this.productReviews = productReviews;
             this.userReviews = userReviews;
         }

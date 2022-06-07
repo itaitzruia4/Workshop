@@ -28,23 +28,6 @@ namespace Workshop.DataLayer
             optionsBuilder.UseSqlServer("Data Source = 34.107.89.228;Initial Catalog=WorkshopDB; Integrated Security = False; User Id = sqlserver; Password = workshop; Encrypt = True; TrustServerCertificate = True; MultipleActiveResultSets = True");
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            /*
-            modelBuilder.Entity<DiscountPolicy>();
-            modelBuilder.Entity<Product>();
-            modelBuilder.Entity<PurchasePolicy>();
-            modelBuilder.Entity<Review>();
-            modelBuilder.Entity<ShoppingBag>();
-            modelBuilder.Entity<ShoppingBagProduct>();
-            modelBuilder.Entity<ShoppingCart>();
-            modelBuilder.Entity<Store>();
-            modelBuilder.Entity<Action>();
-            modelBuilder.Entity<Member>();
-            modelBuilder.Entity<Role>();
-            */
-        }
-
         public override EntityEntry<TEntity> Update<TEntity>(TEntity entity)
         {
             Logger.Instance.LogEvent($"Updating {entity} in the cache");

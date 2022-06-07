@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Workshop.DataLayer.DataObjects.Reviews
 {
-    public class UserToReviewDTO
+    public class UserToReviewDTO : DALObject
     {
-        public int Id { get; set; }
         public string Username { get; set; }
         public ReviewDTO Review { get; set; }
 
@@ -16,9 +15,8 @@ namespace Workshop.DataLayer.DataObjects.Reviews
         {
         }
 
-        public UserToReviewDTO(int id, string username, ReviewDTO review)
+        public UserToReviewDTO(string username, ReviewDTO review)
         {
-            Id = id;
             Username = username;
             Review = review;
         }
