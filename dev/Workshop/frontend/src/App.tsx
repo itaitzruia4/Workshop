@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Register from './Pages/Register'
 import Welcome from './Pages/Welcome'
 import Member from './Pages/Member'
+import Guest from './Pages/Guest'
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Login from './Pages/Login'
 import CssBaseline from '@mui/material/CssBaseline';
@@ -27,6 +28,7 @@ function App() {
                     <Route path="/register" element={<Register />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/member" element={<Member />} />
+                    <Route path="/guest" element={<Guest />} />
                 </Routes>
                 </Router>
              </Grid>

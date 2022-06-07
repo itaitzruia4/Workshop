@@ -328,7 +328,6 @@
     <Compile Include="DomainLayer\MarketPackage\Discounts\SumComposite.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\XorDiscount.cs" />
     <Compile Include="DomainLayer\UserPackage\Notifications\Event.cs" />
-    <Compile Include="DomainLayer\UserPackage\Notifications\IMessageHandler.cs" />
     <Compile Include="DomainLayer\UserPackage\Notifications\IObserver.cs" />
     <Compile Include="DomainLayer\UserPackage\Notifications\Notification.cs" />
     <Compile Include="DomainLayer\UserPackage\Notifications\NotificationHandler.cs" />

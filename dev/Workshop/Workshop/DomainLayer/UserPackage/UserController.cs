@@ -40,6 +40,7 @@ namespace Workshop.DomainLayer.UserPackage
             notificationHandler = new NotificationHandler(new TempClass(), this);
             userControllerDAL = new UserControllerDAL(reviewHandler.ToDAL(), notificationHandler.ToDAL(), orderHandler.ToDAL(), new List<MemberDAL>());
             DataHandler.getDBHandler().save(userControllerDAL);
+            InitializeSystem();
         }
 
         public UserControllerDAL ToDAL()
@@ -76,6 +77,7 @@ namespace Workshop.DomainLayer.UserPackage
             Logger.Instance.LogEvent("Starting initializing the system - User Controller");
             Member admin = new Member("admin", securityHandler.Encrypt("admin"), DateTime.Parse("Aug 22, 1972"));
             admin.AddRole(new MarketManager());
+            members.TryAdd("admin", admin);
             Logger.Instance.LogEvent("Finished initializing the system - User Controller");
         }
 
@@ -312,7 +314,6 @@ namespace Workshop.DomainLayer.UserPackage
             nominatorStoreRole.AddNominee(nominatedUsername, newRole);
 
             RegisterToEvent(nominated.Username, new Event("RemoveStoreOwnerNominationFrom" + nominatedUsername, "", "MarketController"));
-            RegisterToEvent(nominated.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("OpenStore" + storeId, "", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("CloseStore" + storeId, "", "MarketController"));
             Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} successfuly nominated member {nominatedUsername} as a store manager of store {storeId}");
@@ -558,14 +559,13 @@ namespace Workshop.DomainLayer.UserPackage
             // Check that the nominated member is indeed a member
             EnsureMemberExists(canceledUsername);
 
-
             Member actor = members[actingUsername], canceled = members[canceledUsername];
 
             // Check that the canceled member has a role
             if (canceled.HasRoles())
                 throw new MemberAccessException($"User {canceledUsername} has roles so he cannot be canceled.");
 
-            // Check that the nominator is authorized to nominate a store owner
+            // Check that the nominator is authorized to do it
             if (!actor.IsAuthorized(Action.CancelMember))
                 throw new MemberAccessException($"User {actingUsername} is not allowed to cancel members.");
 
@@ -575,9 +575,14 @@ namespace Workshop.DomainLayer.UserPackage
                 userControllerDAL.members.Remove(canceled.ToDAL());
                 DataHandler.getDBHandler().save(userControllerDAL);
             }
+            if (!members.TryRemove(canceledUsername,out canceled))
+            {
+                throw new ArgumentException($"Could not cancel member {canceledUsername}");
+            }
+            Logger.Instance.LogEvent($"User {userId} with member {actingUsername} successfuly canceled member {canceledUsername}");
         }
 
-        public Dictionary<MemberDTO, bool> GetMembersOnlineStats(int userId, string actingUsername)
+        public Dictionary<Member, bool> GetMembersOnlineStats(int userId, string actingUsername)
         {
             Logger.Instance.LogEvent($"User {userId} with member {actingUsername} is trying to get members online stats");
             // Check that nominator is the logged in member
@@ -590,10 +595,10 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new MemberAccessException($"User {actingUsername} is not allowed to get members online stats.");
 
             //get online members stats
-            Dictionary<MemberDTO, bool> OnlineStats = new Dictionary<MemberDTO, bool>();
+            Dictionary<Member, bool> OnlineStats = new Dictionary<Member, bool>();
             foreach( Member member in members.Values)
             {
-                OnlineStats.Add(member.GetMemberDTO(), currentUsers.ContainsKey(userId));
+                OnlineStats.Add(member, CheckOnlineStatus(member.Username));
             }
             return OnlineStats;
         }

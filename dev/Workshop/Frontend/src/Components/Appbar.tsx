@@ -66,16 +66,13 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-export default function Appbar(token: token, name: string,stores : Store[], cart: Cart ) {
+export default function Appbar(token: token, name: string,stores : Store[], cart: Cart, notifications: MarketNotification[] ) {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
         React.useState<null | HTMLElement>(null);
 
     const [notificationsAnchorElem, setNotificationsAnchorElem] =
         React.useState<null | HTMLElement>(null);
-    
-    const [notifications, setNotifications] =
-        React.useState<MarketNotification[]>(isMemberToken(token) ? token.notifications : []);
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -96,7 +93,6 @@ export default function Appbar(token: token, name: string,stores : Store[], cart
 
     const handleCloseNotifications = () => {
         setNotificationsAnchorElem(null);
-        setNotifications([]);
     }
 
     const handleOpenNotifications = (event: React.MouseEvent<HTMLElement>) => {
@@ -107,7 +103,6 @@ export default function Appbar(token: token, name: string,stores : Store[], cart
 
     const menuId = 'primary-search-account-menu';
     const mobileMenuId = 'primary-search-account-menu-mobile';
-    console.log(notifications);
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static">

@@ -522,5 +522,53 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             ShoppingBagProduct product2 = userController.addToCart(1, new ShoppingBagProduct(1, prodName, desc, price, quantity, category, storeId), storeId);
             Assert.ThrowsException<ArgumentException>(() => userController.editCart(1, prodId, newQuantity));
         }
+
+        [DataTestMethod] 
+        [DataRow("member5")] //a member
+        public void TestMemberCancel_Good_Member(string canceledUsername)
+        {
+            userController.EnterMarket(0);
+            userController.Login(0, "admin", "admin");
+            userController.CancelMember(0, "admin", canceledUsername);
+            Assert.ThrowsException<ArgumentException>(() => userController.GetMember(canceledUsername));
+        }
+
+        [DataTestMethod] 
+        [DataRow("member7")] //not a real member
+        [DataRow("user7")] //not a member
+        public void TestMemberCancel_Fail(string canceledUsername)
+        {
+            userController.EnterMarket(0);
+            userController.Login(0, "admin", "admin");
+            userController.EnterMarket(7);
+            //userController.Register(7, "user7", "pass7", new DateTime(5));
+            Assert.ThrowsException<ArgumentException>(() => userController.CancelMember(0, "admin", canceledUsername));
+        }
+
+        [DataTestMethod]
+        [DataRow(1,"member1")] //not an admin
+        public void Test_GetMembersOnlineStats_Fail(int userId, string actingUsername)
+        {
+            userController.EnterMarket(userId);
+            userController.Login(1, actingUsername, "pass1");
+            Assert.ThrowsException<MemberAccessException>(() => userController.GetMembersOnlineStats(userId, actingUsername));
+        }
+
+        [DataTestMethod]
+        [DataRow(0, "admin")] //admin
+        public void Test_GetMembersOnlineStats_Success(int userId, string actingUsername)
+        {
+            userController.EnterMarket(userId);
+            userController.Login(0, actingUsername, "admin");
+            userController.EnterMarket(1);
+            userController.Login(1, "member1", "pass1");
+            bool booly;
+            Assert.IsTrue(userController.GetMembersOnlineStats(userId, actingUsername).ContainsKey(userController.GetMember("member1")));
+            userController.GetMembersOnlineStats(userId, actingUsername).TryGetValue(userController.GetMember("member1"), out booly);
+            Assert.IsTrue(booly==true);
+            userController.GetMembersOnlineStats(userId, actingUsername).TryGetValue(userController.GetMember("member2"), out booly);
+            Assert.IsTrue(booly == false);
+        }
+
     }
 }

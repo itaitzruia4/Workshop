@@ -7,6 +7,7 @@ using Workshop.DomainLayer;
 using Workshop.ServiceLayer.ServiceObjects;
 using DomainUser = Workshop.DomainLayer.UserPackage.User;
 using DomainMember = Workshop.DomainLayer.UserPackage.Permissions.Member;
+using DomainMemberDTO = Workshop.DomainLayer.UserPackage.Permissions.MemberDTO;
 using DomainProduct = Workshop.DomainLayer.MarketPackage.Product;
 using DomainProductDTO = Workshop.DomainLayer.MarketPackage.ProductDTO;
 using DomainStoreManager = Workshop.DomainLayer.UserPackage.Permissions.StoreManager;
@@ -200,6 +201,18 @@ namespace Workshop.ServiceLayer
                             case "add-action-to-manager":
                                 if (actualParams.Length != 5) { throw new ArgumentException(); }
                                 facade.AddActionToManager(int.Parse(actualParams[0]), actualParams[1], actualParams[2], int.Parse(actualParams[3]), actualParams[4]);
+                                break;
+                            case "take-notifications":
+                                if (actualParams.Length != 2) { throw new ArgumentException(); }
+                                facade.TakeNotifications(int.Parse(actualParams[0]), actualParams[1]);
+                                break;
+                            case "get-members-online-stats":
+                                if (actualParams.Length != 2) { throw new ArgumentException(); }
+                                facade.GetMembersOnlineStats(int.Parse(actualParams[0]), actualParams[1]);
+                                break;
+                            case "cancel-member":
+                                if (actualParams.Length != 3) { throw new ArgumentException(); }
+                                facade.CancelMember(int.Parse(actualParams[0]), actualParams[1], actualParams[2]);
                                 break;
                             default:
                                 throw new ArgumentException();
@@ -671,6 +684,33 @@ namespace Workshop.ServiceLayer
             catch (Exception e)
             {
                 return new Response<List<Notification>>(e.Message, userId);
+            }
+        }
+
+        public Response<Dictionary<Member, bool>> GetMembersOnlineStats(int userId, string actingUsername)
+        {
+            try
+            {
+                Dictionary<DomainMember, bool> members = facade.GetMembersOnlineStats(userId, actingUsername);
+                Dictionary<Member, bool> returnMembers = members.Keys.ToDictionary(keySelector: g => new Member(g), elementSelector: g => members[g]);
+                return new Response<Dictionary<Member, bool>>(returnMembers, userId);
+            }
+            catch (Exception e)
+            {
+                return new Response<Dictionary<Member, bool>>(e.Message, userId);
+            }
+        }
+
+        public Response CancelMember(int userId, string actingUsername, string canceledUsername)
+        {
+            try
+            {
+                facade.CancelMember(userId, actingUsername, canceledUsername);
+                return new Response(userId);
+            }
+            catch (Exception e)
+            {
+                return new Response(e.Message, userId);
             }
         }
     }

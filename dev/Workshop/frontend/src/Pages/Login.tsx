@@ -34,16 +34,17 @@ const Login = () => {
                 <Button type='submit' color='primary' variant="contained" style={btnstyle} fullWidth
                 onClick={e =>
                     handleLogin(token, membername, password)
-                        .then((data) => { console.log(JSON.stringify(data)); return data; })
+                        .then(data => { console.log("login user id:", token.userId); return data; })
                         .then((data) => routeChange("/member", makeMemberToken(token.userId, membername, data.notifications))())
                         .catch(error => {
                             alert(error)
                         })
                 } >Sign in</Button>
-                <Button type='submit' color='primary' variant="contained" style={btnstyle} fullWidth >Continue as guest</Button>
+                <Button type='submit' color='primary' variant="contained" style={btnstyle}
+                    onClick={routeChange("/guest", token)} fullWidth >Continue as guest</Button>
                 <Typography > Don't have an account ? 
                     <Link
-                        onClick={routeChange("/register", makeUserToken(token.userId))}>
+                        onClick={routeChange("/register", token)}>
                         Sign Up
                     </Link>
                 </Typography>

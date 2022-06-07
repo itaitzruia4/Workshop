@@ -17,19 +17,17 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
 {
     class NotificationHandler: IPersistentObject<NotificationHandlerDAL>
     {
-        private ConcurrentDictionary<string, List<Notification>>  Notifications { get; }
-        private IMessageHandler MessageHandler;
+        private ConcurrentDictionary<string, List<Notification>> Notifications { get; }
         private ConcurrentDictionary<string, HashSet<string>> observers;
         private ConcurrentDictionary<string, Event> eventsnames;
         private ILoginChecker LoginChecker;
         public NotificationHandlerDAL NotificationHandlerDAL { get; set; }
 
-        public NotificationHandler(IMessageHandler messageHandler, ILoginChecker loginChecker)
+        public NotificationHandler(ILoginChecker loginChecker)
         {
             this.Notifications = new ConcurrentDictionary<string, List<Notification>>();
             observers = new ConcurrentDictionary<string, HashSet<string>>();
             eventsnames = new ConcurrentDictionary<string, Event>();
-            this.MessageHandler = messageHandler;
             this.LoginChecker = loginChecker;
             this.NotificationHandlerDAL = new NotificationHandlerDAL(new List<MemberNotifications>(), new List<EventObservers>());
             DataHandler.getDBHandler().save(NotificationHandlerDAL);
@@ -124,7 +122,7 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
         public void TriggerEvent(Event eventt)
         {
             DateTime time = DateTime.Now;
-            if(this.eventsnames.ContainsKey(eventt.Name))
+            if (this.eventsnames.ContainsKey(eventt.Name))
             {
                 foreach (string observer in this.observers[eventt.Name])
                 {
