@@ -35,6 +35,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             this.rwl = new ReaderWriterLock();
 
             memberDAL = new MemberDAL(password, username, birthdate, new List<RoleDAL>(), shoppingCart.ToDAL());
+            DataHandler.getDBHandler().save(memberDAL);
         }
 
         public MemberDAL ToDAL()

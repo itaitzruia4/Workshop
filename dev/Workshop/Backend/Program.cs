@@ -1,6 +1,6 @@
 ﻿using Workshop.ServiceLayer;
 
-namespace API.Controllers
+namespace API
 {
     public class Program
     {

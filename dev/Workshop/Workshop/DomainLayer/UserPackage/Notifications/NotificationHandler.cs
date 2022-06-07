@@ -33,12 +33,11 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
             DataHandler.getDBHandler().save(NotificationHandlerDAL);
         }
 
-        public NotificationHandler(NotificationHandlerDAL notificationHandlerDAL, IMessageHandler messageHandler, ILoginChecker loginChecker)
+        public NotificationHandler(NotificationHandlerDAL notificationHandlerDAL, ILoginChecker loginChecker)
         {
             Notifications = new ConcurrentDictionary<string, List<Notification>>();
             observers = new ConcurrentDictionary<string, HashSet<string>>();
             eventsnames = new ConcurrentDictionary<string, Event>();
-            this.MessageHandler = messageHandler;
             this.LoginChecker = loginChecker;
             foreach(MemberNotifications memberNotifications in notificationHandlerDAL.Notifications)
             {
@@ -126,27 +125,25 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
             {
                 foreach (string observer in this.observers[eventt.Name])
                 {
-                    if (this.LoginChecker.CheckOnlineStatus(observer))
-                        MessageHandler.SendNotification(observer, new Notification(eventt, time));
-                    else
+
+
+                    List<NotificationDAL> notificationsDAL = new List<NotificationDAL>();
+                    if(this.Notifications.TryAdd(observer, new List<Notification>()))
                     {
-                        List<NotificationDAL> notificationsDAL = new List<NotificationDAL>();
-                        if(this.Notifications.TryAdd(observer, new List<Notification>()))
-                        {
-                            MemberDAL memberDAL = DataHandler.getDBHandler().find<MemberDAL>(typeof(MemberDAL), observer);
-                            MemberNotifications memberNotifications = new MemberNotifications(memberDAL, notificationsDAL);
-                            DataHandler.getDBHandler().save(memberNotifications);
-                            NotificationHandlerDAL.Notifications.Add(memberNotifications);
-                            DataHandler.getDBHandler().update(NotificationHandlerDAL);
-                        }
-                        List<Notification> notis;
-                        if (this.Notifications.TryGetValue(observer, out notis))
-                        {
-                            Notification notification = new Notification(eventt, time);
-                            notis.Add(notification);
-                            notificationsDAL.Add(notification.ToDAL());
-                        }
+                        MemberDAL memberDAL = DataHandler.getDBHandler().find<MemberDAL>(typeof(MemberDAL), observer);
+                        MemberNotifications memberNotifications = new MemberNotifications(memberDAL, notificationsDAL);
+                        DataHandler.getDBHandler().save(memberNotifications);
+                        NotificationHandlerDAL.Notifications.Add(memberNotifications);
+                        DataHandler.getDBHandler().update(NotificationHandlerDAL);
                     }
+                    List<Notification> notis;
+                    if (this.Notifications.TryGetValue(observer, out notis))
+                    {
+                        Notification notification = new Notification(eventt, time);
+                        notis.Add(notification);
+                        notificationsDAL.Add(notification.ToDAL());
+                    }
+                    
                 }
             }
         }

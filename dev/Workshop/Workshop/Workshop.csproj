@@ -332,7 +332,6 @@
     <Compile Include="DomainLayer\UserPackage\Notifications\Notification.cs" />
     <Compile Include="DomainLayer\UserPackage\Notifications\NotificationHandler.cs" />
     <Compile Include="DomainLayer\UserPackage\Permissions\MemberDTO.cs" />
-    <Compile Include="DomainLayer\UserPackage\TempClass.cs" />
     <Compile Include="Migrations\20220606102225_Initial.cs" />
     <Compile Include="Migrations\20220606102225_Initial.designer.cs">
       <DependentUpon>20220606102225_Initial.cs</DependentUpon>

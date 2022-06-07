@@ -38,7 +38,7 @@ namespace Workshop.DomainLayer.Orders
 
         public DataLayer.DataObjects.Orders.OrderHandler<T> ToDAL()
         {
-            throw new NotImplementedException();
+            return OrderHandlerDAL;
         }
 
         public void addOrder(OrderDTO order, T key)

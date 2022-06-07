@@ -37,7 +37,7 @@ namespace Workshop.DomainLayer.UserPackage
             members = new ConcurrentDictionary<string, Member>();
             this.orderHandler = new OrderHandler<string>();
             // TODO Find out how to actually implement IMessageSender, Look at Github Issues!
-            notificationHandler = new NotificationHandler(new TempClass(), this);
+            notificationHandler = new NotificationHandler(this);
             userControllerDAL = new UserControllerDAL(reviewHandler.ToDAL(), notificationHandler.ToDAL(), orderHandler.ToDAL(), new List<MemberDAL>());
             DataHandler.getDBHandler().save(userControllerDAL);
             InitializeSystem();
@@ -135,7 +135,7 @@ namespace Workshop.DomainLayer.UserPackage
             Member newMember = new Member(username, encryptedPassword, birthdate);
             if (members.TryAdd(username, newMember))
             {
-                DataHandler.getDBHandler().update(userControllerDAL);
+                //DataHandler.getDBHandler().update(userControllerDAL);
                 Logger.Instance.LogEvent($"User {userId} has successfuly registered user {username}");
             }
             else
