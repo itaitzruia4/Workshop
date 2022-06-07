@@ -278,6 +278,7 @@
     <Compile Include="DataLayer\DataObjects\Market\ShoppingBagProduct.cs" />
     <Compile Include="DataLayer\DataObjects\Market\ShoppingCart.cs" />
     <Compile Include="DataLayer\DataObjects\Market\Store.cs" />
+    <Compile Include="DataLayer\DataObjects\Market\SupplyAddress.cs" />
     <Compile Include="DataLayer\DataObjects\Members\Action.cs" />
     <Compile Include="DataLayer\DataObjects\Members\Member.cs" />
     <Compile Include="DataLayer\DataObjects\Members\Role.cs" />
@@ -301,6 +302,10 @@
     <Compile Include="DomainLayer\IPersistentObject.cs" />
     <Compile Include="DomainLayer\MarketPackage\CreditCard.cs" />
     <Compile Include="DomainLayer\MarketPackage\SupplyAddress.cs" />
+    <Compile Include="Migrations\20220607094126_Initial2.cs" />
+    <Compile Include="Migrations\20220607094126_Initial2.designer.cs">
+      <DependentUpon>20220607094126_Initial2.cs</DependentUpon>
+    </Compile>
     <Compile Include="ServiceLayer\ExternalSystem.cs" />
     <Compile Include="DomainLayer\UserPackage\ILoginChecker.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\AndDiscount.cs" />

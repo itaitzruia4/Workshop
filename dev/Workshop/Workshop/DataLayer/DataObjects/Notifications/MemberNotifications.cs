@@ -7,7 +7,7 @@ using Workshop.DataLayer.DataObjects.Members;
 
 namespace Workshop.DataLayer.DataObjects.Notifications
 {
-    public class MemberNotifications
+    public class MemberNotifications: DALObject
     {
         public int Id { get; set; }
         public Member Member { get; set; }
@@ -15,6 +15,12 @@ namespace Workshop.DataLayer.DataObjects.Notifications
 
         public MemberNotifications()
         {
+        }
+
+        public MemberNotifications(Member member, List<Notification> notifications)
+        {
+            Member = member;
+            Notifications = notifications;
         }
     }
 }

@@ -4,16 +4,41 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.MarketPackage;
+using DataHandler = Workshop.DataLayer.DataHandler;
 
 namespace Workshop.DomainLayer.Orders
 {
-    class OrderHandler<T>
+    class OrderHandler<T>: IPersistentObject<DataLayer.DataObjects.Orders.OrderHandler<T>>
     {
         private Dictionary<T, List<OrderDTO>> orders;
         private static int CURR_ID = 0;
+        public DataLayer.DataObjects.Orders.OrderHandler<T> OrderHandlerDAL { get; set; }
+
         public OrderHandler()
         {
             this.orders = new Dictionary<T, List<OrderDTO>>();
+            this.OrderHandlerDAL = new DataLayer.DataObjects.Orders.OrderHandler<T>(new List<DataLayer.DataObjects.Orders.MemberToOrders<T>>());
+            DataHandler.getDBHandler().save(OrderHandlerDAL);
+        }
+
+        public OrderHandler(DataLayer.DataObjects.Orders.OrderHandler<T> orderHandlerDAL)
+        {
+            this.orders = new Dictionary<T, List<OrderDTO>>();
+            foreach(DataLayer.DataObjects.Orders.MemberToOrders<T> memberToOrders in orderHandlerDAL.MemberToOrders)
+            {
+                List<OrderDTO> orders = new List<OrderDTO>();
+                foreach(DataLayer.DataObjects.Orders.OrderDTO orderDTO in memberToOrders.orders)
+                {
+                    orders.Add(new OrderDTO(orderDTO));
+                }
+                this.orders.Add(memberToOrders.key, orders);
+            }
+            this.OrderHandlerDAL = orderHandlerDAL;
+        }
+
+        public DataLayer.DataObjects.Orders.OrderHandler<T> ToDAL()
+        {
+            throw new NotImplementedException();
         }
 
         public void addOrder(OrderDTO order, T key)

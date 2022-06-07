@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Workshop.DataLayer.DataObjects.Notifications
 {
-    public class Notification
+    public class Notification: DALObject
     {
         public int Id { get; set; }
         public string Message { get; set; }
@@ -15,6 +15,13 @@ namespace Workshop.DataLayer.DataObjects.Notifications
 
         public Notification()
         {
+        }
+
+        public Notification(string message, string sender, DateTime timeOfEvent)
+        {
+            Message = message;
+            Sender = sender;
+            TimeOfEvent = timeOfEvent;
         }
     }
 }

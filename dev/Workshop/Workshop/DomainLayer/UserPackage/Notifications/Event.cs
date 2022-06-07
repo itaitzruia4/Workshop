@@ -4,21 +4,42 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SysUser = Workshop.DomainLayer.UserPackage.User;
+using EventDAL = Workshop.DataLayer.DataObjects.Notifications.Event;
+using DataHandler = Workshop.DataLayer.DataHandler;
 
 namespace Workshop.DomainLayer.UserPackage.Notifications
 {
-    public class Event
+    public class Event: IPersistentObject<EventDAL>
     {
-        internal string Message { get; }
-        internal string Name { get; }
-        internal string Sender { get; }
+        public string Message { get; }
+        public string Name { get; }
+        public string Sender { get; }
+        public EventDAL EventDAL { get; set; }
+
 
         public Event(string name, string message, string sender)
         {
             Name = name;
             Message = message;
             Sender = sender;
+            this.EventDAL = new EventDAL(name, message, sender);
+            DataHandler.getDBHandler().save(EventDAL);
         }
+
+        public Event(EventDAL eventDAL)
+        {
+            this.Message = eventDAL.Message;
+            this.Sender = eventDAL.Sender;
+            this.Name = eventDAL.Name;
+            this.EventDAL = eventDAL;
+        }
+
+
+        public EventDAL ToDAL()
+        {
+            return EventDAL;
+        }
+
         public override bool Equals(object obj)
         {
             if(obj.GetType() == typeof(Event))
@@ -28,5 +49,6 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
             }
             return base.Equals(obj);
         }
+
     }
 }

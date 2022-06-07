@@ -7,7 +7,7 @@ using Workshop.DataLayer.DataObjects.Members;
 
 namespace Workshop.DataLayer.DataObjects.Notifications
 {
-    public class EventObservers
+    public class EventObservers: DALObject
     {
         public int Id { get; set; }
         public Event Event { get; set; }

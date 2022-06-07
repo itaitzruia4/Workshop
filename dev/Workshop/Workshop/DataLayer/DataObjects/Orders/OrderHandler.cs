@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Workshop.DataLayer.DataObjects.Orders
 {
-    public class OrderHandler<T>
+    public class OrderHandler<T>: DALObject
     {
         public int Id { get; set; }
         public List<MemberToOrders<T>> MemberToOrders { get; set; }
@@ -16,9 +16,8 @@ namespace Workshop.DataLayer.DataObjects.Orders
         {
         }
 
-        public OrderHandler(int id, List<MemberToOrders<T>> memberToOrders)
+        public OrderHandler(List<MemberToOrders<T>> memberToOrders)
         {
-            Id = id;
             MemberToOrders = memberToOrders;
         }
     }

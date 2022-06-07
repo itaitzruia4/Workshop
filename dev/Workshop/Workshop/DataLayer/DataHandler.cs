@@ -44,6 +44,11 @@ namespace Workshop.DataLayer
             cache.Remove(toRemove);
         }
 
+        public T find<T>(Type entityType, object key) where T : class, DALObject
+        {
+            return (T)cache.Find(entityType, key);
+        }
+
         private void upload(int timeOutInSeconds)
         {
             while (true)

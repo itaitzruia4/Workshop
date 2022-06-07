@@ -15,9 +15,10 @@ namespace Workshop.DomainLayer.MarketPackage.Discounts
         public string json_discount { get; set; }
         public abstract double CalculateDiscountValue(ShoppingBagDTO shoppingBag);
         public abstract bool IsEligible(ShoppingBagDTO shoppingBag);
+        public DALDiscount DALDiscount { get; set; }
         public DALDiscount ToDAL()
         {
-            return new DALDiscount(json_discount);
+            return this.DALDiscount;
         }
     }
 }
