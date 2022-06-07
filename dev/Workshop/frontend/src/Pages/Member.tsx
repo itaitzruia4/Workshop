@@ -12,7 +12,7 @@ import { useState, useEffect } from 'react';
 
 import { handleLogout, handleExitMarket } from '../Actions/AuthenticationActions';
 import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleOpenStore, handleRemoveProduct, handleAddDiscount, handleAddProductDiscount, handleAddCategoryDiscount, handleNominateStoreOwner, handleNominateStoreManager, handleRemoveStoreOwnerNomination } from '../Actions/StoreActions';
-import { handleAddToCart, handleViewCart, handleReviewProduct, handleUpdateNotifications } from '../Actions/UserActions';
+import { handleAddToCart, handleViewCart, handleBuyCart, handleReviewProduct, handleUpdateNotifications } from '../Actions/UserActions';
 import { handleChangeProductCategory, handleChangeProductName, handleChangeProductPrice, handleChangeProductQuantity } from '../Actions/ProductActions';
 
 import { makeUserToken, memberToken } from '../Types/roles';
@@ -128,10 +128,16 @@ function Member() {
     const addToCart = (storeId: number, productId: number, quantity: number) => {
         handleAddToCart(makeUserToken(token.userId), storeId, productId, quantity).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     }
+    const buyCart = (number: string, year: string, month: string, ccv: string, holder: string, id: string, name: string, address: string,
+        city: string, country: string, zip: string) => { 
+        handleBuyCart(makeUserToken(token.userId), number, year, month, ccv, holder, id, name, address, city, country, zip)
+            .then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+
+    }
    
     return (
         <div>
-            {Appbar(token, token.membername, stores, cart, notifications)}
+            {Appbar(token, token.membername, stores, cart, notifications, buyCart)}
             <ButtonGroup variant="contained" aria-label="outlined primary button group">
                 {AddStoreDialog(addStore)}
             </ButtonGroup>

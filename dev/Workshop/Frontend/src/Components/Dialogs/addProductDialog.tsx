@@ -23,13 +23,17 @@ export default function AddProductDialog(
     };
 
     const handleClose = () => {
+        setName("");
+        setDescription("");
+        setPrice(0);
+        setQuantity(0);
+        setCategory("");
         setOpen(false);
     };
 
     const handleAdd = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         addProduct(storeId, name, description, price, quantity, category);
-        setName("");
         handleClose();
     };
 
