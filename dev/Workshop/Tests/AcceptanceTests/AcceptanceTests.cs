@@ -93,7 +93,6 @@ namespace Tests.AcceptanceTests
             Assert.IsTrue(service.Register(1, username, password, DateTime.Parse("Aug 22, 1972")).ErrorOccured);
         }
 
-
         [DataTestMethod]
         [DataRow(1, username, password)]
         public void Test_Login_Good(int userId, string username, string password)
@@ -113,6 +112,7 @@ namespace Tests.AcceptanceTests
         [DataRow("Fake1", "")]
         public void Test_Login_Bad_NoSuchUser(string username, string password)
         {
+            service.EnterMarket(1);
             Assert.IsTrue(service.Login(1, username, password).ErrorOccured);
         }
 
@@ -123,6 +123,7 @@ namespace Tests.AcceptanceTests
         [DataRow(username, password, null)]
         public void Test_Login_Bad_WrongPassword(string username, string password, string wrongPassword)
         {
+            service.EnterMarket(1);
             service.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
             Assert.IsTrue(service.Login(1, username, wrongPassword).ErrorOccured);
         }
@@ -134,8 +135,16 @@ namespace Tests.AcceptanceTests
         [DataRow(username, password, null)]
         public void Test_Login_Bad_WrongUsername(string username, string password, string wrongUsername)
         {
+            service.EnterMarket(1);
             service.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
             Assert.IsTrue(service.Login(1, wrongUsername, password).ErrorOccured);
+        }
+
+        public void Test_Login_Bad_LoggedInFromAnotherUser()
+        {
+            Test_Login_Good(1, "Member1", "Pass1");
+            service.EnterMarket(2);
+            Assert.AreEqual("Member Member1 is already logged in from another user", service.Login(2, "Member1", "Pass1").ErrorMessage);
         }
 
         public bool Login_Thread(int userId, string username, string password)
@@ -1773,13 +1782,6 @@ namespace Tests.AcceptanceTests
             Response<KeyValuePair<Member, List<Notification>>> response5 = service.Login(2, "Member3", "Password3");
             Assert.AreEqual(1, response5.Value.Value.Count);
             //Assert.AreEqual("Member1", response5.Value.Value[0].Sender);
-        }
-
-        [TestMethod]
-        public void Test_HoldedNotifications_From_GettingMessaged()
-        {
-            // MAKE SURE IT IS IMPLEMENTED ONCE MESSAGES ARE ADDED
-            throw new NotImplementedException("Test_HoldedNotifications_From_GettingMessaged");
         }
 
         [TestMethod]
