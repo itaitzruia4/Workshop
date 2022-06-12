@@ -14,6 +14,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import ShoppingCart from '@mui/icons-material/ShoppingCart';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MoreIcon from '@mui/icons-material/MoreVert';
 
 import CartDialog from './Dialogs/CartDialog'
@@ -143,7 +144,17 @@ export default function Appbar(
                     </Search>
                     <Box sx={{ flexGrow: 1 }} />
                     <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                        {CartDialog(buyCart)}
+                        <IconButton
+                            size="large"
+                            aria-label="show notifications"
+                            color="inherit"
+                            onClick={handleOpenNotifications}
+                            aria-hashpopup="true"
+                        >
+                         <AccountCircleIcon />
+                        </IconButton>
+
+                        {CartDialog(buyCart, cart, stores)}
 
                         <IconButton
                             size="large"

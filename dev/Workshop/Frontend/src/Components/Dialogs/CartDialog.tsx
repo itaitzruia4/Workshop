@@ -152,7 +152,9 @@ const rows = [
 
 export default function CartDialog(
     buyCart: (number: string, year: string, month: string, ccv: string, holder: string, id: string, name: string, address: string,
-        city: string, country: string, zip: string) => void
+        city: string, country: string, zip: string) => void,
+    cart: Cart,
+    stores: Store[]
 ) {
     const [open, setOpen] = React.useState(false);
     const handleClose = () => {
