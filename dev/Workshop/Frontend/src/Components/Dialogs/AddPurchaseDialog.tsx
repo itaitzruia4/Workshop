@@ -10,11 +10,14 @@ import { BagPurchaseSimpleTerm, CategoryPurchaseSimpleTerm, makeBagPurchaseSimpl
 
 export default function AddPurchaseDialog(
     storeId: number,
-    addPurchase: (storeId: number, purchaseJson: string) => void,
     addProductPurchase: (storeId: number, productId: number, purchaseJson: string) => void,
     addCategoryPurchase: (storeId: number, category: string, purchaseJson: string) => void,
     addBagPurchase: (storeId: number, purchaseJson: string) => void,
     addUserPurchase: (storeId: number, purchaseJson: string) => void) {
+
+    const PURCHASE_TYPES = ["p", "q", "h", "d"]
+    const NON_USER_PURCHASE_ACTIONS = ["<", ">", "=", "!=", ">=", "<="]
+    const USER_PURCHASE_ACTIONS = [">", "!=", ">="]
 
     const [open, setOpen] = React.useState(false);
     const [productOpen, setProductOpen] = React.useState(false);
@@ -68,15 +71,35 @@ export default function AddPurchaseDialog(
         setOpen(true);
     };
 
+    const handleOpenUserPurchase = () => {
+        setOpen(false);
+        setUserPurchaseOpen(true);
+    };
+
+    const handleCloseUserPurchase = () => {
+        setUserPurchaseOpen(false);
+        setOpen(true);
+    };
+
     const handleAdd = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        addPurchase(storeId, purchase);
+        addBagPurchase(storeId, purchase);
         setPurchase("");
         handleClosePurchase();
     };
 
     const handleAddProductPurchase = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        if (!PURCHASE_TYPES.includes(type)) {
+            alert(`Purchase type must be one of the following: ${JSON.stringify(PURCHASE_TYPES)}`);
+            return;
+        }
+
+        if (!NON_USER_PURCHASE_ACTIONS.includes(action)) {
+            alert(`Purchase action must be one of the following: ${JSON.stringify(NON_USER_PURCHASE_ACTIONS)}`);
+            return;
+        }
 
         const productPurchase: ProductPurchaseSimpleTerm = makeProductPurchaseSimpleTerm(type, action, value, productId);
 
@@ -93,6 +116,16 @@ export default function AddPurchaseDialog(
     const handleAddCategoryPurchase = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
+        if (!PURCHASE_TYPES.includes(type)) {
+            alert(`Purchase type must be one of the following: ${JSON.stringify(PURCHASE_TYPES)}`);
+            return;
+        }
+
+        if (!NON_USER_PURCHASE_ACTIONS.includes(action)) {
+            alert(`Purchase action must be one of the following: ${JSON.stringify(NON_USER_PURCHASE_ACTIONS)}`);
+            return;
+        }
+
         const categoryPurchase: CategoryPurchaseSimpleTerm = makeCategoryPurchaseSimpleTerm(type, action, value, category);
 
         addCategoryPurchase(storeId, category, JSON.stringify(categoryPurchase));
@@ -108,6 +141,16 @@ export default function AddPurchaseDialog(
     const handleAddBagPurchase = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
+        if (!PURCHASE_TYPES.includes(type)) {
+            alert(`Purchase type must be one of the following: ${JSON.stringify(PURCHASE_TYPES)}`);
+            return;
+        }
+
+        if (!NON_USER_PURCHASE_ACTIONS.includes(action)) {
+            alert(`Purchase action must be one of the following: ${JSON.stringify(NON_USER_PURCHASE_ACTIONS)}`);
+            return;
+        }
+
         const bagPurchase: BagPurchaseSimpleTerm = makeBagPurchaseSimpleTerm(type, action, value);
 
         addBagPurchase(storeId, JSON.stringify(bagPurchase));
@@ -122,20 +165,25 @@ export default function AddPurchaseDialog(
     const handleAddUserPurchase = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
+        if (!USER_PURCHASE_ACTIONS.includes(action)) {
+            alert(`Purchase action must be one of the following: ${JSON.stringify(USER_PURCHASE_ACTIONS)}`);
+            return;
+        }
+
         const userPurchase: UserPurchaseSimpleTerm = makeUserPurchaseSimpleTerm(action, age);
 
-        addBagPurchase(storeId, JSON.stringify(userPurchase));
+        addUserPurchase(storeId, JSON.stringify(userPurchase));
 
         setAge(0);
         setAction("");
 
-        handleCloseBagPurchase();
+        handleCloseUserPurchase();
     };
 
     return (
         <div>
             <Button onClick={handleOpenPurchase}>
-                Add Purchase
+                Add Purchase Policy
             </Button>
             <Dialog open={open} onClose={handleClosePurchase}>
                 <DialogTitle>Add Purchase</DialogTitle>
@@ -147,9 +195,9 @@ export default function AddPurchaseDialog(
                     <DialogContentText>
                         For complex Purchases, please insert Purchase JSON string below:
                     </DialogContentText>
-                    <form onSubmit={handleAdd} id="PurchaseForm" >
+                    <form onSubmit={handleAdd} id="purchaseForm" >
                         <TextField
-                            value={Purchase}
+                            value={purchase}
                             autoFocus
                             margin="dense"
                             id="name"
@@ -161,17 +209,47 @@ export default function AddPurchaseDialog(
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClosePurchase}>Cancel</Button>
-                    <Button variant="contained" type="submit" form="PurchaseForm">Add</Button>
+                    <Button variant="contained" type="submit" form="purchaseForm">Add</Button>
                 </DialogActions>
             </Dialog>
 
             <Dialog open={productOpen} onClose={handleCloseProductPurchase}>
-                <DialogTitle>Add Product Purchase</DialogTitle>
+                <DialogTitle>Add Product Purchase Policy</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Please insert product Purchase details
+                        Please insert product purchase details
                     </DialogContentText>
                     <form onSubmit={handleAddProductPurchase} id="productPurchaseForm" >
+                        <TextField
+                            value={type}
+                            autoFocus
+                            margin="dense"
+                            id="type"
+                            label="Purchase Policy Type (p, q, h, d)"
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => setType(e.target.value)}
+                        />
+                        <TextField
+                            value={action}
+                            autoFocus
+                            margin="dense"
+                            id="action"
+                            label="Purchase Policy Action (<, >, =, !=, >=, <=)"
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => setAction(e.target.value)}
+                        />
+                        <TextField
+                            value={value}
+                            autoFocus
+                            margin="dense"
+                            id="value"
+                            label="Purchase Policy Value"
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => setValue(e.target.value)}
+                        />
                         <TextField
                             value={productId}
                             autoFocus
@@ -183,17 +261,6 @@ export default function AddPurchaseDialog(
                             variant="standard"
                             onChange={(e) => setProductId(Number(e.target.value))}
                         />
-                        <TextField
-                            value={percentage}
-                            autoFocus
-                            margin="dense"
-                            id="percentage"
-                            label="Purchase Percentage"
-                            type="number"
-                            fullWidth
-                            variant="standard"
-                            onChange={(e) => setPercentage(Number(e.target.value))}
-                        />
                     </form>
                 </DialogContent>
                 <DialogActions>
@@ -203,12 +270,42 @@ export default function AddPurchaseDialog(
             </Dialog>
 
             <Dialog open={categoryOpen} onClose={handleCloseCategoryPurchase}>
-                <DialogTitle>Add Category Purchase</DialogTitle>
+                <DialogTitle>Add Category Purchase Policy</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
                         Please insert category Purchase details
                     </DialogContentText>
                     <form onSubmit={handleAddCategoryPurchase} id="categoryPurchaseForm" >
+                        <TextField
+                            value={type}
+                            autoFocus
+                            margin="dense"
+                            id="type"
+                            label="Purchase Policy Type (p, q, h, d)"
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => setType(e.target.value)}
+                        />
+                        <TextField
+                            value={action}
+                            autoFocus
+                            margin="dense"
+                            id="action"
+                            label="Purchase Policy Action (<, >, =, !=, >=, <=)"
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => setAction(e.target.value)}
+                        />
+                        <TextField
+                            value={value}
+                            autoFocus
+                            margin="dense"
+                            id="value"
+                            label="Purchase Policy Value"
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => setValue(e.target.value)}
+                        />
                         <TextField
                             value={category}
                             autoFocus
@@ -219,17 +316,6 @@ export default function AddPurchaseDialog(
                             variant="standard"
                             onChange={(e) => setCategory(e.target.value)}
                         />
-                        <TextField
-                            value={percentage}
-                            autoFocus
-                            margin="dense"
-                            id="percentage"
-                            label="Purchase Percentage"
-                            type="number"
-                            fullWidth
-                            variant="standard"
-                            onChange={(e) => setPercentage(Number(e.target.value))}
-                        />
                     </form>
                 </DialogContent>
                 <DialogActions>
@@ -238,31 +324,88 @@ export default function AddPurchaseDialog(
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={storePurchaseOpen} onClose={handleCloseStorePurchase}>
-                <DialogTitle>Add Store Purchase</DialogTitle>
+            <Dialog open={bagPurchaseOpen} onClose={handleCloseBagPurchase}>
+                <DialogTitle>Add Bag Purchase Policy</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Please insert store Purchase details
+                        Please insert bag purchase policy details
                     </DialogContentText>
-                    <form onSubmit={handleAddStorePurchase} id="storePurchaseForm" >
+                    <form onSubmit={handleAddBagPurchase} id="bagPurchaseForm" >
                         <TextField
-                            value={percentage}
+                            value={type}
                             autoFocus
                             margin="dense"
-                            id="percentage"
-                            label="Purchase Percentage"
-                            type="number"
+                            id="type"
+                            label="Purchase Policy Type (p, q, h, d)"
                             fullWidth
                             variant="standard"
-                            onChange={(e) => setPercentage(Number(e.target.value))}
+                            onChange={(e) => setType(e.target.value)}
+                        />
+                        <TextField
+                            value={action}
+                            autoFocus
+                            margin="dense"
+                            id="action"
+                            label="Purchase Policy Action (<, >, =, !=, >=, <=)"
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => setAction(e.target.value)}
+                        />
+                        <TextField
+                            value={value}
+                            autoFocus
+                            margin="dense"
+                            id="value"
+                            label="Purchase Policy Value"
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => setValue(e.target.value)}
                         />
                     </form>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseStorePurchase}>Back</Button>
-                    <Button variant="contained" type="submit" form="storePurchaseForm">Add</Button>
+                    <Button onClick={handleCloseBagPurchase}>Back</Button>
+                    <Button variant="contained" type="submit" form="bagPurchaseForm">Add</Button>
                 </DialogActions>
             </Dialog>
+
+
+            <Dialog open={userPurchaseOpen} onClose={handleCloseUserPurchase}>
+                <DialogTitle>Add User Purchase Policy</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Please insert user purchase policy details
+                    </DialogContentText>
+                    <form onSubmit={handleAddUserPurchase} id="userPurchaseForm" >
+                        <TextField
+                            value={action}
+                            autoFocus
+                            margin="dense"
+                            id="action"
+                            label="Purchase Policy Action (>, !=, >=)"
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => setAction(e.target.value)}
+                        />
+                        <TextField
+                            value={age}
+                            autoFocus
+                            margin="dense"
+                            id="age"
+                            label="User Age"
+                            type="number"
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => setAge(Number(e.target.value))}
+                        />
+                    </form>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseUserPurchase}>Back</Button>
+                    <Button variant="contained" type="submit" form="userPurchaseForm">Add</Button>
+                </DialogActions>
+            </Dialog>
+
         </div>
     );
 }

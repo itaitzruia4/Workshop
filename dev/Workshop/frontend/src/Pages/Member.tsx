@@ -11,7 +11,11 @@ import AddStoreDialog from '../Components/Dialogs/addStoreDialog';
 import { useState, useEffect } from 'react';
 
 import { handleLogout, handleExitMarket } from '../Actions/AuthenticationActions';
-import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleOpenStore, handleRemoveProduct, handleAddDiscount, handleAddProductDiscount, handleAddCategoryDiscount, handleNominateStoreOwner, handleNominateStoreManager, handleRemoveStoreOwnerNomination } from '../Actions/StoreActions';
+import {
+    handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleOpenStore, handleRemoveProduct, handleAddDiscount,
+    handleAddProductDiscount, handleAddCategoryDiscount, handleNominateStoreOwner, handleNominateStoreManager, handleRemoveStoreOwnerNomination,
+    handleAddProductPurchasePolicy, handleAddCategoryPurchasePolicy, handleAddStorePurchasePolicy, handleAddUserPurchasePolicy
+} from '../Actions/StoreActions';
 import { handleAddToCart, handleViewCart, handleReviewProduct, handleUpdateNotifications } from '../Actions/UserActions';
 import { handleChangeProductCategory, handleChangeProductName, handleChangeProductPrice, handleChangeProductQuantity } from '../Actions/ProductActions';
 
@@ -95,6 +99,34 @@ function Member() {
             });
     };
 
+    const addProductPurchasePolicy = (storeId: number, productId: number, purchaseJson: string): void => {
+        handleAddProductPurchasePolicy(token, storeId, productId, purchaseJson)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
+    const addCategoryPurchasePolicy = (storeId: number, category: string, purchaseJson: string): void => {
+        handleAddCategoryPurchasePolicy(token, storeId, category, purchaseJson)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
+    const addBagPurchasePolicy = (storeId: number, purchaseJson: string): void => {
+        handleAddStorePurchasePolicy(token, storeId, purchaseJson)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
+    const addUserPurchasePolicy = (storeId: number, purchaseJson: string): void => {
+        handleAddUserPurchasePolicy(token, storeId, purchaseJson)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
     const closeStore = (storeId: number) => {
         handleCloseStore(token, storeId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     };
@@ -135,9 +167,9 @@ function Member() {
             <ButtonGroup variant="contained" aria-label="outlined primary button group">
                 {AddStoreDialog(addStore)}
             </ButtonGroup>
-            {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct, closeStore, openStore,
-                addDiscount, addProductDiscount, addCategoryDiscount, addToCart,
-                nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
+            {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct, closeStore, openStore, addDiscount,
+                addProductDiscount, addCategoryDiscount, addProductPurchasePolicy, addCategoryPurchasePolicy,
+                addBagPurchasePolicy, addUserPurchasePolicy, addToCart, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
             <Stack direction="row" spacing={2}>
                 <Button variant='contained' onClick={e =>
                     handleLogout(token)
