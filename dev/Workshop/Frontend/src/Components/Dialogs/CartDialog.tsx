@@ -33,7 +33,7 @@ import Badge from '@mui/material/Badge';
 
 import { Product } from '../../Types/product';
 import { Store } from '../../Types/store';
-import { Cart, Bag } from '../../Types/shopping';
+import { Cart, Bag, getBagCost } from '../../Types/shopping';
 
 import InputDialog from './InputDialog'
 import BuyCartDialog from './BuyCartDialog'
