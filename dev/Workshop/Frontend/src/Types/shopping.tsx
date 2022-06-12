@@ -15,3 +15,7 @@ export const getBagCost = (bag: Bag) => {
     const price = prices.reduce((sum, c) => sum + c, 0);
     return price;
 }
+
+export const getBagToStore = (cart: Cart, stores: Store[]) : [Bag,Store][] =>{
+    return cart.shoppingBags.map(b => [b, stores.find(s => s.storeId === b.storeId)!]);
+}
