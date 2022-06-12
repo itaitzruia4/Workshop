@@ -36,6 +36,7 @@ import { Store } from '../../Types/store';
 import { Cart, Bag } from '../../Types/shopping';
 
 import InputDialog from './InputDialog'
+import BuyCartDialog from './BuyCartDialog'
 
 const Transition = React.forwardRef(function Transition(
     props: TransitionProps & {
@@ -149,7 +150,10 @@ const rows = [
 
 
 
-export default function CartDialog() {
+export default function CartDialog(
+    buyCart: (number: string, year: string, month: string, ccv: string, holder: string, id: string, name: string, address: string,
+        city: string, country: string, zip: string) => void
+) {
     const [open, setOpen] = React.useState(false);
     const handleClose = () => {
         setOpen(false);
@@ -180,9 +184,7 @@ export default function CartDialog() {
                         <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
                             Your shopping cart
                         </Typography>
-                        <Button variant="contained" color="success">
-                            Buy cart
-                        </Button>
+                        {BuyCartDialog(buyCart)}
                     </Toolbar>
                 </AppBar>
         <TableContainer component={Paper}>

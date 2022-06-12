@@ -11,10 +11,10 @@ import AddStoreDialog from '../Components/Dialogs/addStoreDialog';
 import { useState, useEffect } from 'react';
 
 import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleOpenStore, handleRemoveProduct, handleAddDiscount, handleAddProductDiscount, handleAddCategoryDiscount } from '../Actions/StoreActions';
-import { handleAddToCart, handleViewCart, handleReviewProduct } from '../Actions/UserActions';
+import { handleAddToCart, handleViewCart, handleReviewProduct, handleBuyCart } from '../Actions/UserActions';
 import { handleChangeProductCategory, handleChangeProductName, handleChangeProductPrice, handleChangeProductQuantity } from '../Actions/ProductActions';
 
-import { userToken } from '../Types/roles';
+import { userToken, makeUserToken } from '../Types/roles';
 import { Store } from "../Types/store"
 import { Product } from "../Types/product"
 import { Cart, Bag } from '../Types/shopping';
@@ -120,9 +120,16 @@ function Guest() {
         handleAddToCart(token, storeId, productId, quantity).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     }
 
+    const buyCart = (number: string, year: string, month: string, ccv: string, holder: string, id: string, name: string, address: string,
+        city: string, country: string, zip: string) => {
+        handleBuyCart(makeUserToken(token.userId), number, year, month, ccv, holder, id, name, address, city, country, zip)
+            .then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+
+    }
+
     return (
         <div>
-            {Appbar(token, "guest", stores, cart, [])}
+            {Appbar(token, "guest", stores, cart, [], buyCart)}
             {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct, closeStore, openStore, addDiscount,
                 addProductDiscount, addCategoryDiscount, addProductPurchasePolicy, addCategoryPurchasePolicy,
                 addBagPurchasePolicy, addUserPurchasePolicy, addToCart, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
