@@ -9,6 +9,7 @@ using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Security;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using Workshop.ServiceLayer;
+using SystemAdminDTO = Workshop.ServiceLayer.ServiceObjects.SystemAdminDTO;
 
 namespace Tests.IntegrationTests.DomainLayer.MarketPackage
 {
@@ -24,10 +25,9 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         {
             ISecurityHandler security = new HashSecurityHandler();
             IReviewHandler review = new ReviewHandler();
-            userController = new UserController(security, review);
+            userController = new UserController(security, review, new List<SystemAdminDTO>());
             Mock<IExternalSystem> externalSystem = new Mock<IExternalSystem>();
             marketController = new MarketController(userController, externalSystem.Object);
-            userController.InitializeSystem();
             marketController.InitializeSystem();
 
             userController.EnterMarket(1);

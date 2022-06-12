@@ -28,7 +28,8 @@ namespace Tests.AcceptanceTests
         [TestInitialize]
         public void InitSystem()
         {
-            service = new Service(externalSystem.Object);
+            string config = "admin~admin~admin~22/08/1972";
+            service = new Service(externalSystem.Object, config);
         }
 
         [TestMethod]
@@ -1795,21 +1796,13 @@ namespace Tests.AcceptanceTests
                 "create-new-store(1,user1,store1)");
             file.Flush();
             file.Close();
-            Service service = new Service(externalSystem.Object, JsonConvert.SerializeObject(new ConfigTemplate { StartingStateFile = FileName }));
+            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
             Assert.IsTrue(service.WasInitializedWithFile);
             Assert.IsTrue(service.EnterMarket(1).ErrorOccured);
             Assert.IsTrue(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
             Assert.IsTrue(service.Login(1, "user1", "pass1").ErrorOccured);
             Assert.IsTrue(service.GetAllStores(1).Value.Count == 1);
             Assert.IsTrue(service.GetAllStores(1).Value[0].Name.Equals("store1"));
-        }
-
-        [TestMethod]
-        public void Test_InitializeFromFile_Consistent()
-        {
-            // Sanity check
-            Service service = new Service(externalSystem.Object);
-            Assert.IsFalse(service.WasInitializedWithFile);
         }
 
         [TestMethod]
@@ -1822,7 +1815,7 @@ namespace Tests.AcceptanceTests
                 "create-new-store(1,user1,store1)");
             file.Flush();
             file.Close();
-            Service service = new Service(externalSystem.Object, JsonConvert.SerializeObject(new ConfigTemplate { StartingStateFile = FileName }));
+            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
             // Expecting error: need to register before logging in
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1).ErrorOccured); // Make sure nothing happend after it failed
@@ -1843,7 +1836,7 @@ namespace Tests.AcceptanceTests
                 "blah-blah(1,user1,pass1,store1)");
             file.Flush();
             file.Close();
-            Service service = new Service(externalSystem.Object, JsonConvert.SerializeObject(new ConfigTemplate { StartingStateFile = FileName }));
+            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1862,7 +1855,7 @@ namespace Tests.AcceptanceTests
                 "create-new-store(1,user1,store1,failureInLife1)");
             file.Flush();
             file.Close();
-            Service service = new Service(externalSystem.Object, JsonConvert.SerializeObject(new ConfigTemplate { StartingStateFile = FileName }));
+            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1881,7 +1874,7 @@ namespace Tests.AcceptanceTests
                 "create-new-store(1,user1)");
             file.Flush();
             file.Close();
-            Service service = new Service(externalSystem.Object, JsonConvert.SerializeObject(new ConfigTemplate { StartingStateFile = FileName }));
+            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1900,7 +1893,7 @@ namespace Tests.AcceptanceTests
                 "create-new-store(FAILME,user1,store1)");
             file.Flush();
             file.Close();
-            Service service = new Service(externalSystem.Object, JsonConvert.SerializeObject(new ConfigTemplate { StartingStateFile = FileName }));
+            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1977,7 +1970,7 @@ namespace Tests.AcceptanceTests
             externalSystem.Setup(x => x.Pay(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Callback((string s1, string s2, string s3, string s4, string s5, string s6) => PAY_FLAG = true).Returns(150000);
             externalSystem.Setup(x => x.Cancel_Pay(It.IsAny<int>())).Callback((int n1) => CANCEL_PAY_FLAG = true).Returns(1);
             externalSystem.Setup(x => x.IsExternalSystemOnline()).Returns(true);
-            service = new Service(externalSystem.Object);
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
 
             Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
@@ -2002,7 +1995,7 @@ namespace Tests.AcceptanceTests
             externalSystem.Setup(x => x.Pay(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Callback((string s1, string s2, string s3, string s4, string s5, string s6) => PAY_FLAG = true).Returns(-1);
             externalSystem.Setup(x => x.Cancel_Pay(It.IsAny<int>())).Callback((int n1) => CANCEL_PAY_FLAG = true).Returns(1);
             externalSystem.Setup(x => x.IsExternalSystemOnline()).Returns(true);
-            service = new Service(externalSystem.Object);
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
 
             Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
@@ -2018,7 +2011,7 @@ namespace Tests.AcceptanceTests
         public void Test_ExternalSystem_Real_BuyCart()
         {
             IExternalSystem externalSystem = new ExternalSystem();
-            service = new Service(externalSystem);
+            service = new Service(externalSystem, "admin~admin~admin~22/08/1972");
             Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 2, "cat1").Value;
@@ -2039,7 +2032,7 @@ namespace Tests.AcceptanceTests
             externalSystem.Setup(x => x.Pay(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Callback((string s1, string s2, string s3, string s4, string s5, string s6) => PAY_FLAG = true).Returns(8688);
             externalSystem.Setup(x => x.Cancel_Pay(It.IsAny<int>())).Callback((int n1) => CANCEL_PAY_FLAG = true).Returns(1);
             externalSystem.Setup(x => x.IsExternalSystemOnline()).Returns(true);
-            service = new Service(externalSystem.Object);
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
 
             Test_Login_Good(1, username, password);
             Store store = service.CreateNewStore(1, username, "RandomStore").Value;

@@ -13,6 +13,7 @@ using Workshop.DomainLayer.UserPackage.Shopping;
 using Workshop.DomainLayer.Loggers;
 using System.Collections.Concurrent;
 using Workshop.DomainLayer.UserPackage.Notifications;
+using SystemAdminDTO = Workshop.ServiceLayer.ServiceObjects.SystemAdminDTO;
 
 namespace Workshop.DomainLayer.UserPackage
 {
@@ -24,7 +25,7 @@ namespace Workshop.DomainLayer.UserPackage
         private OrderHandler<string> orderHandler;
         private ConcurrentDictionary<string, Member> members;
         private ConcurrentDictionary<int, User> currentUsers;
-        public UserController(ISecurityHandler securityHandler, IReviewHandler reviewHandler)
+        public UserController(ISecurityHandler securityHandler, IReviewHandler reviewHandler, List<SystemAdminDTO> systemAdmins)
         {
             this.securityHandler = securityHandler;
             currentUsers = new ConcurrentDictionary<int, User>();
@@ -32,7 +33,19 @@ namespace Workshop.DomainLayer.UserPackage
             members = new ConcurrentDictionary<string, Member>();
             this.orderHandler = new OrderHandler<string>();
             notificationHandler = new NotificationHandler(this);
-            InitializeSystem();
+            InitializeAdmins(systemAdmins);
+        }
+
+        private void InitializeAdmins(List<SystemAdminDTO> admins)
+        {
+            foreach (SystemAdminDTO admin in admins)
+            {
+                Logger.Instance.LogEvent($"Started adding market manager permissions to {admin.Membername}");
+                Member member = new Member(admin.Membername, securityHandler.Encrypt(admin.Password), admin.Birthdate);
+                member.AddRole(new MarketManager());
+                members.TryAdd(member.Username, member);
+                Logger.Instance.LogEvent($"Added market manager permissions to {admin.Membername}");
+            }
         }
 
         public bool CheckOnlineStatus(string u)
@@ -52,22 +65,6 @@ namespace Workshop.DomainLayer.UserPackage
             return false;
         }
 
-        //*************************************************************************************************************
-        // System Actions:
-        //*************************************************************************************************************
-
-        /// <summary>
-        /// Load all members of the system
-        /// </summary>
-        /// 
-        public void InitializeSystem()
-        {
-            Logger.Instance.LogEvent("Starting initializing the system - User Controller");
-            Member admin = new Member("admin", securityHandler.Encrypt("admin"), DateTime.Parse("Aug 22, 1972"));
-            admin.AddRole(new MarketManager());
-            members.TryAdd("admin", admin);
-            Logger.Instance.LogEvent("Finished initializing the system - User Controller");
-        }
 
         //*************************************************************************************************************
         // General Visitor-Guest Actions:

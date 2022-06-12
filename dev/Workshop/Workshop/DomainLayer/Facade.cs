@@ -8,7 +8,7 @@ using Workshop.DomainLayer.UserPackage.Security;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using Workshop.ServiceLayer;
 using Notification = Workshop.DomainLayer.UserPackage.Notifications.Notification;
-
+using SystemAdminDTO = Workshop.ServiceLayer.ServiceObjects.SystemAdminDTO;
 
 namespace Workshop.DomainLayer
 {
@@ -17,9 +17,9 @@ namespace Workshop.DomainLayer
         private IUserController UserController;
         private IMarketController MarketController;
 
-        internal Facade(IExternalSystem externalSystem)
+        internal Facade(IExternalSystem externalSystem, List<SystemAdminDTO> systemAdmins)
         {
-            UserController = new UserController(new HashSecurityHandler(), new ReviewHandler());
+            UserController = new UserController(new HashSecurityHandler(), new ReviewHandler(), systemAdmins);
             MarketController = new MarketController(UserController, externalSystem);
         }
 
