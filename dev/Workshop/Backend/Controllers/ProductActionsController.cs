@@ -59,17 +59,5 @@ namespace API.Controllers
             }
             return Ok(new FrontResponse<int>(request.ProductId));
         }
-
-        [HttpPost("addproductpurchaseterm")]
-        public ActionResult<FrontResponse<int>> AddProductPurchaseTerm([FromBody] AddProductPurchaseTermRequest request)
-        {
-            Response response = Service.AddProductPurchaseTerm(request.UserId, request.Membername, request.StoreId, request.Term, request.ProductId);
-            if (response.ErrorOccured)
-            {
-                return BadRequest(new FrontResponse<int>(response.ErrorMessage));
-            }
-            return Ok(new FrontResponse<int>(request.ProductId));
-        }
-
     }
 }

@@ -28,6 +28,7 @@ import AddToCartDialog from '../Components/Dialogs/addToCartDialog';
 import { Store } from "../Types/store"
 import { Product } from "../Types/product"
 import StoreRolesDialog from './Dialogs/StoreRolesDialog';
+import AddPurchaseDialog from './Dialogs/AddPurchaseDialog';
 
 
 export default function StoresList(
@@ -41,6 +42,10 @@ export default function StoresList(
     addDiscount: (storeId: number, discountJson: string) => void,
     addProductDiscount: (storeId: number, productId: number, discountJson: string) => void,
     addCategoryDiscount: (storeId: number, category: string, discountJson: string) => void,
+    addProductPurchasePolicy: (storeId: number, productId: number, purchaseJson: string) => void,
+    addCategoryPurchasePolicy: (storeId: number, category: string, purchaseJson: string) => void,
+    addBagPurchasePolicy: (storeId: number, purchaseJson: string) => void,
+    addUserPurchasePolicy: (storeId: number, purchaseJson: string) => void,
     addToCart: (storeId: number, productId: number, quantity: number) => void,
     nominateStoreOwner: (storeId: number, nominee: string) => void,
     nominateStoreManager: (storeId: number, nominee: string) => void,
@@ -73,6 +78,7 @@ export default function StoresList(
                         <ButtonGroup variant="outlined" aria-label="outlined button group">
                             {AddProductDialog(store.storeId, addProduct)}
                             {AddDiscountDialog(store.storeId, addDiscount, addProductDiscount, addCategoryDiscount)}
+                            {AddPurchaseDialog(store.storeId, addProductPurchasePolicy, addCategoryPurchasePolicy, addBagPurchasePolicy, addUserPurchasePolicy)}
                             {StoreRolesDialog(store.storeId, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
                             <div>
                                 <Button onClick={e => closeStore(store.storeId)}>Close store</Button>

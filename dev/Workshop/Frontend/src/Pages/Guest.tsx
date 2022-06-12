@@ -69,11 +69,31 @@ function Guest() {
 
     const addProductDiscount = (storeId: number, productId: number, discountJson: string) => {
         alert("Permission Denied");
-};
+    };
 
     const addCategoryDiscount = (storeId: number, category: string, discountJson: string) => {
         alert("Permission Denied");
-};
+    };
+
+    const addPurchasePolicy = (storeId: number, purchaseJson: string) => {
+        alert("Permission Denied");
+    };
+
+    const addProductPurchasePolicy = (storeId: number, productId: number, purchaseJson: string) => {
+        alert("Permission Denied");
+    };
+
+    const addCategoryPurchasePolicy = (storeId: number, category: string, purchaseJson: string) => {
+        alert("Permission Denied");
+    };
+
+    const addBagPurchasePolicy = (storeId: number, purchaseJson: string) => {
+        alert("Permission Denied");
+    };
+
+    const addUserPurchasePolicy = (storeId: number, purchaseJson: string) => {
+        alert("Permission Denied");
+    };
 
     const closeStore = (storeId: number) => {
         alert("Permission Denied");
@@ -111,7 +131,8 @@ function Guest() {
         <div>
             {Appbar(token, "guest", stores, cart, [], buyCart)}
             {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct, closeStore, openStore, addDiscount,
-                addProductDiscount, addCategoryDiscount, addToCart, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
+                addProductDiscount, addCategoryDiscount, addProductPurchasePolicy, addCategoryPurchasePolicy,
+                addBagPurchasePolicy, addUserPurchasePolicy, addToCart, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
             <Stack direction="row" spacing={2}>
                 <Button variant='contained' onClick={e =>
                     handleExitMarket(token)

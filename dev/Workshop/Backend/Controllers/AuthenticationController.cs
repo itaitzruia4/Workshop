@@ -50,6 +50,7 @@ namespace API.Controllers
                 return BadRequest(new LoginResponse(response.ErrorMessage));
             }
 
+            List<Notification> nots = new List<Notification>();
             return Ok(new LoginResponse(response.Value.Key, response.Value.Value));
         }
 
