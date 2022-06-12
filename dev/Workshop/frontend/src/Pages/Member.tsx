@@ -16,7 +16,7 @@ import {
     handleAddProductDiscount, handleAddCategoryDiscount, handleNominateStoreOwner, handleNominateStoreManager, handleRemoveStoreOwnerNomination,
     handleAddProductPurchasePolicy, handleAddCategoryPurchasePolicy, handleAddStorePurchasePolicy, handleAddUserPurchasePolicy
 } from '../Actions/StoreActions';
-import { handleAddToCart, handleViewCart, handleBuyCart, handleReviewProduct, handleUpdateNotifications } from '../Actions/UserActions';
+import { handleAddToCart, handleViewCart, handleEditCart ,handleBuyCart, handleReviewProduct, handleUpdateNotifications } from '../Actions/UserActions';
 import { handleChangeProductCategory, handleChangeProductName, handleChangeProductPrice, handleChangeProductQuantity } from '../Actions/ProductActions';
 
 import { makeUserToken, memberToken } from '../Types/roles';
@@ -160,6 +160,9 @@ function Member() {
     const addToCart = (storeId: number, productId: number, quantity: number) => {
         handleAddToCart(makeUserToken(token.userId), storeId, productId, quantity).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     }
+    const editCart = (productId: number, quantity: number) => {
+        handleEditCart(makeUserToken(token.userId),productId, quantity).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+    }
     const buyCart = (number: string, year: string, month: string, ccv: string, holder: string, id: string, name: string, address: string,
         city: string, country: string, zip: string) => { 
         handleBuyCart(makeUserToken(token.userId), number, year, month, ccv, holder, id, name, address, city, country, zip)
@@ -169,7 +172,7 @@ function Member() {
    
     return (
         <div>
-            {Appbar(token, token.membername, stores, cart, notifications, buyCart)}
+            {Appbar(token, token.membername, stores, cart, notifications, editCart, buyCart)}
             <ButtonGroup variant="contained" aria-label="outlined primary button group">
                 {AddStoreDialog(addStore)}
             </ButtonGroup>

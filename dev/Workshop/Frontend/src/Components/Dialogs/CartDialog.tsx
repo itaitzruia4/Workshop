@@ -77,8 +77,8 @@ function createData(
     };
 }
 
-function Row(props: { store: Store, bag: Bag }) {
-    const { store , bag} = props;
+function Row(props: { store: Store, bag: Bag , removeProduct: (productId : number) => void}) {
+    const { store, bag, removeProduct } = props;
     const [open, setOpen] = React.useState(false);
 
     return (
@@ -126,7 +126,7 @@ function Row(props: { store: Store, bag: Bag }) {
                                                 {product.quantity * product.basePrice}
                                             </TableCell>
                                             <TableCell >
-                                                <Button variant="contained" color="error">Remove</Button>
+                                                <Button variant="contained" color="error" onClick={() => { removeProduct(product.id) }}>Remove</Button>
                                             </TableCell>
 
                                         </TableRow>
@@ -143,6 +143,7 @@ function Row(props: { store: Store, bag: Bag }) {
 }
 
 export default function CartDialog(
+    editCart: (productId: number, quantity: number) => void,
     buyCart: (number: string, year: string, month: string, ccv: string, holder: string, id: string, name: string, address: string,
         city: string, country: string, zip: string) => void,
     cart: Cart,
@@ -152,6 +153,10 @@ export default function CartDialog(
     const handleClose = () => {
         setOpen(false);
     };
+    const handleRemoveProduct = (productId: number) => {
+        editCart(productId, 0);
+        setOpen(true);
+    }
     return (
         <div>
             <IconButton size="large" color="inherit" onClick={e => setOpen(true)}>
@@ -192,8 +197,8 @@ export default function CartDialog(
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {getBagToStore(cart, stores).map(([bag, store] : [Bag, Store]) => (
-                        <Row key={store.storeId} store={store} bag={bag} />
+                            {getBagToStore(cart, stores).map(([bag, store]: [Bag, Store]) => (
+                                <Row key={store.storeId} store={store} bag={bag} removeProduct={handleRemoveProduct}/>
                     ))}
                 </TableBody>
             </Table>

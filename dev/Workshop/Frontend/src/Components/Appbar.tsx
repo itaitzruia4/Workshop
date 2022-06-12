@@ -73,6 +73,7 @@ export default function Appbar(
     stores: Store[],
     cart: Cart,
     nots: MarketNotification[],
+    editCart: (productId: number, quantity: number) => void,
     buyCart: (number: string, year: string, month: string, ccv: string, holder: string, id: string, name: string, address: string,
         city: string, country: string, zip: string) => void
 ) {
@@ -154,7 +155,7 @@ export default function Appbar(
                          <AccountCircleIcon />
                         </IconButton>
 
-                        {CartDialog(buyCart, cart, stores)}
+                        {CartDialog(editCart,buyCart, cart, stores)}
 
                         <IconButton
                             size="large"
