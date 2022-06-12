@@ -162,8 +162,8 @@ export default function CartDialog(
     };
     return (
         <div>
-        <IconButton size="large" color="inherit" onClick={e => setOpen(true) }>
-            <Badge badgeContent={0} color="error">
+            <IconButton size="large" color="inherit" onClick={e => setOpen(true)}>
+                <Badge badgeContent={cart.shoppingBags.length} color="error">
                 <ShoppingCart />
             </Badge>
             </IconButton>
