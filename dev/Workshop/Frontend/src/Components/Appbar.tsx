@@ -104,7 +104,7 @@ export default function Appbar(
     }
 
     const handleOpenNotifications = (event: React.MouseEvent<HTMLElement>) => {
-        if (notifications.length > 0) {
+        if (nots.length > 0) {
             setNotificationsAnchorElem(event.currentTarget);
         }
     }
@@ -152,12 +152,12 @@ export default function Appbar(
                             onClick={handleOpenNotifications}
                             aria-hashpopup="true"
                         >
-                            <Badge badgeContent={notifications.length} color="error">
+                            <Badge badgeContent={nots.length} color="error">
                                 <NotificationsIcon />
                             </Badge>
                         </IconButton>
 
-                        {NotificationsList(notifications, openNotifications, handleCloseNotifications, notificationsAnchorElem) }
+                        {NotificationsList(nots, openNotifications, handleCloseNotifications, notificationsAnchorElem) }
                     </Box>
                     <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
                         <IconButton
