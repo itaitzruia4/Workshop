@@ -44,5 +44,6 @@ namespace Workshop.DomainLayer.UserPackage
         List<Notification> TakeNotifications(int userId, string membername);
         Dictionary<Member, bool> GetMembersOnlineStats(int userId, string actingUsername);
         void CancelMember(int userId, string actingUsername, string canceledUsername);
+        List<ServiceLayer.ServiceObjects.PermissionInformation> GetMemberPermissions(int userId, string membername);
     }
 }

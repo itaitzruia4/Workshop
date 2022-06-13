@@ -81,5 +81,6 @@ namespace Workshop.ServiceLayer
         Response CancelMember(int userId, string actingUsername, string canceledUsername);
 
         Response<Dictionary<Member, bool>> GetMembersOnlineStats(int userId, string actingUsername);
+        Response<List<PermissionInformation>> GetMemberPermissions(int userId, string membername);
     }
 }
