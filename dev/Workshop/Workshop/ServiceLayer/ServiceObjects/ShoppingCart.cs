@@ -10,7 +10,7 @@ namespace Workshop.ServiceLayer.ServiceObjects
     public class ShoppingCart
     {
         public List<ShoppingBag> ShoppingBags { get; set; }
-
+        public double Price { get; set; }
         public ShoppingCart(DomainShoppingCart shoppingCart)
         {
             this.ShoppingBags = shoppingCart.shoppingBags.Values.Select(x => new ShoppingBag(x)).ToList();

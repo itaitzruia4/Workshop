@@ -559,6 +559,7 @@ namespace Tests.AcceptanceTests
             Response<ShoppingCart> resSC = service.ViewCart(1);
             Assert.IsFalse(resSC.ErrorOccured);
             Assert.AreEqual(0, resSC.Value.ShoppingBags.Count);
+            Assert.AreEqual(0.0, resSC.Value.Price);
         }
 
         [DataTestMethod]
@@ -567,10 +568,11 @@ namespace Tests.AcceptanceTests
         {
             Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 10.0, 1, "cat1").Value;
             service.AddToCart(1, prod.Id, storeId, 1);
             Response<ShoppingCart> resSC = service.ViewCart(1);
             Assert.IsFalse(resSC.ErrorOccured);
+            Assert.AreEqual(10.0, resSC.Value.Price);
             Assert.AreEqual(1, resSC.Value.ShoppingBags.Count);
             Assert.AreEqual(1, resSC.Value.ShoppingBags[storeId].Products.Count);
             AssertProductsEqual(resSC.Value.ShoppingBags[storeId].Products.First(), prod);
@@ -582,10 +584,11 @@ namespace Tests.AcceptanceTests
         {
             Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 10.0, 10, "cat1").Value;
             service.AddToCart(1, prod.Id, storeId, 1);
             Response<ShoppingCart> resSC = service.EditCart(1, prod.Id, 5);
             Assert.IsFalse(resSC.ErrorOccured);
+            Assert.AreEqual(50.0, resSC.Value.Price);
             Assert.AreEqual(5, resSC.Value.ShoppingBags[storeId].Products.First().Quantity);
             resSC = service.EditCart(1, prod.Id, 1);
             Assert.IsFalse(resSC.ErrorOccured);
@@ -2150,7 +2153,9 @@ namespace Tests.AcceptanceTests
             service.AddToCart(2, p.Id, st.StoreId, 2);
             Assert.IsTrue(service.EditCart(2, p.Id, 50).ErrorOccured);
             Assert.AreEqual(1, service.GetAllStores(2).Value[0].Products[0].Quantity);
-            Assert.IsFalse(service.EditCart(2, p.Id, 3).ErrorOccured);
+            Response<ShoppingCart> resp = service.EditCart(2, p.Id, 3);
+            Assert.IsFalse(resp.ErrorOccured);
+            Assert.AreEqual(30.0, resp.Value.Price);
             Assert.AreEqual(0, service.GetAllStores(2).Value[0].Products[0].Quantity);
         }
 
@@ -2162,7 +2167,9 @@ namespace Tests.AcceptanceTests
             Product p = service.AddProduct(1, "mem", st.StoreId, "p1", "d1", 10.0, 3, "cat1").Value;
             Test_Login_Good(2, "buyer", "pass");
             service.AddToCart(2, p.Id, st.StoreId, 2);
-            Assert.IsFalse(service.EditCart(2, p.Id, 0).ErrorOccured);
+            Response<ShoppingCart> resp = service.EditCart(2, p.Id, 0);
+            Assert.IsFalse(resp.ErrorOccured);
+            Assert.AreEqual(0, resp.Value.Price);
             Assert.AreEqual(3, service.GetAllStores(2).Value[0].Products[0].Quantity);
         }
     }

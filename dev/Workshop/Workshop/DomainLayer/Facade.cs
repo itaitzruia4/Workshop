@@ -207,5 +207,10 @@ namespace Workshop.DomainLayer
         {
             return UserController.GetMemberPermissions(userId, membername);
         }
+
+        internal double GetCartPrice(ShoppingCartDTO shoppingCart)
+        {
+            return MarketController.GetCartPrice(shoppingCart);
+        }
     }
 }
