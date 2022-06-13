@@ -624,5 +624,24 @@ namespace Workshop.DomainLayer.UserPackage
             notificationHandler.RemoveNotifications(membername);
             return retme;
         }
+
+        public List<ServiceLayer.ServiceObjects.PermissionInformation> GetMemberPermissions(int userId, string membername)
+        {
+            Func<Role, ServiceLayer.ServiceObjects.PermissionInformation> handleRole = (Role r) =>
+            {
+                return new ServiceLayer.ServiceObjects.PermissionInformation(userId, membername, (r is StoreRole ? ((StoreRole)r).StoreId : -1), r.GetAllActions());
+            };
+            AssertCurrentUser(userId, membername);
+            Member member = null;
+            try
+            {
+                member = (Member)GetUser(userId);
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException("SANITY CHECK: GETMEMBERPERMISSIONS");
+            }
+            return member.GetAllRoles().Select(r => new ServiceLayer.ServiceObjects.PermissionInformation(userId, membername, (r is StoreRole ? ((StoreRole)r).StoreId : -1), r.GetAllActions())).ToList();
+        }
     }
 }

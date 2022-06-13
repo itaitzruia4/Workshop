@@ -210,6 +210,10 @@ namespace Workshop.ServiceLayer
                                     if (actualParams.Length != 3) { throw new ArgumentException(); }
                                     facade.CancelMember(int.Parse(actualParams[0]), actualParams[1], actualParams[2]);
                                     break;
+                                case "get-member-permissions":
+                                    if (actualParams.Length != 2) { throw new ArgumentException(); }
+                                    facade.GetMemberPermissions(int.Parse(actualParams[0]), actualParams[1]);
+                                    break;
                                 default:
                                     throw new ArgumentException();
                             }
@@ -737,6 +741,18 @@ namespace Workshop.ServiceLayer
             catch (Exception e)
             {
                 return new Response(e.Message, userId);
+            }
+        }
+
+        public Response<List<PermissionInformation>> GetMemberPermissions(int userId, string membername)
+        {
+            try
+            {
+                return new Response<List<PermissionInformation>>(facade.GetMemberPermissions(userId, membername), userId);
+            }
+            catch (Exception e)
+            {
+                return new Response<List<PermissionInformation>>(e.Message, userId);
             }
         }
     }

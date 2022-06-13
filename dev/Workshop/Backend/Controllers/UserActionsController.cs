@@ -117,5 +117,16 @@ namespace API.Controllers
             }
             return Ok(new FrontResponse<Dictionary<Member, bool>>(response.Value));
         }
+
+        [HttpPost("getmemberpermissions")]
+        public ActionResult<FrontResponse<List<PermissionInformation>>> GetMemberPermissions([FromBody] MemberRequest request)
+        {
+            Response<List<PermissionInformation>> response = Service.GetMemberPermissions(request.UserId, request.Membername);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<List<PermissionInformation>>(response.ErrorMessage));
+            }
+            return Ok(new FrontResponse<List<PermissionInformation>>(response.Value));
+        }
     }
 }

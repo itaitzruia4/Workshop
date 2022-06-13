@@ -202,5 +202,10 @@ namespace Workshop.DomainLayer
         {
             UserController.CancelMember(userId, actingUsername, canceledUsername);
         }
+
+        internal List<ServiceLayer.ServiceObjects.PermissionInformation> GetMemberPermissions(int userId, string membername)
+        {
+            return UserController.GetMemberPermissions(userId, membername);
+        }
     }
 }
