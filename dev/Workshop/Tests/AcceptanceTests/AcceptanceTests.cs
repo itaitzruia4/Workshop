@@ -2139,5 +2139,31 @@ namespace Tests.AcceptanceTests
             Test_Login_Good(3, "member3", "pass3");
             Assert.IsTrue(service.GetMembersOnlineStats(3, "member3").ErrorOccured);
         }
+
+        [TestMethod]
+        public void Test_EditCart_InBoundsOfStore()
+        {
+            Test_Login_Good(1, "mem", "pass");
+            Store st = service.CreateNewStore(1, "mem", "S1").Value;
+            Product p = service.AddProduct(1, "mem", st.StoreId, "p1", "d1", 10.0, 3, "cat1").Value;
+            Test_Login_Good(2, "buyer", "pass");
+            service.AddToCart(2, p.Id, st.StoreId, 2);
+            Assert.IsTrue(service.EditCart(2, p.Id, 50).ErrorOccured);
+            Assert.AreEqual(1, service.GetAllStores(2).Value[0].Products[0].Quantity);
+            Assert.IsFalse(service.EditCart(2, p.Id, 3).ErrorOccured);
+            Assert.AreEqual(0, service.GetAllStores(2).Value[0].Products[0].Quantity);
+        }
+
+        [TestMethod]
+        public void Test_EditCart_ReturnsToStore()
+        {
+            Test_Login_Good(1, "mem", "pass");
+            Store st = service.CreateNewStore(1, "mem", "S1").Value;
+            Product p = service.AddProduct(1, "mem", st.StoreId, "p1", "d1", 10.0, 3, "cat1").Value;
+            Test_Login_Good(2, "buyer", "pass");
+            service.AddToCart(2, p.Id, st.StoreId, 2);
+            Assert.IsFalse(service.EditCart(2, p.Id, 0).ErrorOccured);
+            Assert.AreEqual(3, service.GetAllStores(2).Value[0].Products[0].Quantity);
+        }
     }
 }
