@@ -133,6 +133,7 @@
     <Compile Include="ServiceLayer\ServiceObjects\MarketManager.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Member.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Notification.cs" />
+    <Compile Include="ServiceLayer\ServiceObjects\PermissionInformation.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Product.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Role.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\StoreRole.cs" />
