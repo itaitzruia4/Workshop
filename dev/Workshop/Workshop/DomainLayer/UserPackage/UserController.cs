@@ -13,6 +13,7 @@ using Workshop.DomainLayer.UserPackage.Shopping;
 using Workshop.DomainLayer.Loggers;
 using System.Collections.Concurrent;
 using Workshop.DomainLayer.UserPackage.Notifications;
+using SystemAdminDTO = Workshop.ServiceLayer.ServiceObjects.SystemAdminDTO;
 
 namespace Workshop.DomainLayer.UserPackage
 {
@@ -24,7 +25,7 @@ namespace Workshop.DomainLayer.UserPackage
         private OrderHandler<string> orderHandler;
         private ConcurrentDictionary<string, Member> members;
         private ConcurrentDictionary<int, User> currentUsers;
-        public UserController(ISecurityHandler securityHandler, IReviewHandler reviewHandler)
+        public UserController(ISecurityHandler securityHandler, IReviewHandler reviewHandler, List<SystemAdminDTO> systemAdmins)
         {
             this.securityHandler = securityHandler;
             currentUsers = new ConcurrentDictionary<int, User>();
@@ -32,13 +33,26 @@ namespace Workshop.DomainLayer.UserPackage
             members = new ConcurrentDictionary<string, Member>();
             this.orderHandler = new OrderHandler<string>();
             notificationHandler = new NotificationHandler(this);
-            InitializeSystem();
+            InitializeAdmins(systemAdmins);
+        }
+
+        private void InitializeAdmins(List<SystemAdminDTO> admins)
+        {
+            foreach (SystemAdminDTO admin in admins)
+            {
+                Logger.Instance.LogEvent($"Started adding market manager permissions to {admin.Membername}");
+                Member member = new Member(admin.Membername, securityHandler.Encrypt(admin.Password), admin.Birthdate);
+                member.AddRole(new MarketManager());
+                members.TryAdd(member.Username, member);
+                Logger.Instance.LogEvent($"Added market manager permissions to {admin.Membername}");
+            }
         }
 
         public bool CheckOnlineStatus(string u)
         {
 
-            foreach (User member in currentUsers.Values) {
+            foreach (User member in currentUsers.Values)
+            {
                 if (member is Member)
                 {
                     if (((Member)member).Username == u)
@@ -51,22 +65,6 @@ namespace Workshop.DomainLayer.UserPackage
             return false;
         }
 
-            //*************************************************************************************************************
-            // System Actions:
-            //*************************************************************************************************************
-
-            /// <summary>
-            /// Load all members of the system
-            /// </summary>
-            /// 
-            public void InitializeSystem()
-        {
-            Logger.Instance.LogEvent("Starting initializing the system - User Controller");
-            Member admin = new Member("admin", securityHandler.Encrypt("admin"), DateTime.Parse("Aug 22, 1972"));
-            admin.AddRole(new MarketManager());
-            members.TryAdd("admin", admin);
-            Logger.Instance.LogEvent("Finished initializing the system - User Controller");
-        }
 
         //*************************************************************************************************************
         // General Visitor-Guest Actions:
@@ -82,10 +80,10 @@ namespace Workshop.DomainLayer.UserPackage
         {
             Logger.Instance.LogEvent($"User {userId} is trying to enter the market");
             User user = new User();
-            if (currentUsers.TryAdd(userId, user)) 
+            if (currentUsers.TryAdd(userId, user))
             {
                 Logger.Instance.LogEvent($"User {userId} has entered the market successfuly");
-                return user; 
+                return user;
             }
             throw new InvalidOperationException($"User {userId} has already entered the market");
         }
@@ -124,7 +122,7 @@ namespace Workshop.DomainLayer.UserPackage
                 Logger.Instance.LogEvent($"User {userId} has successfuly registered user {username}");
             else
                 throw new ArgumentException($"Username {username} already exists");
-            
+
         }
 
         /// <summary>
@@ -145,16 +143,20 @@ namespace Workshop.DomainLayer.UserPackage
             EnsureNonEmptyUserDetails(username, password);
             EnsureEnteredMarket(userId);
 
-            if (!IsMember(username))
-                throw new ArgumentException($"Username {username} does not exist");
 
             if (currentUsers[userId] is Member)
                 throw new InvalidOperationException($"User {userId} is already logged in");
 
-            Member member = members[username];
+            Member member;
+
+            if (!members.TryGetValue(username, out member))
+                throw new ArgumentException($"Username {username} does not exist");
+
+            if (currentUsers.Values.Contains(member))
+                throw new ArgumentException($"Member {username} is already logged in from another user");
 
             string encryptedTruePassword = member.Password,
-                   encryptedPasswordInput = securityHandler.Encrypt(password);
+               encryptedPasswordInput = securityHandler.Encrypt(password);
 
             if (!encryptedPasswordInput.Equals(encryptedTruePassword))
                 throw new ArgumentException($"User {userId} has entered wrong password for member {username}");
@@ -254,7 +256,7 @@ namespace Workshop.DomainLayer.UserPackage
             StoreRole nominatorStoreOwner = nominatorStoreRoles.Last();
             nominatorStoreOwner.AddNominee(nominatedUsername, newRole);
 
-            RegisterToEvent(nominated.Username, new Event("RemoveStoreOwnerNominationFrom" + nominatedUsername,"", "MarketController"));
+            RegisterToEvent(nominated.Username, new Event("RemoveStoreOwnerNominationFrom" + nominatedUsername, "", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("OpenStore" + storeId, "", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("CloseStore" + storeId, "", "MarketController"));
@@ -382,7 +384,7 @@ namespace Workshop.DomainLayer.UserPackage
             if (!currentUsers.ContainsKey(userId))
                 throw new InvalidOperationException($"User {userId} must enter the market first");
         }
-        
+
 
         /// <summary>
         /// Assert that current user is the user that 
@@ -479,7 +481,7 @@ namespace Workshop.DomainLayer.UserPackage
             //ShoppingBagProduct 
             Logger.Instance.LogEvent("User " + userId + " is trying to add a product to his cart from store " + storeId);
             AssertUserEnteredMarket(userId);
-            return this.currentUsers[userId].addToCart(product,storeId);
+            return this.currentUsers[userId].addToCart(product, storeId);
         }
 
         public ShoppingCartDTO viewCart(int userId)
@@ -488,7 +490,7 @@ namespace Workshop.DomainLayer.UserPackage
             AssertUserEnteredMarket(userId);
             return currentUsers[userId].viewShopingCart();
         }
-        
+
         public void AssertUserEnteredMarket(int userId)
         {
             if (!currentUsers.ContainsKey(userId))
@@ -501,18 +503,18 @@ namespace Workshop.DomainLayer.UserPackage
         {
             Logger.Instance.LogEvent("User " + userId + " is trying to edit the quantity of " + productId + " in his cart");
             AssertUserEnteredMarket(userId);
-            if(newQuantity < 0)
+            if (newQuantity < 0)
             {
                 Logger.Instance.LogEvent("User " + userId + " failed to edit the quantity of " + productId + " in his cart");
                 throw new ArgumentException($"Quantity {newQuantity} can not be a negtive number");
             }
-            if(newQuantity == 0)
+            if (newQuantity == 0)
             {
                 currentUsers[userId].deleteFromCart(productId);
             }
             else
             {
-                currentUsers[userId].changeQuantityInCart(productId,newQuantity);
+                currentUsers[userId].changeQuantityInCart(productId, newQuantity);
             }
             Logger.Instance.LogEvent("User " + userId + " successfuly edited the quantity of " + productId + " in his cart");
             return currentUsers[userId].viewShopingCart();
@@ -554,7 +556,7 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new MemberAccessException($"User {actingUsername} is not allowed to cancel members.");
 
             //cancel member
-            if (!members.TryRemove(canceledUsername,out canceled))
+            if (!members.TryRemove(canceledUsername, out canceled))
             {
                 throw new ArgumentException($"Could not cancel member {canceledUsername}");
             }
@@ -575,7 +577,7 @@ namespace Workshop.DomainLayer.UserPackage
 
             //get online members stats
             Dictionary<Member, bool> OnlineStats = new Dictionary<Member, bool>();
-            foreach( Member member in members.Values)
+            foreach (Member member in members.Values)
             {
                 OnlineStats.Add(member, CheckOnlineStatus(member.Username));
             }

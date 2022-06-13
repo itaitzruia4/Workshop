@@ -14,7 +14,6 @@ namespace Workshop.DomainLayer.UserPackage
 {
     public interface IUserController
     {
-        void InitializeSystem();
         void AssertUserEnteredMarket(int userId);
         bool IsConnected(int userId);
         User EnterMarket(int userId);

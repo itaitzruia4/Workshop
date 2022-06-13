@@ -9,6 +9,7 @@ using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Security;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 using ShoppingCartDTO = Workshop.DomainLayer.UserPackage.Shopping.ShoppingCartDTO;
+using SystemAdminDTO = Workshop.ServiceLayer.ServiceObjects.SystemAdminDTO;
 
 namespace Tests.UnitTests.DomainLayer.UserPackage
 {
@@ -30,8 +31,7 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             reviewMock.Setup(x => x.AddReview(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>()))
                                    .Returns((string u, int pid, string r, int i) => new ReviewDTO(u, pid, r, i));
 
-            userController = new UserController(securityMock.Object, reviewMock.Object);
-            userController.InitializeSystem();
+            userController = new UserController(securityMock.Object, reviewMock.Object, new List<SystemAdminDTO>(){ new SystemAdminDTO("admin", "admin", "22/08/1972")});
 
             userController.EnterMarket(1);
 

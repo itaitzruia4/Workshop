@@ -7,7 +7,7 @@ using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Security;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
-
+using SystemAdminDTO = Workshop.ServiceLayer.ServiceObjects.SystemAdminDTO;
 namespace Tests.IntegrationTests.DomainLayer.UserPackage
 {
     [TestClass]
@@ -24,8 +24,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             ISecurityHandler security = new HashSecurityHandler();
             IReviewHandler review = new ReviewHandler();
 
-            userController = new UserController(security, review);
-            userController.InitializeSystem();
+            userController = new UserController(security, review, new List<SystemAdminDTO>());
 
             userController.EnterMarket(1);
 
