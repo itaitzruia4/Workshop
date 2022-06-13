@@ -548,7 +548,7 @@ namespace Tests.AcceptanceTests
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             Response<ShoppingCart> resSC = service.ViewCart(1);
             Assert.IsFalse(resSC.ErrorOccured);
-            Assert.AreEqual(0, resSC.Value.shoppingBags.Count);
+            Assert.AreEqual(0, resSC.Value.ShoppingBags.Count);
         }
 
         [DataTestMethod]
@@ -561,9 +561,9 @@ namespace Tests.AcceptanceTests
             service.AddToCart(1, prod.Id, storeId, 1);
             Response<ShoppingCart> resSC = service.ViewCart(1);
             Assert.IsFalse(resSC.ErrorOccured);
-            Assert.AreEqual(1, resSC.Value.shoppingBags.Count);
-            Assert.AreEqual(1, resSC.Value.shoppingBags[storeId].products.Count);
-            AssertProductsEqual(resSC.Value.shoppingBags[storeId].products.First(), prod);
+            Assert.AreEqual(1, resSC.Value.ShoppingBags.Count);
+            Assert.AreEqual(1, resSC.Value.ShoppingBags[storeId].Products.Count);
+            AssertProductsEqual(resSC.Value.ShoppingBags[storeId].Products.First(), prod);
         }
 
         [DataTestMethod]
@@ -576,10 +576,10 @@ namespace Tests.AcceptanceTests
             service.AddToCart(1, prod.Id, storeId, 1);
             Response<ShoppingCart> resSC = service.EditCart(1, prod.Id, 5);
             Assert.IsFalse(resSC.ErrorOccured);
-            Assert.AreEqual(5, resSC.Value.shoppingBags[storeId].products.First().Quantity);
+            Assert.AreEqual(5, resSC.Value.ShoppingBags[storeId].Products.First().Quantity);
             resSC = service.EditCart(1, prod.Id, 1);
             Assert.IsFalse(resSC.ErrorOccured);
-            Assert.AreEqual(1, resSC.Value.shoppingBags[storeId].products.First().Quantity);
+            Assert.AreEqual(1, resSC.Value.ShoppingBags[storeId].Products.First().Quantity);
         }
 
 
@@ -1505,15 +1505,15 @@ namespace Tests.AcceptanceTests
             service.EnterMarket(55);
             service.Login(55, member2, "Password2");
             ShoppingCart cart = service.ViewCart(55).Value;
-            Assert.AreEqual(1, cart.shoppingBags.Count);
-            Assert.AreEqual(2, cart.shoppingBags[store.StoreId].products.Count);
-            Assert.AreEqual("Product1", cart.shoppingBags[store.StoreId].products[0].Name);
-            Assert.AreEqual(2, cart.shoppingBags[store.StoreId].products[0].Quantity);
-            Assert.AreEqual(p1.Id, cart.shoppingBags[store.StoreId].products[0].Id);
+            Assert.AreEqual(1, cart.ShoppingBags.Count);
+            Assert.AreEqual(2, cart.ShoppingBags[store.StoreId].Products.Count);
+            Assert.AreEqual("Product1", cart.ShoppingBags[store.StoreId].Products[0].Name);
+            Assert.AreEqual(2, cart.ShoppingBags[store.StoreId].Products[0].Quantity);
+            Assert.AreEqual(p1.Id, cart.ShoppingBags[store.StoreId].Products[0].Id);
 
-            Assert.AreEqual("Product2", cart.shoppingBags[store.StoreId].products[1].Name);
-            Assert.AreEqual(3, cart.shoppingBags[store.StoreId].products[1].Quantity);
-            Assert.AreEqual(p2.Id, cart.shoppingBags[store.StoreId].products[1].Id);
+            Assert.AreEqual("Product2", cart.ShoppingBags[store.StoreId].Products[1].Name);
+            Assert.AreEqual(3, cart.ShoppingBags[store.StoreId].Products[1].Quantity);
+            Assert.AreEqual(p2.Id, cart.ShoppingBags[store.StoreId].Products[1].Id);
 
             Assert.IsFalse(service.BuyCart(55, cc, address).ErrorOccured);
         }

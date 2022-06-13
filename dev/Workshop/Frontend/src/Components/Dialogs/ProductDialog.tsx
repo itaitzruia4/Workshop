@@ -18,6 +18,8 @@ import { TransitionProps } from '@mui/material/transitions';
 import Rating from '@mui/material/Rating';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
+import Badge, { BadgeProps } from '@mui/material/Badge';
+import { styled } from '@mui/material/styles';
 
 import { Product } from '../../Types/product';
 import { Store } from '../../Types/store';
@@ -32,6 +34,15 @@ const Transition = React.forwardRef(function Transition(
 ) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
+
+const StyledBadge = styled(Badge)<BadgeProps>(({ theme }) => ({
+    '& .MuiBadge-badge': {
+        right: -5,
+        top: -5,
+        border: `2px solid ${theme.palette.background.paper}`,
+        padding: '0 4px',
+    },
+}));
 
 export default function ProductDialog(
     store: Store,
@@ -79,11 +90,14 @@ export default function ProductDialog(
 
     return (
         <div>
-            <ListItemButton key={product.id} onClick={handleClickOpen}>
-                <ListItemIcon>
-                    <ProductionQuantityLimitsIcon />
-                </ListItemIcon>
-                <ListItemText key={product.id} primary={<Typography style={{ color: 'black' }}>{product.name}</Typography>} />
+            <ListItemButton key={product.id} onClick={handleClickOpen}>              
+                    <ListItemIcon>
+                        <StyledBadge badgeContent={product.id} color="primary">
+                            <ProductionQuantityLimitsIcon />
+                        </StyledBadge >
+                    </ListItemIcon>
+                <ListItemText key={product.id} primary={
+                    <Typography style={{ color: 'black' }}>{product.name}</Typography>} />
             </ListItemButton>
             <Dialog
                 fullScreen
