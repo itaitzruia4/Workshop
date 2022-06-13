@@ -16,7 +16,7 @@ import {
     handleAddProductDiscount, handleAddCategoryDiscount, handleNominateStoreOwner, handleNominateStoreManager, handleRemoveStoreOwnerNomination,
     handleAddProductPurchasePolicy, handleAddCategoryPurchasePolicy, handleAddStorePurchasePolicy, handleAddUserPurchasePolicy
 } from '../Actions/StoreActions';
-import { handleAddToCart, handleViewCart, handleBuyCart, handleReviewProduct, handleUpdateNotifications } from '../Actions/UserActions';
+import { handleAddToCart, handleViewCart, handleBuyCart, handleReviewProduct, handleUpdateNotifications, handleEditCart } from '../Actions/UserActions';
 import { handleChangeProductCategory, handleChangeProductName, handleChangeProductPrice, handleChangeProductQuantity } from '../Actions/ProductActions';
 
 import { makeUserToken, memberToken } from '../Types/roles';
@@ -25,7 +25,7 @@ import { Product } from "../Types/product"
 import { Cart, Bag } from '../Types/shopping';
 import { MarketNotification } from '../Types/Notification';
 
-
+// Member page
 function Member() {
     const [refreshKey, setRefreshKey] = useState(0);
 
@@ -164,12 +164,14 @@ function Member() {
         city: string, country: string, zip: string) => { 
         handleBuyCart(makeUserToken(token.userId), number, year, month, ccv, holder, id, name, address, city, country, zip)
             .then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
-
+    }
+    const editCart = (productId: number, quantity: number): void => {
+        handleEditCart(makeUserToken(token.userId), productId, quantity).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     }
    
     return (
         <div>
-            {Appbar(token, token.membername, stores, cart, notifications, buyCart)}
+            {Appbar(token, token.membername, stores, cart, notifications, editCart, buyCart)}
             <ButtonGroup variant="contained" aria-label="outlined primary button group">
                 {AddStoreDialog(addStore)}
             </ButtonGroup>

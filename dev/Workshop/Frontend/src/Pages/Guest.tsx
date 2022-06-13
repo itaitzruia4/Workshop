@@ -11,7 +11,7 @@ import AddStoreDialog from '../Components/Dialogs/addStoreDialog';
 import { useState, useEffect } from 'react';
 
 import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleOpenStore, handleRemoveProduct, handleAddDiscount, handleAddProductDiscount, handleAddCategoryDiscount } from '../Actions/StoreActions';
-import { handleAddToCart, handleViewCart, handleReviewProduct, handleBuyCart } from '../Actions/UserActions';
+import { handleAddToCart, handleViewCart, handleReviewProduct, handleBuyCart, handleEditCart } from '../Actions/UserActions';
 import { handleChangeProductCategory, handleChangeProductName, handleChangeProductPrice, handleChangeProductQuantity } from '../Actions/ProductActions';
 
 import { userToken, makeUserToken } from '../Types/roles';
@@ -119,7 +119,9 @@ function Guest() {
     const addToCart = (storeId: number, productId: number, quantity: number) => {
         handleAddToCart(token, storeId, productId, quantity).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     }
-
+    const editCart = (productId: number, quantity: number) => {
+        handleEditCart(makeUserToken(token.userId), productId, quantity).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+    }
     const buyCart = (number: string, year: string, month: string, ccv: string, holder: string, id: string, name: string, address: string,
         city: string, country: string, zip: string) => {
         handleBuyCart(makeUserToken(token.userId), number, year, month, ccv, holder, id, name, address, city, country, zip)
@@ -129,7 +131,7 @@ function Guest() {
 
     return (
         <div>
-            {Appbar(token, "guest", stores, cart, [], buyCart)}
+            {Appbar(token, "guest", stores, cart, [], editCart,buyCart)}
             {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct, closeStore, openStore, addDiscount,
                 addProductDiscount, addCategoryDiscount, addProductPurchasePolicy, addCategoryPurchasePolicy,
                 addBagPurchasePolicy, addUserPurchasePolicy, addToCart, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
