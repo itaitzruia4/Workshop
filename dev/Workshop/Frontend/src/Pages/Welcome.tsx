@@ -16,7 +16,6 @@ function Welcome() {
     let navigate = useNavigate();
     const routeChange = (path: string, token: userToken) =>
         () => {
-            console.log("navigating from enter market to login page, user id:", token.userId)
             navigate(path, { state: token });
         }
         
@@ -27,7 +26,6 @@ function Welcome() {
                 <Button variant="contained"
                     onClick={() =>
                         handleEnterMarket()
-                            .then(value => { console.log("enter market user id:", value); return value; })
                             .then(value => routeChange('/login', makeUserToken(value as number))())
                             .catch(error => {
                                 alert("Couldnt connect to server")

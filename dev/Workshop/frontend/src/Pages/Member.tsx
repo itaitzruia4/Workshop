@@ -45,7 +45,7 @@ function Member() {
     const refresh = () => {
         handleGetStores(token).then(value => setStores(value as Store[])).catch(error => alert(error));
         handleViewCart(makeUserToken(token.userId)).then(value => setCart(value as Cart)).catch(error => alert(error));
-        if (notifications.length > 0) {
+        if (notifications.length === 0) {
             handleUpdateNotifications(token)
                 .then(value => {
                     setNotifications(value as MarketNotification[]);
