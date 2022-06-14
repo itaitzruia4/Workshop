@@ -81,15 +81,15 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new InvalidOperationException($"Member {nominatorUsername} cannot nominate itself to be a store owner.");
             }
-
-            if (store.VoteForStoreOwnerNominee(nominator, nominated) != null)
+            Member original_voter;
+            if ((original_voter = store.VoteForStoreOwnerNominee(nominator, nominated)) != null)
             {
                 StoreOwner newRole = new StoreOwner(storeId);
                 nominated.AddRole(newRole);
                 store.AddOwner(nominated);
                 store.RemoveVotingOnMember(nominated);
                 // Add the new manager to the nominator's nominees list
-                StoreRole nominatorStoreOwner = nominator.GetStoreRoles(storeId).Last();
+                StoreRole nominatorStoreOwner = original_voter.GetStoreRoles(storeId).Last();
                 nominatorStoreOwner.AddNominee(nominatedUsername, newRole);
 
                 userController.RegisterToEvent(nominated.Username, new Event("RemoveStoreOwnerNominationFrom" + nominatedUsername, "", "MarketController"));
