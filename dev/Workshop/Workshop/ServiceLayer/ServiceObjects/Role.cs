@@ -10,7 +10,7 @@ namespace Workshop.ServiceLayer.ServiceObjects
 {
     public abstract class Role
     {
-        public IReadOnlyCollection<Action> Actions { get; set; }
+        public List<Action> Actions { get; set; }
 
         public Role(DomainRole dr)
         {

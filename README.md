@@ -8,13 +8,11 @@ Docs - https://docs.google.com/document/d/1uBLL_rCitwB7XsHgOPCzonL1Q7abzKXr6gH22
 When starting the system, you can choose to pass the path to a config file as a command line argument. The config file must be of the format specified below.
 
 # The config file format
-The current format is a json format, of the form:
+You can type commands of the type:
+admin~[ADMIN_NAME]~[ADMIN_PASS]~[ADMIN_BIRTHDATE]
+ss~[STARTING_STATE_FILE_PATH]
 
-{
-
-  StartingStateFile: # PATH TO THE FILE
-  
-}
+Note, the admin command can be entered multiple times
 
 # The Starting State file
 The starting state file will be a file from which you can initialize the system. The file will contain multiple commands, each seperated by a newline character. A command will be of the format:

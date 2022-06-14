@@ -2,6 +2,7 @@
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Workshop.DomainLayer.MarketPackage;
 using Workshop.DomainLayer.UserPackage.Shopping;
 
@@ -15,7 +16,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [TestInitialize]
         public void InitSystem()
         {
-            var storeMock = new Mock<Store>(1, "Store1");
+            var storeMock = new Mock<Store>(1, "Store1", new Workshop.DomainLayer.UserPackage.Permissions.Member("member", "pass", DateTime.ParseExact("22/08/1972", "dd/MM/yyyy", CultureInfo.InvariantCulture)));
             storeMock.Setup(x => x.ProductExists(It.IsAny<int>())).Returns(true);
             purchasePolicy = new PurchasePolicy(storeMock.Object);
         }

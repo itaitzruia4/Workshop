@@ -26,9 +26,9 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             return roleDAL;
         }
 
-        public IReadOnlyCollection<Action> GetAllActions()
+        public List<Action> GetAllActions()
         {
-            return new HashSet<Action>(actions);
+            return new List<Action>(actions);
         }
 
         public bool IsAuthorized(Action action)

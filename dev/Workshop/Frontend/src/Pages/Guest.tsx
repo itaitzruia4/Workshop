@@ -11,10 +11,10 @@ import AddStoreDialog from '../Components/Dialogs/addStoreDialog';
 import { useState, useEffect } from 'react';
 
 import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleOpenStore, handleRemoveProduct, handleAddDiscount, handleAddProductDiscount, handleAddCategoryDiscount } from '../Actions/StoreActions';
-import { handleAddToCart, handleViewCart, handleReviewProduct } from '../Actions/UserActions';
+import { handleAddToCart, handleViewCart, handleReviewProduct, handleBuyCart, handleEditCart } from '../Actions/UserActions';
 import { handleChangeProductCategory, handleChangeProductName, handleChangeProductPrice, handleChangeProductQuantity } from '../Actions/ProductActions';
 
-import { userToken } from '../Types/roles';
+import { userToken, makeUserToken } from '../Types/roles';
 import { Store } from "../Types/store"
 import { Product } from "../Types/product"
 import { Cart, Bag } from '../Types/shopping';
@@ -69,11 +69,31 @@ function Guest() {
 
     const addProductDiscount = (storeId: number, productId: number, discountJson: string) => {
         alert("Permission Denied");
-};
+    };
 
     const addCategoryDiscount = (storeId: number, category: string, discountJson: string) => {
         alert("Permission Denied");
-};
+    };
+
+    const addPurchasePolicy = (storeId: number, purchaseJson: string) => {
+        alert("Permission Denied");
+    };
+
+    const addProductPurchasePolicy = (storeId: number, productId: number, purchaseJson: string) => {
+        alert("Permission Denied");
+    };
+
+    const addCategoryPurchasePolicy = (storeId: number, category: string, purchaseJson: string) => {
+        alert("Permission Denied");
+    };
+
+    const addBagPurchasePolicy = (storeId: number, purchaseJson: string) => {
+        alert("Permission Denied");
+    };
+
+    const addUserPurchasePolicy = (storeId: number, purchaseJson: string) => {
+        alert("Permission Denied");
+    };
 
     const closeStore = (storeId: number) => {
         alert("Permission Denied");
@@ -99,12 +119,22 @@ function Guest() {
     const addToCart = (storeId: number, productId: number, quantity: number) => {
         handleAddToCart(token, storeId, productId, quantity).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     }
+    const editCart = (productId: number, quantity: number) => {
+        handleEditCart(makeUserToken(token.userId), productId, quantity).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+    }
+    const buyCart = (number: string, year: string, month: string, ccv: string, holder: string, id: string, name: string, address: string,
+        city: string, country: string, zip: string) => {
+        handleBuyCart(makeUserToken(token.userId), number, year, month, ccv, holder, id, name, address, city, country, zip)
+            .then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+
+    }
 
     return (
         <div>
-            {Appbar(token, "guest", stores, cart, [])}
+            {Appbar(token, "guest", stores, cart, [], editCart,buyCart)}
             {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct, closeStore, openStore, addDiscount,
-                addProductDiscount, addCategoryDiscount, addToCart, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
+                addProductDiscount, addCategoryDiscount, addProductPurchasePolicy, addCategoryPurchasePolicy,
+                addBagPurchasePolicy, addUserPurchasePolicy, addToCart, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
             <Stack direction="row" spacing={2}>
                 <Button variant='contained' onClick={e =>
                     handleExitMarket(token)

@@ -14,6 +14,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import ShoppingCart from '@mui/icons-material/ShoppingCart';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MoreIcon from '@mui/icons-material/MoreVert';
 
 import CartDialog from './Dialogs/CartDialog'
@@ -66,7 +67,16 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-export default function Appbar(token: token, name: string,stores : Store[], cart: Cart, notifications: MarketNotification[] ) {
+export default function Appbar(
+    token: token,
+    name: string,
+    stores: Store[],
+    cart: Cart,
+    nots: MarketNotification[],
+    editCart: (productId: number, quantity: number) => void,
+    buyCart: (number: string, year: string, month: string, ccv: string, holder: string, id: string, name: string, address: string,
+        city: string, country: string, zip: string) => void
+) {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
         React.useState<null | HTMLElement>(null);
@@ -96,7 +106,7 @@ export default function Appbar(token: token, name: string,stores : Store[], cart
     }
 
     const handleOpenNotifications = (event: React.MouseEvent<HTMLElement>) => {
-        if (notifications.length > 0) {
+        if (nots.length > 0) {
             setNotificationsAnchorElem(event.currentTarget);
         }
     }
@@ -135,7 +145,17 @@ export default function Appbar(token: token, name: string,stores : Store[], cart
                     </Search>
                     <Box sx={{ flexGrow: 1 }} />
                     <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                        {CartDialog()}
+                        <IconButton
+                            size="large"
+                            aria-label="show notifications"
+                            color="inherit"
+                            onClick={handleOpenNotifications}
+                            aria-hashpopup="true"
+                        >
+                         <AccountCircleIcon />
+                        </IconButton>
+
+                        {CartDialog(editCart,buyCart, cart, stores)}
 
                         <IconButton
                             size="large"
@@ -144,12 +164,12 @@ export default function Appbar(token: token, name: string,stores : Store[], cart
                             onClick={handleOpenNotifications}
                             aria-hashpopup="true"
                         >
-                            <Badge badgeContent={notifications.length} color="error">
+                            <Badge badgeContent={nots.length} color="error">
                                 <NotificationsIcon />
                             </Badge>
                         </IconButton>
 
-                        {NotificationsList(notifications, openNotifications, handleCloseNotifications, notificationsAnchorElem) }
+                        {NotificationsList(nots, openNotifications, handleCloseNotifications, notificationsAnchorElem) }
                     </Box>
                     <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
                         <IconButton

@@ -16,6 +16,7 @@ using Workshop.DomainLayer.UserPackage.Notifications;
 using UserControllerDAL = Workshop.DataLayer.DataObjects.Controllers.UserController;
 using MemberDAL = Workshop.DataLayer.DataObjects.Members.Member;
 using DataHandler = Workshop.DataLayer.DataHandler;
+using SystemAdminDTO = Workshop.ServiceLayer.ServiceObjects.SystemAdminDTO;
 
 namespace Workshop.DomainLayer.UserPackage
 {
@@ -30,6 +31,7 @@ namespace Workshop.DomainLayer.UserPackage
 
         public UserControllerDAL userControllerDAL { get; set; }
         public UserController(ISecurityHandler securityHandler, IReviewHandler reviewHandler)
+        public UserController(ISecurityHandler securityHandler, IReviewHandler reviewHandler, List<SystemAdminDTO> systemAdmins)
         {
             this.securityHandler = securityHandler;
             currentUsers = new ConcurrentDictionary<int, User>();
@@ -41,6 +43,7 @@ namespace Workshop.DomainLayer.UserPackage
             userControllerDAL = new UserControllerDAL(reviewHandler.ToDAL(), notificationHandler.ToDAL(), orderHandler.ToDAL(), new List<MemberDAL>());
             DataHandler.getDBHandler().save(userControllerDAL);
             InitializeSystem();
+            InitializeAdmins(systemAdmins);
         }
 
         public UserControllerDAL ToDAL()
@@ -48,10 +51,23 @@ namespace Workshop.DomainLayer.UserPackage
             return userControllerDAL;
         }
 
+        private void InitializeAdmins(List<SystemAdminDTO> admins)
+        {
+            foreach (SystemAdminDTO admin in admins)
+            {
+                Logger.Instance.LogEvent($"Started adding market manager permissions to {admin.Membername}");
+                Member member = new Member(admin.Membername, securityHandler.Encrypt(admin.Password), admin.Birthdate);
+                member.AddRole(new MarketManager());
+                members.TryAdd(member.Username, member);
+                Logger.Instance.LogEvent($"Added market manager permissions to {admin.Membername}");
+            }
+        }
+
         public bool CheckOnlineStatus(string u)
         {
 
-            foreach (User member in currentUsers.Values) {
+            foreach (User member in currentUsers.Values)
+            {
                 if (member is Member)
                 {
                     if (((Member)member).Username == u)
@@ -64,22 +80,6 @@ namespace Workshop.DomainLayer.UserPackage
             return false;
         }
 
-            //*************************************************************************************************************
-            // System Actions:
-            //*************************************************************************************************************
-
-            /// <summary>
-            /// Load all members of the system
-            /// </summary>
-            /// 
-            public void InitializeSystem()
-        {
-            Logger.Instance.LogEvent("Starting initializing the system - User Controller");
-            Member admin = new Member("admin", securityHandler.Encrypt("admin"), DateTime.Parse("Aug 22, 1972"));
-            admin.AddRole(new MarketManager());
-            members.TryAdd("admin", admin);
-            Logger.Instance.LogEvent("Finished initializing the system - User Controller");
-        }
 
         //*************************************************************************************************************
         // General Visitor-Guest Actions:
@@ -95,10 +95,10 @@ namespace Workshop.DomainLayer.UserPackage
         {
             Logger.Instance.LogEvent($"User {userId} is trying to enter the market");
             User user = new User();
-            if (currentUsers.TryAdd(userId, user)) 
+            if (currentUsers.TryAdd(userId, user))
             {
                 Logger.Instance.LogEvent($"User {userId} has entered the market successfuly");
-                return user; 
+                return user;
             }
             throw new InvalidOperationException($"User {userId} has already entered the market");
         }
@@ -140,7 +140,7 @@ namespace Workshop.DomainLayer.UserPackage
             }
             else
                 throw new ArgumentException($"Username {username} already exists");
-            
+
         }
 
         /// <summary>
@@ -161,16 +161,20 @@ namespace Workshop.DomainLayer.UserPackage
             EnsureNonEmptyUserDetails(username, password);
             EnsureEnteredMarket(userId);
 
-            if (!IsMember(username))
-                throw new ArgumentException($"Username {username} does not exist");
 
             if (currentUsers[userId] is Member)
                 throw new InvalidOperationException($"User {userId} is already logged in");
 
-            Member member = members[username];
+            Member member;
+
+            if (!members.TryGetValue(username, out member))
+                throw new ArgumentException($"Username {username} does not exist");
+
+            if (currentUsers.Values.Contains(member))
+                throw new ArgumentException($"Member {username} is already logged in from another user");
 
             string encryptedTruePassword = member.Password,
-                   encryptedPasswordInput = securityHandler.Encrypt(password);
+               encryptedPasswordInput = securityHandler.Encrypt(password);
 
             if (!encryptedPasswordInput.Equals(encryptedTruePassword))
                 throw new ArgumentException($"User {userId} has entered wrong password for member {username}");
@@ -226,10 +230,9 @@ namespace Workshop.DomainLayer.UserPackage
             member.AddRole(new StoreFounder(storeId));
         }
 
-        // Being called only from MarketController
+        /*// Being called only from MarketController
         public StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId)
         {
-            Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} is trying to nominate {nominatedUsername} as a store owner of store {storeId}");
             // Check that nominator is the logged in member
             AssertCurrentUser(userId, nominatorUsername);
 
@@ -240,11 +243,11 @@ namespace Workshop.DomainLayer.UserPackage
 
             // Check that the nominator is authorized to nominate a store owner
             if (!nominator.IsAuthorized(storeId, Action.NominateStoreOwner))
-                throw new MemberAccessException($"User {nominatorUsername} is not allowed to nominate owners in store #{storeId}.");
+                throw new MemberAccessException($"Member {nominatorUsername} is not allowed to nominate owners in store #{storeId}.");
 
             if (nominatorUsername.Equals(nominatedUsername))
             {
-                throw new InvalidOperationException($"User {nominatorUsername} cannot nominate itself to be a Store Owner");
+                throw new InvalidOperationException($"Member {nominatorUsername} cannot nominate itself to be a store owner.");
             }
 
             // Check that nominator is not a store owner and that there is no circular nomination
@@ -253,12 +256,12 @@ namespace Workshop.DomainLayer.UserPackage
             foreach (StoreRole nominatedStoreRole in nominatedStoreRoles)
             {
                 if (nominatedStoreRole is StoreOwner)
-                    throw new InvalidOperationException($"User {nominatedUsername} is already a store owner of store #{storeId}");
+                    throw new InvalidOperationException($"Member {nominatedUsername} is already a store owner of store #{storeId}");
 
                 foreach (StoreRole nominatorStoreRole in nominatorStoreRoles)
                 {
                     if (nominatedStoreRole.ContainsNominee(nominatorStoreRole))
-                        throw new InvalidOperationException($"User {nominatedUsername} was already nominated by {nominatorUsername} or one of its nominators");
+                        throw new InvalidOperationException($"Member {nominatedUsername} was already nominated by {nominatorUsername} or one of its nominators");
                 }
             }
 
@@ -270,13 +273,13 @@ namespace Workshop.DomainLayer.UserPackage
             StoreRole nominatorStoreOwner = nominatorStoreRoles.Last();
             nominatorStoreOwner.AddNominee(nominatedUsername, newRole);
 
-            RegisterToEvent(nominated.Username, new Event("RemoveStoreOwnerNominationFrom" + nominatedUsername,"", "MarketController"));
+            RegisterToEvent(nominated.Username, new Event("RemoveStoreOwnerNominationFrom" + nominatedUsername, "", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("OpenStore" + storeId, "", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("CloseStore" + storeId, "", "MarketController"));
             Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} successfuly nominated member {nominatedUsername} as a store owner of store {storeId}");
             return newRole;
-        }
+        }*/
 
         // Being called only from MarketController
         public StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId)
@@ -398,7 +401,7 @@ namespace Workshop.DomainLayer.UserPackage
             if (!currentUsers.ContainsKey(userId))
                 throw new InvalidOperationException($"User {userId} must enter the market first");
         }
-        
+
 
         /// <summary>
         /// Assert that current user is the user that 
@@ -495,7 +498,7 @@ namespace Workshop.DomainLayer.UserPackage
             //ShoppingBagProduct 
             Logger.Instance.LogEvent("User " + userId + " is trying to add a product to his cart from store " + storeId);
             AssertUserEnteredMarket(userId);
-            return this.currentUsers[userId].addToCart(product,storeId);
+            return this.currentUsers[userId].addToCart(product, storeId);
         }
 
         public ShoppingCartDTO viewCart(int userId)
@@ -504,7 +507,7 @@ namespace Workshop.DomainLayer.UserPackage
             AssertUserEnteredMarket(userId);
             return currentUsers[userId].viewShopingCart();
         }
-        
+
         public void AssertUserEnteredMarket(int userId)
         {
             if (!currentUsers.ContainsKey(userId))
@@ -517,18 +520,18 @@ namespace Workshop.DomainLayer.UserPackage
         {
             Logger.Instance.LogEvent("User " + userId + " is trying to edit the quantity of " + productId + " in his cart");
             AssertUserEnteredMarket(userId);
-            if(newQuantity < 0)
+            if (newQuantity < 0)
             {
                 Logger.Instance.LogEvent("User " + userId + " failed to edit the quantity of " + productId + " in his cart");
                 throw new ArgumentException($"Quantity {newQuantity} can not be a negtive number");
             }
-            if(newQuantity == 0)
+            if (newQuantity == 0)
             {
                 currentUsers[userId].deleteFromCart(productId);
             }
             else
             {
-                currentUsers[userId].changeQuantityInCart(productId,newQuantity);
+                currentUsers[userId].changeQuantityInCart(productId, newQuantity);
             }
             Logger.Instance.LogEvent("User " + userId + " successfuly edited the quantity of " + productId + " in his cart");
             return currentUsers[userId].viewShopingCart();
@@ -576,6 +579,7 @@ namespace Workshop.DomainLayer.UserPackage
                 DataHandler.getDBHandler().save(userControllerDAL);
             }
             if (!members.TryRemove(canceledUsername,out canceled))
+            if (!members.TryRemove(canceledUsername, out canceled))
             {
                 throw new ArgumentException($"Could not cancel member {canceledUsername}");
             }
@@ -596,7 +600,7 @@ namespace Workshop.DomainLayer.UserPackage
 
             //get online members stats
             Dictionary<Member, bool> OnlineStats = new Dictionary<Member, bool>();
-            foreach( Member member in members.Values)
+            foreach (Member member in members.Values)
             {
                 OnlineStats.Add(member, CheckOnlineStatus(member.Username));
             }
@@ -645,5 +649,24 @@ namespace Workshop.DomainLayer.UserPackage
         }
 
         
+
+        public List<ServiceLayer.ServiceObjects.PermissionInformation> GetMemberPermissions(int userId, string membername)
+        {
+            Func<Role, ServiceLayer.ServiceObjects.PermissionInformation> handleRole = (Role r) =>
+            {
+                return new ServiceLayer.ServiceObjects.PermissionInformation(userId, membername, (r is StoreRole ? ((StoreRole)r).StoreId : -1), r.GetAllActions());
+            };
+            AssertCurrentUser(userId, membername);
+            Member member = null;
+            try
+            {
+                member = (Member)GetUser(userId);
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException("SANITY CHECK: GETMEMBERPERMISSIONS");
+            }
+            return member.GetAllRoles().Select(r => new ServiceLayer.ServiceObjects.PermissionInformation(userId, membername, (r is StoreRole ? ((StoreRole)r).StoreId : -1), r.GetAllActions())).ToList();
+        }
     }
 }

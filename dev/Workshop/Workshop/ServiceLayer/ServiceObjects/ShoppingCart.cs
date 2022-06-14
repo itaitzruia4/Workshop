@@ -9,19 +9,11 @@ namespace Workshop.ServiceLayer.ServiceObjects
 {
     public class ShoppingCart
     {
-        public Dictionary<int, ShoppingBag> shoppingBags { get; set; }
-
-        public ShoppingCart(Dictionary<int, ShoppingBag> shoppingBags)
-        {
-            this.shoppingBags = shoppingBags;
-        }
+        public List<ShoppingBag> ShoppingBags { get; set; }
+        public double Price { get; set; }
         public ShoppingCart(DomainShoppingCart shoppingCart)
         {
-            this.shoppingBags = new Dictionary<int, ShoppingBag>();
-            foreach (int key in shoppingCart.shoppingBags.Keys)
-            {
-                this.shoppingBags.Add(key,new ShoppingBag(shoppingCart.shoppingBags[key]));
-            }
+            this.ShoppingBags = shoppingCart.shoppingBags.Values.Select(x => new ShoppingBag(x)).ToList();
         }
     }
 }
