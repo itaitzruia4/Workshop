@@ -7,17 +7,15 @@ using Workshop.DomainLayer;
 using Workshop.ServiceLayer.ServiceObjects;
 using DomainUser = Workshop.DomainLayer.UserPackage.User;
 using DomainMember = Workshop.DomainLayer.UserPackage.Permissions.Member;
-using DomainMemberDTO = Workshop.DomainLayer.UserPackage.Permissions.MemberDTO;
 using DomainProduct = Workshop.DomainLayer.MarketPackage.Product;
 using DomainProductDTO = Workshop.DomainLayer.MarketPackage.ProductDTO;
 using DomainStoreManager = Workshop.DomainLayer.UserPackage.Permissions.StoreManager;
 using DomainStoreOwner = Workshop.DomainLayer.UserPackage.Permissions.StoreOwner;
-using DomainStoreFounder = Workshop.DomainLayer.UserPackage.Permissions.StoreFounder;
 using DomainStore = Workshop.DomainLayer.MarketPackage.Store;
 using DomainNotification = Workshop.DomainLayer.UserPackage.Notifications.Notification;
 using CreditCard = Workshop.DomainLayer.MarketPackage.CreditCard;
 using SupplyAddress = Workshop.DomainLayer.MarketPackage.SupplyAddress;
-using Newtonsoft.Json;
+using DomainShoppingCart = Workshop.DomainLayer.UserPackage.Shopping.ShoppingCartDTO;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.Loggers;
 using System.Globalization;
@@ -350,7 +348,7 @@ namespace Workshop.ServiceLayer
             try
             {
                 DomainStoreOwner domainOwner = facade.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId);
-                StoreOwner serviceOwner = new StoreOwner(domainOwner);
+                StoreOwner serviceOwner = domainOwner == null ? null : new StoreOwner(domainOwner);
                 return new Response<StoreOwner>(serviceOwner, userId);
             }
             catch (Exception e)
@@ -497,7 +495,9 @@ namespace Workshop.ServiceLayer
         {
             try
             {
-                ShoppingCart shoppingCart = new ShoppingCart(facade.ViewCart(userId));
+                DomainShoppingCart shoppingCartDTO = facade.ViewCart(userId);
+                ShoppingCart shoppingCart = new ShoppingCart(shoppingCartDTO);
+                shoppingCart.Price = facade.GetCartPrice(shoppingCartDTO);
                 return new Response<ShoppingCart>(shoppingCart, userId);
             }
             catch (Exception e)
@@ -510,7 +510,9 @@ namespace Workshop.ServiceLayer
         {
             try
             {
-                ShoppingCart shoppingCart = new ShoppingCart(facade.EditCart(userId, productId, newQuantity));
+                DomainShoppingCart shoppingCartDTO = facade.EditCart(userId, productId, newQuantity);
+                ShoppingCart shoppingCart = new ShoppingCart(shoppingCartDTO);
+                shoppingCart.Price = facade.GetCartPrice(shoppingCartDTO);
                 return new Response<ShoppingCart>(shoppingCart, userId);
             }
             catch (Exception e)

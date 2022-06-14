@@ -212,10 +212,9 @@ namespace Workshop.DomainLayer.UserPackage
             member.AddRole(new StoreFounder(storeId));
         }
 
-        // Being called only from MarketController
+        /*// Being called only from MarketController
         public StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId)
         {
-            Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} is trying to nominate {nominatedUsername} as a store owner of store {storeId}");
             // Check that nominator is the logged in member
             AssertCurrentUser(userId, nominatorUsername);
 
@@ -226,11 +225,11 @@ namespace Workshop.DomainLayer.UserPackage
 
             // Check that the nominator is authorized to nominate a store owner
             if (!nominator.IsAuthorized(storeId, Action.NominateStoreOwner))
-                throw new MemberAccessException($"User {nominatorUsername} is not allowed to nominate owners in store #{storeId}.");
+                throw new MemberAccessException($"Member {nominatorUsername} is not allowed to nominate owners in store #{storeId}.");
 
             if (nominatorUsername.Equals(nominatedUsername))
             {
-                throw new InvalidOperationException($"User {nominatorUsername} cannot nominate itself to be a Store Owner");
+                throw new InvalidOperationException($"Member {nominatorUsername} cannot nominate itself to be a store owner.");
             }
 
             // Check that nominator is not a store owner and that there is no circular nomination
@@ -239,12 +238,12 @@ namespace Workshop.DomainLayer.UserPackage
             foreach (StoreRole nominatedStoreRole in nominatedStoreRoles)
             {
                 if (nominatedStoreRole is StoreOwner)
-                    throw new InvalidOperationException($"User {nominatedUsername} is already a store owner of store #{storeId}");
+                    throw new InvalidOperationException($"Member {nominatedUsername} is already a store owner of store #{storeId}");
 
                 foreach (StoreRole nominatorStoreRole in nominatorStoreRoles)
                 {
                     if (nominatedStoreRole.ContainsNominee(nominatorStoreRole))
-                        throw new InvalidOperationException($"User {nominatedUsername} was already nominated by {nominatorUsername} or one of its nominators");
+                        throw new InvalidOperationException($"Member {nominatedUsername} was already nominated by {nominatorUsername} or one of its nominators");
                 }
             }
 
@@ -262,7 +261,7 @@ namespace Workshop.DomainLayer.UserPackage
             RegisterToEvent(nominated.Username, new Event("CloseStore" + storeId, "", "MarketController"));
             Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} successfuly nominated member {nominatedUsername} as a store owner of store {storeId}");
             return newRole;
-        }
+        }*/
 
         // Being called only from MarketController
         public StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId)

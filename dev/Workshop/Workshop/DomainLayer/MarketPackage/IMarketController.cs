@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.UserPackage.Permissions;
+using Workshop.DomainLayer.UserPackage.Shopping;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
@@ -69,5 +70,6 @@ namespace Workshop.DomainLayer.MarketPackage
         void AddUserPurchaseTerm(int userId, string user, int storeId, string json_term);
 
         List<Store> GetAllStores(int userId);
+        double GetCartPrice(ShoppingCartDTO shoppingCart);
     }
 }

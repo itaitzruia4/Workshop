@@ -242,12 +242,38 @@ namespace Tests.AcceptanceTests
             return storeId;
         }
 
-        [DataTestMethod]
-        [DataRow(username, password, "Random")]
-        public void Test_NominateStoreOwner_Bad_NominateTwice(string username, string password, string nominated)
+        [TestMethod]
+        public void Test_NominateStoreOwner_FullVoteNeeded()
         {
-            int storeId = Test_NominateStoreOwner_Good(username, password, nominated);
-            Assert.IsTrue(service.NominateStoreOwner(1, username, nominated, storeId).ErrorOccured);
+            Test_Login_Good(1, "mem1", "pass1");
+            Test_Login_Good(2, "mem2", "pass2");
+            Test_Login_Good(3, "mem3", "pass3");
+            Store st = service.CreateNewStore(1, "mem1", "s1").Value;
+            Response<StoreOwner> resp1 = service.NominateStoreOwner(1, "mem1", "mem2", st.StoreId);
+            Assert.IsFalse(resp1.ErrorOccured);
+            Assert.IsNotNull(resp1.Value);
+
+            Response<StoreOwner> resp2 = service.NominateStoreOwner(1, "mem1", "mem3", st.StoreId);
+            Assert.IsFalse(resp2.ErrorOccured);
+            Assert.IsNull(resp2.Value);
+
+            Response<StoreOwner> resp3 = service.NominateStoreOwner(2, "mem2", "mem3", st.StoreId);
+            Assert.IsFalse(resp3.ErrorOccured);
+            Assert.IsNotNull(resp3.Value);
+        }
+
+        [TestMethod]
+        public void Test_NominateStoreOwner_Bad_NominateTwice()
+        {
+            Test_Login_Good(1, "mem1", "pass1");
+            Test_Login_Good(2, "mem2", "pass2");
+            Test_Login_Good(3, "mem3", "pass3");
+            Store st = service.CreateNewStore(1, "mem1", "s1").Value;
+            Response<StoreOwner> resp1 = service.NominateStoreOwner(1, "mem1", "mem2", st.StoreId);
+            Assert.IsFalse(resp1.ErrorOccured);
+            Assert.IsNotNull(resp1.Value);
+
+            Assert.IsTrue(service.NominateStoreOwner(1, "mem1", "mem2", st.StoreId).ErrorOccured);
         }
 
         [DataTestMethod]
@@ -326,19 +352,19 @@ namespace Tests.AcceptanceTests
             bool res1 = false;
             bool res2 = false;
 
-            service.EnterMarket(1);
-            service.EnterMarket(2);
-            service.EnterMarket(3);
-            service.EnterMarket(4);
-            Assert.IsFalse(service.Register(1, "Nominated", "none", DateTime.Parse("Aug 22, 1972")).ErrorOccured);
-            Assert.IsFalse(service.Register(2, "Nominator1", "1", DateTime.Parse("Aug 22, 1972")).ErrorOccured);
-            Assert.IsFalse(service.Register(3, "Nominator2", "2", DateTime.Parse("Aug 22, 1972")).ErrorOccured);
-            Assert.IsFalse(service.Register(4, "Owner", "own", DateTime.Parse("Aug 22, 1972")).ErrorOccured);
-            Assert.IsFalse(service.Login(4, "Owner", "own").ErrorOccured);
+            Test_Login_Good(4, "Owner", "own");
+            Test_Login_Good(2, "Nominator1", "1");
+            Test_Register_Good(1, "Nominated", "none");
+            Test_Register_Good(3, "Nominator2", "2");
 
             int storeId = service.CreateNewStore(4, "Owner", "RandomStore").Value.StoreId;
             Assert.IsFalse(service.NominateStoreOwner(4, "Owner", "Nominator1", storeId).ErrorOccured);
+            Response<StoreOwner> resp = service.NominateStoreOwner(2, "Nominator1", "Nominator2", storeId);
+            Assert.IsFalse(resp.ErrorOccured);
+            Assert.IsNull(resp.Value);
             Assert.IsFalse(service.NominateStoreOwner(4, "Owner", "Nominator2", storeId).ErrorOccured);
+
+            service.Logout(2, "Nominator1");
 
             Thread thr1 = new Thread(() => res1 = NominateStoreManager_Thread(2, "Nominator1", "1", "Nominated", storeId));
             Thread thr2 = new Thread(() => res2 = NominateStoreManager_Thread(3, "Nominator2", "2", "Nominated", storeId));
@@ -559,6 +585,7 @@ namespace Tests.AcceptanceTests
             Response<ShoppingCart> resSC = service.ViewCart(1);
             Assert.IsFalse(resSC.ErrorOccured);
             Assert.AreEqual(0, resSC.Value.ShoppingBags.Count);
+            Assert.AreEqual(0.0, resSC.Value.Price);
         }
 
         [DataTestMethod]
@@ -567,10 +594,11 @@ namespace Tests.AcceptanceTests
         {
             Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 10.0, 1, "cat1").Value;
             service.AddToCart(1, prod.Id, storeId, 1);
             Response<ShoppingCart> resSC = service.ViewCart(1);
             Assert.IsFalse(resSC.ErrorOccured);
+            Assert.AreEqual(10.0, resSC.Value.Price);
             Assert.AreEqual(1, resSC.Value.ShoppingBags.Count);
             Assert.AreEqual(1, resSC.Value.ShoppingBags[storeId].Products.Count);
             AssertProductsEqual(resSC.Value.ShoppingBags[storeId].Products.First(), prod);
@@ -582,10 +610,11 @@ namespace Tests.AcceptanceTests
         {
             Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
-            Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
+            Product prod = service.AddProduct(1, username, storeId, product, "Good", 10.0, 10, "cat1").Value;
             service.AddToCart(1, prod.Id, storeId, 1);
             Response<ShoppingCart> resSC = service.EditCart(1, prod.Id, 5);
             Assert.IsFalse(resSC.ErrorOccured);
+            Assert.AreEqual(50.0, resSC.Value.Price);
             Assert.AreEqual(5, resSC.Value.ShoppingBags[storeId].Products.First().Quantity);
             resSC = service.EditCart(1, prod.Id, 1);
             Assert.IsFalse(resSC.ErrorOccured);
@@ -1767,6 +1796,7 @@ namespace Tests.AcceptanceTests
             Test_Login_Good(3, "Member4", "Password4");
             Store store1 = service.CreateNewStore(0, "Member1", "Store1").Value;
             service.NominateStoreOwner(0, "Member1", "Member4", store1.StoreId);
+            service.NominateStoreOwner(0, "Member1", "Member2", store1.StoreId);
             service.NominateStoreOwner(3, "Member4", "Member2", store1.StoreId);
             service.NominateStoreManager(3, "Member4", "Member3", store1.StoreId);
             service.Logout(3, "Member4");
@@ -2138,6 +2168,44 @@ namespace Tests.AcceptanceTests
         {
             Test_Login_Good(3, "member3", "pass3");
             Assert.IsTrue(service.GetMembersOnlineStats(3, "member3").ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_EditCart_InBoundsOfStore()
+        {
+            Test_Login_Good(1, "mem", "pass");
+            Store st = service.CreateNewStore(1, "mem", "S1").Value;
+            Product p = service.AddProduct(1, "mem", st.StoreId, "p1", "d1", 10.0, 3, "cat1").Value;
+            Test_Login_Good(2, "buyer", "pass");
+            service.AddToCart(2, p.Id, st.StoreId, 2);
+            Assert.IsTrue(service.EditCart(2, p.Id, 50).ErrorOccured);
+            Assert.AreEqual(1, service.GetAllStores(2).Value[0].Products[0].Quantity);
+            Response<ShoppingCart> resp = service.EditCart(2, p.Id, 3);
+            Assert.IsFalse(resp.ErrorOccured);
+            Assert.AreEqual(30.0, resp.Value.Price);
+            Assert.AreEqual(0, service.GetAllStores(2).Value[0].Products[0].Quantity);
+        }
+
+        [TestMethod]
+        public void Test_EditCart_ReturnsToStore()
+        {
+            Test_Login_Good(1, "mem", "pass");
+            Store st = service.CreateNewStore(1, "mem", "S1").Value;
+            Product p = service.AddProduct(1, "mem", st.StoreId, "p1", "d1", 10.0, 3, "cat1").Value;
+            Test_Login_Good(2, "buyer", "pass");
+            service.AddToCart(2, p.Id, st.StoreId, 2);
+            Response<ShoppingCart> resp = service.EditCart(2, p.Id, 0);
+            Assert.IsFalse(resp.ErrorOccured);
+            Assert.AreEqual(0, resp.Value.Price);
+            Assert.AreEqual(3, service.GetAllStores(2).Value[0].Products[0].Quantity);
+        }
+
+        [TestMethod]
+        public void Test_CreateNewStore_NoSuchFounder()
+        {
+            Test_Login_Good(1, "mem", "pass");
+            Response<Store> resp = service.CreateNewStore(1, "mem1", "s1");
+            Assert.IsTrue(resp.ErrorOccured);
         }
     }
 }

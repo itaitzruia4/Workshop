@@ -1,12 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Workshop.DomainLayer.UserPackage.Shopping;
-using Workshop.DomainLayer.MarketPackage;
-using System.Threading;
-
+using Member = Workshop.DomainLayer.UserPackage.Permissions.Member;
 namespace Workshop.DomainLayer.MarketPackage
 {
     public class Store
@@ -17,25 +13,56 @@ namespace Workshop.DomainLayer.MarketPackage
         private Dictionary<int, Product> products { get; set; }
         private DiscountPolicy discountPolicy { get; set; }
         private PurchasePolicy purchasePolicy { get; set; }
-
-        private ReaderWriterLock rwl;
-        public Store(int id, string name)
+        public HashSet<Member> owners { get; }
+        public ConcurrentDictionary<Member, HashSet<Member>> owner_voting { get; }
+        public Store(int id, string name, Member founder)
         {
-            this.id = id;
             if (name == null || name.Equals(""))
                 throw new ArgumentException("Store name cannot be empty.");
+            this.id = id;
             this.name = name;
             products = new Dictionary<int, Product>();
-            this.open = true; //TODO: check if on init store supposed to be open or closed.
-            this.rwl = new ReaderWriterLock();
-            this.discountPolicy = new DiscountPolicy(this);
-            this.purchasePolicy = new PurchasePolicy(this);
+            open = true; //TODO: check if on init store supposed to be open or closed.
+            discountPolicy = new DiscountPolicy(this);
+            purchasePolicy = new PurchasePolicy(this);
+            owners = new HashSet<Member>();
+            owners.Add(founder);
+            owner_voting = new ConcurrentDictionary<Member, HashSet<Member>>();
         }
 
-        public ReaderWriterLock getLock()
+        public bool AddOwner(Member owner)
         {
-            return this.rwl;
+            return owners.Add(owner);
         }
+
+        public bool VoteForStoreOwnerNominee(Member voter, Member nominee)
+        {
+            if (!owners.Contains(voter))
+            {
+                throw new ArgumentException($"{voter.Username} is not a store owner of store {id}, hence he can not vote to nominate {nominee.Username} as a store owner.");
+            }
+            if (owners.Contains(nominee))
+            {
+                throw new ArgumentException($"{nominee.Username} is already a store owner of store {id}, and you can not vote to nominate him again.");
+            }
+            HashSet<Member> voters;
+            if (owner_voting.TryGetValue(nominee, out voters))
+            {
+                if (voters.Add(voter))
+                {
+                    return voters.Count == owners.Count;
+                }
+                return false;
+            }
+            else
+            {
+                HashSet<Member> temp = new HashSet<Member>();
+                temp.Add(voter);
+                owner_voting.TryAdd(nominee, temp);
+                return 1 == owners.Count;
+            }
+        }
+
         public int GetId()
         {
             return this.id;
