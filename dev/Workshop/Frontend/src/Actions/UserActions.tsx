@@ -136,3 +136,23 @@ export function handleUpdateNotifications(token: memberToken) {
         return Promise.resolve(data.value)
     })
 }
+
+export function handleGetMemberPermissions(token: memberToken) {
+    let url = "http://localhost:5165/api/useractions/getmemberpermissions";
+
+    return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            userId: token.userId,
+            membername: token.membername
+        })
+    }).then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            return Promise.reject(data.error);
+        }
+        return Promise.resolve(data.value)
+    })
+}

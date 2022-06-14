@@ -20,9 +20,8 @@ function Welcome() {
         }
         
     return (
-        <p className="welcome">
+        <div>
             <div className="welcome_title" style={textStyle}> Welcome to the Trading System website! </div>
-            <p className="welcome_buttons">
                 <Button variant="contained"
                     onClick={() =>
                         handleEnterMarket()
@@ -31,8 +30,7 @@ function Welcome() {
                                 alert("Couldnt connect to server")
                             })
                     }> Enter Market </Button>
-            </p>
-        </p>
+            </div>
     )
 }
 

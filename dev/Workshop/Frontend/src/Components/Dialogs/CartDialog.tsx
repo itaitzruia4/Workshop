@@ -48,35 +48,6 @@ const Transition = React.forwardRef(function Transition(
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function createData(
-    name: string,
-    calories: number,
-    fat: number,
-    carbs: number,
-    protein: number,
-    price: number,
-) {
-    return {
-        name,
-        calories,
-        fat,
-        carbs,
-        protein,
-        price,
-        history: [
-            {
-                date: '2020-01-05',
-                customerId: '11091700',
-                amount: 3,
-            },
-            {
-                date: '2020-01-02',
-                customerId: 'Anonymous',
-                amount: 1,
-            },
-        ],
-    };
-}
 
 function Row(props: { store: Store, bag: Bag, removeProduct: (productId: number) => void, editProductAmount: (productId: number, amount: number) => void }) {
     const { store, bag, removeProduct, editProductAmount } = props;
