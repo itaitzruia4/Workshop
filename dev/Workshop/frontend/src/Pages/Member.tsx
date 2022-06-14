@@ -19,7 +19,7 @@ import {
 import { handleAddToCart, handleViewCart, handleBuyCart, handleReviewProduct, handleUpdateNotifications, handleEditCart } from '../Actions/UserActions';
 import { handleChangeProductCategory, handleChangeProductName, handleChangeProductPrice, handleChangeProductQuantity } from '../Actions/ProductActions';
 
-import { makeUserToken, memberToken } from '../Types/roles';
+import { makeUserToken, memberToken, token } from '../Types/roles';
 import { Store } from "../Types/store"
 import { Product } from "../Types/product"
 import { Cart, Bag } from '../Types/shopping';
@@ -33,7 +33,7 @@ function Member() {
     const token = location.state as memberToken;
 
     let navigate = useNavigate();
-    const routeChange = (path: string, token: memberToken) =>
+    const routeChange = (path: string, token: token) =>
         () =>
             navigate(path, { state: token });
 
@@ -172,7 +172,7 @@ function Member() {
    
     return (
         <div>
-            {Appbar(token, token.membername, stores, cart, notifications, editCart, buyCart)}
+            {Appbar(routeChange,token, token.membername, stores, cart, notifications, editCart, buyCart)}
             <ButtonGroup variant="contained" aria-label="outlined primary button group">
                 {AddStoreDialog(addStore)}
             </ButtonGroup>

@@ -22,7 +22,7 @@ import CartDialog from './Dialogs/CartDialog'
 import { Store } from "../Types/store"
 import { Product } from "../Types/product"
 import { Cart, Bag } from '../Types/shopping';
-import { isMemberToken, token } from '../Types/roles';
+import { isMemberToken, token, memberToken } from '../Types/roles';
 import { MarketNotification } from '../Types/Notification';
 import { NotificationsList } from './NotificationsList';
 
@@ -68,6 +68,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function Appbar(
+    routeChange: (path: string, token: token) => () => void,
     token: token,
     name: string,
     stores: Store[],
@@ -145,15 +146,17 @@ export default function Appbar(
                     </Search>
                     <Box sx={{ flexGrow: 1 }} />
                     <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                        <IconButton
-                            size="large"
-                            aria-label="show notifications"
-                            color="inherit"
-                            onClick={handleOpenNotifications}
-                            aria-hashpopup="true"
-                        >
-                         <AccountCircleIcon />
-                        </IconButton>
+                        {isMemberToken(token) ?
+                            <IconButton
+                                size="large"
+                                aria-label="show notifications"
+                                color="inherit"
+                                onClick={routeChange('/profile', token as memberToken)}
+                                aria-hashpopup="true"
+                            >
+                                <AccountCircleIcon />
+                            </IconButton> : null
+                        }
 
                         {CartDialog(editCart,buyCart, cart, stores)}
 

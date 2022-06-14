@@ -14,7 +14,7 @@ import { handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, ha
 import { handleAddToCart, handleViewCart, handleReviewProduct, handleBuyCart, handleEditCart } from '../Actions/UserActions';
 import { handleChangeProductCategory, handleChangeProductName, handleChangeProductPrice, handleChangeProductQuantity } from '../Actions/ProductActions';
 
-import { userToken, makeUserToken } from '../Types/roles';
+import { userToken, makeUserToken ,token} from '../Types/roles';
 import { Store } from "../Types/store"
 import { Product } from "../Types/product"
 import { Cart, Bag } from '../Types/shopping';
@@ -28,7 +28,7 @@ function Guest() {
     const token = location.state as userToken;
 
     let navigate = useNavigate();
-    const routeChange = (path: string, token: userToken) =>
+    const routeChange = (path: string, token: token) =>
         () =>
             navigate(path, { state: token });
 
@@ -131,7 +131,7 @@ function Guest() {
 
     return (
         <div>
-            {Appbar(token, "guest", stores, cart, [], editCart,buyCart)}
+            {Appbar(routeChange,token, "guest", stores, cart, [], editCart,buyCart)}
             {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct, closeStore, openStore, addDiscount,
                 addProductDiscount, addCategoryDiscount, addProductPurchasePolicy, addCategoryPurchasePolicy,
                 addBagPurchasePolicy, addUserPurchasePolicy, addToCart, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
