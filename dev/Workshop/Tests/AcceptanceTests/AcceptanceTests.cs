@@ -2199,5 +2199,13 @@ namespace Tests.AcceptanceTests
             Assert.AreEqual(0, resp.Value.Price);
             Assert.AreEqual(3, service.GetAllStores(2).Value[0].Products[0].Quantity);
         }
+
+        [TestMethod]
+        public void Test_CreateNewStore_NoSuchFounder()
+        {
+            Test_Login_Good(1, "mem", "pass");
+            Response<Store> resp = service.CreateNewStore(1, "mem1", "s1");
+            Assert.IsTrue(resp.ErrorOccured);
+        }
     }
 }
