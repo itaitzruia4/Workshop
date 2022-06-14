@@ -27,3 +27,26 @@ export interface StoreFounder { tag: 'StoreFounder', storeId: number };
 export const makeStoreFounder = (storeId: number): StoreFounder => ({ tag: "StoreFounder", storeId: storeId });
 export const isStoreFounder = (x: any): x is StoreFounder => x.tag === "StoreFounder";
 
+export enum Actions {
+    AddProduct,
+    RemoveProduct,
+    ChangeProductName,
+    ChangeProductPrice,
+    ChangeProductQuantity,
+    ChangeProductDescription,
+    NominateStoreOwner,
+    NominateStoreManager,
+    GetWorkersInformation,
+    OpenStore,
+    CloseStore,
+    AddPermissionToStoreManager,
+    RemovePermissionFromStoreManager,
+    GetStoreOrdersList,
+    ViewClosedStore,
+    AddDiscount,
+    GetMarketStatistics,
+    CancelMember,
+    GetMembersOnlineStats,
+    AddPurchaseTerm
+}
+

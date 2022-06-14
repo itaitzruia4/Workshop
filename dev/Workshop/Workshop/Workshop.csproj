@@ -130,10 +130,11 @@
     <Compile Include="ServiceLayer\IExternalSystem.cs" />
     <Compile Include="ServiceLayer\Response.cs" />
     <Compile Include="ServiceLayer\ResponseT.cs" />
-    <Compile Include="ServiceLayer\ServiceObjects\ConfigTemplate.cs" />
+    <Compile Include="ServiceLayer\ServiceObjects\PermissionInformation.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\MarketManager.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Member.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Notification.cs" />
+    <Compile Include="ServiceLayer\ServiceObjects\PermissionInformation.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Product.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Role.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\StoreRole.cs" />
@@ -143,6 +144,7 @@
     <Compile Include="ServiceLayer\ServiceObjects\StoreFounder.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\StoreManager.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\StoreOwner.cs" />
+    <Compile Include="ServiceLayer\ServiceObjects\SystemAdminDTO.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\User.cs" />
     <Compile Include="ServiceLayer\ServicePackage\IService.cs" />
     <Compile Include="ServiceLayer\ServicePackage\Service.cs" />

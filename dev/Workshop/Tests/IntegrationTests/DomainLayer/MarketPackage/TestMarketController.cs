@@ -9,6 +9,7 @@ using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Security;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using Workshop.ServiceLayer;
+using SystemAdminDTO = Workshop.ServiceLayer.ServiceObjects.SystemAdminDTO;
 
 namespace Tests.IntegrationTests.DomainLayer.MarketPackage
 {
@@ -24,10 +25,12 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         {
             ISecurityHandler security = new HashSecurityHandler();
             IReviewHandler review = new ReviewHandler();
-            userController = new UserController(security, review);
+            SystemAdminDTO adminDTO = new SystemAdminDTO("adm", "adm", "14/06/2022");
+            List<SystemAdminDTO> adms = new List<SystemAdminDTO>();
+            adms.Add(adminDTO);
+            userController = new UserController(security, review, adms);
             Mock<IExternalSystem> externalSystem = new Mock<IExternalSystem>();
             marketController = new MarketController(userController, externalSystem.Object);
-            userController.InitializeSystem();
             marketController.InitializeSystem();
 
             userController.EnterMarket(1);
@@ -166,12 +169,12 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         }
 
         [DataTestMethod]
-        [DataRow(0, "admin")]
+        [DataRow(0, "adm")]
         public void TestGetDaliyIncomeMarketManager_Success(int userId, string username)
         {
             userController.EnterMarket(0);
-            userController.Login(0, username, "admin");
-            //userController.Login(userId, "member1", "pass1");
+            userController.Login(0, username, "adm");
+
             int storeId = marketController.CreateNewStore(1, "member1", "store").GetId();
             Product prod1 = marketController.AddProductToStore(1, "member1", storeId, "someName", "someDesc", 10.0, 5, "cat1");
             ShoppingBagProduct product2 = userController.addToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);

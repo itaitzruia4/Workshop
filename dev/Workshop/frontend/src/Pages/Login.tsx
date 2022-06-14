@@ -34,7 +34,6 @@ const Login = () => {
                 <Button type='submit' color='primary' variant="contained" style={btnstyle} fullWidth
                 onClick={e =>
                     handleLogin(token, membername, password)
-                        .then(data => { console.log("login user id:", token.userId); return data; })
                         .then((data) => routeChange("/member", makeMemberToken(token.userId, membername, data.notifications))())
                         .catch(error => {
                             alert(error)

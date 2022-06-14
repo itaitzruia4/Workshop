@@ -84,6 +84,7 @@ export function handleCloseStore(token: memberToken, storeId: number) {
         if (!response.ok) {
             return Promise.reject(data.error);
         }
+        alert(`Store closed successfully`);
         return Promise.resolve(data.value)
     })
 }
@@ -105,6 +106,7 @@ export function handleOpenStore(token: memberToken, storeId: number) {
         if (!response.ok) {
             return Promise.reject(data.error);
         }
+        alert(`Store opened successfully`);
         return Promise.resolve(data.value)
     })
 }
@@ -269,6 +271,100 @@ export function handleRemoveStoreOwnerNomination(token: memberToken, storeId: nu
             return Promise.reject(data.error);
         }
         alert(`${nominee} is no longer Store Owner of store ${storeId}`);
+        return Promise.resolve(data.value)
+    })
+}
+
+export function handleAddStorePurchasePolicy(token: memberToken, storeId: number, purchaseJson: string) {
+    const url = "http://localhost:5165/api/store/addstorepurchaseterm";
+
+    return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            userId: token.userId,
+            membername: token.membername,
+            storeId: storeId,
+            Term: purchaseJson
+        })
+    }).then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            return Promise.reject(data.error);
+        }
+        alert(`Purchase Policy in store ${storeId} has been added successfully`);
+        return Promise.resolve(data.value)
+    })
+}
+
+export function handleAddProductPurchasePolicy(token: memberToken, storeId: number, productId: number, purchaseJson: string) {
+    const url = "http://localhost:5165/api/store/addproductpurchaseterm";
+
+    return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            userId: token.userId,
+            membername: token.membername,
+            storeId: storeId,
+            productId: productId,
+            Term: purchaseJson
+        })
+    }).then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            return Promise.reject(data.error);
+        }
+        alert(`Purchase Policy for product ${productId} in store ${storeId} has been added successfully`);
+        return Promise.resolve(data.value)
+    })
+}
+
+export function handleAddCategoryPurchasePolicy(token: memberToken, storeId: number, category: string, purchaseJson: string) {
+    const url = "http://localhost:5165/api/store/addcategorypurchaseterm";
+
+    return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            userId: token.userId,
+            membername: token.membername,
+            storeId: storeId,
+            category: category,
+            Term: purchaseJson
+        })
+    }).then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            return Promise.reject(data.error);
+        }
+        alert(`Purchase Policy for category ${category} in store ${storeId} has been added successfully`);
+        return Promise.resolve(data.value)
+    })
+}
+
+export function handleAddUserPurchasePolicy(token: memberToken, storeId: number, purchaseJson: string) {
+    const url = "http://localhost:5165/api/store/adduserpurchaseterm";
+
+    return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            userId: token.userId,
+            membername: token.membername,
+            storeId: storeId,
+            Term: purchaseJson
+        })
+    }).then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            return Promise.reject(data.error);
+        }
+        alert(`User Purchase Policy in store ${storeId} has been added successfully`);
         return Promise.resolve(data.value)
     })
 }

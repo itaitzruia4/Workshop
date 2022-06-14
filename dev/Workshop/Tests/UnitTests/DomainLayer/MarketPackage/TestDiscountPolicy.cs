@@ -2,6 +2,7 @@
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Workshop.DomainLayer.MarketPackage;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using Workshop.ServiceLayer;
@@ -17,7 +18,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [TestInitialize]
         public void InitSystem()
         {
-            var storeMock = new Mock<Store>(1, "Store1" );
+            var storeMock = new Mock<Store>(1, "Store1", new Workshop.DomainLayer.UserPackage.Permissions.Member("member", "pass", DateTime.ParseExact("22/08/1972", "dd/MM/yyyy", CultureInfo.InvariantCulture)));
             storeMock.Setup(x => x.ProductExists(It.IsAny<int>())).Returns(true);
             discountPolicy = new DiscountPolicy(storeMock.Object);
         }
@@ -134,7 +135,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [DataRow(30)]
         public void TestAddProductDiscount_Bad_NoSuchProduct(double discount)
         {
-            var storeMock = new Mock<Store>(1, "Store1" );
+            var storeMock = new Mock<Store>(1, "Store1", new Workshop.DomainLayer.UserPackage.Permissions.Member("member", "pass", DateTime.ParseExact("22/08/1972", "dd/MM/yyyy", CultureInfo.InvariantCulture)));
             storeMock.Setup(s => s.ProductExists(It.IsAny<int>())).Returns(false);
             discountPolicy = new DiscountPolicy(storeMock.Object);
             Assert.ThrowsException<Exception>(() => discountPolicy.AddProductDiscount(makeSimpleProductDiscount(discount)(0), 0));

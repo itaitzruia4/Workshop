@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.UserPackage.Permissions;
+using Workshop.DomainLayer.UserPackage.Shopping;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
@@ -71,5 +72,6 @@ namespace Workshop.DomainLayer.MarketPackage
         List<Store> GetAllStores(int userId);
         double GetDaliyIncomeStoreOwner(int userId, string username, int storeId);
         double GetDaliyIncomeMarketManager(int userId, string username);
+        double GetCartPrice(ShoppingCartDTO shoppingCart);
     }
 }

@@ -29,13 +29,15 @@ import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import ShoppingCart from '@mui/icons-material/ShoppingCart';
 import Badge from '@mui/material/Badge';
+import TextField from '@mui/material/TextField';
 
 
 import { Product } from '../../Types/product';
 import { Store } from '../../Types/store';
-import { Cart, Bag } from '../../Types/shopping';
+import { Cart, Bag, getBagCost, getBagToStore } from '../../Types/shopping';
 
 import InputDialog from './InputDialog'
+import BuyCartDialog from './BuyCartDialog'
 
 const Transition = React.forwardRef(function Transition(
     props: TransitionProps & {
@@ -76,8 +78,8 @@ function createData(
     };
 }
 
-function Row(props: { row: ReturnType<typeof createData> }) {
-    const { row } = props;
+function Row(props: { store: Store, bag: Bag, removeProduct: (productId: number) => void, editProductAmount: (productId: number, amount: number) => void }) {
+    const { store, bag, removeProduct, editProductAmount } = props;
     const [open, setOpen] = React.useState(false);
 
     return (
@@ -86,52 +88,66 @@ function Row(props: { row: ReturnType<typeof createData> }) {
                 <TableCell>
                     <IconButton
                         aria-label="expand row"
-                        size="small"
+                        size="large"
                         onClick={() => setOpen(!open)}
                     >
                         {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                     </IconButton>
                 </TableCell>
                 <TableCell component="th" scope="row">
-                    {row.name}
+                    {store.name}
                 </TableCell>
-                <TableCell align="right">{row.calories}</TableCell>
-                <TableCell align="right">{row.fat}</TableCell>
-                <TableCell align="right">{row.carbs}</TableCell>
-                <TableCell align="right">{row.protein}</TableCell>
+                <TableCell >{bag.products.length}</TableCell>
+                <TableCell >{getBagCost(bag)}</TableCell>
             </TableRow>
             <TableRow>
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
-                        <Box sx={{ margin: 1 }}>
+                        <Paper elevation={8} variant="outlined" sx={{ margin: 1, border: '3px dashed' ,borderColor: '#cfd8dc'}}>
+                            <Box >
                             <Typography variant="h6" gutterBottom component="div">
-                                History
+                                    {'Products from ' + store.name}
                             </Typography>
-                            <Table size="small" aria-label="purchases">
+                            <Table size="medium" aria-label="purchases">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>Date</TableCell>
-                                        <TableCell>Customer</TableCell>
-                                        <TableCell align="right">Amount</TableCell>
-                                        <TableCell align="right">Total price ($)</TableCell>
+                                        <TableCell >Name</TableCell>
+                                        <TableCell >Amount</TableCell>
+                                        <TableCell >Total price ($)</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {row.history.map((historyRow) => (
-                                        <TableRow key={historyRow.date}>
+                                    {bag.products.map((product) => (
+                                        <TableRow key={product.id}>
                                             <TableCell component="th" scope="row">
-                                                {historyRow.date}
+                                                {product.name}
                                             </TableCell>
-                                            <TableCell>{historyRow.customerId}</TableCell>
-                                            <TableCell align="right">{historyRow.amount}</TableCell>
-                                            <TableCell align="right">
-                                                {Math.round(historyRow.amount * row.price * 100) / 100}
+                                            <TableCell >
+                                                <TextField
+                                                value={product.quantity}
+                                                autoFocus
+                                                margin="dense"
+                                                id="quantity"
+                                                label="quantity"
+                                                type="number"
+                                                fullWidth
+                                                variant="standard"
+                                                    onChange={(e) => editProductAmount(product.id,Number(e.target.value))}
+                                                />
                                             </TableCell>
+                                            <TableCell >
+                                                {product.quantity * product.basePrice}
+                                            </TableCell>
+                                            <TableCell >
+                                                <Button variant="contained" color="error" onClick={() => { removeProduct(product.id) }}>Remove</Button>
+                                            </TableCell>
+
                                         </TableRow>
                                     ))}
                                 </TableBody>
                             </Table>
-                        </Box>
+                            </Box>
+                            </Paper>
                     </Collapse>
                 </TableCell>
             </TableRow>
@@ -139,25 +155,29 @@ function Row(props: { row: ReturnType<typeof createData> }) {
     );
 }
 
-const rows = [
-    createData('Frozen yoghurt', 159, 6.0, 24, 4.0, 3.99),
-    createData('Ice cream sandwich', 237, 9.0, 37, 4.3, 4.99),
-    createData('Eclair', 262, 16.0, 24, 6.0, 3.79),
-    createData('Cupcake', 305, 3.7, 67, 4.3, 2.5),
-    createData('Gingerbread', 356, 16.0, 49, 3.9, 1.5),
-];
-
-
-
-export default function CartDialog() {
+export default function CartDialog(
+    editCart: (productId: number, quantity: number) => void,
+    buyCart: (number: string, year: string, month: string, ccv: string, holder: string, id: string, name: string, address: string,
+        city: string, country: string, zip: string) => void,
+    cart: Cart,
+    stores: Store[]
+) {
     const [open, setOpen] = React.useState(false);
     const handleClose = () => {
         setOpen(false);
     };
+    const handleRemoveProduct = (productId: number) => {
+        editCart(productId, 0);
+        setOpen(true);
+    }
+    const handleEditProductAmount = (productId: number, amount: number) => {
+        editCart(productId, amount);
+        setOpen(true);
+    }
     return (
         <div>
-        <IconButton size="large" color="inherit" onClick={e => setOpen(true) }>
-            <Badge badgeContent={0} color="error">
+            <IconButton size="large" color="inherit" onClick={e => setOpen(true)}>
+                <Badge badgeContent={cart.shoppingBags.reduce((sum, bag) => sum + bag.products.length, 0)} color="error">
                 <ShoppingCart />
             </Badge>
             </IconButton>
@@ -180,9 +200,7 @@ export default function CartDialog() {
                         <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
                             Your shopping cart
                         </Typography>
-                        <Button variant="contained" color="success">
-                            Buy cart
-                        </Button>
+                        {BuyCartDialog(buyCart)}
                     </Toolbar>
                 </AppBar>
         <TableContainer component={Paper}>
@@ -190,16 +208,14 @@ export default function CartDialog() {
                 <TableHead>
                     <TableRow>
                         <TableCell />
-                        <TableCell>Dessert (100g serving)</TableCell>
-                        <TableCell align="right">Calories</TableCell>
-                        <TableCell align="right">Fat&nbsp;(g)</TableCell>
-                        <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-                        <TableCell align="right">Protein&nbsp;(g)</TableCell>
+                        <TableCell>Store</TableCell>
+                        <TableCell >Total products</TableCell>
+                                <TableCell >Total price($)</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {rows.map((row) => (
-                        <Row key={row.name} row={row} />
+                            {getBagToStore(cart, stores).map(([bag, store]: [Bag, Store]) => (
+                                <Row key={store.storeId} store={store} bag={bag} removeProduct={handleRemoveProduct} editProductAmount={handleEditProductAmount} />
                     ))}
                 </TableBody>
             </Table>

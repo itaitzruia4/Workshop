@@ -8,7 +8,7 @@ export function NotificationsList(notifications: MarketNotification[], open: boo
         <Menu anchorEl={ anchor } open={open} onClose={handleClose}>
             {notifications.map((notification: MarketNotification) => (
                 <MenuItem>
-                    {`${notification.sender} sent: \"${notification.message}\"`}
+                    {`${notification.message}`}
                 </MenuItem>
             ))}
         </Menu>

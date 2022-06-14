@@ -10,17 +10,22 @@ namespace API.Controllers
 
             // Add builder.Services to the container.
             IService service;
-            if (args.Length == 0)
-            {
-                service = new Service(new ExternalSystem());
-            }
-            else
+            if (args.Length == 1)
             {
                 using (StreamReader streamReader = File.OpenText(args[0]))
                 {
                     service = new Service(new ExternalSystem(), streamReader.ReadToEnd());
                 }
             }
+            else if (args.Length == 0)
+            {
+                service = new Service(new ExternalSystem(), "admin~admin~admin~22/08/1972");
+            }
+            else
+            {
+                throw new ArgumentException("API needs to receive at most one command line arguments.");
+            }
+
             builder.Services.AddSingleton(service);
             builder.Services.AddControllers();
             builder.Services.AddCors(options =>

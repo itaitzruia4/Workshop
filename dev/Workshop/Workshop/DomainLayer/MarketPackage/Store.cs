@@ -1,12 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Workshop.DomainLayer.UserPackage.Shopping;
-using Workshop.DomainLayer.MarketPackage;
-using System.Threading;
-
+using Member = Workshop.DomainLayer.UserPackage.Permissions.Member;
 namespace Workshop.DomainLayer.MarketPackage
 {
     public class Store
@@ -17,25 +13,60 @@ namespace Workshop.DomainLayer.MarketPackage
         private Dictionary<int, Product> products { get; set; }
         private DiscountPolicy discountPolicy { get; set; }
         private PurchasePolicy purchasePolicy { get; set; }
-
-        private ReaderWriterLock rwl;
-        public Store(int id, string name)
+        public HashSet<Member> owners { get; }
+        public ConcurrentDictionary<Member, KeyValuePair<Member, HashSet<Member>>> owner_voting { get; }
+        public Store(int id, string name, Member founder)
         {
-            this.id = id;
             if (name == null || name.Equals(""))
                 throw new ArgumentException("Store name cannot be empty.");
+            this.id = id;
             this.name = name;
             products = new Dictionary<int, Product>();
-            this.open = true; //TODO: check if on init store supposed to be open or closed.
-            this.rwl = new ReaderWriterLock();
-            this.discountPolicy = new DiscountPolicy(this);
-            this.purchasePolicy = new PurchasePolicy(this);
+            open = true; //TODO: check if on init store supposed to be open or closed.
+            discountPolicy = new DiscountPolicy(this);
+            purchasePolicy = new PurchasePolicy(this);
+            owners = new HashSet<Member>();
+            owners.Add(founder);
+            owner_voting = new ConcurrentDictionary<Member, KeyValuePair<Member, HashSet<Member>>>();
         }
 
-        public ReaderWriterLock getLock()
+        public bool AddOwner(Member owner)
         {
-            return this.rwl;
+            return owners.Add(owner);
         }
+
+        public Member VoteForStoreOwnerNominee(Member voter, Member nominee)
+        {
+            // Returns the nominator of nominee if he was successfuly voted on by all parties, else returns null
+            if (!owners.Contains(voter))
+            {
+                throw new ArgumentException($"{voter.Username} is not a store owner of store {id}, hence he can not vote to nominate {nominee.Username} as a store owner.");
+            }
+            if (owners.Contains(nominee))
+            {
+                throw new ArgumentException($"{nominee.Username} is already a store owner of store {id}, and you can not vote to nominate him again.");
+            }
+            KeyValuePair<Member, HashSet<Member>> nominator_voter_pair;
+            if (owner_voting.TryGetValue(nominee, out nominator_voter_pair))
+            {
+                if (nominator_voter_pair.Value.Add(voter))
+                {
+                    return nominator_voter_pair.Value.Count == owners.Count ? nominator_voter_pair.Key : null;
+                }
+                else
+                {
+                    throw new ArgumentException($"{voter.Username} has already voted for {nominee.Username} to be a store owner of store {id}.");
+                }
+            }
+            else
+            {
+                HashSet<Member> temp = new HashSet<Member>();
+                temp.Add(voter);
+                owner_voting.TryAdd(nominee, new KeyValuePair<Member, HashSet<Member>>(voter, temp));
+                return 1 == owners.Count ? voter : null;
+            }
+        }
+
         public int GetId()
         {
             return this.id;
@@ -75,6 +106,11 @@ namespace Workshop.DomainLayer.MarketPackage
             Product newProd = new Product(productId, name, description, price, quantity, category, id);
             products.Add(productId, newProd);
             return newProd;
+        }
+
+        internal void RemoveVotingOnMember(Member nominated)
+        {
+            owner_voting.TryRemove(nominated, out var voter);
         }
 
         public void RemoveProduct(int productID)
@@ -214,6 +250,12 @@ namespace Workshop.DomainLayer.MarketPackage
             products[productId].Quantity -= quantity;
             return products[productId];
         }
+
+        internal void RemoveOwner(Member nominatedMember)
+        {
+            owners.Remove(nominatedMember);
+        }
+
         internal ShoppingBagDTO validateBagInStockAndGet(ShoppingBagDTO shoppingBag)
         {
             

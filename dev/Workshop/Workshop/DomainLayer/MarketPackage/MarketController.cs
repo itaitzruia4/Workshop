@@ -34,7 +34,7 @@ namespace Workshop.DomainLayer.MarketPackage
             STORE_COUNT = 0;
             PRODUCT_COUNT = 1;
         }
-
+        
         public void InitializeSystem()
         {
 
@@ -51,20 +51,58 @@ namespace Workshop.DomainLayer.MarketPackage
 
         public StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId)
         {
-            Logger.Instance.LogEvent($"{nominatorUsername} is trying to nominate {nominatedUsername} to be a store owner of store {storeId}");
-            userController.AssertCurrentUser(userId, nominatorUsername);
+            Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} is trying to nominate {nominatedUsername} to be a store owner of store {storeId}");
             try
             {
                 storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
             }
             catch
             {
-                throw new ArgumentException("Store ID does not exist");
+                throw new ArgumentException($"Store ID does not exist: {storeId}");
             }
-            StoreOwner storeOwner = userController.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId);
 
-            storesLocks[storeId].ReleaseReaderLock();
-            return storeOwner;
+            Store store;
+            try
+            {
+                store = stores[storeId];
+            }
+            catch
+            {
+                throw new ArgumentException($"Store ID does not exist: {storeId}");
+            }
+
+            userController.AssertCurrentUser(userId, nominatorUsername);
+            Member nominator = userController.GetMember(nominatorUsername), nominated = userController.GetMember(nominatedUsername);
+
+            if (!nominator.IsAuthorized(storeId, Action.NominateStoreOwner))
+                throw new MemberAccessException($"Member {nominatorUsername} is not allowed to nominate owners in store #{storeId}.");
+
+            if (nominatorUsername.Equals(nominatedUsername))
+            {
+                throw new InvalidOperationException($"Member {nominatorUsername} cannot nominate itself to be a store owner.");
+            }
+            Member original_voter;
+            if ((original_voter = store.VoteForStoreOwnerNominee(nominator, nominated)) != null)
+            {
+                StoreOwner newRole = new StoreOwner(storeId);
+                nominated.AddRole(newRole);
+                store.AddOwner(nominated);
+                store.RemoveVotingOnMember(nominated);
+                // Add the new manager to the nominator's nominees list
+                StoreRole nominatorStoreOwner = original_voter.GetStoreRoles(storeId).Last();
+                nominatorStoreOwner.AddNominee(nominatedUsername, newRole);
+
+                userController.RegisterToEvent(nominated.Username, new Event("RemoveStoreOwnerNominationFrom" + nominatedUsername, "", "MarketController"));
+                userController.RegisterToEvent(nominated.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
+                userController.RegisterToEvent(nominated.Username, new Event("OpenStore" + storeId, "", "MarketController"));
+                userController.RegisterToEvent(nominated.Username, new Event("CloseStore" + storeId, "", "MarketController"));
+
+
+                storesLocks[storeId].ReleaseReaderLock();
+                Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} successfuly nominated member {nominatedUsername} as a store owner of store {storeId}");
+                return newRole;
+            }
+            return null;
         }
 
         public StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId)
@@ -126,6 +164,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             nominatedMember.RemoveRole(FOUND_NOMINATED_ROLE);
             FOUND_NOMINATOR_ROLE.RemoveNominee(FOUND_NOMINATED_ROLE);
+            stores[storeId].RemoveOwner(nominatedMember);
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("OpenStore" + storeId, "", "MarketController"));
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("CloseStore" + storeId, "", "MarketController"));
@@ -493,7 +532,7 @@ namespace Workshop.DomainLayer.MarketPackage
             ReaderWriterLock rwl = new ReaderWriterLock();
             rwl.AcquireWriterLock(Timeout.Infinite);
             storesLocks[storeId] = rwl;
-            Store store = new Store(storeId, storeName);
+            Store store = new Store(storeId, storeName, userController.GetMember(creator));
             stores[storeId] = store;
             STORE_COUNT++;
             rwl.ReleaseWriterLock();
