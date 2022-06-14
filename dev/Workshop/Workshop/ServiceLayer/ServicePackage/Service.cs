@@ -713,5 +713,31 @@ namespace Workshop.ServiceLayer
                 return new Response(e.Message, userId);
             }
         }
+
+        public Response<double> GetDaliyIncomeMarketManager(int userId, string username)
+        {
+            try
+            {
+                double res = facade.GetDaliyIncomeMarketManager(userId, username);
+                return new Response<double>(res,userId);
+            }
+            catch (Exception e)
+            {
+                return new Response<double>(e.Message, userId);
+            }
+        }
+
+        public Response<double> GetDaliyIncomeStoreOwner(int userId, string username, int storeId)
+        {
+            try
+            {
+                double res = facade.GetDaliyIncomeStoreOwner(userId, username, storeId);
+                return new Response<double>(res, userId);
+            }
+            catch (Exception e)
+            {
+                return new Response<double>(e.Message, userId);
+            }
+        }
     }
 }
