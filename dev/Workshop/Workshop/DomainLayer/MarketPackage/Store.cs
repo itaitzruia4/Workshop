@@ -14,7 +14,7 @@ namespace Workshop.DomainLayer.MarketPackage
         private DiscountPolicy discountPolicy { get; set; }
         private PurchasePolicy purchasePolicy { get; set; }
         public HashSet<Member> owners { get; }
-        public ConcurrentDictionary<Member, HashSet<Member>> owner_voting { get; }
+        public ConcurrentDictionary<Member, KeyValuePair<Member, HashSet<Member>>> owner_voting { get; }
         public Store(int id, string name, Member founder)
         {
             if (name == null || name.Equals(""))
@@ -27,7 +27,7 @@ namespace Workshop.DomainLayer.MarketPackage
             purchasePolicy = new PurchasePolicy(this);
             owners = new HashSet<Member>();
             owners.Add(founder);
-            owner_voting = new ConcurrentDictionary<Member, HashSet<Member>>();
+            owner_voting = new ConcurrentDictionary<Member, KeyValuePair<Member, HashSet<Member>>>();
         }
 
         public bool AddOwner(Member owner)
@@ -35,8 +35,9 @@ namespace Workshop.DomainLayer.MarketPackage
             return owners.Add(owner);
         }
 
-        public bool VoteForStoreOwnerNominee(Member voter, Member nominee)
+        public Member VoteForStoreOwnerNominee(Member voter, Member nominee)
         {
+            // Returns the nominator of nominee if he was successfuly voted on by all parties, else returns null
             if (!owners.Contains(voter))
             {
                 throw new ArgumentException($"{voter.Username} is not a store owner of store {id}, hence he can not vote to nominate {nominee.Username} as a store owner.");
@@ -45,21 +46,24 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException($"{nominee.Username} is already a store owner of store {id}, and you can not vote to nominate him again.");
             }
-            HashSet<Member> voters;
-            if (owner_voting.TryGetValue(nominee, out voters))
+            KeyValuePair<Member, HashSet<Member>> nominator_voter_pair;
+            if (owner_voting.TryGetValue(nominee, out nominator_voter_pair))
             {
-                if (voters.Add(voter))
+                if (nominator_voter_pair.Value.Add(voter))
                 {
-                    return voters.Count == owners.Count;
+                    return nominator_voter_pair.Value.Count == owners.Count ? nominator_voter_pair.Key : null;
                 }
-                return false;
+                else
+                {
+                    throw new ArgumentException($"{voter.Username} has already voted for {nominee.Username} to be a store owner of store {id}.");
+                }
             }
             else
             {
                 HashSet<Member> temp = new HashSet<Member>();
                 temp.Add(voter);
-                owner_voting.TryAdd(nominee, temp);
-                return 1 == owners.Count;
+                owner_voting.TryAdd(nominee, new KeyValuePair<Member, HashSet<Member>>(voter, temp));
+                return 1 == owners.Count ? voter : null;
             }
         }
 
@@ -102,6 +106,11 @@ namespace Workshop.DomainLayer.MarketPackage
             Product newProd = new Product(productId, name, description, price, quantity, category, id);
             products.Add(productId, newProd);
             return newProd;
+        }
+
+        internal void RemoveVotingOnMember(Member nominated)
+        {
+            owner_voting.TryRemove(nominated, out var voter);
         }
 
         public void RemoveProduct(int productID)
@@ -241,6 +250,12 @@ namespace Workshop.DomainLayer.MarketPackage
             products[productId].Quantity -= quantity;
             return products[productId];
         }
+
+        internal void RemoveOwner(Member nominatedMember)
+        {
+            owners.Remove(nominatedMember);
+        }
+
         internal ShoppingBagDTO validateBagInStockAndGet(ShoppingBagDTO shoppingBag)
         {
             

@@ -82,13 +82,12 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new InvalidOperationException($"Member {nominatorUsername} cannot nominate itself to be a store owner.");
             }
 
-            if (store.VoteForStoreOwnerNominee(nominator, nominated))
+            if (store.VoteForStoreOwnerNominee(nominator, nominated) != null)
             {
-
                 StoreOwner newRole = new StoreOwner(storeId);
                 nominated.AddRole(newRole);
                 store.AddOwner(nominated);
-
+                store.RemoveVotingOnMember(nominated);
                 // Add the new manager to the nominator's nominees list
                 StoreRole nominatorStoreOwner = nominator.GetStoreRoles(storeId).Last();
                 nominatorStoreOwner.AddNominee(nominatedUsername, newRole);
@@ -97,6 +96,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 userController.RegisterToEvent(nominated.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
                 userController.RegisterToEvent(nominated.Username, new Event("OpenStore" + storeId, "", "MarketController"));
                 userController.RegisterToEvent(nominated.Username, new Event("CloseStore" + storeId, "", "MarketController"));
+
 
                 storesLocks[storeId].ReleaseReaderLock();
                 Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} successfuly nominated member {nominatedUsername} as a store owner of store {storeId}");
@@ -164,6 +164,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             nominatedMember.RemoveRole(FOUND_NOMINATED_ROLE);
             FOUND_NOMINATOR_ROLE.RemoveNominee(FOUND_NOMINATED_ROLE);
+            stores[storeId].RemoveOwner(nominatedMember);
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("OpenStore" + storeId, "", "MarketController"));
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("CloseStore" + storeId, "", "MarketController"));

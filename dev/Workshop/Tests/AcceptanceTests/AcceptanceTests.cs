@@ -2207,5 +2207,16 @@ namespace Tests.AcceptanceTests
             Response<Store> resp = service.CreateNewStore(1, "mem1", "s1");
             Assert.IsTrue(resp.ErrorOccured);
         }
+
+        [TestMethod]
+        public void Test_StoreOwnerNominationAfterRemoval()
+        {
+            Test_Login_Good(1, "mem", "pass");
+            Store st = service.CreateNewStore(1, "mem", "s1").Value;
+            Test_Login_Good(2, "mem1", "pass");
+            Assert.IsFalse(service.NominateStoreOwner(1, "mem", "mem1", st.StoreId).ErrorOccured);
+            Assert.IsFalse(service.RemoveStoreOwnerNomination(1, "mem", "mem1", st.StoreId).ErrorOccured);
+            Assert.IsFalse(service.NominateStoreOwner(1, "mem", "mem1", st.StoreId).ErrorOccured);
+        }
     }
 }
