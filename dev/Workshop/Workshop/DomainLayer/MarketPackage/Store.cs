@@ -28,7 +28,7 @@ namespace Workshop.DomainLayer.MarketPackage
         private StoreDAL storeDAL;
 
 
-        public Store(int id, string name)
+        //public Store(int id, string name)
         public HashSet<Member> owners { get; }
         public ConcurrentDictionary<Member, HashSet<Member>> owner_voting { get; }
         public Store(int id, string name, Member founder)
@@ -85,6 +85,7 @@ namespace Workshop.DomainLayer.MarketPackage
         public ReaderWriterLock getLock()
         {
             return this.rwl;
+        }
         public bool VoteForStoreOwnerNominee(Member voter, Member nominee)
         {
             if (!owners.Contains(voter))
