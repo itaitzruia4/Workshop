@@ -84,6 +84,7 @@ export function handleCloseStore(token: memberToken, storeId: number) {
         if (!response.ok) {
             return Promise.reject(data.error);
         }
+        alert(`Store closed successfully`);
         return Promise.resolve(data.value)
     })
 }
@@ -105,6 +106,7 @@ export function handleOpenStore(token: memberToken, storeId: number) {
         if (!response.ok) {
             return Promise.reject(data.error);
         }
+        alert(`Store opened successfully`);
         return Promise.resolve(data.value)
     })
 }
