@@ -30,7 +30,7 @@ namespace Workshop.DomainLayer.UserPackage
         private ConcurrentDictionary<int, User> currentUsers;
 
         public UserControllerDAL userControllerDAL { get; set; }
-        public UserController(ISecurityHandler securityHandler, IReviewHandler reviewHandler)
+        //public UserController(ISecurityHandler securityHandler, IReviewHandler reviewHandler)
         public UserController(ISecurityHandler securityHandler, IReviewHandler reviewHandler, List<SystemAdminDTO> systemAdmins)
         {
             this.securityHandler = securityHandler;
@@ -42,7 +42,7 @@ namespace Workshop.DomainLayer.UserPackage
             notificationHandler = new NotificationHandler(this);
             userControllerDAL = new UserControllerDAL(reviewHandler.ToDAL(), notificationHandler.ToDAL(), orderHandler.ToDAL(), new List<MemberDAL>());
             DataHandler.getDBHandler().save(userControllerDAL);
-            InitializeSystem();
+            //InitializeSystem();
             InitializeAdmins(systemAdmins);
         }
 
