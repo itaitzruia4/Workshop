@@ -348,7 +348,7 @@ namespace Workshop.ServiceLayer
             try
             {
                 DomainStoreOwner domainOwner = facade.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId);
-                StoreOwner serviceOwner = new StoreOwner(domainOwner);
+                StoreOwner serviceOwner = domainOwner == null ? null : new StoreOwner(domainOwner);
                 return new Response<StoreOwner>(serviceOwner, userId);
             }
             catch (Exception e)

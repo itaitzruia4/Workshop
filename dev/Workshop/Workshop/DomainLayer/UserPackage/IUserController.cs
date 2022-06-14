@@ -24,7 +24,7 @@ namespace Workshop.DomainLayer.UserPackage
         int GetAge(int userId);
         KeyValuePair<Member, List<Notification>> Login(int userId, string username, string password);
         void Logout(int userId, string username);
-        StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId);
+        //StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId);
         StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId);
         bool IsAuthorized(string username, int storeId, Action action);
         void AssertCurrentUser(int userId, string username);

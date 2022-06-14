@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Workshop.DomainLayer.MarketPackage;
 using Workshop.DomainLayer.UserPackage.Shopping;
 
@@ -16,7 +17,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         [TestInitialize]
         public void InitSystem()
         {
-            store = new Store(1, "Store1");
+            store = new Store(1, "Store1", new Workshop.DomainLayer.UserPackage.Permissions.Member("member", "pass", DateTime.ParseExact("22/08/1972", "dd/MM/yyyy", CultureInfo.InvariantCulture)));
             discountPolicy = new DiscountPolicy(store);
             store.AddProduct("p1",1,"desc1",100.0,3,"Cat0");
             store.AddProduct("p2", 2, "desc2", 200.0, 2, "Cat1");

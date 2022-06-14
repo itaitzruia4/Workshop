@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
+using System.Globalization;
 using Workshop.DomainLayer.MarketPackage;
 
 namespace Tests.IntegrationTests.DomainLayer.MarketPackage
@@ -13,7 +14,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [TestInitialize]
         public void Setup()
         {
-            store = new Store(1, "Store1");
+            store = new Store(1, "Store1", new Workshop.DomainLayer.UserPackage.Permissions.Member("member", "pass", DateTime.ParseExact("22/08/1972", "dd/MM/yyyy", CultureInfo.InvariantCulture)));
             int id = 2;
             string name = "Product2";
             string description = "Product2Desc";
