@@ -39,18 +39,19 @@ function Member() {
 
     const [stores, setStores] = useState<Store[]>([])
     const [cart, setCart] = useState<Cart>({ shoppingBags: [] })
-    const [notifications, setNotifications] = useState<MarketNotification[]>([]);
+    const [notifications, setNotifications] = useState<MarketNotification[]>(token.notifications);
 
 
     const refresh = () => {
         handleGetStores(token).then(value => setStores(value as Store[])).catch(error => alert(error));
         handleViewCart(makeUserToken(token.userId)).then(value => setCart(value as Cart)).catch(error => alert(error));
-        handleUpdateNotifications(token)
-            .then(value => {
-                console.log("refresh nots:", JSON.stringify(value));
-                setNotifications(value as MarketNotification[]);
-            })
-            .catch(error => alert(error));
+        if (notifications.length > 0) {
+            handleUpdateNotifications(token)
+                .then(value => {
+                    setNotifications(value as MarketNotification[]);
+                })
+                .catch(error => alert(error));
+        }
     };
 
     useEffect(() => {
