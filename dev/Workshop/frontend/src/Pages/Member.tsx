@@ -58,9 +58,6 @@ function Member() {
         refresh();
     }, [refreshKey])
 
-    const addStore = (storeName: string) => {
-        handleNewStore(token, storeName).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
-    };
     const addProduct = (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => {
         handleAddProduct(token, storeId, productName, description, price, quantity, category).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     };
@@ -156,7 +153,7 @@ function Member() {
             });
     }
 
-    //cart actions 
+    //cart actions
 
     const addToCart = (storeId: number, productId: number, quantity: number) => {
         handleAddToCart(makeUserToken(token.userId), storeId, productId, quantity).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
@@ -173,9 +170,6 @@ function Member() {
     return (
         <div>
             {Appbar(routeChange,token, token.membername, stores, cart, notifications, editCart, buyCart)}
-            <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                {AddStoreDialog(addStore)}
-            </ButtonGroup>
             {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct, closeStore, openStore, addDiscount,
                 addProductDiscount, addCategoryDiscount, addProductPurchasePolicy, addCategoryPurchasePolicy,
                 addBagPurchasePolicy, addUserPurchasePolicy, addToCart, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
