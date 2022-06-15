@@ -692,7 +692,7 @@ namespace Workshop.DomainLayer.MarketPackage
                     string username = currentUser is Member ? ((Member)currentUser).Username : "A guest";
                     events.Add(new Event("SaleInStore" + storeId, $"Prouducts with the name {products} were bought from store {storeId} by {username}", "marketController"));
                     productsSoFar.Add(storeId, shoppingCart.shoppingBags[storeId].products);
-                    OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetStoreName(), shoppingCart.shoppingBags[storeId].products);
+                    OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetStoreName(), shoppingCart.shoppingBags[storeId].products, DateTime.Now, GetCartPrice(shoppingCart));
                     orderHandler.addOrder(order, storeId);
                     userController.AddOrder(userId, order, username);
                     storesLocks[storeId].ReleaseWriterLock();
@@ -875,5 +875,55 @@ namespace Workshop.DomainLayer.MarketPackage
         }
         return new List<Store>(stores.Values);
     }
-}
+
+    private double GetDailyIncome(List<Store> stores)
+        {
+            double count = 0;
+            foreach (Store store in stores)
+            {
+                List<OrderDTO> orders = orderHandler.GetOrders(store.GetId());
+                foreach (OrderDTO order in orders)
+                {
+                    if(order.date.Date == DateTime.Today)
+                    {
+                        count += order.price;
+                    }
+                }
+            }
+            return count;
+        }
+    
+    public double GetDaliyIncomeStoreOwner(int userId, string username, int storeId)
+        {
+            userController.AssertCurrentUser(userId, username);
+            Member member = userController.GetMember(username);
+            foreach (StoreRole role in member.GetStoreRoles(storeId))
+            {
+                if(role.GetType() == typeof(StoreOwner) | role.GetType() == typeof(StoreFounder))
+                {
+                    List<Store> stores = new List<Store>();
+                    stores.Add(this.stores[storeId]);
+                    return GetDailyIncome(stores);
+                }
+            }
+            throw new ArgumentException("user " + username + " is not a store owner of store " + storeId);
+                
+        }
+
+        public double GetDaliyIncomeMarketManager(int userId, string username)
+        {
+            userController.AssertCurrentUser(userId, username);
+            Member member = userController.GetMember(username);
+            foreach (Role role in member.GetAllRoles())
+            {
+                if (role.GetType() == typeof(MarketManager))
+                {
+                    List<Store> stores = (List<Store>)this.stores.Values.ToList();
+                    return GetDailyIncome(stores);
+                }
+            }
+            throw new ArgumentException("user " + username + " is not a market manager");
+
+        }
+    }
 }
