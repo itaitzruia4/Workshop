@@ -28,7 +28,7 @@ function Welcome() {
                         handleEnterMarket()
                             .then(value => routeChange('/login', makeUserToken(value as number))())
                             .catch(error => {
-                                alert("Couldnt connect to server")
+                                alert("Couldn't connect to server")
                             })
                     }> Enter Market </Button>
             </p>

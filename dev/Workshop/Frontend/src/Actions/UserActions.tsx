@@ -90,6 +90,7 @@ export function handleBuyCart(token: userToken, number: string, year: string, mo
         if (!response.ok) {
             return Promise.reject(data.error);
         }
+        alert("Bought cart successfully!")
         return Promise.resolve(data.value)
     })
 }

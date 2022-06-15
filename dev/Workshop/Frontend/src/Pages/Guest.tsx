@@ -45,9 +45,6 @@ function Guest() {
         refresh();
     }, [refreshKey])
 
-    const addStore = (storeName: string) => {
-        alert("Permission Denied");
-    };
     const addProduct = (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => {
         alert("Permission Denied");
     };
