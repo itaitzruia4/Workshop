@@ -26,9 +26,9 @@ namespace Workshop.DomainLayer.Orders
             orders[key].Add(order);
         }
 
-        public OrderDTO CreateOrder(string membername, SupplyAddress address, string storeName, List<ProductDTO> items)
+        public OrderDTO CreateOrder(string membername, SupplyAddress address, string storeName, List<ProductDTO> items, DateTime date, double price)
         {
-            OrderDTO temp = new OrderDTO(CURR_ID, membername, address, storeName, items);
+            OrderDTO temp = new OrderDTO(CURR_ID, membername, address, storeName, items,date,price);
             CURR_ID++;
             return temp;
         }

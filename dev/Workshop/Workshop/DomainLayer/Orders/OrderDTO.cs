@@ -14,14 +14,18 @@ namespace Workshop.DomainLayer.Orders
         public SupplyAddress address { get; set; }
         public string storeName { get; set; }
         public List<ProductDTO> items { get; set; }
+        public DateTime date { get; set; }
+        public double price { get; set; }
 
-        public OrderDTO(int id, string clientName, SupplyAddress address, string storeName, List<ProductDTO> items)
+        public OrderDTO(int id, string clientName, SupplyAddress address, string storeName, List<ProductDTO> items, DateTime date, double price)
         {
             this.id = id;
             this.clientName = clientName;
             this.address = address;
             this.storeName = storeName;
             this.items = items;
+            this.date = date;
+            this.price = price;
         }
 
         public bool ContainsProduct(int productId){

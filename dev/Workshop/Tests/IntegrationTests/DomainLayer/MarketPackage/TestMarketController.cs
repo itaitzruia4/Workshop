@@ -25,7 +25,10 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         {
             ISecurityHandler security = new HashSecurityHandler();
             IReviewHandler review = new ReviewHandler();
-            userController = new UserController(security, review, new List<SystemAdminDTO>());
+            SystemAdminDTO adminDTO = new SystemAdminDTO("adm", "adm", "14/06/2022");
+            List<SystemAdminDTO> adms = new List<SystemAdminDTO>();
+            adms.Add(adminDTO);
+            userController = new UserController(security, review, adms);
             Mock<IExternalSystem> externalSystem = new Mock<IExternalSystem>();
             marketController = new MarketController(userController, externalSystem.Object);
             marketController.InitializeSystem();
@@ -149,6 +152,62 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         public void TestRemoveStoreOwnerNomination_Failure_NoNomination()
         {
             Assert.ThrowsException<ArgumentException>(() => marketController.RemoveStoreOwnerNomination(1, "member1", "member2", 1));
+        }
+
+
+
+        [DataTestMethod]
+        [DataRow(1, "member1")]
+        public void TestGetDaliyIncomeMarketManager_Failure_NotAdmin(int userId, string username)
+        {
+            int storeId = marketController.CreateNewStore(1, "member1", "store").GetId();
+            Product prod1 = marketController.AddProductToStore(1, "member1", storeId, "someName", "someDesc", 10.0, 5, "cat1");
+            ShoppingBagProduct product2 = userController.addToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);
+            marketController.BuyCart(1, cc, address);
+            //List <StoreRole> original_roles = new List<StoreRole>(userController.GetMember("coolStoreOwner").GetStoreRoles(storeId));
+            Assert.ThrowsException<ArgumentException>(() => marketController.GetDaliyIncomeMarketManager(userId, username));
+        }
+
+        [DataTestMethod]
+        [DataRow(0, "adm")]
+        public void TestGetDaliyIncomeMarketManager_Success(int userId, string username)
+        {
+            userController.EnterMarket(0);
+            userController.Login(0, username, "adm");
+
+            int storeId = marketController.CreateNewStore(1, "member1", "store").GetId();
+            Product prod1 = marketController.AddProductToStore(1, "member1", storeId, "someName", "someDesc", 10.0, 5, "cat1");
+            ShoppingBagProduct product2 = userController.addToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);
+            marketController.BuyCart(1, cc, address);
+            //List <StoreRole> original_roles = new List<StoreRole>(userController.GetMember("coolStoreOwner").GetStoreRoles(storeId));
+            double res = marketController.GetDaliyIncomeMarketManager(userId, username);
+            Assert.AreEqual(res, prod1.Price * 5);
+        }
+
+        [DataTestMethod]
+        [DataRow(2, "member2")]
+        public void TestGetDaliyIncomeStoreOwner_Failure_NotOwner(int userId, string username)
+        {
+            userController.EnterMarket(userId);
+            userController.Login(userId, username, "pass2");
+            int storeId = marketController.CreateNewStore(1, "member1", "store").GetId();
+            Product prod1 = marketController.AddProductToStore(1, "member1", storeId, "someName", "someDesc", 10.0, 5, "cat1");
+            ShoppingBagProduct product2 = userController.addToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);
+            marketController.BuyCart(1, cc, address);
+            Assert.ThrowsException<ArgumentException>(() => marketController.GetDaliyIncomeStoreOwner(userId, username, storeId));
+        }
+
+        [DataTestMethod]
+        [DataRow(1, "member1")]
+        public void TestGetDaliyIncomeStoreOwner_Success(int userId, string username)
+        {
+            int storeId = marketController.CreateNewStore(1, "member1", "store").GetId();
+            Product prod1 = marketController.AddProductToStore(1, "member1", storeId, "someName", "someDesc", 10.0, 5, "cat1");
+            ShoppingBagProduct product2 = userController.addToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);
+            marketController.BuyCart(1, cc, address);
+            //List <StoreRole> original_roles = new List<StoreRole>(userController.GetMember("coolStoreOwner").GetStoreRoles(storeId));
+            double res = marketController.GetDaliyIncomeStoreOwner(userId, username, storeId);
+            Assert.AreEqual(res, prod1.Price * 5);
         }
     }
 }

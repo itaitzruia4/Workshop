@@ -1796,23 +1796,20 @@ namespace Tests.AcceptanceTests
             Test_Login_Good(3, "Member4", "Password4");
             Store store1 = service.CreateNewStore(0, "Member1", "Store1").Value;
             service.NominateStoreOwner(0, "Member1", "Member4", store1.StoreId);
-            service.NominateStoreOwner(0, "Member1", "Member2", store1.StoreId);
             service.NominateStoreOwner(3, "Member4", "Member2", store1.StoreId);
+            service.NominateStoreOwner(0, "Member1", "Member2", store1.StoreId);
             service.NominateStoreManager(3, "Member4", "Member3", store1.StoreId);
             service.Logout(3, "Member4");
             service.RemoveStoreOwnerNomination(0, "Member1", "Member4", store1.StoreId);
 
             Response<KeyValuePair<Member, List<Notification>>> response3 = service.Login(3, "Member4", "Password4");
             Assert.AreEqual(1, response3.Value.Value.Count);
-            //Assert.AreEqual("Member1", response3.Value.Value[0].Sender);
 
             Response<KeyValuePair<Member, List<Notification>>> response4 = service.Login(1, "Member2", "Password2");
             Assert.AreEqual(1, response4.Value.Value.Count);
-            //Assert.AreEqual("Member1", response4.Value.Value[0].Sender);
 
             Response<KeyValuePair<Member, List<Notification>>> response5 = service.Login(2, "Member3", "Password3");
             Assert.AreEqual(1, response5.Value.Value.Count);
-            //Assert.AreEqual("Member1", response5.Value.Value[0].Sender);
         }
 
         [TestMethod]
@@ -2217,6 +2214,26 @@ namespace Tests.AcceptanceTests
             Assert.IsFalse(service.NominateStoreOwner(1, "mem", "mem1", st.StoreId).ErrorOccured);
             Assert.IsFalse(service.RemoveStoreOwnerNomination(1, "mem", "mem1", st.StoreId).ErrorOccured);
             Assert.IsFalse(service.NominateStoreOwner(1, "mem", "mem1", st.StoreId).ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_RemoveStoreOwnerNomination_NotTheNominator()
+        {
+            Test_Login_Good(1, "mem", "pass");
+            Test_Login_Good(2, "mem1", "pass");
+            Test_Login_Good(3, "mem2", "pass");
+            Store st = service.CreateNewStore(1, "mem", "s1").Value;
+            Assert.IsFalse(service.NominateStoreOwner(1, "mem", "mem1", st.StoreId).ErrorOccured);
+            Response<StoreOwner> resp1 = service.NominateStoreOwner(1, "mem", "mem2", st.StoreId);
+            Assert.IsFalse(resp1.ErrorOccured);
+            Assert.IsNull(resp1.Value);
+            Response<StoreOwner> resp2 = service.NominateStoreOwner(2, "mem1", "mem2", st.StoreId);
+            Assert.IsFalse(resp2.ErrorOccured);
+            Assert.IsNotNull(resp2.Value);
+            Response<Member> resp3 = service.RemoveStoreOwnerNomination(2, "mem1", "mem2", st.StoreId);
+            Assert.IsTrue(resp3.ErrorOccured);
+            Response<Member> resp4 = service.RemoveStoreOwnerNomination(1, "mem", "mem2", st.StoreId);
+            Assert.IsFalse(resp4.ErrorOccured);
         }
     }
 }

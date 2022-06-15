@@ -70,6 +70,8 @@ namespace Workshop.DomainLayer.MarketPackage
         void AddUserPurchaseTerm(int userId, string user, int storeId, string json_term);
 
         List<Store> GetAllStores(int userId);
+        double GetDaliyIncomeStoreOwner(int userId, string username, int storeId);
+        double GetDaliyIncomeMarketManager(int userId, string username);
         double GetCartPrice(ShoppingCartDTO shoppingCart);
     }
 }
