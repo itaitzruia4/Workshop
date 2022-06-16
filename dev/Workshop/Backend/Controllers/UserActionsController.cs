@@ -1,6 +1,7 @@
 ﻿using API.Requests;
 using API.Responses;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 using Workshop.DomainLayer.Reviews;
 using Workshop.ServiceLayer;
 using Workshop.ServiceLayer.ServiceObjects;
@@ -88,7 +89,7 @@ namespace API.Controllers
         [HttpPost("buycart")]
         public ActionResult<FrontResponse<double>> BuyCart([FromBody] BuyCartRequest request)
         {
-            Response<double> response = Service.BuyCart(request.UserId, new CreditCard(request.Card_number, request.Month, request.Year, request.Holder, request.Ccv, request.Id), new SupplyAddress(request.Name, request.Address, request.City, request.Country, request.Zip));
+            Response<double> response = Service.BuyCart(request.UserId, new CreditCard(request.Card_number, request.Month, request.Year, request.Holder, request.Ccv, request.Id), new SupplyAddress(request.Name, request.Address, request.City, request.Country, request.Zip), DateTime.ParseExact(request.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture));
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<double>(response.ErrorMessage));

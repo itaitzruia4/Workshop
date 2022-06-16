@@ -139,10 +139,10 @@ namespace Workshop.ServiceLayer
                                     facade.EditCart(int.Parse(actualParams[0]), int.Parse(actualParams[1]), int.Parse(actualParams[2]));
                                     break;
                                 case "buy-cart":
-                                    if (actualParams.Length != 12) { throw new ArgumentException(); }
+                                    if (actualParams.Length != 13) { throw new ArgumentException(); }
                                     CreditCard cc = new CreditCard(actualParams[1], actualParams[2], actualParams[3], actualParams[4], actualParams[5], actualParams[6]);
                                     SupplyAddress address = new SupplyAddress(actualParams[7], actualParams[8], actualParams[9], actualParams[10], actualParams[11]);
-                                    facade.BuyCart(int.Parse(actualParams[0]), cc, address);
+                                    facade.BuyCart(int.Parse(actualParams[0]), cc, address, DateTime.ParseExact(actualParams[12], "dd/MM/yyyy", CultureInfo.InvariantCulture));
                                     break;
                                 case "add-product-discount":
                                     if (actualParams.Length != 5) { throw new ArgumentException(); }
@@ -521,11 +521,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<double> BuyCart(int userId, CreditCard cc, SupplyAddress address)
+        public Response<double> BuyCart(int userId, CreditCard cc, SupplyAddress address, DateTime buyTime)
         {
             try
             {
-                return new Response<double>(facade.BuyCart(userId, cc, address), userId);
+                return new Response<double>(facade.BuyCart(userId, cc, address, buyTime), userId);
             }
             catch (Exception e)
             {

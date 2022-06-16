@@ -619,9 +619,17 @@ namespace Workshop.DomainLayer.MarketPackage
             return products.Select(p => p.GetProductDTO()).ToList();
         }
 
-        public ShoppingBagProduct getProductForSale(int productId, int storeId, int quantity)
+        public ShoppingCartDTO EditCart(int userId, int productId, int newQuantity)
         {
-            ShoppingBagProduct porduct = null;
+            Logger.Instance.LogEvent("User " + userId + " is trying to edit the quantity of " + productId + " in his cart");
+            if (newQuantity < 0)
+            {
+                Logger.Instance.LogEvent("User " + userId + " failed to edit the quantity of " + productId + " in his cart");
+                throw new ArgumentException($"Quantity {newQuantity} can not be a negtive number");
+            }
+            User user = userController.GetUser(userId);
+
+            int storeId = user.GetStoreOfProduct(productId);
             try
             {
                 storesLocks[storeId].AcquireWriterLock(Timeout.Infinite);
@@ -630,34 +638,37 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            if (quantity <= 0)
+
+            try
+            {
+                int userQuantity = user.GetQuantityInCart(productId);
+
+                if (newQuantity == 0)
+                {
+                    stores[storeId].AddToProductQuantity(productId, userQuantity);
+                    user.deleteFromCart(productId);
+                }
+                else if (newQuantity > userQuantity)
+                {
+                    stores[storeId].RemoveFromProductQuantity(productId, newQuantity - userQuantity);
+                    user.changeQuantityInCart(productId, newQuantity);
+                }
+                else
+                {
+                    stores[storeId].AddToProductQuantity(productId, userQuantity);
+                    user.changeQuantityInCart(productId, newQuantity);
+                }
+            }
+            catch (Exception e)
             {
                 storesLocks[storeId].ReleaseWriterLock();
-                throw new ArgumentException($"Can't add {quantity} of an item to the shopping cart");
+                throw e;
             }
-            if (stores[storeId].GetProduct(productId).Quantity >= quantity)
-            {
-                try
-                {
-                    porduct = stores[storeId].GetProductForSale(productId, quantity).GetShoppingBagProduct(quantity);
-                    storesLocks[storeId].ReleaseWriterLock();
-                }
-                catch (Exception e)
-                {
-                    storesLocks[storeId].ReleaseWriterLock();
-                    throw e;
-                }
-
-            }
-            else
-            {
-                storesLocks[storeId].ReleaseWriterLock();
-                throw new ArgumentException("Store doesn't has enough from the product");
-            }
-
-            return porduct;
+            Logger.Instance.LogEvent("User " + userId + " successfuly edited the quantity of " + productId + " in his cart");
+            return user.ViewShoppingCart();
         }
-        public double BuyCart(int userId, CreditCard cc, SupplyAddress address)
+
+        public double BuyCart(int userId, CreditCard cc, SupplyAddress address, DateTime buyTime)
         {
             Logger.Instance.LogEvent($"User {userId} is trying to buy his cart.");
             ShoppingCartDTO shoppingCart = userController.viewCart(userId);
@@ -665,8 +676,17 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new InvalidOperationException("Can't buy an empty shopping cart");
             }
+
+            if (buyTime > DateTime.Now)
+            {
+                throw new ArgumentException("Can not purchase from the future!");
+            }
+
+
             Dictionary<int, List<ProductDTO>> productsSoFar = new Dictionary<int, List<ProductDTO>>();
             List<Event> events = new List<Event>();
+            Dictionary<int, OrderDTO> storeOrdersSoFar = new Dictionary<int, OrderDTO>();
+            Dictionary<string, OrderDTO> userOrdersSoFar = new Dictionary<string, OrderDTO>();
             foreach (int storeId in shoppingCart.shoppingBags.Keys)
             {
                 try
@@ -683,27 +703,28 @@ namespace Workshop.DomainLayer.MarketPackage
                     stores[storeId].CheckPurchasePolicy(shoppingCart.shoppingBags[storeId], age);
                     //ShoppingBagDTO bag = stores[storeId].validateBagInStockAndGet(shoppingCart.shoppingBags[storeId]);
                     ShoppingBagDTO bag = new ShoppingBagDTO(storeId, shoppingCart.shoppingBags[storeId].products);
-                    string products = "";
-                    foreach (ProductDTO product in bag.products)
-                    {
-                        products = product.Name + " ";
-                    }
                     User currentUser = userController.GetUser(userId);
                     string username = currentUser is Member ? ((Member)currentUser).Username : "A guest";
-                    events.Add(new Event("SaleInStore" + storeId, $"Prouducts with the name {products} were bought from store {storeId} by {username}", "marketController"));
-                    productsSoFar.Add(storeId, shoppingCart.shoppingBags[storeId].products);
-                    OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetStoreName(), shoppingCart.shoppingBags[storeId].products, DateTime.Now, GetCartPrice(shoppingCart));
-                    orderHandler.addOrder(order, storeId);
-                    userController.AddOrder(userId, order, username);
+
+                    events.Add(new Event("SaleInStore" + storeId, $"Prouducts with the name {String.Join(" ", bag.products.Select(p => p.Name).ToArray())} were bought from store {storeId} by {username}", "marketController"));
+                    productsSoFar.Add(storeId, bag.products);
+                    OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetStoreName(), bag.products, buyTime, stores[storeId].CalaculatePrice(bag));
+                    storeOrdersSoFar.Add(storeId, order);
+                    userOrdersSoFar.Add(username, order);
+
                     storesLocks[storeId].ReleaseWriterLock();
                 }
                 catch (Exception e)
                 {
-                    //todo add restore prod who tf added this :D
                     storesLocks[storeId].ReleaseWriterLock();
+                    foreach (int sid in productsSoFar.Keys)
+                    {
+                        storesLocks[sid].AcquireWriterLock(Timeout.Infinite);
+                        productsSoFar[sid].ForEach(p => stores[sid].restoreProduct(p));
+                        storesLocks[sid].ReleaseWriterLock();
+                    }
                     throw e;
                 }
-
             }
             int pay_trans_id = ExternalSystem.Pay(cc.Card_number, cc.Month, cc.Year, cc.Holder, cc.Ccv, cc.Id);
             if (pay_trans_id != -1)
@@ -712,10 +733,16 @@ namespace Workshop.DomainLayer.MarketPackage
                 if (supply_trans_id != -1)
                 {
                     double cartPrice = GetCartPrice(shoppingCart);
-                    foreach (Event eventt in events)
+                    events.ForEach(e => userController.notify(e));
+
+                    foreach (int storeId in storeOrdersSoFar.Keys)
                     {
-                        userController.notify(eventt);
+                        orderHandler.addOrder(storeOrdersSoFar[storeId], storeId);
                     }
+                    foreach (string username in userOrdersSoFar.Keys) {
+                        userController.AddOrder(userId, userOrdersSoFar[username], username);
+                    }
+
                     userController.ClearUserCart(userId);
                     Logger.Instance.LogEvent($"User {userId} successfuly paid {cartPrice} and purchased his cart.");
                     return cartPrice;
@@ -739,9 +766,34 @@ namespace Workshop.DomainLayer.MarketPackage
         return price;
     }
 
-    public ShoppingBagProduct addToBag(int userId, int productId, int storeId, int quantity)
+    public ShoppingBagProduct AddToCart(int userId, int productId, int storeId, int quantity)
     {
-        return userController.addToCart(userId, getProductForSale(productId, storeId, quantity), storeId);
+            ShoppingBagProduct product = null;
+            if (quantity <= 0)
+            {
+                throw new ArgumentException($"Can't add {quantity} of an item to the shopping cart");
+            }
+            try
+            {
+                storesLocks[storeId].AcquireWriterLock(Timeout.Infinite);
+            }
+            catch
+            {
+                throw new ArgumentException("Store ID does not exist");
+            }
+            try
+            {
+                User u = userController.GetUser(userId);
+                product = stores[storeId].GetProductForSale(productId, quantity);
+                u.AddToCart(product, storeId);
+                storesLocks[storeId].ReleaseWriterLock();
+            }
+            catch (Exception e)
+            {
+                storesLocks[storeId].ReleaseWriterLock();
+                throw e;
+            }
+            return product;
     }
 
     public void AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId)

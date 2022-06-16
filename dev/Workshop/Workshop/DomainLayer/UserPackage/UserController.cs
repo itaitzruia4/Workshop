@@ -475,19 +475,18 @@ namespace Workshop.DomainLayer.UserPackage
         }
 
 
-        public ShoppingBagProduct addToCart(int userId, ShoppingBagProduct product, int storeId)
+        public ShoppingBagProduct AddToCart(int userId, ShoppingBagProduct product, int storeId)
         {
             //ShoppingBagProduct 
             Logger.Instance.LogEvent("User " + userId + " is trying to add a product to his cart from store " + storeId);
-            AssertUserEnteredMarket(userId);
-            return this.currentUsers[userId].addToCart(product, storeId);
+            return this.currentUsers[userId].AddToCart(product, storeId);
         }
 
         public ShoppingCartDTO viewCart(int userId)
         {
             Logger.Instance.LogEvent($"User {userId} is trying to view his cart");
             AssertUserEnteredMarket(userId);
-            return currentUsers[userId].viewShopingCart();
+            return currentUsers[userId].ViewShoppingCart();
         }
 
         public void AssertUserEnteredMarket(int userId)
@@ -496,27 +495,6 @@ namespace Workshop.DomainLayer.UserPackage
             {
                 throw new ArgumentException($"User {userId} has not entered market");
             }
-        }
-
-        public ShoppingCartDTO editCart(int userId, int productId, int newQuantity)
-        {
-            Logger.Instance.LogEvent("User " + userId + " is trying to edit the quantity of " + productId + " in his cart");
-            AssertUserEnteredMarket(userId);
-            if (newQuantity < 0)
-            {
-                Logger.Instance.LogEvent("User " + userId + " failed to edit the quantity of " + productId + " in his cart");
-                throw new ArgumentException($"Quantity {newQuantity} can not be a negtive number");
-            }
-            if (newQuantity == 0)
-            {
-                currentUsers[userId].deleteFromCart(productId);
-            }
-            else
-            {
-                currentUsers[userId].changeQuantityInCart(productId, newQuantity);
-            }
-            Logger.Instance.LogEvent("User " + userId + " successfuly edited the quantity of " + productId + " in his cart");
-            return currentUsers[userId].viewShopingCart();
         }
 
         public void ClearUserCart(int userId)

@@ -30,11 +30,10 @@ namespace Workshop.DomainLayer.UserPackage
         void AssertCurrentUser(int userId, string username);
         List<Member> GetWorkers(int storeId);
         ReviewDTO ReviewProduct(int userId, string user, int productId, string review, int rating);
-        ShoppingBagProduct addToCart(int userId, ShoppingBagProduct shoppingBagProduct, int storeId);
+        ShoppingBagProduct AddToCart(int userId, ShoppingBagProduct shoppingBagProduct, int storeId);
         ShoppingCartDTO viewCart(int userId);
         void AddStoreFounder(string username, int storeId);
         void AddOrder(int userId, OrderDTO order, string username);
-        ShoppingCartDTO editCart(int userId, int productId, int newQuantity);
         void ClearUserCart(int userId);
         double GetProductRating(int productId);
         void RegisterToEvent(string user, Notifications.Event @event);

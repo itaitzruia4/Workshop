@@ -110,7 +110,7 @@ namespace Workshop.DomainLayer
         }
         internal ShoppingBagProduct AddToCart(int userId, int productId, int storeId,int quantity)
         {
-            return MarketController.addToBag(userId, productId, storeId, quantity);
+            return MarketController.AddToCart(userId, productId, storeId, quantity);
         }
         internal ShoppingCartDTO ViewCart(int userId)
         {
@@ -118,11 +118,11 @@ namespace Workshop.DomainLayer
         }
         internal ShoppingCartDTO EditCart(int userId, int productId, int newQuantity)
         {
-            return UserController.editCart(userId, productId, newQuantity);
+            return MarketController.EditCart(userId, productId, newQuantity);
         }
-        internal double BuyCart(int userId, CreditCard cc, SupplyAddress address)
+        internal double BuyCart(int userId, CreditCard cc, SupplyAddress address, DateTime buyTime)
         {
-            return MarketController.BuyCart(userId, cc, address);
+            return MarketController.BuyCart(userId, cc, address, buyTime);
         }
 
         public void AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId)

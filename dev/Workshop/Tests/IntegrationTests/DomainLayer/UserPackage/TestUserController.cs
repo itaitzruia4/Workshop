@@ -30,7 +30,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
             userController.Register(1, "member1", "pass1", DateTime.Parse("Aug 22, 1972"));
             userController.Login(1, "member1", "pass1");
-            userController.addToCart(1, new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1, "cat1", 1), 1);
+            userController.AddToCart(1, new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1, "cat1", 1), 1);
 
             List<ShoppingBagProduct> member1prods = new List<ShoppingBagProduct>();
             member1prods.Add(new ShoppingBagProduct(1, "prod1", "desc1", 11.90, 3, "cat1", 1));

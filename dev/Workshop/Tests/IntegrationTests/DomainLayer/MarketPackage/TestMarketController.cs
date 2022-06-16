@@ -30,6 +30,11 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             adms.Add(adminDTO);
             userController = new UserController(security, review, adms);
             Mock<IExternalSystem> externalSystem = new Mock<IExternalSystem>();
+            externalSystem.Setup(x => x.Supply(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(new Random().Next(10000, 100000));
+            externalSystem.Setup(x => x.Cancel_Supply(It.IsAny<int>())).Returns(1);
+            externalSystem.Setup(x => x.Pay(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(new Random().Next(10000, 100000));
+            externalSystem.Setup(x => x.Cancel_Pay(It.IsAny<int>())).Returns(1);
+            externalSystem.Setup(x => x.IsExternalSystemOnline()).Returns(true);
             marketController = new MarketController(userController, externalSystem.Object);
             marketController.InitializeSystem();
 
@@ -125,9 +130,9 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         {
             int storeId = marketController.CreateNewStore(1, user, "store").GetId();
             Product prod1 = marketController.AddProductToStore(1, user, storeId, "someName", "someDesc", 10.0, 5, category);
-            ShoppingBagProduct product2 = userController.addToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, userQuantity, prod1.Category, storeId), storeId);
+            ShoppingBagProduct product2 = userController.AddToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, userQuantity, prod1.Category, storeId), storeId);
             int leftovers = marketController.getStoreInfo(1, user, storeId).products[prod1.Id].Quantity;
-            marketController.BuyCart(1, cc, address);
+            marketController.BuyCart(1, cc, address, DateTime.Now);
             Assert.AreEqual(userController.viewCart(1).shoppingBags.Count, 0);
             Assert.IsTrue(marketController.getStoreInfo(1, user, storeId).products[prod1.Id].Quantity == leftovers);
         }
@@ -162,8 +167,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         {
             int storeId = marketController.CreateNewStore(1, "member1", "store").GetId();
             Product prod1 = marketController.AddProductToStore(1, "member1", storeId, "someName", "someDesc", 10.0, 5, "cat1");
-            ShoppingBagProduct product2 = userController.addToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);
-            marketController.BuyCart(1, cc, address);
+            ShoppingBagProduct product2 = userController.AddToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);
+            marketController.BuyCart(1, cc, address, DateTime.Now);
             //List <StoreRole> original_roles = new List<StoreRole>(userController.GetMember("coolStoreOwner").GetStoreRoles(storeId));
             Assert.ThrowsException<ArgumentException>(() => marketController.GetDaliyIncomeMarketManager(userId, username));
         }
@@ -177,8 +182,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
 
             int storeId = marketController.CreateNewStore(1, "member1", "store").GetId();
             Product prod1 = marketController.AddProductToStore(1, "member1", storeId, "someName", "someDesc", 10.0, 5, "cat1");
-            ShoppingBagProduct product2 = userController.addToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);
-            marketController.BuyCart(1, cc, address);
+            ShoppingBagProduct product2 = userController.AddToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);
+            marketController.BuyCart(1, cc, address, DateTime.Now);
             //List <StoreRole> original_roles = new List<StoreRole>(userController.GetMember("coolStoreOwner").GetStoreRoles(storeId));
             double res = marketController.GetDaliyIncomeMarketManager(userId, username);
             Assert.AreEqual(res, prod1.Price * 5);
@@ -192,8 +197,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             userController.Login(userId, username, "pass2");
             int storeId = marketController.CreateNewStore(1, "member1", "store").GetId();
             Product prod1 = marketController.AddProductToStore(1, "member1", storeId, "someName", "someDesc", 10.0, 5, "cat1");
-            ShoppingBagProduct product2 = userController.addToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);
-            marketController.BuyCart(1, cc, address);
+            ShoppingBagProduct product2 = userController.AddToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);
+            marketController.BuyCart(1, cc, address, DateTime.Now);
             Assert.ThrowsException<ArgumentException>(() => marketController.GetDaliyIncomeStoreOwner(userId, username, storeId));
         }
 
@@ -203,8 +208,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         {
             int storeId = marketController.CreateNewStore(1, "member1", "store").GetId();
             Product prod1 = marketController.AddProductToStore(1, "member1", storeId, "someName", "someDesc", 10.0, 5, "cat1");
-            ShoppingBagProduct product2 = userController.addToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);
-            marketController.BuyCart(1, cc, address);
+            ShoppingBagProduct product2 = userController.AddToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);
+            marketController.BuyCart(1, cc, address, DateTime.Now);
             //List <StoreRole> original_roles = new List<StoreRole>(userController.GetMember("coolStoreOwner").GetStoreRoles(storeId));
             double res = marketController.GetDaliyIncomeStoreOwner(userId, username, storeId);
             Assert.AreEqual(res, prod1.Price * 5);

@@ -50,7 +50,7 @@ namespace Workshop.ServiceLayer
 
         Response<ShoppingCart> EditCart(int userId, int productId, int newQuantity);
 
-        Response<double> BuyCart(int userId, CreditCard cc, SupplyAddress address);
+        Response<double> BuyCart(int userId, CreditCard cc, SupplyAddress address, DateTime buyTime);
 
         Response AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId);
 
@@ -79,7 +79,8 @@ namespace Workshop.ServiceLayer
         Response AddActionToManager(int userId, string owner, string manager, int storeId, string action);
 
         Response CancelMember(int userId, string actingUsername, string canceledUsername);
-
+        Response<double> GetDaliyIncomeStoreOwner(int userId, string username, int storeId);
+        Response<double> GetDaliyIncomeMarketManager(int userId, string username);
         Response<Dictionary<Member, bool>> GetMembersOnlineStats(int userId, string actingUsername);
         Response<List<PermissionInformation>> GetMemberPermissions(int userId, string membername);
     }

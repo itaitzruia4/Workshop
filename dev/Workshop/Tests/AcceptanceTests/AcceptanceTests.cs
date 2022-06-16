@@ -29,6 +29,11 @@ namespace Tests.AcceptanceTests
         public void InitSystem()
         {
             string config = "admin~admin~admin~22/08/1972";
+            externalSystem.Setup(x => x.Supply(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(new Random().Next(10000, 100000));
+            externalSystem.Setup(x => x.Cancel_Supply(It.IsAny<int>())).Returns(1);
+            externalSystem.Setup(x => x.Pay(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(new Random().Next(10000, 100000));
+            externalSystem.Setup(x => x.Cancel_Pay(It.IsAny<int>())).Returns(1);
+            externalSystem.Setup(x => x.IsExternalSystemOnline()).Returns(true);
             service = new Service(externalSystem.Object, config);
         }
 
@@ -447,7 +452,7 @@ namespace Tests.AcceptanceTests
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             int prodId = service.AddProduct(1, username, storeId, "TestReviewProduct", "Good", 1, 2, "cat1").Value.Id;
             service.AddToCart(1, prodId, storeId, 1);
-            service.BuyCart(1, cc, address);
+            service.BuyCart(1, cc, address, DateTime.Now);
             Assert.IsFalse(service.ReviewProduct(1, username, prodId, "Blank", 6).ErrorOccured);
         }
 
@@ -630,7 +635,7 @@ namespace Tests.AcceptanceTests
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 2, "cat1").Value;
             service.AddToCart(1, prod.Id, storeId, 1);
-            Assert.IsFalse(service.BuyCart(1, cc, address).ErrorOccured);
+            Assert.IsFalse(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
             Assert.IsTrue(service.AddToCart(1, prod.Id, storeId, 10).ErrorOccured);
         }
 
@@ -642,7 +647,7 @@ namespace Tests.AcceptanceTests
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 1, "cat1").Value;
             service.AddToCart(1, prod.Id, storeId, 1);
-            Assert.IsFalse(service.BuyCart(1, cc, address).ErrorOccured);
+            Assert.IsFalse(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
             Assert.IsTrue(service.AddToCart(1, prod.Id, storeId, 10).ErrorOccured);
         }
 
@@ -653,7 +658,7 @@ namespace Tests.AcceptanceTests
             Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 10, "cat1").Value;
-            Assert.IsTrue(service.BuyCart(1, cc, address).ErrorOccured);
+            Assert.IsTrue(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
         }
 
 
@@ -807,7 +812,7 @@ namespace Tests.AcceptanceTests
         {
             Assert.IsFalse(service.Login(userId, user, password).ErrorOccured);
             bool ret = service.AddToCart(userId, productId, storeId, quantity).ErrorOccured;
-            ret = ret & service.BuyCart(userId, cc, address).ErrorOccured;
+            ret = ret & service.BuyCart(userId, cc, address, DateTime.Now).ErrorOccured;
             return ret;
         }
 
@@ -1077,7 +1082,7 @@ namespace Tests.AcceptanceTests
             service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm("d", "=", DateTime.Now.ToString("dd/MM/yyyy"))(p1.Id), p1.Id);
             service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm("h", ">", "00:01")(p1.Id), p1.Id);
             service.AddToCart(1, p1.Id, store.StoreId, 3);
-            Assert.IsFalse(service.BuyCart(1, cc, address).ErrorOccured);
+            Assert.IsFalse(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
         }
 
         [DataTestMethod]
@@ -1093,7 +1098,7 @@ namespace Tests.AcceptanceTests
             Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
             service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm("q", action, "2")(p1.Id), p1.Id);
             service.AddToCart(1, p1.Id, store.StoreId, n);
-            Assert.IsTrue(service.BuyCart(1, cc, address).ErrorOccured);
+            Assert.IsTrue(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
         }
 
         [DataTestMethod]
@@ -1109,7 +1114,7 @@ namespace Tests.AcceptanceTests
             Product p1 = service.AddProduct(1, member, store.StoreId, "Prod1", "Desc1", 100.0, 100, "Cat1").Value;
             service.AddProductPurchaseTerm(1, member, store.StoreId, makeSimpleProductPurchaseTerm("p", action, "200")(p1.Id), p1.Id);
             service.AddToCart(1, p1.Id, store.StoreId, n);
-            Assert.IsTrue(service.BuyCart(1, cc, address).ErrorOccured);
+            Assert.IsTrue(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
         }
 
         [DataTestMethod]
@@ -1126,7 +1131,7 @@ namespace Tests.AcceptanceTests
             service.AddCategoryPurchaseTerm(1, member, store.StoreId, makeSimpleCategoryPurchaseTerm("q", action, "3")("Category1"), "Category1");
             service.AddToCart(1, p1.Id, store.StoreId, n - 1);
             service.AddToCart(1, p2.Id, store.StoreId, 1);
-            Assert.IsFalse(service.BuyCart(1, cc, address).ErrorOccured);
+            Assert.IsFalse(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
         }
 
         [DataTestMethod]
@@ -1143,7 +1148,7 @@ namespace Tests.AcceptanceTests
             service.AddCategoryPurchaseTerm(1, member, store.StoreId, makeSimpleCategoryPurchaseTerm("q", action, "3")("Category1"), "Category1");
             service.AddToCart(1, p1.Id, store.StoreId, n);
             service.AddToCart(1, p2.Id, store.StoreId, n);
-            Assert.IsTrue(service.BuyCart(1, cc, address).ErrorOccured);
+            Assert.IsTrue(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
         }
 
         [DataTestMethod]
@@ -1168,7 +1173,7 @@ namespace Tests.AcceptanceTests
             {
                 service.AddToCart(1, p1.Id, store.StoreId, 1);
             }
-            Assert.IsTrue(service.BuyCart(1, cc, address).ErrorOccured);
+            Assert.IsTrue(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
         }
 
         [TestMethod]
@@ -1180,7 +1185,7 @@ namespace Tests.AcceptanceTests
             Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
             service.AddUserPurchaseTerm(1, member, store.StoreId, makeSimpleUserPurchaseTerm(">", 18));
             service.AddToCart(1, p1.Id, store.StoreId, 3);
-            Assert.IsFalse(service.BuyCart(1, cc, address).ErrorOccured);
+            Assert.IsFalse(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
         }
 
         [TestMethod]
@@ -1194,7 +1199,7 @@ namespace Tests.AcceptanceTests
             Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 10, "Category1").Value;
             service.AddUserPurchaseTerm(1, member, store.StoreId, makeSimpleUserPurchaseTerm(">", 18));
             service.AddToCart(1, p1.Id, store.StoreId, 3);
-            Assert.IsTrue(service.BuyCart(1, cc, address).ErrorOccured);
+            Assert.IsTrue(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
         }
 
         [DataTestMethod]
@@ -1213,7 +1218,7 @@ namespace Tests.AcceptanceTests
             Product p1 = service.AddProduct(1, member, store.StoreId, "Prod1", "Desc1", 100.0, 100, "Cat1").Value;
             service.AddStorePurchaseTerm(1, member, store.StoreId, makeSimpleBagPurchaseTerm(type, action, val));
             service.AddToCart(1, p1.Id, store.StoreId, 1);
-            Assert.IsFalse(service.BuyCart(1, cc, address).ErrorOccured);
+            Assert.IsFalse(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
         }
 
         [TestMethod]
@@ -1225,7 +1230,7 @@ namespace Tests.AcceptanceTests
             Product p1 = service.AddProduct(1, member, store.StoreId, "Prod1", "Desc1", 100.0, 100, "Cat1").Value;
             service.AddStorePurchaseTerm(1, member, store.StoreId, makeSimpleBagPurchaseTerm("h", "=", "04:04"));
             service.AddToCart(1, p1.Id, store.StoreId, 1);
-            Assert.IsTrue(service.BuyCart(1, cc, address).ErrorOccured);
+            Assert.IsTrue(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
         }
 
         [TestMethod]
@@ -1237,7 +1242,7 @@ namespace Tests.AcceptanceTests
             Product p1 = service.AddProduct(1, member, store.StoreId, "Prod1", "Desc1", 100.0, 100, "Cat1").Value;
             service.AddStorePurchaseTerm(1, member, store.StoreId, makeSimpleBagPurchaseTerm("d", "=", "30/08/2030"));
             service.AddToCart(1, p1.Id, store.StoreId, 1);
-            Assert.IsTrue(service.BuyCart(1, cc, address).ErrorOccured);
+            Assert.IsTrue(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
         }
 
         // Discount policy tests
@@ -1437,7 +1442,7 @@ namespace Tests.AcceptanceTests
             service.AddToCart(1, p2.Id, store.StoreId, 2);
             service.AddToCart(1, p3.Id, store.StoreId, 5);
             double expected_price = 615;
-            Assert.AreEqual(expected_price, service.BuyCart(1, cc, address).Value);
+            Assert.AreEqual(expected_price, service.BuyCart(1, cc, address, DateTime.Now).Value);
         }
 
         [TestMethod]
@@ -1456,7 +1461,7 @@ namespace Tests.AcceptanceTests
             service.AddToCart(1, p2.Id, store.StoreId, 2);
             service.AddToCart(1, p3.Id, store.StoreId, 5);
             double expected_price = 745;
-            Assert.AreEqual(expected_price, service.BuyCart(1, cc, address).Value);
+            Assert.AreEqual(expected_price, service.BuyCart(1, cc, address, DateTime.Now).Value);
         }
 
         [TestMethod]
@@ -1474,7 +1479,7 @@ namespace Tests.AcceptanceTests
             service.AddToCart(1, p2.Id, store.StoreId, 2);
             service.AddToCart(1, p3.Id, store.StoreId, 5);
             double expected_price = 920;
-            Assert.AreEqual(expected_price, service.BuyCart(1, cc, address).Value);
+            Assert.AreEqual(expected_price, service.BuyCart(1, cc, address, DateTime.Now).Value);
         }
 
         [TestMethod]
@@ -1493,7 +1498,7 @@ namespace Tests.AcceptanceTests
             service.AddToCart(1, p2.Id, store.StoreId, 2);
             service.AddToCart(1, p3.Id, store.StoreId, 5);
             double expected_price = 680;
-            Assert.AreEqual(expected_price, service.BuyCart(1, cc, address).Value);
+            Assert.AreEqual(expected_price, service.BuyCart(1, cc, address, DateTime.Now).Value);
         }
 
         // NEW FOR VERSION 3
@@ -1513,9 +1518,9 @@ namespace Tests.AcceptanceTests
             Product p2 = service.AddProduct(1, member1, store.StoreId, "Product2", "Description2", 10.0, 5, "Category2").Value;
             service.AddCategoryDiscount(1, member1, store.StoreId, makeSimpleCategoryDiscount(10)("Category1"), "Category1");
             service.AddProductDiscount(2, member2, store.StoreId, makeSimpleProductDiscount(20)(p2.Id), p2.Id);
-            service.AddToCart(3, p1.Id, store.StoreId, 2); // 200 before discount, 180 after
-            service.AddToCart(3, p2.Id, store.StoreId, 3); // 30 before discount, 24 after
-            Assert.AreEqual(204, service.BuyCart(3, cc, address).Value);
+            Assert.IsFalse(service.AddToCart(3, p1.Id, store.StoreId, 2).ErrorOccured); // 200 before discount, 180 after
+            Assert.IsFalse(service.AddToCart(3, p2.Id, store.StoreId, 3).ErrorOccured); // 30 before discount, 24 after
+            Assert.AreEqual(204, service.BuyCart(3, cc, address, DateTime.Now).Value);
             string review_string = "Good product, that is!";
             ReviewDTO rev = service.ReviewProduct(3, member3, p1.Id, review_string, 4).Value;
             Assert.AreEqual(review_string, rev.Review);
@@ -1554,7 +1559,7 @@ namespace Tests.AcceptanceTests
             Assert.AreEqual(3, cart.ShoppingBags[store.StoreId].Products[1].Quantity);
             Assert.AreEqual(p2.Id, cart.ShoppingBags[store.StoreId].Products[1].Id);
 
-            Assert.IsFalse(service.BuyCart(55, cc, address).ErrorOccured);
+            Assert.IsFalse(service.BuyCart(55, cc, address, DateTime.Now).ErrorOccured);
         }
 
         [TestMethod]
@@ -1774,7 +1779,7 @@ namespace Tests.AcceptanceTests
             service.Logout(0, "Member1");
             service.Login(3, "Member4", "Password4");
             service.AddToCart(3, product1.Id, store1.StoreId, 1);
-            service.BuyCart(3, cc, address);
+            service.BuyCart(3, cc, address, DateTime.Now);
             Response<KeyValuePair<Member, List<Notification>>> response6 = service.Login(0, "Member1", "Password1");
             Assert.AreEqual(1, response6.Value.Value.Count);
             //Assert.AreEqual("Member4", response6.Value.Value[0].Sender);
@@ -2003,7 +2008,7 @@ namespace Tests.AcceptanceTests
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 2, "cat1").Value;
             service.AddToCart(1, prod.Id, storeId, 1);
-            Assert.IsTrue(service.BuyCart(1, cc, address).ErrorOccured);
+            Assert.IsTrue(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
             Assert.IsTrue(SUPPLY_FLAG);
             Assert.IsFalse(CANCEL_SUPPLY_FLAG);
             Assert.IsTrue(!(CANCEL_PAY_FLAG ^ PAY_FLAG));
@@ -2028,7 +2033,7 @@ namespace Tests.AcceptanceTests
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 2, "cat1").Value;
             service.AddToCart(1, prod.Id, storeId, 1);
-            Assert.IsTrue(service.BuyCart(1, cc, address).ErrorOccured);
+            Assert.IsTrue(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
             Assert.IsTrue(PAY_FLAG);
             Assert.IsFalse(CANCEL_PAY_FLAG);
             Assert.IsTrue(!(CANCEL_SUPPLY_FLAG ^ SUPPLY_FLAG));
@@ -2043,7 +2048,7 @@ namespace Tests.AcceptanceTests
             int storeId = service.CreateNewStore(1, username, "RandomStore").Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 2, "cat1").Value;
             service.AddToCart(1, prod.Id, storeId, 1);
-            Assert.AreEqual(!externalSystem.IsExternalSystemOnline(), service.BuyCart(1, cc, address).ErrorOccured);
+            Assert.AreEqual(!externalSystem.IsExternalSystemOnline(), service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
         }
 
         [TestMethod]
@@ -2069,7 +2074,7 @@ namespace Tests.AcceptanceTests
             service.Register(2, "member2", "password2", DateTime.Now);
             service.Login(2, "member2", "password2");
             service.AddToCart(2, prod.Id, store.StoreId, 1);
-            Assert.IsTrue(service.BuyCart(1, cc, address).ErrorOccured);
+            Assert.IsTrue(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
             Assert.IsTrue(!(PAY_FLAG ^ CANCEL_PAY_FLAG));
             Assert.IsTrue(!(CANCEL_SUPPLY_FLAG ^ SUPPLY_FLAG));
         }
@@ -2165,6 +2170,18 @@ namespace Tests.AcceptanceTests
         {
             Test_Login_Good(3, "member3", "pass3");
             Assert.IsTrue(service.GetMembersOnlineStats(3, "member3").ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_AddToCart_StoreUpdatesQuantity()
+        {
+            Test_Login_Good(1, "mem1", "pass1");
+            Test_Login_Good(2, "mem2", "pass2");
+            Store st = service.CreateNewStore(1, "mem1", "s1").Value;
+            Product p = service.AddProduct(1, "mem1", st.StoreId, "p1", "d1", 10.0, 5, "cat1").Value;
+            Product userP = service.AddToCart(2, p.Id, st.StoreId, 4).Value;
+            Assert.AreEqual(4, userP.Quantity);
+            Assert.AreEqual(1, service.GetAllStores(1).Value[0].Products[0].Quantity);
         }
 
         [TestMethod]
