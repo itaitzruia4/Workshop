@@ -184,6 +184,18 @@ namespace API.Controllers
             return Ok(new FrontResponse<int>(request.StoreId));
 
         }
+
+        [HttpPost("getdailyincomestore")]
+        public ActionResult<FrontResponse<double>> GetDailyIncomeStore([FromBody] StoreRequest request)
+        {
+            Response<double> response = Service.GetDailyIncomeStore(request.UserId, request.Membername, request.StoreId);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<double>(response.ErrorMessage));
+            }
+            return Ok(new FrontResponse<double>(response.Value));
+
+        }
     }
 }
 

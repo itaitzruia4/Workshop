@@ -129,5 +129,17 @@ namespace API.Controllers
             }
             return Ok(new FrontResponse<List<PermissionInformation>>(response.Value));
         }
+
+        [HttpPost("getdailyincomemarketmanager")]
+        public ActionResult<FrontResponse<double>> GetDailyIncomeMarketManager([FromBody] MemberRequest request)
+        {
+            Response<double> response = Service.GetDailyIncomeMarketManager(request.UserId, request.Membername);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<double>(response.ErrorMessage));
+            }
+            return Ok(new FrontResponse<double>(response.Value));
+
+        }
     }
 }

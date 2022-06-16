@@ -2287,7 +2287,8 @@ namespace Tests.AcceptanceTests
         {
             service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
             Test_Login_Good(1, "mem1", "pass1");
-            Test_Login_Good(2, "admin", "admin");
+            service.EnterMarket(2);
+            service.Login(2, "admin", "admin");
             Store st = service.CreateNewStore(1, "mem1", "s1").Value;
             Product p = service.AddProduct(1, "mem1", st.StoreId, "p1", "d1", 100.0, 5, "cat1").Value;
             service.AddToCart(1, p.Id, st.StoreId, 3);
@@ -2302,7 +2303,8 @@ namespace Tests.AcceptanceTests
         {
             service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
             Test_Login_Good(1, "mem1", "pass1");
-            Test_Login_Good(2, "admin", "admin");
+            service.EnterMarket(2);
+            service.Login(2, "admin", "admin");
             Test_Login_Good(3, "mem2", "pass2");
 
             Store st1 = service.CreateNewStore(1, "mem1", "s1").Value;
@@ -2336,5 +2338,116 @@ namespace Tests.AcceptanceTests
             service.BuyCart(1, cc, address, DateTime.Parse("Aug 22, 1972"));
             Assert.IsTrue(service.GetDailyIncomeMarketManager(2, "Ron").ErrorOccured);
         }
+
+        [TestMethod]
+        public void Test_DailyIncomeMarketManager_SuccessWithDiscounts()
+        {
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
+            string member = "member1";
+            Test_Login_Good(1, member, "password1");
+            service.EnterMarket(2);
+            service.Login(2, "admin", "admin");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 3, "no_cat").Value;
+            Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Description2", 200.0, 2, "Cat1").Value;
+            Product p3 = service.AddProduct(1, member, store.StoreId, "Product3", "Description3", 50.0, 5, "Cat2").Value;
+            service.AddProductDiscount(1, member, store.StoreId, makeAndproductDiscount(10, 20)(p1.Id), p1.Id);
+            service.AddProductDiscount(1, member, store.StoreId, makeXorproductDiscount(10, 20)(p2.Id), p2.Id);
+            service.AddProductDiscount(1, member, store.StoreId, makeXorproductDiscount(30, 40)(p3.Id), p3.Id);
+            service.AddToCart(1, p1.Id, store.StoreId, 3);
+            service.AddToCart(1, p2.Id, store.StoreId, 2);
+            service.AddToCart(1, p3.Id, store.StoreId, 5);
+            double expected_price = 680.0;
+            Assert.AreEqual(expected_price, service.BuyCart(1, cc, address, DateTime.Now).Value);
+            Assert.AreEqual(680.0, service.GetDailyIncomeMarketManager(2, "admin").Value);
+        }
+
+        [TestMethod]
+        public void Test_DailyIncomeStoreOwner_Success()
+        {
+            Test_Login_Good(1, "mem1", "pass1");
+            Test_Login_Good(2, "ron", "ron");
+            Store st = service.CreateNewStore(1, "mem1", "s1").Value;
+            Product p1 = service.AddProduct(1, "mem1", st.StoreId, "p1", "d1", 100.0, 5, "cat1").Value;
+            Product p2 = service.AddProduct(1, "mem1", st.StoreId, "p2", "d2", 50.0, 5, "cat2").Value;
+
+            service.AddToCart(2, p1.Id, st.StoreId, 3);
+            service.AddToCart(2, p2.Id, st.StoreId, 1);
+            service.BuyCart(2, cc, address, DateTime.Now);
+            service.AddToCart(2, p1.Id, st.StoreId, 1);
+            service.AddToCart(2, p2.Id, st.StoreId, 1);
+            service.BuyCart(2, cc, address, DateTime.Parse("Aug 22, 1972"));
+
+            Assert.AreEqual(350.0, service.GetDailyIncomeStore(1, "mem1", st.StoreId).Value);
+        }
+
+        [TestMethod]
+        public void Test_DailyIncomeStoreOwner_MultipleUsers()
+        {
+            Test_Login_Good(1, "mem1", "pass1");
+            Test_Login_Good(2, "ron", "ron");
+            Test_Login_Good(3, "nir", "nir");
+            Store st = service.CreateNewStore(1, "mem1", "s1").Value;
+            Product p1 = service.AddProduct(1, "mem1", st.StoreId, "p1", "d1", 100.0, 5, "cat1").Value;
+            Product p2 = service.AddProduct(1, "mem1", st.StoreId, "p2", "d2", 50.0, 5, "cat2").Value;
+
+            service.AddToCart(2, p1.Id, st.StoreId, 2);
+            service.AddToCart(2, p2.Id, st.StoreId, 1);
+            service.BuyCart(2, cc, address, DateTime.Now);
+
+            service.AddToCart(3, p1.Id, st.StoreId, 1);
+            service.AddToCart(3, p2.Id, st.StoreId, 2);
+            service.BuyCart(3, cc, address, DateTime.Now);
+
+            service.AddToCart(2, p1.Id, st.StoreId, 1);
+            service.AddToCart(2, p2.Id, st.StoreId, 1);
+            service.BuyCart(2, cc, address, DateTime.Parse("Aug 22, 1972"));
+
+            service.AddToCart(3, p1.Id, st.StoreId, 1);
+            service.AddToCart(3, p2.Id, st.StoreId, 1);
+            service.BuyCart(3, cc, address, DateTime.Parse("Aug 22, 1972"));
+
+            Assert.AreEqual(450.0, service.GetDailyIncomeStore(1, "mem1", st.StoreId).Value);
+        }
+
+        [TestMethod]
+        public void Test_DailyIncomeStoreOwner_Failure_NoPermissions()
+        {
+            Test_Login_Good(1, "mem1", "pass1");
+            Test_Login_Good(2, "ron", "ron");
+            Store st = service.CreateNewStore(1, "mem1", "s1").Value;
+            Product p1 = service.AddProduct(1, "mem1", st.StoreId, "p1", "d1", 100.0, 5, "cat1").Value;
+            Product p2 = service.AddProduct(1, "mem1", st.StoreId, "p2", "d2", 50.0, 5, "cat2").Value;
+
+            service.AddToCart(2, p1.Id, st.StoreId, 3);
+            service.AddToCart(2, p2.Id, st.StoreId, 1);
+            service.BuyCart(2, cc, address, DateTime.Now);
+            service.AddToCart(2, p1.Id, st.StoreId, 1);
+            service.AddToCart(2, p2.Id, st.StoreId, 1);
+            service.BuyCart(2, cc, address, DateTime.Parse("Aug 22, 1972"));
+
+            Assert.IsTrue(service.GetDailyIncomeStore(2, "ron", st.StoreId).ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_DailyIncomeStoreOwner_SuccessWithDiscounts()
+        {
+            string member = "member1";
+            Test_Login_Good(1, member, "password1");
+            Store store = service.CreateNewStore(1, member, "Store1").Value;
+            Product p1 = service.AddProduct(1, member, store.StoreId, "Product1", "Description1", 100.0, 3, "no_cat").Value;
+            Product p2 = service.AddProduct(1, member, store.StoreId, "Product2", "Description2", 200.0, 2, "Cat1").Value;
+            Product p3 = service.AddProduct(1, member, store.StoreId, "Product3", "Description3", 50.0, 5, "Cat2").Value;
+            service.AddProductDiscount(1, member, store.StoreId, makeAndproductDiscount(10, 20)(p1.Id), p1.Id);
+            service.AddProductDiscount(1, member, store.StoreId, makeXorproductDiscount(10, 20)(p2.Id), p2.Id);
+            service.AddProductDiscount(1, member, store.StoreId, makeXorproductDiscount(30, 40)(p3.Id), p3.Id);
+            service.AddToCart(1, p1.Id, store.StoreId, 3);
+            service.AddToCart(1, p2.Id, store.StoreId, 2);
+            service.AddToCart(1, p3.Id, store.StoreId, 5);
+            double expected_price = 680.0;
+            Assert.AreEqual(expected_price, service.BuyCart(1, cc, address, DateTime.Now).Value);
+            Assert.AreEqual(680.0, service.GetDailyIncomeStore(1, member, store.StoreId).Value);
+        }
+
     }
 }
