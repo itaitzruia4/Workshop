@@ -29,6 +29,21 @@ namespace Workshop.DataLayer
             optionsBuilder.EnableSensitiveDataLogging();
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            foreach (var item in modelBuilder.Model.GetEntityTypes())
+            {
+                var p = item.FindPrimaryKey().Properties.FirstOrDefault(i => i.ValueGenerated != Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.Never);
+                if (p != null)
+                {
+                    p.ValueGenerated = Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.Never;
+                }
+
+            }
+        }
+
         public override EntityEntry<TEntity> Update<TEntity>(TEntity entity)
         {
             Logger.Instance.LogEvent($"Updating {entity} in the cache");

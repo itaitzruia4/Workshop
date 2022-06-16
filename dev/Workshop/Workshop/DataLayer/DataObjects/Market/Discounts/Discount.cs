@@ -10,16 +10,22 @@ namespace Workshop.DataLayer.DataObjects.Market.Discounts
 {
     public class Discount : DALObject
     {
+        private static int nextId = 0;
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
         public string discountJson { get; set; }
         public Discount()
-        { }
+        {
+            this.Id = nextId;
+            nextId++;
+        }
 
         public Discount(string discountJson)
         {
             this.discountJson = discountJson;
+            this.Id = nextId;
+            nextId++;
         }
     }
 }

@@ -11,6 +11,8 @@ namespace Workshop.DataLayer.DataObjects.Notifications
 {
     public class MemberNotifications: DALObject
     {
+        private static int nextId = 0;
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
@@ -19,12 +21,16 @@ namespace Workshop.DataLayer.DataObjects.Notifications
 
         public MemberNotifications()
         {
+            this.Id = nextId;
+            nextId++;
         }
 
         public MemberNotifications(Member member, List<Notification> notifications)
         {
             Member = member;
             Notifications = notifications;
+            this.Id = nextId;
+            nextId++;
         }
     }
 }

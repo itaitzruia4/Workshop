@@ -10,6 +10,8 @@ namespace Workshop.DataLayer.DataObjects.Reviews
 {
     public class Review : DALObject
     {
+        private static int nextId = 0;
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
@@ -19,6 +21,8 @@ namespace Workshop.DataLayer.DataObjects.Reviews
 
         public Review()
         {
+            this.Id = nextId;
+            nextId++;
         }
 
         public Review(string review, string reviewer, int productId)
@@ -26,6 +30,8 @@ namespace Workshop.DataLayer.DataObjects.Reviews
             this.review = review;
             this.reviewer = reviewer;
             this.productId = productId;
+            this.Id = nextId;
+            nextId++;
         }
     }
 }

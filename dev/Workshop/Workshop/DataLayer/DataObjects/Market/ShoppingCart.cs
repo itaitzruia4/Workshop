@@ -10,17 +10,24 @@ namespace Workshop.DataLayer.DataObjects.Market
 {
     public class ShoppingCart : DALObject
     {
+        private static int nextId = 0;
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
         public List<ShoppingBag> ShoppingBags { get; set; }
 
         public ShoppingCart()
-        { }
+        {
+            ShoppingBags = new List<ShoppingBag>();
+            this.Id = nextId;
+            nextId++;
+        }
 
         public ShoppingCart(List<ShoppingBag> shoppingBags)
         {
             ShoppingBags = shoppingBags;
+            this.Id = nextId;
+            nextId++;
         }
     }
 }

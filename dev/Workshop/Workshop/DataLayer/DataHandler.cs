@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Data.SqlClient;
 using Workshop.DataLayer.DataObjects.Market;
 using System.Threading;
+using Workshop.DomainLayer.Loggers;
 
 namespace Workshop.DataLayer
 {
@@ -18,7 +19,8 @@ namespace Workshop.DataLayer
         private DataHandler()
         {
             cache = new Context();
-            new Thread(() => upload(20)).Start();
+            cache.ChangeTracker.AutoDetectChangesEnabled = false;
+            new Thread(() => upload(2)).Start();
         }
 
         public static DataHandler getDBHandler()
@@ -29,9 +31,11 @@ namespace Workshop.DataLayer
             return Instance;
         }
         
-        public void save<T>(T toSave) where T : class, DALObject
+        public T save<T>(T toSave) where T : class, DALObject
         {
-            cache.Add(toSave);
+            T output = cache.Add(toSave).Entity;
+            //cache.SaveChanges();
+            return output;
         }
 
         public void update<T>(T toUpdate) where T : class, DALObject
@@ -49,12 +53,23 @@ namespace Workshop.DataLayer
             return (T)cache.Find(entityType, key);
         }
 
-        private void upload(int timeOutInSeconds)
+        private void upload(double timeOutInSeconds)
         {
             while (true)
             {
-                Thread.Sleep(timeOutInSeconds * 1000);
-                cache.SaveChanges();
+                Logger.Instance.LogEvent($"Saving in {timeOutInSeconds} secs to the DB");
+                Thread.Sleep((int)timeOutInSeconds * 1000);
+                Logger.Instance.LogEvent($"Trying to upload data to DB");
+                try
+                {
+                    cache.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Instance.LogEvent($"Exception!!!!!!!!!!!!!!!! " + ex.Message + ex.InnerException);
+                }
+                Logger.Instance.LogEvent($"Upload succeded");
+
             }
         }
 

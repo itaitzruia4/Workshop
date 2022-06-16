@@ -10,6 +10,8 @@ namespace Workshop.DataLayer.DataObjects.Reviews
 {
     public class ReviewHandler: DALObject
     {
+        private static int nextId = 0;
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
@@ -18,12 +20,16 @@ namespace Workshop.DataLayer.DataObjects.Reviews
 
         public ReviewHandler()
         {
+            this.Id = nextId;
+            nextId++;
         }
 
         public ReviewHandler(List<ProductReviews> productReviews, List<UserReviews> userReviews)
         {
             this.productReviews = productReviews;
             this.userReviews = userReviews;
+            this.Id = nextId;
+            nextId++;
         }
     }
 }

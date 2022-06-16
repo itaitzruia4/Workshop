@@ -11,8 +11,7 @@ namespace Workshop.Migrations
                 name: "Event",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     Message = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
                     Sender = table.Column<string>(nullable: true)
@@ -27,7 +26,6 @@ namespace Workshop.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1")
                 },
                 constraints: table =>
                 {
@@ -39,7 +37,6 @@ namespace Workshop.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1")
                 },
                 constraints: table =>
                 {
@@ -51,7 +48,6 @@ namespace Workshop.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1")
                 },
                 constraints: table =>
                 {
@@ -59,26 +55,10 @@ namespace Workshop.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Review",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    review = table.Column<string>(nullable: true),
-                    reviewer = table.Column<string>(nullable: true),
-                    productId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Review", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ReviewDTO",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     Review = table.Column<string>(nullable: true),
                     Reviewer = table.Column<string>(nullable: true),
                     ProductId = table.Column<int>(nullable: false),
@@ -94,7 +74,6 @@ namespace Workshop.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1")
                 },
                 constraints: table =>
                 {
@@ -106,7 +85,6 @@ namespace Workshop.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1")
                 },
                 constraints: table =>
                 {
@@ -114,11 +92,26 @@ namespace Workshop.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SupplyAddress",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    Address = table.Column<string>(nullable: true),
+                    City = table.Column<string>(nullable: true),
+                    Country = table.Column<string>(nullable: true),
+                    Zip = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SupplyAddress", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "EventObservers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     EventId = table.Column<int>(nullable: true),
                     NotificationHandlerId = table.Column<int>(nullable: true)
                 },
@@ -143,8 +136,7 @@ namespace Workshop.Migrations
                 name: "MemberToOrders<int>",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     key = table.Column<int>(nullable: false),
                     OrderHandlerintId = table.Column<int>(name: "OrderHandler<int>Id", nullable: true)
                 },
@@ -163,8 +155,7 @@ namespace Workshop.Migrations
                 name: "MemberToOrders<string>",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     key = table.Column<string>(nullable: true),
                     OrderHandlerstringId = table.Column<int>(name: "OrderHandler<string>Id", nullable: true)
                 },
@@ -183,8 +174,7 @@ namespace Workshop.Migrations
                 name: "ProductReviews",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     ProductId = table.Column<int>(nullable: false),
                     ReviewHandlerId = table.Column<int>(nullable: true)
                 },
@@ -203,8 +193,7 @@ namespace Workshop.Migrations
                 name: "userController",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     reviewHandlerId = table.Column<int>(nullable: true),
                     notificationHandlerId = table.Column<int>(nullable: true),
                     orderHandlerId = table.Column<int>(nullable: true)
@@ -236,8 +225,7 @@ namespace Workshop.Migrations
                 name: "UserReviews",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     Username = table.Column<string>(nullable: true),
                     ReviewHandlerId = table.Column<int>(nullable: true)
                 },
@@ -256,8 +244,7 @@ namespace Workshop.Migrations
                 name: "ShoppingBag",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     StoreId = table.Column<int>(nullable: false),
                     ShoppingCartId = table.Column<int>(nullable: true)
                 },
@@ -276,10 +263,9 @@ namespace Workshop.Migrations
                 name: "OrderDTO",
                 columns: table => new
                 {
-                    id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    id = table.Column<int>(nullable: false),
                     clientName = table.Column<string>(nullable: true),
-                    address = table.Column<string>(nullable: true),
+                    addressId = table.Column<int>(nullable: true),
                     storeName = table.Column<string>(nullable: true),
                     MemberToOrdersintId = table.Column<int>(name: "MemberToOrders<int>Id", nullable: true),
                     MemberToOrdersstringId = table.Column<int>(name: "MemberToOrders<string>Id", nullable: true)
@@ -299,14 +285,19 @@ namespace Workshop.Migrations
                         principalTable: "MemberToOrders<string>",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrderDTO_SupplyAddress_addressId",
+                        column: x => x.addressId,
+                        principalTable: "SupplyAddress",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
                 name: "UserToReviewDTO",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     Username = table.Column<string>(nullable: true),
                     ReviewId = table.Column<int>(nullable: true),
                     ProductReviewsId = table.Column<int>(nullable: true)
@@ -332,8 +323,7 @@ namespace Workshop.Migrations
                 name: "marketController",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     userControllerId = table.Column<int>(nullable: true),
                     orderHandlerId = table.Column<int>(nullable: true),
                     STORE_COUNT = table.Column<int>(nullable: false),
@@ -394,8 +384,7 @@ namespace Workshop.Migrations
                 name: "ProductToReviewDTO",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     ProductId = table.Column<int>(nullable: false),
                     ReviewId = table.Column<int>(nullable: true),
                     UserReviewsId = table.Column<int>(nullable: true)
@@ -421,8 +410,7 @@ namespace Workshop.Migrations
                 name: "ShoppingBagProduct",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     Price = table.Column<double>(nullable: false),
                     Quantity = table.Column<int>(nullable: false),
@@ -445,8 +433,7 @@ namespace Workshop.Migrations
                 name: "ProductDTO",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     Price = table.Column<double>(nullable: false),
@@ -470,8 +457,7 @@ namespace Workshop.Migrations
                 name: "MemberNotifications",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     MemberName = table.Column<string>(nullable: true),
                     NotificationHandlerId = table.Column<int>(nullable: true)
                 },
@@ -496,12 +482,10 @@ namespace Workshop.Migrations
                 name: "Role",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     RoleType = table.Column<string>(nullable: true),
                     StoreId = table.Column<int>(nullable: false),
-                    MemberName = table.Column<string>(nullable: true),
-                    RoleId = table.Column<int>(nullable: true)
+                    MemberName = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -512,20 +496,13 @@ namespace Workshop.Migrations
                         principalTable: "Member",
                         principalColumn: "MemberName",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Role_Role_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "Role",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Notification",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     Message = table.Column<string>(nullable: true),
                     Sender = table.Column<string>(nullable: true),
                     TimeOfEvent = table.Column<DateTime>(nullable: false),
@@ -546,8 +523,7 @@ namespace Workshop.Migrations
                 name: "Action",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     ActionType = table.Column<int>(nullable: false),
                     RoleId = table.Column<int>(nullable: true)
                 },
@@ -563,11 +539,29 @@ namespace Workshop.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "NameToRole",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false),
+                    roleId = table.Column<int>(nullable: true),
+                    memberName = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_NameToRole", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_NameToRole_Role_roleId",
+                        column: x => x.roleId,
+                        principalTable: "Role",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DiscountPolicy",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     store_discountId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
@@ -579,8 +573,7 @@ namespace Workshop.Migrations
                 name: "Discount",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     discountJson = table.Column<string>(nullable: true),
                     DiscountPolicyId = table.Column<int>(nullable: true),
                     DiscountPolicyId1 = table.Column<int>(nullable: true)
@@ -606,8 +599,7 @@ namespace Workshop.Migrations
                 name: "Store",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     Open = table.Column<bool>(nullable: false),
                     StoreName = table.Column<string>(nullable: true),
                     DiscountPolicyId = table.Column<int>(nullable: true),
@@ -635,8 +627,7 @@ namespace Workshop.Migrations
                 name: "Product",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     Store = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
@@ -660,8 +651,7 @@ namespace Workshop.Migrations
                 name: "Term",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     TermJson = table.Column<string>(nullable: true),
                     PurchasePolicyId = table.Column<int>(nullable: true),
                     PurchasePolicyId1 = table.Column<int>(nullable: true)
@@ -675,8 +665,7 @@ namespace Workshop.Migrations
                 name: "PurchasePolicy",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(nullable: false),
                     user_termsId = table.Column<int>(nullable: true),
                     store_termsId = table.Column<int>(nullable: true)
                 },
@@ -773,6 +762,11 @@ namespace Workshop.Migrations
                 column: "OrderHandler<string>Id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_NameToRole_roleId",
+                table: "NameToRole",
+                column: "roleId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Notification_MemberNotificationsId",
                 table: "Notification",
                 column: "MemberNotificationsId");
@@ -786,6 +780,11 @@ namespace Workshop.Migrations
                 name: "IX_OrderDTO_MemberToOrders<string>Id",
                 table: "OrderDTO",
                 column: "MemberToOrders<string>Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderDTO_addressId",
+                table: "OrderDTO",
+                column: "addressId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Product_StoreId",
@@ -826,11 +825,6 @@ namespace Workshop.Migrations
                 name: "IX_Role_MemberName",
                 table: "Role",
                 column: "MemberName");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Role_RoleId",
-                table: "Role",
-                column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ShoppingBag_ShoppingCartId",
@@ -952,6 +946,9 @@ namespace Workshop.Migrations
                 name: "Action");
 
             migrationBuilder.DropTable(
+                name: "NameToRole");
+
+            migrationBuilder.DropTable(
                 name: "Notification");
 
             migrationBuilder.DropTable(
@@ -962,9 +959,6 @@ namespace Workshop.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProductToReviewDTO");
-
-            migrationBuilder.DropTable(
-                name: "Review");
 
             migrationBuilder.DropTable(
                 name: "ShoppingBagProduct");
@@ -1007,6 +1001,9 @@ namespace Workshop.Migrations
 
             migrationBuilder.DropTable(
                 name: "MemberToOrders<string>");
+
+            migrationBuilder.DropTable(
+                name: "SupplyAddress");
 
             migrationBuilder.DropTable(
                 name: "EventObservers");

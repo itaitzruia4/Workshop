@@ -10,6 +10,8 @@ namespace Workshop.DataLayer.DataObjects.Members
 {
     public class Role : DALObject
     {
+        private static int nextId = 0;
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
@@ -19,7 +21,10 @@ namespace Workshop.DataLayer.DataObjects.Members
         public List<NameToRole> nominees { get; set; }
 
         public Role()
-        { }
+        {
+            this.Id = nextId;
+            nextId++;
+        }
 
         // Consructor for non-store role
         public Role(int StoreId, List<Action> actions, string RoleType)
@@ -28,6 +33,8 @@ namespace Workshop.DataLayer.DataObjects.Members
             this.Actions = actions;
             this.RoleType = RoleType;
             Actions = new List<Action>();
+            this.Id = nextId;
+            nextId++;
         }
 
         // Consructor for non-store role
@@ -39,6 +46,8 @@ namespace Workshop.DataLayer.DataObjects.Members
             this.StoreId = StoreId;
             this.nominees = nominees;
             Actions = new List<Action>();
+            this.Id = nextId;
+            nextId++;
         }
     }
 }

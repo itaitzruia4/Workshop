@@ -10,6 +10,8 @@ namespace Workshop.DataLayer.DataObjects.Notifications
 {
     public class Event: DALObject
     {
+        private static int nextId = 0;
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
@@ -19,6 +21,8 @@ namespace Workshop.DataLayer.DataObjects.Notifications
 
         public Event()
         {
+            this.Id = nextId;
+            nextId++;
         }
 
         public Event(string message, string name, string sender)
@@ -26,6 +30,8 @@ namespace Workshop.DataLayer.DataObjects.Notifications
             Message = message;
             Name = name;
             Sender = sender;
+            this.Id = nextId;
+            nextId++;
         }
     }
 }

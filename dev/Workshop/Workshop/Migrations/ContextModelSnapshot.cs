@@ -22,9 +22,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Controllers.MarketController", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int>("PRODUCT_COUNT")
                         .HasColumnType("int");
@@ -50,9 +48,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Controllers.UserController", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int?>("notificationHandlerId")
                         .HasColumnType("int");
@@ -77,9 +73,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.Discount", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int?>("DiscountPolicyId")
                         .HasColumnType("int");
@@ -102,9 +96,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int?>("store_discountId")
                         .HasColumnType("int");
@@ -119,9 +111,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Product", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<string>("Category")
                         .HasColumnType("nvarchar(max)");
@@ -154,9 +144,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.ProductDTO", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<string>("Category")
                         .HasColumnType("nvarchar(max)");
@@ -189,9 +177,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Purchases.PurchasePolicy", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int?>("store_termsId")
                         .HasColumnType("int");
@@ -211,9 +197,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Purchases.Term", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int?>("PurchasePolicyId")
                         .HasColumnType("int");
@@ -236,9 +220,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.ShoppingBag", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int?>("ShoppingCartId")
                         .HasColumnType("int");
@@ -256,9 +238,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.ShoppingBagProduct", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<string>("Category")
                         .HasColumnType("nvarchar(max)");
@@ -288,9 +268,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.ShoppingCart", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -300,9 +278,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Store", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int?>("DiscountPolicyId")
                         .HasColumnType("int");
@@ -333,9 +309,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.SupplyAddress", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
@@ -360,9 +334,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Members.Action", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int>("ActionType")
                         .HasColumnType("int");
@@ -408,18 +380,31 @@ namespace Workshop.Migrations
                     b.ToTable("Member");
                 });
 
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Members.NameToRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("memberName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("roleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("roleId");
+
+                    b.ToTable("NameToRole");
+                });
+
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Members.Role", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<string>("MemberName")
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<int?>("RoleId")
-                        .HasColumnType("int");
 
                     b.Property<string>("RoleType")
                         .HasColumnType("nvarchar(max)");
@@ -431,17 +416,13 @@ namespace Workshop.Migrations
 
                     b.HasIndex("MemberName");
 
-                    b.HasIndex("RoleId");
-
                     b.ToTable("Role");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Notifications.Event", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<string>("Message")
                         .HasColumnType("nvarchar(max)");
@@ -460,9 +441,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Notifications.EventObservers", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int?>("EventId")
                         .HasColumnType("int");
@@ -482,9 +461,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Notifications.MemberNotifications", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<string>("MemberName")
                         .HasColumnType("nvarchar(450)");
@@ -504,9 +481,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Notifications.Notification", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int?>("MemberNotificationsId")
                         .HasColumnType("int");
@@ -530,9 +505,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Notifications.NotificationHandler", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -542,9 +515,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Orders.MemberToOrders<int>", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int?>("OrderHandler<int>Id")
                         .HasColumnType("int");
@@ -562,9 +533,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Orders.MemberToOrders<string>", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int?>("OrderHandler<string>Id")
                         .HasColumnType("int");
@@ -582,9 +551,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Orders.OrderDTO", b =>
                 {
                     b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int?>("MemberToOrders<int>Id")
                         .HasColumnType("int");
@@ -615,9 +582,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Orders.OrderHandler<int>", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -627,9 +592,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Orders.OrderHandler<string>", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -639,9 +602,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.ProductReviews", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -659,9 +620,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.ProductToReviewDTO", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -684,9 +643,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.ReviewDTO", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -708,9 +665,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.ReviewHandler", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -720,9 +675,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.UserReviews", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int?>("ReviewHandlerId")
                         .HasColumnType("int");
@@ -740,9 +693,7 @@ namespace Workshop.Migrations
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.UserToReviewDTO", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int?>("ProductReviewsId")
                         .HasColumnType("int");
@@ -893,15 +844,18 @@ namespace Workshop.Migrations
                         .HasForeignKey("UserControllerId");
                 });
 
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Members.NameToRole", b =>
+                {
+                    b.HasOne("Workshop.DataLayer.DataObjects.Members.Role", "role")
+                        .WithMany("nominees")
+                        .HasForeignKey("roleId");
+                });
+
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Members.Role", b =>
                 {
                     b.HasOne("Workshop.DataLayer.DataObjects.Members.Member", null)
                         .WithMany("Roles")
                         .HasForeignKey("MemberName");
-
-                    b.HasOne("Workshop.DataLayer.DataObjects.Members.Role", null)
-                        .WithMany("nominees")
-                        .HasForeignKey("RoleId");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Notifications.EventObservers", b =>

@@ -10,6 +10,7 @@ namespace Workshop.DataLayer.DataObjects.Market.Purchases
 {
     public class PurchasePolicy : DALObject
     {
+        private static int nextId = 0;
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
@@ -20,6 +21,8 @@ namespace Workshop.DataLayer.DataObjects.Market.Purchases
 
         public PurchasePolicy()
         {
+            this.Id = nextId;
+            nextId++;
         }
 
         public PurchasePolicy(List<Term> products_terms, List<Term> category_terms, Term user_terms, Term store_terms)
@@ -28,6 +31,8 @@ namespace Workshop.DataLayer.DataObjects.Market.Purchases
             this.category_terms = category_terms;
             this.user_terms = user_terms;
             this.store_terms = store_terms;
+            this.Id = nextId;
+            nextId++;
         }
     }
 }

@@ -10,6 +10,8 @@ namespace Workshop.DataLayer.DataObjects.Orders
 {
     public class OrderHandler<T>: DALObject
     {
+        private static int nextId = 0;
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
@@ -18,11 +20,15 @@ namespace Workshop.DataLayer.DataObjects.Orders
 
         public OrderHandler()
         {
+            this.Id = nextId;
+            nextId++;
         }
 
         public OrderHandler(List<MemberToOrders<T>> memberToOrders)
         {
             MemberToOrders = memberToOrders;
+            this.Id = nextId;
+            nextId++;
         }
     }
 }

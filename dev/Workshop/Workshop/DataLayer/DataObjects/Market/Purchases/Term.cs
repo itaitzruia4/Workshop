@@ -10,6 +10,7 @@ namespace Workshop.DataLayer.DataObjects.Market.Purchases
 {
     public class Term
     {
+        private static int nextId = 0;
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
@@ -17,11 +18,15 @@ namespace Workshop.DataLayer.DataObjects.Market.Purchases
 
         public Term()
         {
+            this.Id = nextId;
+            nextId++;
         }
 
         public Term(string TermJson)
         {
             this.TermJson = TermJson;
+            this.Id = nextId;
+            nextId++;
         }
     }
 }

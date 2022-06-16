@@ -10,6 +10,7 @@ namespace Workshop.DataLayer.DataObjects.Market.Discounts
 {
     public class CompositeDiscount
     {
+        private static int nextId = 0;
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }

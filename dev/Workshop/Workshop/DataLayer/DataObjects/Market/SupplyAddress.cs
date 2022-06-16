@@ -10,6 +10,7 @@ namespace Workshop.DataLayer.DataObjects.Market
 {
     public class SupplyAddress: DALObject
     {
+        private static int nextId = 0;
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
@@ -21,6 +22,8 @@ namespace Workshop.DataLayer.DataObjects.Market
 
         public SupplyAddress()
         {
+            this.Id = nextId;
+            nextId++;
         }
 
         public SupplyAddress(string name, string address, string city, string country, string zip)
@@ -30,6 +33,8 @@ namespace Workshop.DataLayer.DataObjects.Market
             City = city;
             Country = country;
             Zip = zip;
+            this.Id = nextId;
+            nextId++;
         }
     }
 }

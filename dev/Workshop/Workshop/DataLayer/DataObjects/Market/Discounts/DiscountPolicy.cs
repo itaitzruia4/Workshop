@@ -10,6 +10,7 @@ namespace Workshop.DataLayer.DataObjects.Market.Discounts
 {
     public class DiscountPolicy: DALObject
     {
+        private static int nextId = 0;
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
@@ -19,6 +20,8 @@ namespace Workshop.DataLayer.DataObjects.Market.Discounts
 
         public DiscountPolicy()
         {
+            this.Id = nextId;
+            nextId++;
         }
 
         public DiscountPolicy(List<Discount> products_discounts, List<Discount> category_discounts, Discount store_discount)
@@ -26,6 +29,8 @@ namespace Workshop.DataLayer.DataObjects.Market.Discounts
             this.products_discounts = products_discounts;
             this.category_discounts = category_discounts;
             this.store_discount = store_discount;
+            this.Id = nextId;
+            nextId++;
         }
     }
 }

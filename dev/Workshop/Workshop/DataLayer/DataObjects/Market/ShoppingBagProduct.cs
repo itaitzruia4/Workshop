@@ -10,6 +10,7 @@ namespace Workshop.DataLayer.DataObjects.Market
 {
     public class ShoppingBagProduct : DALObject
     {
+        private static int nextId = 0;
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
@@ -21,6 +22,8 @@ namespace Workshop.DataLayer.DataObjects.Market
 
         public ShoppingBagProduct()
         {
+            this.Id = nextId;
+            nextId++;
         }
 
         public ShoppingBagProduct(string name, double price, int quantity, string description, string category)
@@ -30,6 +33,8 @@ namespace Workshop.DataLayer.DataObjects.Market
             Quantity = quantity;
             Description = description;
             Category = category;
+            this.Id = nextId;
+            nextId++;
         }
     }
 }

@@ -12,6 +12,7 @@ namespace Workshop.DataLayer.DataObjects.Members
     public class Member : DALObject
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string MemberName { get; set; }
         public string Password { get; set; }
         public DateTime Birthdate { get; set; }
@@ -20,7 +21,8 @@ namespace Workshop.DataLayer.DataObjects.Members
 
         public Member()
         { 
-
+            Roles = new List<Role>();
+            ShoppingCart = new ShoppingCart();
         }
         public Member(string password, string memberName, DateTime birthdate, List<Role> roles, ShoppingCart shoppingCart)
         {

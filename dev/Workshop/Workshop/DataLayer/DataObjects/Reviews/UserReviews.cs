@@ -10,6 +10,8 @@ namespace Workshop.DataLayer.DataObjects.Reviews
 {
     public class UserReviews
     {
+        private static int nextId = 0;
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
@@ -18,12 +20,16 @@ namespace Workshop.DataLayer.DataObjects.Reviews
 
         public UserReviews()
         {
+            this.Id = nextId;
+            nextId++;
         }
 
         public UserReviews(string username, List<ProductToReviewDTO> productToReviewDTOs)
         {
             this.Username = username;
             this.productToReviewDTOs = productToReviewDTOs;
+            this.Id = nextId;
+            nextId++;
         }
     }
 }

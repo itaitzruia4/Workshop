@@ -10,6 +10,8 @@ namespace Workshop.DataLayer.DataObjects.Orders
 {
     public class MemberToOrders<T>
     {
+        private static int nextId = 0;
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
@@ -17,7 +19,10 @@ namespace Workshop.DataLayer.DataObjects.Orders
         public List<OrderDTO> orders { get; set; }
 
         public MemberToOrders()
-        { }
+        {
+            this.Id = nextId;
+            nextId++;
+        }
 
     }
 }

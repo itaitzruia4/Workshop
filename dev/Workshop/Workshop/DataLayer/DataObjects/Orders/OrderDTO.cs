@@ -11,6 +11,8 @@ namespace Workshop.DataLayer.DataObjects.Orders
 {
     public class OrderDTO: DALObject
     {
+        private static int nextId = 0;
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int id { get; set; }
@@ -21,6 +23,8 @@ namespace Workshop.DataLayer.DataObjects.Orders
 
         public OrderDTO()
         {
+            this.id = nextId;
+            nextId++;
         }
 
         public OrderDTO(int id, string clientName, SupplyAddress address, string storeName, List<ProductDTO> items)

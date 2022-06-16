@@ -13,6 +13,7 @@ namespace Workshop.DataLayer.DataObjects.Market
 {
     public class Store : DALObject
     {
+        private static int nextId = 0;
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
@@ -23,7 +24,10 @@ namespace Workshop.DataLayer.DataObjects.Market
         public List<Product> Products { get; set; }
 
         public Store()
-        { }
+        {
+            this.Id = nextId;
+            nextId++;
+        }
         public Store(int id, bool open, string storeName, DiscountPolicy discountPolicy, PurchasePolicy purchasePolicy, List<Product> products)
         {
             Id = id;
@@ -32,6 +36,8 @@ namespace Workshop.DataLayer.DataObjects.Market
             DiscountPolicy = discountPolicy;
             PurchasePolicy = purchasePolicy;
             Products = products;
+            this.Id = nextId;
+            nextId++;
         }
     }
 }
