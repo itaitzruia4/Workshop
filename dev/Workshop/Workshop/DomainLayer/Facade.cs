@@ -222,5 +222,10 @@ namespace Workshop.DomainLayer
         {
             return MarketController.GetCartPrice(shoppingCart);
         }
+
+        internal void RejectStoreOwnerNomination(int userId, string nominatorUsername, string nominatedUsername, int storeId)
+        {
+            MarketController.RejectStoreOwnerNomination(userId, nominatorUsername, nominatedUsername, storeId);
+        }
     }
 }

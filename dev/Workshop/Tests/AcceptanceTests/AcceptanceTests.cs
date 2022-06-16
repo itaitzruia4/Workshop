@@ -2449,5 +2449,43 @@ namespace Tests.AcceptanceTests
             Assert.AreEqual(680.0, service.GetDailyIncomeStore(1, member, store.StoreId).Value);
         }
 
+        [TestMethod]
+        public void Test_RejectStoreOwnerNomination_Success()
+        {
+            Test_Login_Good(1, "mem1", "pass1");
+            Store st = service.CreateNewStore(1, "mem1", "s1").Value;
+            Test_Login_Good(2, "mem2", "pass2");
+            Test_Login_Good(3, "mem3", "pass3");
+            Assert.IsFalse(service.NominateStoreOwner(1, "mem1", "mem2", st.StoreId).ErrorOccured);
+            Assert.IsFalse(service.NominateStoreOwner(1, "mem1", "mem3", st.StoreId).ErrorOccured);
+            Assert.IsFalse(service.RejectStoreOwnerNomination(2, "mem2", "mem3", st.StoreId).ErrorOccured);
+            Assert.AreEqual(0, service.GetMemberPermissions(3, "mem3").Value.Count);
+            Assert.IsFalse(service.NominateStoreOwner(1, "mem1", "mem3", st.StoreId).ErrorOccured);
+            Assert.IsFalse(service.NominateStoreOwner(2, "mem2", "mem3", st.StoreId).ErrorOccured);
+            Assert.AreEqual(1, service.GetMemberPermissions(3, "mem3").Value.Count);
+        }
+
+        [TestMethod]
+        public void Test_RejectStoreOwnerNomination_Failure_NotVotingOn()
+        {
+            Test_Login_Good(1, "mem1", "pass1");
+            Store st = service.CreateNewStore(1, "mem1", "s1").Value;
+            Test_Login_Good(2, "mem2", "pass2");
+            Test_Login_Good(3, "mem3", "pass3");
+            Assert.IsFalse(service.NominateStoreOwner(1, "mem1", "mem2", st.StoreId).ErrorOccured);
+            Assert.IsTrue(service.RejectStoreOwnerNomination(2, "mem2", "mem3", st.StoreId).ErrorOccured);
+            Assert.AreEqual(0, service.GetMemberPermissions(3, "mem3").Value.Count);
+        }
+
+        [TestMethod]
+        public void Test_RejectStoreOwnerNomination_Failure_NotStoreOwner()
+        {
+            Test_Login_Good(1, "mem1", "pass1");
+            Store st = service.CreateNewStore(1, "mem1", "s1").Value;
+            Test_Login_Good(2, "mem2", "pass2");
+            Test_Login_Good(3, "mem3", "pass3");
+            Assert.IsTrue(service.RejectStoreOwnerNomination(2, "mem2", "mem3", st.StoreId).ErrorOccured);
+            Assert.AreEqual(0, service.GetMemberPermissions(3, "mem3").Value.Count);
+        }
     }
 }

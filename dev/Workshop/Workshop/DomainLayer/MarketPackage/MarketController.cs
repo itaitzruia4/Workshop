@@ -52,18 +52,10 @@ namespace Workshop.DomainLayer.MarketPackage
         public StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId)
         {
             Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} is trying to nominate {nominatedUsername} to be a store owner of store {storeId}");
-            try
-            {
-                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
-            }
-            catch
-            {
-                throw new ArgumentException($"Store ID does not exist: {storeId}");
-            }
-
             Store store;
             try
             {
+                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
                 store = stores[storeId];
             }
             catch
@@ -74,7 +66,7 @@ namespace Workshop.DomainLayer.MarketPackage
             userController.AssertCurrentUser(userId, nominatorUsername);
             Member nominator = userController.GetMember(nominatorUsername), nominated = userController.GetMember(nominatedUsername);
 
-            if (!nominator.IsAuthorized(storeId, Action.NominateStoreOwner))
+            if (!nominator.GetStoreRoles(storeId).Any(x => x is StoreOwner))
                 throw new MemberAccessException($"Member {nominatorUsername} is not allowed to nominate owners in store #{storeId}.");
 
             if (nominatorUsername.Equals(nominatedUsername))
@@ -103,6 +95,28 @@ namespace Workshop.DomainLayer.MarketPackage
                 return newRole;
             }
             return null;
+        }
+
+        public void RejectStoreOwnerNomination(int userId, string nominatorUsername, string nominatedUsername, int storeId)
+        {
+            Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} is trying to reject the nomination of {nominatedUsername} to be a store owner of store {storeId}");
+            Store store;
+            try
+            {
+                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
+                store = stores[storeId];
+            }
+            catch
+            {
+                throw new ArgumentException($"Store ID does not exist: {storeId}");
+            }
+
+            userController.AssertCurrentUser(userId, nominatorUsername);
+            Member nominator = userController.GetMember(nominatorUsername), nominated = userController.GetMember(nominatedUsername);
+
+            store.RejectStoreOwnerNomination(nominator, nominated);
+
+            storesLocks[storeId].ReleaseReaderLock();
         }
 
         public StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId)

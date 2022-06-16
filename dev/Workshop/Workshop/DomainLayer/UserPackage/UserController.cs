@@ -614,7 +614,7 @@ namespace Workshop.DomainLayer.UserPackage
             {
                 member = (Member)GetUser(userId);
             }
-            catch (Exception ex)
+            catch
             {
                 throw new ArgumentException("SANITY CHECK: GETMEMBERPERMISSIONS");
             }

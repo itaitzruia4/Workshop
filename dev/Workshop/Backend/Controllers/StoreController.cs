@@ -71,6 +71,17 @@ namespace API.Controllers
             return Ok(new FrontResponse<StoreOwner>(response.Value));
         }
 
+        [HttpPost("rejectownernomination")]
+        public ActionResult<FrontResponse<int>> RejectStoreOwnerNomination([FromBody] NominationRequest request)
+        {
+            Response response = Service.RejectStoreOwnerNomination(request.UserId, request.Membername, request.Nominee, request.StoreId);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<int>(response.ErrorMessage));
+            }
+            return Ok(new FrontResponse<int>(response.UserId));
+        }
+
         [HttpPost("removeownernomination")]
         public ActionResult<FrontResponse<Member>> RemoveStoreOwnerNomination([FromBody] NominationRequest request)
         {

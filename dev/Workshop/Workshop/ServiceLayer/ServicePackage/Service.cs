@@ -212,6 +212,10 @@ namespace Workshop.ServiceLayer
                                     if (actualParams.Length != 2) { throw new ArgumentException(); }
                                     facade.GetMemberPermissions(int.Parse(actualParams[0]), actualParams[1]);
                                     break;
+                                case "reject-store-owner-nomination":
+                                    if (actualParams.Length != 4) { throw new ArgumentException(); }
+                                    facade.RejectStoreOwnerNomination(int.Parse(actualParams[0]), actualParams[1], actualParams[2], int.Parse(actualParams[3]));
+                                    break;
                                 default:
                                     throw new ArgumentException();
                             }
@@ -240,7 +244,7 @@ namespace Workshop.ServiceLayer
                     case "admin":
                         if (parts.Length != 4) throw new ArgumentException($"admin is not in the correct format: {entry}");
                         try { systemManagers.Add(new SystemAdminDTO(parts[1], parts[2], parts[3])); }
-                        catch (Exception _)
+                        catch
                         {
                             throw new ArgumentException($"admin is not in the correct format: {entry}");
                         }
@@ -350,6 +354,19 @@ namespace Workshop.ServiceLayer
                 DomainStoreOwner domainOwner = facade.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId);
                 StoreOwner serviceOwner = domainOwner == null ? null : new StoreOwner(domainOwner);
                 return new Response<StoreOwner>(serviceOwner, userId);
+            }
+            catch (Exception e)
+            {
+                return new Response<StoreOwner>(e.Message, userId);
+            }
+        }
+
+        public Response RejectStoreOwnerNomination(int userId, string nominatorUsername, string nominatedUsername, int storeId)
+        {
+            try
+            {
+                facade.RejectStoreOwnerNomination(userId, nominatorUsername, nominatedUsername, storeId);
+                return new Response(userId);
             }
             catch (Exception e)
             {

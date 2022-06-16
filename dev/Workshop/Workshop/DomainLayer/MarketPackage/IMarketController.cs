@@ -72,5 +72,6 @@ namespace Workshop.DomainLayer.MarketPackage
         double GetDailyIncomeStoreOwner(int userId, string username, int storeId);
         double GetDailyIncomeMarketManager(int userId, string username);
         double GetCartPrice(ShoppingCartDTO shoppingCart);
+        void RejectStoreOwnerNomination(int userId, string nominatorUsername, string nominatedUsername, int storeId);
     }
 }

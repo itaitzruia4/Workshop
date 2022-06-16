@@ -27,7 +27,7 @@ namespace Workshop.ServiceLayer
         Response<StoreManager> NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId);
 
         Response<StoreOwner> NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId);
-
+        Response RejectStoreOwnerNomination(int userId, string nominatorUsername, string nominatedUsername, int storeId);
         Response<Member> RemoveStoreOwnerNomination(int userId, string nominatorMembername, string nominatedMembername, int storeId);
 
         Response<List<Member>> GetWorkersInformation(int userId, string username, int storeId);
