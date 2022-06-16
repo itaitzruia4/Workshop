@@ -2281,5 +2281,60 @@ namespace Tests.AcceptanceTests
             Response<Member> resp4 = service.RemoveStoreOwnerNomination(1, "mem", "mem2", st.StoreId);
             Assert.IsFalse(resp4.ErrorOccured);
         }
+
+        [TestMethod]
+        public void Test_DailyIncomeMarketManager_Success()
+        {
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
+            Test_Login_Good(1, "mem1", "pass1");
+            Test_Login_Good(2, "admin", "admin");
+            Store st = service.CreateNewStore(1, "mem1", "s1").Value;
+            Product p = service.AddProduct(1, "mem1", st.StoreId, "p1", "d1", 100.0, 5, "cat1").Value;
+            service.AddToCart(1, p.Id, st.StoreId, 3);
+            service.BuyCart(1, cc, address, DateTime.Now);
+            service.AddToCart(1, p.Id, st.StoreId, 1);
+            service.BuyCart(1, cc, address, DateTime.Parse("Aug 22, 1972"));
+            Assert.AreEqual(300.0, service.GetDailyIncomeMarketManager(2, "admin").Value);
+        }
+
+        [TestMethod]
+        public void Test_DailyIncomeMarketManager_MultipleStores()
+        {
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
+            Test_Login_Good(1, "mem1", "pass1");
+            Test_Login_Good(2, "admin", "admin");
+            Test_Login_Good(3, "mem2", "pass2");
+
+            Store st1 = service.CreateNewStore(1, "mem1", "s1").Value;
+            Product p1 = service.AddProduct(1, "mem1", st1.StoreId, "p1", "d1", 100.0, 5, "cat1").Value;
+
+            Store st2 = service.CreateNewStore(3, "mem2", "s2").Value;
+            Product p2 = service.AddProduct(3, "mem2", st2.StoreId, "p2", "d2", 50.0, 5, "cat2").Value;
+
+            Assert.IsFalse(service.AddToCart(1, p1.Id, st1.StoreId, 3).ErrorOccured);
+            Assert.IsFalse(service.AddToCart(1, p2.Id, st2.StoreId, 1).ErrorOccured);
+            Assert.IsFalse(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
+
+            Assert.IsFalse(service.AddToCart(1, p1.Id, st1.StoreId, 1).ErrorOccured);
+            Assert.IsFalse(service.AddToCart(1, p2.Id, st2.StoreId, 1).ErrorOccured);
+            Assert.IsFalse(service.BuyCart(1, cc, address, DateTime.Parse("Aug 22, 1972")).ErrorOccured);
+
+            Assert.AreEqual(350.0, service.GetDailyIncomeMarketManager(2, "admin").Value);
+        }
+
+        [TestMethod]
+        public void Test_DailyIncomeMarketManager_Failure_NoPermission()
+        {
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
+            Test_Login_Good(1, "mem1", "pass1");
+            Test_Login_Good(2, "Ron", "Ron");
+            Store st = service.CreateNewStore(1, "mem1", "s1").Value;
+            Product p = service.AddProduct(1, "mem1", st.StoreId, "p1", "d1", 100.0, 5, "cat1").Value;
+            service.AddToCart(1, p.Id, st.StoreId, 3);
+            service.BuyCart(1, cc, address, DateTime.Now);
+            service.AddToCart(1, p.Id, st.StoreId, 1);
+            service.BuyCart(1, cc, address, DateTime.Parse("Aug 22, 1972"));
+            Assert.IsTrue(service.GetDailyIncomeMarketManager(2, "Ron").ErrorOccured);
+        }
     }
 }

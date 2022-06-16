@@ -746,11 +746,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<double> GetDaliyIncomeMarketManager(int userId, string username)
+        public Response<double> GetDailyIncomeMarketManager(int userId, string username)
         {
             try
             {
-                double res = facade.GetDaliyIncomeMarketManager(userId, username);
+                double res = facade.GetDailyIncomeMarketManager(userId, username);
                 return new Response<double>(res,userId);
             }
             catch (Exception e)
@@ -759,11 +759,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<double> GetDaliyIncomeStoreOwner(int userId, string username, int storeId)
+        public Response<double> GetDailyIncomeStore(int userId, string username, int storeId)
         {
             try
             {
-                double res = facade.GetDaliyIncomeStoreOwner(userId, username, storeId);
+                double res = facade.GetDailyIncomeStoreOwner(userId, username, storeId);
                 return new Response<double>(res, userId);
             }
             catch (Exception e)

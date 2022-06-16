@@ -170,7 +170,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             ShoppingBagProduct product2 = userController.AddToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);
             marketController.BuyCart(1, cc, address, DateTime.Now);
             //List <StoreRole> original_roles = new List<StoreRole>(userController.GetMember("coolStoreOwner").GetStoreRoles(storeId));
-            Assert.ThrowsException<ArgumentException>(() => marketController.GetDaliyIncomeMarketManager(userId, username));
+            Assert.ThrowsException<ArgumentException>(() => marketController.GetDailyIncomeMarketManager(userId, username));
         }
 
         [DataTestMethod]
@@ -185,7 +185,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             ShoppingBagProduct product2 = userController.AddToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);
             marketController.BuyCart(1, cc, address, DateTime.Now);
             //List <StoreRole> original_roles = new List<StoreRole>(userController.GetMember("coolStoreOwner").GetStoreRoles(storeId));
-            double res = marketController.GetDaliyIncomeMarketManager(userId, username);
+            double res = marketController.GetDailyIncomeMarketManager(userId, username);
             Assert.AreEqual(res, prod1.Price * 5);
         }
 
@@ -199,7 +199,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             Product prod1 = marketController.AddProductToStore(1, "member1", storeId, "someName", "someDesc", 10.0, 5, "cat1");
             ShoppingBagProduct product2 = userController.AddToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);
             marketController.BuyCart(1, cc, address, DateTime.Now);
-            Assert.ThrowsException<ArgumentException>(() => marketController.GetDaliyIncomeStoreOwner(userId, username, storeId));
+            Assert.ThrowsException<ArgumentException>(() => marketController.GetDailyIncomeStoreOwner(userId, username, storeId));
         }
 
         [DataTestMethod]
@@ -211,7 +211,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             ShoppingBagProduct product2 = userController.AddToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);
             marketController.BuyCart(1, cc, address, DateTime.Now);
             //List <StoreRole> original_roles = new List<StoreRole>(userController.GetMember("coolStoreOwner").GetStoreRoles(storeId));
-            double res = marketController.GetDaliyIncomeStoreOwner(userId, username, storeId);
+            double res = marketController.GetDailyIncomeStoreOwner(userId, username, storeId);
             Assert.AreEqual(res, prod1.Price * 5);
         }
     }

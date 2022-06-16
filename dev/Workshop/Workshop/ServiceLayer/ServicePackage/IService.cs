@@ -79,8 +79,8 @@ namespace Workshop.ServiceLayer
         Response AddActionToManager(int userId, string owner, string manager, int storeId, string action);
 
         Response CancelMember(int userId, string actingUsername, string canceledUsername);
-        Response<double> GetDaliyIncomeStoreOwner(int userId, string username, int storeId);
-        Response<double> GetDaliyIncomeMarketManager(int userId, string username);
+        Response<double> GetDailyIncomeStore(int userId, string username, int storeId);
+        Response<double> GetDailyIncomeMarketManager(int userId, string username);
         Response<Dictionary<Member, bool>> GetMembersOnlineStats(int userId, string actingUsername);
         Response<List<PermissionInformation>> GetMemberPermissions(int userId, string membername);
     }

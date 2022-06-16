@@ -203,14 +203,14 @@ namespace Workshop.DomainLayer
             UserController.CancelMember(userId, actingUsername, canceledUsername);
         }
 
-        internal double GetDaliyIncomeMarketManager(int userId, string username)
+        internal double GetDailyIncomeMarketManager(int userId, string username)
         {
-            return MarketController.GetDaliyIncomeMarketManager(userId, username);
+            return MarketController.GetDailyIncomeMarketManager(userId, username);
         }
 
-        internal double GetDaliyIncomeStoreOwner(int userId, string username, int storeId)
+        internal double GetDailyIncomeStoreOwner(int userId, string username, int storeId)
         {
-            return MarketController.GetDaliyIncomeStoreOwner(userId, username, storeId);
+            return MarketController.GetDailyIncomeStoreOwner(userId, username, storeId);
         }
 
         internal List<ServiceLayer.ServiceObjects.PermissionInformation> GetMemberPermissions(int userId, string membername)
