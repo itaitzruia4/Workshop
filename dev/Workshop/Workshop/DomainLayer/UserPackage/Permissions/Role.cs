@@ -18,8 +18,37 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         public Role() 
         {
             actions = new HashSet<Action>();
-            roleDAL = new RoleDAL(-1, new List<ActionDAL>(), "");
+            roleDAL = new RoleDAL(-1, new List<ActionDAL>(), "Role");
         }
+
+        public Role(RoleDAL roleDAL)
+        {
+            actions = new HashSet<Action>();
+            this.roleDAL = roleDAL;
+            foreach (ActionDAL action in roleDAL.Actions)
+                actions.Add((Action)action.ActionType);
+        }
+
+        public static Role createRole(RoleDAL roleDAL)
+        {
+            switch (roleDAL.RoleType)
+            {
+                case "MarketManager":
+                    return new MarketManager(roleDAL);
+                case "StoreFounder":
+                    return new StoreFounder(roleDAL);
+                case "StoreManager":
+                    return new StoreManager(roleDAL);
+                case "StoreOwner":
+                    return new StoreOwner(roleDAL);
+                case "StoreRole":
+                case "Role":
+                    throw new ArgumentException("Can't reate such role");
+                default:
+                    throw new ArgumentException("No such role type");
+            }
+        }
+
 
         public virtual RoleDAL ToDAL()
         {
@@ -58,7 +87,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             ActionDAL toRemove = null;
             foreach(ActionDAL actionDAL in roleDAL.Actions) 
             {
-                if (actionDAL.Id == (int)action)
+                if (actionDAL.ActionType == (int)action)
                 {
                     toRemove = actionDAL;
                     break;

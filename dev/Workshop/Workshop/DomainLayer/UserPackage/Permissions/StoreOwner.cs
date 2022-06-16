@@ -9,6 +9,7 @@ using static Workshop.DomainLayer.UserPackage.Permissions.Role;
 using StoreOwnerDAl = Workshop.DataLayer.DataObjects.Members.Role;
 using ActionDAL = Workshop.DataLayer.DataObjects.Members.Action;
 using DataHandler = Workshop.DataLayer.DataHandler;
+using RoleDAL = Workshop.DataLayer.DataObjects.Members.Role;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
@@ -36,8 +37,11 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             foreach(var action in actions)
                 roleDAL.Actions.Add(new ActionDAL((int)action));
 
-            DataHandler.getDBHandler().update(roleDAL);
+            DataHandler.getDBHandler().save(roleDAL);
         }
+
+        public StoreOwner(RoleDAL roleDAL) : base(roleDAL)
+        { }
 
         public override StoreOwnerDAl ToDAL()
         {

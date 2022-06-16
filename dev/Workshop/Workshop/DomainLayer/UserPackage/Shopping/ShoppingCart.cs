@@ -5,11 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.MarketPackage;
 using Workshop.DomainLayer.UserPackage.Shopping;
-using ShoppingCartDAL = Workshop.DataLayer.DataObjects.Market.ShoppingCart;
-using DALObject = Workshop.DataLayer.DALObject;
-using ShoppingBagDAL = Workshop.DataLayer.DataObjects.Market.ShoppingBag;
-using DataHandler = Workshop.DataLayer.DataHandler;
-using ShoppingBagProductDAL = Workshop.DataLayer.DataObjects.Market.ShoppingBagProduct;
 
 namespace Workshop.DomainLayer.UserPackage.Shopping
 {

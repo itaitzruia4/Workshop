@@ -19,7 +19,7 @@ namespace Workshop.DomainLayer.UserPackage
 
         public ShoppingBagProduct addToCart(ShoppingBagProduct product, int storeId)
         {
-            return this.shoppingCart.addToCart(product,storeId);
+            return shoppingCart.addToCart(product,storeId);
         }
         internal ShoppingCartDTO viewShopingCart()
         {

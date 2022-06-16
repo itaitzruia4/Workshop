@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,11 +10,13 @@ namespace Workshop.DataLayer.DataObjects.Members
 {
     public class Role : DALObject
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
         public List<Action> Actions { get; set; }
         public string RoleType { get; set; }
         public int StoreId { get; set; }
-        public List<Role> nominees { get; set; }
+        public List<NameToRole> nominees { get; set; }
 
         public Role()
         { }
@@ -27,7 +31,7 @@ namespace Workshop.DataLayer.DataObjects.Members
         }
 
         // Consructor for non-store role
-        public Role(int StoreId, List<Action> actions, string RoleType, List<Role> nominees)
+        public Role(int StoreId, List<Action> actions, string RoleType, List<NameToRole> nominees)
         {
             this.StoreId=StoreId;
             this.Actions = actions;

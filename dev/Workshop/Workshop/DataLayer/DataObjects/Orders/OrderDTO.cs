@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +11,8 @@ namespace Workshop.DataLayer.DataObjects.Orders
 {
     public class OrderDTO: DALObject
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int id { get; set; }
         public string clientName { get; set; }
         public SupplyAddress address { get; set; }

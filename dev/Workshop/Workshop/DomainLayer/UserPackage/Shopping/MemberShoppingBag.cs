@@ -19,6 +19,7 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
         public MemberShoppingBag(int storeId) : base(storeId)
         {
             shoppingBagDAL = new ShoppingBagDAL(storeId, new List<ShoppingBagProductDAL>());
+            DataHandler.getDBHandler().save(shoppingBagDAL);
         }
 
         public MemberShoppingBag(ShoppingBagDAL shoppingBagDAL)

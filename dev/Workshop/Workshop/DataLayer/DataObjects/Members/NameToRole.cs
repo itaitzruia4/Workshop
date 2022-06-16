@@ -6,20 +6,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Workshop.DataLayer.DataObjects.Market.Discounts
+namespace Workshop.DataLayer.DataObjects.Members
 {
-    public class Discount : DALObject
+    public class NameToRole
     {
+        public NameToRole()
+        {
+        }
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
-        public string discountJson { get; set; }
-        public Discount()
-        { }
+        public Role role { get; set; }
+        public string memberName { get; set; }
 
-        public Discount(string discountJson)
+        public NameToRole(Role role, string memberName)
         {
-            this.discountJson = discountJson;
+            this.role = role;
+            this.memberName = memberName;
         }
     }
 }

@@ -12,7 +12,6 @@ namespace Workshop.DataLayer.DataObjects.Members
     public class Member : DALObject
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string MemberName { get; set; }
         public string Password { get; set; }
         public DateTime Birthdate { get; set; }

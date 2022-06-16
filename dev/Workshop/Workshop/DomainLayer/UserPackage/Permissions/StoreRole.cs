@@ -7,20 +7,33 @@ using Workshop.DomainLayer.MarketPackage;
 using DALObject = Workshop.DataLayer.DALObject;
 using ActionDAL = Workshop.DataLayer.DataObjects.Members.Action;
 using StoreRoleDAL = Workshop.DataLayer.DataObjects.Members.Role;
+using NameToRole = Workshop.DataLayer.DataObjects.Members.NameToRole;
+using Workshop.DataLayer;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
 
-    public class StoreRole : Role
+    public abstract class StoreRole : Role
     {
         public int StoreId { get; }
         public Dictionary<string, StoreRole> nominees { get; }
 
         public StoreRole(int storeId): base()
         {
-            this.StoreId = storeId;
-            this.nominees = new Dictionary<string, StoreRole>();
-            this.roleDAL.StoreId = storeId;
+            StoreId = storeId;
+            nominees = new Dictionary<string, StoreRole>();
+            roleDAL.StoreId = storeId;
+        }
+
+        public StoreRole(StoreRoleDAL storeRoleDAL) : base(storeRoleDAL)
+        {
+            StoreId = storeRoleDAL.StoreId;
+            nominees = new Dictionary<string, StoreRole>();
+
+            foreach(NameToRole ntr in storeRoleDAL.nominees)
+            {
+                nominees[ntr.memberName] = (StoreRole)createRole(ntr.role);
+            }
         }
 
         public Dictionary<string, StoreRole> GetAllNominees()
@@ -43,7 +56,8 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
 
         public void AddNominee(string membername, StoreRole nominee)
         {
-            this.nominees.Add(membername, nominee);
+            nominees.Add(membername, nominee);
+            roleDAL.nominees.Add(new NameToRole(nominee.ToDAL(), membername));
         }
 
         public void RemoveNominee(StoreRole nominee)
@@ -59,7 +73,8 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             }
             if (key_to_remove != null)
             {
-                this.nominees.Remove(key_to_remove);
+                nominees.Remove(key_to_remove);
+                
             }
         }
 

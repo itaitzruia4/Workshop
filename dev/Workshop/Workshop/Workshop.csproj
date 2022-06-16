@@ -297,11 +297,13 @@
     <Compile Include="DataLayer\DataObjects\Reviews\ReviewHandler.cs" />
     <Compile Include="DataLayer\DataObjects\Reviews\UserReviews.cs" />
     <Compile Include="DataLayer\DataObjects\Reviews\UserToReviewDTO.cs" />
-    <Compile Include="DataLayer\DataObjects\Role.cs" />
+    <Compile Include="DataLayer\DataObjects\Members\NameToRole.cs" />
     <Compile Include="DataLayer\Test.cs" />
     <Compile Include="DomainLayer\IPersistentObject.cs" />
     <Compile Include="DomainLayer\MarketPackage\CreditCard.cs" />
     <Compile Include="DomainLayer\MarketPackage\SupplyAddress.cs" />
+    <Compile Include="DomainLayer\UserPackage\Shopping\MemberShoppingBag.cs" />
+    <Compile Include="DomainLayer\UserPackage\Shopping\MemberShoppingCart.cs" />
     <Compile Include="Migrations\20220607094126_Initial2.cs" />
     <Compile Include="Migrations\20220607094126_Initial2.designer.cs">
       <DependentUpon>20220607094126_Initial2.cs</DependentUpon>

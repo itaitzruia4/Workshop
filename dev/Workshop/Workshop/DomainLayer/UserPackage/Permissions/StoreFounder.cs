@@ -7,6 +7,8 @@ using Workshop.DataLayer;
 using StoreOwnerDAl = Workshop.DataLayer.DataObjects.Members.Role;
 using ActionDAL = Workshop.DataLayer.DataObjects.Members.Action;
 using DataHandler = Workshop.DataLayer.DataHandler;
+using RoleDAL = Workshop.DataLayer.DataObjects.Members.Role;
+
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
@@ -22,6 +24,9 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
 
             DataHandler.getDBHandler().update(roleDAL);
         }
+
+        public StoreFounder(RoleDAL roleDAL) : base(roleDAL)
+        {}
 
         public override StoreOwnerDAl ToDAL()
         {

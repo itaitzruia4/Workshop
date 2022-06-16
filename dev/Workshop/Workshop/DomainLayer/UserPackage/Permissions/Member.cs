@@ -40,6 +40,20 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             DataHandler.getDBHandler().save(memberDAL);
         }
 
+        public Member(MemberDAL memberDAL)
+        {
+            this.memberDAL = memberDAL;
+            Username = memberDAL.MemberName;
+            Password = memberDAL.Password;
+            Birthdate = memberDAL.Birthdate;
+            roles = new List<Role>();
+            foreach (RoleDAL role in memberDAL.Roles)
+                roles.Add(Role.createRole(role));
+            this.rwl = new ReaderWriterLock();
+            shoppingCart = new MemberShoppingCart(memberDAL.ShoppingCart);
+        }
+
+
         public MemberDAL ToDAL()
         {
             return memberDAL;

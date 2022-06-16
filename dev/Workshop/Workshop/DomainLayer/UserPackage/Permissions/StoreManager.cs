@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DataHandler = Workshop.DataLayer.DataHandler;
+using RoleDAL = Workshop.DataLayer.DataObjects.Members.Role;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
@@ -13,7 +14,11 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         {
             roleDAL.RoleType = "StoreManager";
 
-            DataHandler.getDBHandler().update(roleDAL);
+            DataHandler.getDBHandler().save(roleDAL);
         }
+
+        public StoreManager(RoleDAL roleDAL) : base(roleDAL)
+        { }
+
     }
 }
