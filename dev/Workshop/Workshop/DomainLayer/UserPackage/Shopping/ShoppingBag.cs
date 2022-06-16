@@ -12,38 +12,24 @@ using DataHandler = Workshop.DataLayer.DataHandler;
 
 namespace Workshop.DomainLayer.UserPackage.Shopping
 {
-    public class ShoppingBag : IPersistentObject<ShoppingBagDAL>
+    public class ShoppingBag
     {
-        private int storeId;
-        private Dictionary<int, ShoppingBagProduct> products;
-        private ShoppingBagDAL shoppingBagDAL;
+        protected int storeId;
+        protected Dictionary<int, ShoppingBagProduct> products;
+
+        protected ShoppingBag(){}
 
         public ShoppingBag(int storeId)
         {
             this.storeId = storeId;
             products = new Dictionary<int,ShoppingBagProduct>();
-            shoppingBagDAL = new ShoppingBagDAL(storeId, new List<ShoppingBagProductDAL>());
         }
 
-        public ShoppingBag(ShoppingBagDAL shoppingBagDAL)
-        {
-            this.storeId = shoppingBagDAL.StoreId;
-            products = new Dictionary<int, ShoppingBagProduct>(); //TODO: futher implement
-            this.shoppingBagDAL = shoppingBagDAL;
-        }
-
-        public ShoppingBagDAL ToDAL()
-        {
-            return shoppingBagDAL;
-        }
-
-        public ShoppingBagProduct addToBag(ShoppingBagProduct product)
+        public virtual ShoppingBagProduct addToBag(ShoppingBagProduct product)
         {
             if (!products.ContainsKey(product.Id))
             {
                 products.Add(product.Id, product);
-                shoppingBagDAL.Products.Add(product.ToDAL());
-                DataHandler.getDBHandler().update(shoppingBagDAL);
             }
             else 
                 changeQuantity(product.Id, products[product.Id].Quantity + product.Quantity);
@@ -64,14 +50,12 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
         {
             return products.ContainsKey(ProductId);
         }
-        internal void deleteProduct(int productId)
+        internal virtual void deleteProduct(int productId)
         {
-            shoppingBagDAL.Products.Remove(products[productId].ToDAL());
-            DataHandler.getDBHandler().remove(products[productId].ToDAL());
+            //DataHandler.getDBHandler().remove(products[productId].ToDAL());
             products.Remove(productId);
-            DataHandler.getDBHandler().update(shoppingBagDAL);
         }
-        internal void changeQuantity(int productId,int newQuantity)
+        internal virtual void changeQuantity(int productId,int newQuantity)
         {
             products[productId].Quantity = newQuantity;
         }

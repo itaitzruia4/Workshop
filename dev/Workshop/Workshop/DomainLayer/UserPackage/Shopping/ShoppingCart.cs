@@ -13,45 +13,26 @@ using ShoppingBagProductDAL = Workshop.DataLayer.DataObjects.Market.ShoppingBagP
 
 namespace Workshop.DomainLayer.UserPackage.Shopping
 {
-    public class ShoppingCart : IPersistentObject<ShoppingCartDAL>
+    public class ShoppingCart
     {
-        private Dictionary<int,ShoppingBag> shoppingBags { get; set; }
-        ShoppingCartDAL shoppingCartDAL;
+        protected Dictionary<int,ShoppingBag> shoppingBags { get; set; }
 
         public ShoppingCart()
         {
-            this.shoppingBags = new Dictionary<int,ShoppingBag>();
-            shoppingCartDAL = new ShoppingCartDAL(new List<ShoppingBagDAL>());
-            DataHandler.getDBHandler().save(shoppingCartDAL);
+            shoppingBags = new Dictionary<int,ShoppingBag>();
         }
 
-        public ShoppingCart(ShoppingCartDAL shoppingCartDAL)
-        {
-            shoppingBags = new Dictionary<int, ShoppingBag>();
-            foreach(ShoppingBagDAL shoppingBagDAL in shoppingCartDAL.ShoppingBags)
-            {
-                shoppingBags.Add(shoppingBagDAL.StoreId, new ShoppingBag(shoppingBagDAL));
-            }
-            this.shoppingCartDAL = shoppingCartDAL;
-        }
-
-        public ShoppingCartDAL ToDAL()
-        {
-            return shoppingCartDAL;
-        }
-
-        public ShoppingBagProduct addToCart(ShoppingBagProduct product, int storeId)
+        public virtual  ShoppingBagProduct addToCart(ShoppingBagProduct product, int storeId)
         {
             if(!checkIfStoreHasBag(storeId))
             {
                 shoppingBags.Add(storeId,new ShoppingBag(storeId));
-                shoppingCartDAL.ShoppingBags.Add(new ShoppingBagDAL(storeId, new List<ShoppingBagProductDAL>()));
             }
 
             ShoppingBagProduct productRet = shoppingBags[storeId].addToBag(product);
-            DataHandler.getDBHandler().update(shoppingCartDAL);
             return productRet;
         }
+
         public ShoppingCartDTO getShoppingCartDTO()
         {
             Dictionary<int,ShoppingBagDTO> shoppingBagsDTOs = new Dictionary<int, ShoppingBagDTO>();
@@ -78,18 +59,9 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
             return shoppingBags.ContainsKey(StoreId);
         }
 
-        internal void Clear()
+        internal virtual void Clear()
         {
             shoppingBags.Clear();
-            foreach(ShoppingBagDAL sbDAL in shoppingCartDAL.ShoppingBags)
-            {
-                foreach(ShoppingBagProductDAL sbpDAL in sbDAL.Products)
-                {
-                    DataHandler.getDBHandler().remove(sbpDAL);
-                }
-                DataHandler.getDBHandler().remove(sbDAL);
-            }
-            shoppingCartDAL.ShoppingBags = new List<ShoppingBagDAL>();
         }
 
         internal void deleteProduct(int productId, int bagNum)

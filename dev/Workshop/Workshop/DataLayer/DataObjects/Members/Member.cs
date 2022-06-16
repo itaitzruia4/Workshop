@@ -20,7 +20,9 @@ namespace Workshop.DataLayer.DataObjects.Members
         public ShoppingCart ShoppingCart { get; set; }
 
         public Member()
-        { }
+        { 
+
+        }
         public Member(string password, string memberName, DateTime birthdate, List<Role> roles, ShoppingCart shoppingCart)
         {
             Password = password;

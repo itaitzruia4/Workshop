@@ -26,6 +26,7 @@ namespace Workshop.DataLayer
         {
             
             optionsBuilder.UseSqlServer("Data Source = 34.107.89.228;Initial Catalog=WorkshopDB; Integrated Security = False; User Id = sqlserver; Password = workshop; Encrypt = True; TrustServerCertificate = True; MultipleActiveResultSets = True");
+            optionsBuilder.EnableSensitiveDataLogging();
         }
 
         public override EntityEntry<TEntity> Update<TEntity>(TEntity entity)

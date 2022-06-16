@@ -9,6 +9,7 @@ using DALObject = Workshop.DataLayer.DALObject;
 using RoleDAL = Workshop.DataLayer.DataObjects.Members.Role;
 using ShoppingCartDAL = Workshop.DataLayer.DataObjects.Market.ShoppingCart;
 using DataHandler = Workshop.DataLayer.DataHandler;
+using Workshop.DomainLayer.UserPackage.Shopping;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
@@ -33,8 +34,9 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             Birthdate = birthdate;
             roles = new List<Role>();
             this.rwl = new ReaderWriterLock();
+            shoppingCart = new MemberShoppingCart(shoppingCart);
 
-            memberDAL = new MemberDAL(password, username, birthdate, new List<RoleDAL>(), shoppingCart.ToDAL());
+            memberDAL = new MemberDAL(password, username, birthdate, new List<RoleDAL>(), ((MemberShoppingCart)shoppingCart).ToDAL());
             DataHandler.getDBHandler().save(memberDAL);
         }
 
