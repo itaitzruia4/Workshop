@@ -726,33 +726,43 @@ namespace Workshop.DomainLayer.MarketPackage
                     throw e;
                 }
             }
-            int pay_trans_id = ExternalSystem.Pay(cc.Card_number, cc.Month, cc.Year, cc.Holder, cc.Ccv, cc.Id);
-            if (pay_trans_id != -1)
+            if (ExternalSystem.IsExternalSystemOnline())
             {
-                int supply_trans_id = ExternalSystem.Supply(address.Name, address.Address, address.City, address.Country, address.Zip);
-                if (supply_trans_id != -1)
+                int pay_trans_id = ExternalSystem.Pay(cc.Card_number, cc.Month, cc.Year, cc.Holder, cc.Ccv, cc.Id);
+                if (pay_trans_id != -1)
                 {
-                    double cartPrice = GetCartPrice(shoppingCart);
-                    events.ForEach(e => userController.notify(e));
-
-                    foreach (int storeId in storeOrdersSoFar.Keys)
+                    int supply_trans_id = ExternalSystem.Supply(address.Name, address.Address, address.City, address.Country, address.Zip);
+                    if (supply_trans_id != -1)
                     {
-                        orderHandler.addOrder(storeOrdersSoFar[storeId], storeId);
-                    }
-                    foreach (string username in userOrdersSoFar.Keys) {
-                        userController.AddOrder(userId, userOrdersSoFar[username], username);
-                    }
+                        double cartPrice = GetCartPrice(shoppingCart);
+                        events.ForEach(e => userController.notify(e));
 
-                    userController.ClearUserCart(userId);
-                    Logger.Instance.LogEvent($"User {userId} successfuly paid {cartPrice} and purchased his cart.");
-                    return cartPrice;
-                }
-                else
-                {
-                    ExternalSystem.Cancel_Pay(pay_trans_id);
+                        foreach (int storeId in storeOrdersSoFar.Keys)
+                        {
+                            orderHandler.addOrder(storeOrdersSoFar[storeId], storeId);
+                        }
+                        foreach (string username in userOrdersSoFar.Keys)
+                        {
+                            userController.AddOrder(userId, userOrdersSoFar[username], username);
+                        }
+
+                        userController.ClearUserCart(userId);
+                        Logger.Instance.LogEvent($"User {userId} successfuly paid {cartPrice} and purchased his cart.");
+                        return cartPrice;
+                    }
+                    else
+                    {
+                        ExternalSystem.Cancel_Pay(pay_trans_id);
+                    }
                 }
             }
-            throw new ArgumentException("Buying cart failed");
+            foreach (int sid in productsSoFar.Keys)
+            {
+                storesLocks[sid].AcquireWriterLock(Timeout.Infinite);
+                productsSoFar[sid].ForEach(p => stores[sid].restoreProduct(p));
+                storesLocks[sid].ReleaseWriterLock();
+            }
+            throw new ArgumentException("Buying cart failed due to failures with the external system we're using!");
         }
     
 

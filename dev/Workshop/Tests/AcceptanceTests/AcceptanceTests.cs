@@ -2074,7 +2074,36 @@ namespace Tests.AcceptanceTests
             service.Register(2, "member2", "password2", DateTime.Now);
             service.Login(2, "member2", "password2");
             service.AddToCart(2, prod.Id, store.StoreId, 1);
-            Assert.IsTrue(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
+            Assert.IsTrue(service.BuyCart(2, cc, address, DateTime.Now).ErrorOccured);
+            Assert.IsTrue(!(PAY_FLAG ^ CANCEL_PAY_FLAG));
+            Assert.IsTrue(!(CANCEL_SUPPLY_FLAG ^ SUPPLY_FLAG));
+        }
+
+        [TestMethod]
+        public void Test_ExternalSystems_NoConnection()
+        {
+            Mock<IExternalSystem> externalSystem = new Mock<IExternalSystem>();
+            bool SUPPLY_FLAG = false;
+            bool CANCEL_SUPPLY_FLAG = false;
+            bool PAY_FLAG = false;
+            bool CANCEL_PAY_FLAG = false;
+            bool IS_ONLINE_FLAG = false;
+            externalSystem.Setup(x => x.Supply(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Callback((string s1, string s2, string s3, string s4, string s5) => { SUPPLY_FLAG = true; throw new Exception(); }).Returns(150000);
+            externalSystem.Setup(x => x.Cancel_Supply(It.IsAny<int>())).Callback((int n1) => { CANCEL_SUPPLY_FLAG = true; throw new Exception(); }).Returns(1);
+            externalSystem.Setup(x => x.Pay(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Callback((string s1, string s2, string s3, string s4, string s5, string s6) => { PAY_FLAG = true; throw new Exception(); }).Returns(8688);
+            externalSystem.Setup(x => x.Cancel_Pay(It.IsAny<int>())).Callback((int n1) => { CANCEL_PAY_FLAG = true; throw new Exception(); }).Returns(1);
+            externalSystem.Setup(x => x.IsExternalSystemOnline()).Callback(() => { IS_ONLINE_FLAG = true; throw new Exception(); }).Returns(true);
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
+
+            Test_Login_Good(1, username, password);
+            Store store = service.CreateNewStore(1, username, "RandomStore").Value;
+            Product prod = service.AddProduct(1, username, store.StoreId, product, "Good", 1.0, 2, "cat1").Value;
+            service.EnterMarket(2);
+            service.Register(2, "member2", "password2", DateTime.Now);
+            service.Login(2, "member2", "password2");
+            service.AddToCart(2, prod.Id, store.StoreId, 1);
+            Assert.IsTrue(service.BuyCart(2, cc, address, DateTime.Now).ErrorOccured);
+            Assert.IsTrue(IS_ONLINE_FLAG);
             Assert.IsTrue(!(PAY_FLAG ^ CANCEL_PAY_FLAG));
             Assert.IsTrue(!(CANCEL_SUPPLY_FLAG ^ SUPPLY_FLAG));
         }
