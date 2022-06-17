@@ -19,10 +19,10 @@ namespace API.Controllers
             Service = service;
         }
 
-        [HttpPost("entermarket")]
-        public ActionResult<FrontResponse<int>> EnterMarket([FromBody] DateRequest request)
+        [HttpGet("entermarket")]
+        public ActionResult<FrontResponse<int>> EnterMarket()
         {
-            Response<User> response = Service.EnterMarket(userId, DateTime.ParseExact(request.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture));
+            Response<User> response = Service.EnterMarket(userId, DateTime.Now.Date);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<int>(response.ErrorMessage));
@@ -42,9 +42,9 @@ namespace API.Controllers
         }
 
         [HttpPost("login")]
-        public ActionResult<LoginResponse> Login([FromBody] LoginRequest request)
+        public ActionResult<LoginResponse> Login([FromBody] AuthenticationRequest request)
         {
-            Response<KeyValuePair<Member, List<Notification>>> response = Service.Login(request.UserId, request.Membername, request.Password, DateTime.ParseExact(request.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture));
+            Response<KeyValuePair<Member, List<Notification>>> response = Service.Login(request.UserId, request.Membername, request.Password, DateTime.Now.Date);
             if (response.ErrorOccured)
             {
                 return BadRequest(new LoginResponse(response.ErrorMessage));

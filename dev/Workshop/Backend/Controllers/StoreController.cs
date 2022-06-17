@@ -20,7 +20,7 @@ namespace API.Controllers
         [HttpPost("newstore")]
         public ActionResult<FrontResponse<Store>> CreateNewStore([FromBody] StoreCreationRequest request)
         {
-            Response<Store> response = Service.CreateNewStore(request.UserId, request.Membername, request.StoreName, DateTime.ParseExact(request.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture));
+            Response<Store> response = Service.CreateNewStore(request.UserId, request.Membername, request.StoreName, DateTime.Now.Date);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<Store>(response.ErrorMessage));
@@ -51,9 +51,9 @@ namespace API.Controllers
         }
 
         [HttpPost("nominatemanager")]
-        public ActionResult<FrontResponse<StoreManager>> NominateStoreManager([FromBody] NominationRequestWithDate request)
+        public ActionResult<FrontResponse<StoreManager>> NominateStoreManager([FromBody] NominationRequest request)
         {
-            Response<StoreManager> response = Service.NominateStoreManager(request.UserId, request.Membername, request.Nominee, request.StoreId, DateTime.ParseExact(request.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture));
+            Response<StoreManager> response = Service.NominateStoreManager(request.UserId, request.Membername, request.Nominee, request.StoreId, DateTime.Now.Date);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<StoreManager>(response.ErrorMessage));
@@ -62,9 +62,9 @@ namespace API.Controllers
         }
 
         [HttpPost("nominateowner")]
-        public ActionResult<FrontResponse<StoreOwner>> NominateStoreOwner([FromBody] NominationRequestWithDate request)
+        public ActionResult<FrontResponse<StoreOwner>> NominateStoreOwner([FromBody] NominationRequest request)
         {
-            Response<StoreOwner> response = Service.NominateStoreOwner(request.UserId, request.Membername, request.Nominee, request.StoreId, DateTime.ParseExact(request.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture));
+            Response<StoreOwner> response = Service.NominateStoreOwner(request.UserId, request.Membername, request.Nominee, request.StoreId, DateTime.Now.Date);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<StoreOwner>(response.ErrorMessage));
