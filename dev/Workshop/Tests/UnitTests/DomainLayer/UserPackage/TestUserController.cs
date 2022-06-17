@@ -399,6 +399,5 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             userController.GetMembersOnlineStats(userId, actingUsername).TryGetValue(userController.GetMember("member2"), out booly);
             Assert.IsTrue(booly == false);
         }
-
     }
 }

@@ -45,6 +45,6 @@ namespace Workshop.DomainLayer.UserPackage
         Dictionary<Member, bool> GetMembersOnlineStats(int userId, string actingUsername);
         void CancelMember(int userId, string actingUsername, string canceledUsername);
         List<ServiceLayer.ServiceObjects.PermissionInformation> GetMemberPermissions(int userId, string membername);
-        dynamic MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end);
+        Dictionary<string, Dictionary<string, dynamic>> MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end);
     }
 }

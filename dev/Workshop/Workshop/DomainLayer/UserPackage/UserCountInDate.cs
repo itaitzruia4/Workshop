@@ -86,7 +86,7 @@ namespace Workshop.DomainLayer.UserPackage
             }
         }
 
-        public dynamic Information()
+        public Dictionary<string, dynamic> Information()
         {
             dynamic result = new Dictionary<string, dynamic>()
             {

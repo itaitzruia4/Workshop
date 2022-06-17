@@ -2488,21 +2488,184 @@ namespace Tests.AcceptanceTests
             Assert.AreEqual(0, service.GetMemberPermissions(3, "mem3").Value.Count);
         }
 
-        [TestMethod]
-        public void Test_MarketManagerDailyRangeInformation_Success()
+        private void ValidateDailyRangeInformation(Dictionary<string, Dictionary<string, dynamic>> data, 
+            DateTime begin,
+            DateTime end,
+            int EXPECTED_GUEST_COUNT, 
+            int EXPECTED_MEMBER_COUNT, 
+            int EXPECTED_MANAGER_COUNT, 
+            int EXPECTED_OWNER_COUNT, 
+            int EXPECTED_MARKET_COUNT)
+        {
+            int CURR_GUEST_COUNT = 0;
+            int CURR_MEMBER_COUNT = 0;
+            int CURR_MANAGER_COUNT = 0;
+            int CURR_OWNER_COUNT = 0;
+            int CURR_MARKET_COUNT = 0;
+
+            foreach (string date in data.Keys)
+            {
+                bool NOT_TRASH_VALUE_FLAG = false;
+                DateTime currentDate = DateTime.Parse(date);
+                Assert.IsTrue(currentDate >= begin && currentDate <= end);
+                Dictionary<string, dynamic> dateEntries = data[date];
+                foreach (string value in dateEntries.Keys)
+                {
+                    switch (value)
+                    {
+                        case "date":
+                            Assert.AreEqual(date, ((DateTime)dateEntries[value]).ToShortDateString());
+                            break;
+                        case "guest":
+                            if (dateEntries[value] != 0) NOT_TRASH_VALUE_FLAG = true;
+                            CURR_GUEST_COUNT += dateEntries[value];
+                            break;
+                        case "member":
+                            if (dateEntries[value] != 0) NOT_TRASH_VALUE_FLAG = true;
+                            CURR_MEMBER_COUNT += dateEntries[value];
+                            break;
+                        case "manager":
+                            if (dateEntries[value] != 0) NOT_TRASH_VALUE_FLAG = true;
+                            CURR_MANAGER_COUNT += dateEntries[value];
+                            break;
+                        case "owner":
+                            if (dateEntries[value] != 0) NOT_TRASH_VALUE_FLAG = true;
+                            CURR_OWNER_COUNT += dateEntries[value];
+                            break;
+                        case "market":
+                            if (dateEntries[value] != 0) NOT_TRASH_VALUE_FLAG = true;
+                            CURR_MARKET_COUNT += dateEntries[value];
+                            break;
+                    }
+                }
+                Assert.IsTrue(NOT_TRASH_VALUE_FLAG);
+            }
+            Assert.AreEqual(CURR_GUEST_COUNT, EXPECTED_GUEST_COUNT);
+            Assert.AreEqual(CURR_MEMBER_COUNT, EXPECTED_MEMBER_COUNT);
+            Assert.AreEqual(CURR_MANAGER_COUNT, EXPECTED_MANAGER_COUNT);
+            Assert.AreEqual(CURR_OWNER_COUNT, EXPECTED_OWNER_COUNT);
+            Assert.AreEqual(CURR_MARKET_COUNT, EXPECTED_MARKET_COUNT);
+        }
+
+        [DataTestMethod]
+        [DataRow("Aug 21, 1980", "Aug 21, 1990", 1, 0, 0, 0, 0)]
+        [DataRow("Aug 21, 1980", "Aug 22, 1990", 2, 0, 0, 0, 0)]
+        [DataRow("Aug 21, 1980", "May 22, 2022", 3, 0, 0, 0, 0)]
+        [DataRow("Aug 22, 1980", "Jun 14, 2022", 3, 1, 0, 1, 0)]
+        [DataRow("Aug 22, 1980", "Jun 15, 2022", 3, 2, 1, 1, 0)]
+        [DataRow("Aug 22, 1980", "Jun 16, 2022", 3, 2, 1, 1, 1)]
+
+        [DataRow("Aug 21, 1990", "Aug 22, 1990", 1, 0, 0, 0, 0)]
+        [DataRow("Aug 21, 1990", "May 22, 2022", 2, 0, 0, 0, 0)]
+        [DataRow("Aug 22, 1990", "Jun 14, 2022", 2, 1, 0, 1, 0)]
+        [DataRow("Aug 22, 1990", "Jun 15, 2022", 2, 2, 1, 1, 0)]
+        [DataRow("Aug 22, 1990", "Jun 16, 2022", 2, 2, 1, 1, 1)]
+
+        [DataRow("May 21, 2022", "May 22, 2022", 1, 0, 0, 0, 0)]
+        [DataRow("May 22, 2022", "Jun 14, 2022", 1, 1, 0, 1, 0)]
+        [DataRow("May 22, 2022", "Jun 15, 2022", 1, 2, 1, 1, 0)]
+        [DataRow("May 22, 2022", "Jun 16, 2022", 1, 2, 1, 1, 1)]
+
+        [DataRow("Jun 14, 2022", "Jun 14, 2022", 0, 1, 0, 1, 0)]
+        [DataRow("Jun 14, 2022", "Jun 15, 2022", 0, 2, 1, 1, 0)]
+        [DataRow("Jun 14, 2022", "Jun 16, 2022", 0, 2, 1, 1, 1)]
+
+        [DataRow("Jun 15, 2022", "Jun 15, 2022", 0, 1, 1, 0, 0)]
+        [DataRow("Jun 15, 2022", "Jun 16, 2022", 0, 1, 1, 0, 1)]
+
+        [DataRow("Jun 16, 2022", "Jun 16, 2022", 0, 0, 0, 0, 1)]
+        public void Test_MarketManagerDailyRangeInformation_Success(string begin, string end, int guest, int member, int manager, int owner, int market)
         {
             // Information:
-            // 22/05/22 - Guest
-            // 15/06/22 - Member
             // 22/08/1980 - Guest
+            // 22/08/1990 - Guest
+            // 22/05/22 - Guest
+            // 14/06/22 - Store owner
+            // 14/06/22 - Member
+            // 15/06/22 - Member
+            // 15/06/22 - Store manager
             // 16/06/22 - Market manager
+
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
+
+            service.EnterMarket(1, DateTime.Parse("May 22, 2022"));
+            service.EnterMarket(2, DateTime.Parse("Aug 22, 1980"));
+            service.EnterMarket(3, DateTime.Parse("Aug 22, 1990"));
+
+            service.Register(1, "mem1", "pass1", DateTime.Parse("Aug 22, 1972"));
+            service.Register(3, "mem2", "pass2", DateTime.Parse("Aug 22, 1972"));
+
+            service.Login(1, "mem1", "pass1", DateTime.Parse("Jun 15, 2022"));
+            service.Login(2, "admin", "admin", DateTime.Parse("Jun 16, 2022"));
+            service.Login(3, "mem2", "pass2", DateTime.Parse("Jun 14, 2022"));
+
+            Store st = service.CreateNewStore(1, "mem1", "s1", DateTime.Parse("Jun 14, 2022")).Value;
+            service.NominateStoreManager(1, "mem1", "mem2", st.StoreId, DateTime.Parse("Jun 15, 2022"));
+
+            Response<Dictionary<string, Dictionary<string, dynamic>>> resp = service.MarketManagerDailyRangeInformation(2, "admin", DateTime.Parse(begin), DateTime.Parse(end));
+            Assert.IsFalse(resp.ErrorOccured);
+            Assert.IsNotNull(resp.Value);
+            ValidateDailyRangeInformation(resp.Value, DateTime.Parse(begin), DateTime.Parse(end), guest, member, manager, owner, market);
+        }
+
+        public void Test_MarketManagerDailyInformation_Failure_NotMarketManager()
+        {
+            service = new Service(externalSystem.Object, "admin~NOTYOU~admin~22/08/1972");
+
+            service.EnterMarket(1, DateTime.Parse("May 22, 2022"));
+            service.EnterMarket(2, DateTime.Parse("Aug 22, 1980"));
+            service.EnterMarket(3, DateTime.Parse("Aug 22, 1990"));
+
+            service.Register(1, "mem1", "pass1", DateTime.Parse("Aug 22, 1972"));
+            service.Register(2, "admin", "admin", DateTime.Parse("Aug 22, 1972"));
+            service.Register(3, "mem2", "pass2", DateTime.Parse("Aug 22, 1972"));
+
+            service.Login(1, "mem1", "pass1", DateTime.Parse("Jun 15, 2022"));
+            service.Login(2, "admin", "admin", DateTime.Parse("Jun 16, 2022"));
+            service.Login(3, "mem2", "pass2", DateTime.Parse("Jun 14, 2022"));
+
+            Store st = service.CreateNewStore(1, "mem1", "s1", DateTime.Parse("Jun 14, 2022")).Value;
+            service.NominateStoreManager(1, "mem1", "mem2", st.StoreId, DateTime.Parse("Jun 15, 2022"));
+
+            Response<Dictionary<string, Dictionary<string, dynamic>>> resp = service.MarketManagerDailyRangeInformation(2, "admin", DateTime.Parse("Jun 14, 2022"), DateTime.Parse("Jun 15, 2022"));
+            Assert.IsTrue(resp.ErrorOccured);
+            Assert.IsNotNull(resp.Value);
+        }
+
+        [DataTestMethod]
+        [DataRow("Aug 22, 1970", "Aug 21, 1980")]
+        [DataRow("Jun 17, 2022", "Jun 17, 2022")]
+        public void Test_MarketManagerDailyInformation_Empty(string begin, string end)
+        {
+            // Information:
+            // 22/08/1980 - Guest
+            // 22/08/1990 - Guest
+            // 22/05/22 - Guest
+            // 14/06/22 - Store owner
+            // 14/06/22 - Member
+            // 15/06/22 - Member
+            // 15/06/22 - Store manager
+            // 16/06/22 - Market manager
+
             service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
             service.EnterMarket(1, DateTime.Parse("May 22, 2022"));
-            service.Register(1, "mem1", "pass1", DateTime.Parse("Aug 22, 1972"));
-            service.Login(1, "mem1", "pass1", DateTime.Parse("Jun 15, 2022"));
             service.EnterMarket(2, DateTime.Parse("Aug 22, 1980"));
+            service.EnterMarket(3, DateTime.Parse("Aug 22, 1990"));
+
+            service.Register(1, "mem1", "pass1", DateTime.Parse("Aug 22, 1972"));
+            service.Register(3, "mem2", "pass2", DateTime.Parse("Aug 22, 1972"));
+
+            service.Login(1, "mem1", "pass1", DateTime.Parse("Jun 15, 2022"));
             service.Login(2, "admin", "admin", DateTime.Parse("Jun 16, 2022"));
+            service.Login(3, "mem2", "pass2", DateTime.Parse("Jun 14, 2022"));
+
             Store st = service.CreateNewStore(1, "mem1", "s1", DateTime.Parse("Jun 14, 2022")).Value;
+            service.NominateStoreManager(1, "mem1", "mem2", st.StoreId, DateTime.Parse("Jun 15, 2022"));
+
+            Response<Dictionary<string, Dictionary<string, dynamic>>> resp = service.MarketManagerDailyRangeInformation(2, "admin", DateTime.Parse(begin), DateTime.Parse(end));
+            Assert.IsFalse(resp.ErrorOccured);
+            Assert.IsNotNull(resp.Value);
+            ValidateDailyRangeInformation(resp.Value, DateTime.Parse(begin), DateTime.Parse(end), 0, 0, 0, 0, 0);
         }
     }
 }

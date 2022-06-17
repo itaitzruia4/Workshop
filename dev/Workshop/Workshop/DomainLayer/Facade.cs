@@ -228,7 +228,7 @@ namespace Workshop.DomainLayer
             MarketController.RejectStoreOwnerNomination(userId, nominatorUsername, nominatedUsername, storeId);
         }
 
-        internal dynamic MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end)
+        internal Dictionary<string, Dictionary<string, dynamic>> MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end)
         {
             return UserController.MarketManagerDailyRangeInformation(userId, membername, beginning, end);
         }
