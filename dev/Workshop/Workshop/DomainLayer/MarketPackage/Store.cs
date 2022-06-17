@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using Member = Workshop.DomainLayer.UserPackage.Permissions.Member;
 namespace Workshop.DomainLayer.MarketPackage
@@ -64,6 +65,18 @@ namespace Workshop.DomainLayer.MarketPackage
                 temp.Add(voter);
                 owner_voting.TryAdd(nominee, new KeyValuePair<Member, HashSet<Member>>(voter, temp));
                 return 1 == owners.Count ? voter : null;
+            }
+        }
+
+        internal void RejectStoreOwnerNomination(Member rejecter, Member nominee)
+        {
+            if (!owners.Contains(rejecter))
+            {
+                throw new ArgumentException($"{rejecter.Username} is not a store owner of store {id}, hence he can not reject to nominate {nominee.Username} as a store owner.");
+            }
+            if (!owner_voting.TryRemove(nominee, out var value))
+            {
+                throw new ArgumentException($"{nominee.Username} is not being voted to be a store owner of store {id}, hence you can not reject his nomination.");
             }
         }
 
@@ -241,14 +254,14 @@ namespace Workshop.DomainLayer.MarketPackage
             return products[productId];
         }
 
-        public Product GetProductForSale(int productId, int quantity)
+        public ShoppingBagProduct GetProductForSale(int productId, int quantity)
         {
             if (!products.ContainsKey(productId))
                 throw new ArgumentException($"Product with ID {productId} does not exist in the store.");
-            if (products[productId].Quantity<quantity)
-                throw new ArgumentException($"Product with ID {productId} does not has enough quantity.");
+            if (products[productId].Quantity < quantity)
+                throw new ArgumentException($"There is not enough quantity from product with ID {productId}.");
             products[productId].Quantity -= quantity;
-            return products[productId];
+            return products[productId].GetShoppingBagProduct(quantity);
         }
 
         internal void RemoveOwner(Member nominatedMember)
@@ -256,23 +269,6 @@ namespace Workshop.DomainLayer.MarketPackage
             owners.Remove(nominatedMember);
         }
 
-        internal ShoppingBagDTO validateBagInStockAndGet(ShoppingBagDTO shoppingBag)
-        {
-            
-            foreach (ProductDTO product in shoppingBag.products)
-            {
-                if(products.ContainsKey(product.Id) && products[product.Id].Quantity >= product.Quantity)
-                {
-                    //products[product.Id].Quantity -= product.Quantity;
-                    //todo does it impact thred
-                }
-                else {
-                    throw new ArgumentException($"store {id} doesn't has enough {product.Name} in stock");
-                }
-                        
-            }  
-            return shoppingBag;     
-        }
         internal void restoreProduct(ProductDTO product)
         {
             if(products.ContainsKey(product.Id))
@@ -283,6 +279,28 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 products.Add(product.Id,new Product(product.Id,product.Name,product.Description,product.Price,product.Quantity, product.Category, id));
             }
+        }
+
+        internal void AddToProductQuantity(int productId, int quantity)
+        {
+            if (products.ContainsKey(productId))
+            {
+                products[productId].Quantity += quantity;
+            }
+            else throw new ArgumentException($"Store {id} does not have product {productId}");
+        }
+
+        internal void RemoveFromProductQuantity(int productId, int quantity)
+        {
+            if (products.ContainsKey(productId))
+            {
+                if (products[productId].Quantity < quantity)
+                {
+                    throw new ArgumentException($"Store {name} does not have enough to provide {quantity} of product {productId}");
+                }
+                products[productId].Quantity -= quantity;
+            }
+            else throw new ArgumentException($"Store {id} does not have product {productId}");
         }
 
         internal StoreDTO GetStoreDTO()

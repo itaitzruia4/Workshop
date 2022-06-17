@@ -65,6 +65,7 @@
   <ItemGroup>
     <Compile Include="DomainLayer\MarketPackage\CreditCard.cs" />
     <Compile Include="DomainLayer\MarketPackage\SupplyAddress.cs" />
+    <Compile Include="DomainLayer\UserPackage\UserCountInDate.cs" />
     <Compile Include="ServiceLayer\ExternalSystem.cs" />
     <Compile Include="DomainLayer\UserPackage\ILoginChecker.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\AndDiscount.cs" />

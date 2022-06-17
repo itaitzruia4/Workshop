@@ -49,5 +49,10 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
         {
             products[productId].Quantity = newQuantity;
         }
+
+        internal int GetQuantity(int productId)
+        {
+            return products[productId].Quantity;
+        }
     }
 }

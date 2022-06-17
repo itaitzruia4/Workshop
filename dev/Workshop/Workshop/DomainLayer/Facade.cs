@@ -23,9 +23,9 @@ namespace Workshop.DomainLayer
             MarketController = new MarketController(UserController, externalSystem);
         }
 
-        public User EnterMarket(int userId)
+        public User EnterMarket(int userId, DateTime date)
         {
-            return UserController.EnterMarket(userId);
+            return UserController.EnterMarket(userId, date);
         }
 
         public void ExitMarket(int userId)
@@ -33,9 +33,9 @@ namespace Workshop.DomainLayer
             UserController.ExitMarket(userId);
         }
 
-        public KeyValuePair<Member, List<Notification>> Login(int userId, string membername, string password)
+        public KeyValuePair<Member, List<Notification>> Login(int userId, string membername, string password, DateTime date)
         {
-            return UserController.Login(userId, membername, password);
+            return UserController.Login(userId, membername, password, date);
         }
 
         public void Logout(int userId, string membername)
@@ -53,14 +53,14 @@ namespace Workshop.DomainLayer
             return MarketController.AddProductToStore(userId, membername, storeId, productName, description, price, quantity, category);
         }
 
-        internal StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId)
+        internal StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId, DateTime date)
         {
-            return MarketController.NominateStoreManager(userId, nominatorUsername, nominatedUsername, storeId);
+            return MarketController.NominateStoreManager(userId, nominatorUsername, nominatedUsername, storeId, date);
         }
 
-        internal StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId)
+        internal StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId, DateTime date)
         {
-            return MarketController.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId);
+            return MarketController.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId, date);
         }
 
         internal Member RemoveStoreOwnerNomination(int userId, string nominatorMembername, string nominatedMembername, int storeId)
@@ -87,9 +87,9 @@ namespace Workshop.DomainLayer
             MarketController.OpenStore(userId, membername, storeId);
         }
 
-        internal Store CreateNewStore(int userId, string creator, string storeName)
+        internal Store CreateNewStore(int userId, string creator, string storeName, DateTime date)
         {
-            return MarketController.CreateNewStore(userId, creator, storeName);
+            return MarketController.CreateNewStore(userId, creator, storeName, date);
         }
 
         internal ReviewDTO ReviewProduct(int userId, string user, int productId, string review, int rating)
@@ -110,7 +110,7 @@ namespace Workshop.DomainLayer
         }
         internal ShoppingBagProduct AddToCart(int userId, int productId, int storeId,int quantity)
         {
-            return MarketController.addToBag(userId, productId, storeId, quantity);
+            return MarketController.AddToCart(userId, productId, storeId, quantity);
         }
         internal ShoppingCartDTO ViewCart(int userId)
         {
@@ -118,11 +118,11 @@ namespace Workshop.DomainLayer
         }
         internal ShoppingCartDTO EditCart(int userId, int productId, int newQuantity)
         {
-            return UserController.editCart(userId, productId, newQuantity);
+            return MarketController.EditCart(userId, productId, newQuantity);
         }
-        internal double BuyCart(int userId, CreditCard cc, SupplyAddress address)
+        internal double BuyCart(int userId, CreditCard cc, SupplyAddress address, DateTime buyTime)
         {
-            return MarketController.BuyCart(userId, cc, address);
+            return MarketController.BuyCart(userId, cc, address, buyTime);
         }
 
         public void AddProductDiscount(int userId, string user, int storeId, string jsonDiscount, int productId)
@@ -203,14 +203,14 @@ namespace Workshop.DomainLayer
             UserController.CancelMember(userId, actingUsername, canceledUsername);
         }
 
-        internal double GetDaliyIncomeMarketManager(int userId, string username)
+        internal double GetDailyIncomeMarketManager(int userId, string username)
         {
-            return MarketController.GetDaliyIncomeMarketManager(userId, username);
+            return MarketController.GetDailyIncomeMarketManager(userId, username);
         }
 
-        internal double GetDaliyIncomeStoreOwner(int userId, string username, int storeId)
+        internal double GetDailyIncomeStoreOwner(int userId, string username, int storeId)
         {
-            return MarketController.GetDaliyIncomeStoreOwner(userId, username, storeId);
+            return MarketController.GetDailyIncomeStoreOwner(userId, username, storeId);
         }
 
         internal List<ServiceLayer.ServiceObjects.PermissionInformation> GetMemberPermissions(int userId, string membername)
@@ -221,6 +221,16 @@ namespace Workshop.DomainLayer
         internal double GetCartPrice(ShoppingCartDTO shoppingCart)
         {
             return MarketController.GetCartPrice(shoppingCart);
+        }
+
+        internal void RejectStoreOwnerNomination(int userId, string nominatorUsername, string nominatedUsername, int storeId)
+        {
+            MarketController.RejectStoreOwnerNomination(userId, nominatorUsername, nominatedUsername, storeId);
+        }
+
+        internal Dictionary<string, Dictionary<string, dynamic>> MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end)
+        {
+            return UserController.MarketManagerDailyRangeInformation(userId, membername, beginning, end);
         }
     }
 }

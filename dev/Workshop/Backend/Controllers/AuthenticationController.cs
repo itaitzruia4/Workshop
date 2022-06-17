@@ -22,7 +22,7 @@ namespace API.Controllers
         [HttpGet("entermarket")]
         public ActionResult<FrontResponse<int>> EnterMarket()
         {
-            Response<User> response = Service.EnterMarket(userId);
+            Response<User> response = Service.EnterMarket(userId, DateTime.Now.Date);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<int>(response.ErrorMessage));
@@ -44,13 +44,11 @@ namespace API.Controllers
         [HttpPost("login")]
         public ActionResult<LoginResponse> Login([FromBody] AuthenticationRequest request)
         {
-            Response<KeyValuePair<Member, List<Notification>>> response = Service.Login(request.UserId, request.Membername, request.Password);
+            Response<KeyValuePair<Member, List<Notification>>> response = Service.Login(request.UserId, request.Membername, request.Password, DateTime.Now.Date);
             if (response.ErrorOccured)
             {
                 return BadRequest(new LoginResponse(response.ErrorMessage));
             }
-
-            List<Notification> nots = new List<Notification>();
             return Ok(new LoginResponse(response.Value.Key, response.Value.Value));
         }
 

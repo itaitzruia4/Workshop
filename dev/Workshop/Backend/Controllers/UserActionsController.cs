@@ -1,6 +1,8 @@
 ﻿using API.Requests;
 using API.Responses;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
+using WebSocketSharp.Server;
 using Workshop.DomainLayer.Reviews;
 using Workshop.ServiceLayer;
 using Workshop.ServiceLayer.ServiceObjects;
@@ -14,9 +16,16 @@ namespace API.Controllers
     public class UserActionsController : ControllerBase
     {
         IService Service;
-        public UserActionsController(IService service)
+        private WebSocketServer adminDailyService;
+        private class AdminDailyService : WebSocketBehavior
+        {
+
+        }
+
+        public UserActionsController(IService service, WebSocketServer serv)
         {
             Service = service;
+            adminDailyService = serv;
         }
 
         [HttpPost("takenotifications")]
@@ -88,7 +97,7 @@ namespace API.Controllers
         [HttpPost("buycart")]
         public ActionResult<FrontResponse<double>> BuyCart([FromBody] BuyCartRequest request)
         {
-            Response<double> response = Service.BuyCart(request.UserId, new CreditCard(request.Card_number, request.Month, request.Year, request.Holder, request.Ccv, request.Id), new SupplyAddress(request.Name, request.Address, request.City, request.Country, request.Zip));
+            Response<double> response = Service.BuyCart(request.UserId, new CreditCard(request.Card_number, request.Month, request.Year, request.Holder, request.Ccv, request.Id), new SupplyAddress(request.Name, request.Address, request.City, request.Country, request.Zip), DateTime.ParseExact(request.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture));
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<double>(response.ErrorMessage));
@@ -127,6 +136,70 @@ namespace API.Controllers
                 return BadRequest(new FrontResponse<List<PermissionInformation>>(response.ErrorMessage));
             }
             return Ok(new FrontResponse<List<PermissionInformation>>(response.Value));
+        }
+
+        [HttpPost("getdailyincomemarketmanager")]
+        public ActionResult<FrontResponse<double>> GetDailyIncomeMarketManager([FromBody] MemberRequest request)
+        {
+            Response<double> response = Service.GetDailyIncomeMarketManager(request.UserId, request.Membername);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<double>(response.ErrorMessage));
+            }
+            return Ok(new FrontResponse<double>(response.Value));
+        }
+
+        [HttpPost("marketmanagerdaily")]
+        public ActionResult<FrontResponse<int>> MarketManagerDailyStatistics([FromBody] MemberRequest request)
+        {
+            string relativeServicePath = "/" + request.Membername + "-live_view";
+            try
+            {
+                if (adminDailyService.WebSocketServices[relativeServicePath] == null)
+                    adminDailyService.AddWebSocketService<AdminDailyService>(relativeServicePath);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new FrontResponse<int>("Sorry, but it seems that we cant connect you"));
+            }
+            return Ok(new FrontResponse<int>(16666)); // TODO REMOVE
+            
+            // in case the client tries to login again
+
+            /*Func<string[], bool> notifier = (msgs) =>
+            {
+                string username = request.Membername;
+
+                // Try send, if not - add to unsent messages
+                if (adminDailyService.WebSocketServices[relativeServicePath] == null || adminDailyService.WebSocketServices[relativeServicePath].Sessions.Count < 1)
+                {
+                    IList<string> unsentMsgs = new List<string>();
+                    if (buyerUnsentMessages.ContainsKey(username))
+                        unsentMsgs = buyerUnsentMessages[username];
+
+                    // Adding new unsent messages
+                    foreach (string msg in msgs)
+                        unsentMsgs.Add(msg);
+
+                    //this.buyerUnsentMessages[username] = unsentMsgs;
+                    AddUnsentMessage(username, unsentMsgs);
+                    return true; // So msgs delete on member msgs queue
+                }
+
+                foreach (string msg in msgs)
+                    notificationServer.WebSocketServices[relativeServicePath].Sessions.Broadcast(msg);
+                return true;
+            };
+            Response<int> response = buyerFacade.Login(request.UserName, request.Password, notifier);
+
+            if (response.IsErrorOccured())
+            {
+                notificationServer.RemoveWebSocketService(relativeServicePath);
+                return BadRequest(response);
+            }
+
+            buyerIdToRelativeNotificationPath.Add(response.Value, relativeServicePath);
+            return Ok(response);*/
         }
     }
 }

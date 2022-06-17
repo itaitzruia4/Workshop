@@ -17,14 +17,25 @@ namespace Workshop.DomainLayer.UserPackage
             shoppingCart = new ShoppingCart();
         }
 
-        public ShoppingBagProduct addToCart(ShoppingBagProduct product, int storeId)
+        public ShoppingBagProduct AddToCart(ShoppingBagProduct product, int storeId)
         {
-            return this.shoppingCart.addToCart(product,storeId);
+            return this.shoppingCart.AddToCart(product,storeId);
         }
-        internal ShoppingCartDTO viewShopingCart()
+        internal ShoppingCartDTO ViewShoppingCart()
         {
             return shoppingCart.getShoppingCartDTO();
         }
+
+        internal int GetStoreOfProduct(int productId)
+        {
+            int bagNum = shoppingCart.checkIfHasBag(productId);
+            if (bagNum == -1)
+            {
+                throw new ArgumentException($"Product {productId} does not exist in the cart of this user");
+            }
+            return bagNum;
+        }
+
         internal void deleteFromCart(int productId)
         {
             int bagNum = shoppingCart.checkIfHasBag(productId);
@@ -32,8 +43,19 @@ namespace Workshop.DomainLayer.UserPackage
             {
                 shoppingCart.deleteProduct(productId, bagNum);
             }
-            else throw new ArgumentException("product doesnt exsist in cart");
+            else throw new ArgumentException("product doesnt exist in cart");
         }
+
+        internal int GetQuantityInCart(int productId)
+        {
+            int bagNum = shoppingCart.checkIfHasBag(productId);
+            if (bagNum != -1)
+            {
+                return shoppingCart.GetQuantityInCart(productId, bagNum);
+            }
+            else throw new ArgumentException("Product doesnt exist in cart");
+        }
+
         internal void changeQuantityInCart(int productId, int newQuantity)
         {
             int bagNum = shoppingCart.checkIfHasBag(productId);
@@ -41,7 +63,7 @@ namespace Workshop.DomainLayer.UserPackage
             {
                 shoppingCart.changeQuantity(productId, newQuantity,bagNum);
             }
-            else throw new ArgumentException("product doesnt exsist in cart");
+            else throw new ArgumentException("product doesnt exist in cart");
         }
 
         internal void ClearCart()
