@@ -19,10 +19,10 @@ namespace API.Controllers
             Service = service;
         }
 
-        [HttpGet("entermarket")]
-        public ActionResult<FrontResponse<int>> EnterMarket()
+        [HttpPost("entermarket")]
+        public ActionResult<FrontResponse<int>> EnterMarket([FromBody] DateRequest request)
         {
-            Response<User> response = Service.EnterMarket(userId);
+            Response<User> response = Service.EnterMarket(userId, DateTime.ParseExact(request.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture));
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<int>(response.ErrorMessage));
@@ -42,15 +42,13 @@ namespace API.Controllers
         }
 
         [HttpPost("login")]
-        public ActionResult<LoginResponse> Login([FromBody] AuthenticationRequest request)
+        public ActionResult<LoginResponse> Login([FromBody] LoginRequest request)
         {
-            Response<KeyValuePair<Member, List<Notification>>> response = Service.Login(request.UserId, request.Membername, request.Password);
+            Response<KeyValuePair<Member, List<Notification>>> response = Service.Login(request.UserId, request.Membername, request.Password, DateTime.ParseExact(request.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture));
             if (response.ErrorOccured)
             {
                 return BadRequest(new LoginResponse(response.ErrorMessage));
             }
-
-            List<Notification> nots = new List<Notification>();
             return Ok(new LoginResponse(response.Value.Key, response.Value.Value));
         }
 

@@ -27,7 +27,7 @@ namespace Workshop.ServiceLayer
     {
         private Facade facade;
         public readonly bool WasInitializedWithFile;
-
+        private readonly int Port;
         public Service(IExternalSystem externalSystem, string conf)
         {
             string starting_state_file = null;
@@ -63,8 +63,8 @@ namespace Workshop.ServiceLayer
                             switch (splits[0])
                             {
                                 case "enter-market":
-                                    if (actualParams.Length != 1) { throw new ArgumentException(); }
-                                    facade.EnterMarket(int.Parse(actualParams[0]));
+                                    if (actualParams.Length != 2) { throw new ArgumentException(); }
+                                    facade.EnterMarket(int.Parse(actualParams[0]), DateTime.ParseExact(actualParams[1], "dd/MM/yyyy", CultureInfo.InvariantCulture));
                                     break;
                                 case "exit-market":
                                     if (actualParams.Length != 1) { throw new ArgumentException(); }
@@ -75,8 +75,8 @@ namespace Workshop.ServiceLayer
                                     facade.Register(int.Parse(actualParams[0]), actualParams[1], actualParams[2], DateTime.ParseExact(actualParams[3], "dd/MM/yyyy", CultureInfo.InvariantCulture));
                                     break;
                                 case "login":
-                                    if (actualParams.Length != 3) { throw new ArgumentException(); }
-                                    facade.Login(int.Parse(actualParams[0]), actualParams[1], actualParams[2]);
+                                    if (actualParams.Length != 4) { throw new ArgumentException(); }
+                                    facade.Login(int.Parse(actualParams[0]), actualParams[1], actualParams[2], DateTime.ParseExact(actualParams[3], "dd/MM/yyyy", CultureInfo.InvariantCulture));
                                     break;
                                 case "logout":
                                     if (actualParams.Length != 2) { throw new ArgumentException(); }
@@ -87,12 +87,12 @@ namespace Workshop.ServiceLayer
                                     facade.AddProduct(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), actualParams[3], actualParams[4], double.Parse(actualParams[5]), int.Parse(actualParams[6]), actualParams[7]);
                                     break;
                                 case "nominate-store-manager":
-                                    if (actualParams.Length != 4) { throw new ArgumentException(); }
-                                    facade.NominateStoreManager(int.Parse(actualParams[0]), actualParams[1], actualParams[2], int.Parse(actualParams[3]));
+                                    if (actualParams.Length != 5) { throw new ArgumentException(); }
+                                    facade.NominateStoreManager(int.Parse(actualParams[0]), actualParams[1], actualParams[2], int.Parse(actualParams[3]), DateTime.ParseExact(actualParams[4], "dd/MM/yyyy", CultureInfo.InvariantCulture));
                                     break;
                                 case "nominate-store-owner":
-                                    if (actualParams.Length != 4) { throw new ArgumentException(); }
-                                    facade.NominateStoreOwner(int.Parse(actualParams[0]), actualParams[1], actualParams[2], int.Parse(actualParams[3]));
+                                    if (actualParams.Length != 5) { throw new ArgumentException(); }
+                                    facade.NominateStoreOwner(int.Parse(actualParams[0]), actualParams[1], actualParams[2], int.Parse(actualParams[3]), DateTime.ParseExact(actualParams[4], "dd/MM/yyyy", CultureInfo.InvariantCulture));
                                     break;
                                 case "remove-store-owner-nomination":
                                     if (actualParams.Length != 4) { throw new ArgumentException(); }
@@ -253,6 +253,10 @@ namespace Workshop.ServiceLayer
                         if (parts.Length != 2) throw new ArgumentException($"starting state is not in the correct format: {entry}");
                         starting_state_file = parts[1];
                         break;
+                    case "port":
+                        if (parts.Length != 2) throw new ArgumentException($"port is not in the correct format: {entry}");
+                        if (!int.TryParse(parts[1], out Port)) throw new ArgumentException($"port is not in the correct format: {entry}");
+                        break;
                     default:
                         throw new ArgumentException("Unidentified command in config file");
                 }
@@ -265,11 +269,16 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<User> EnterMarket(int userId)
+        public int GetPort()
+        {
+            return Port;
+        }
+
+        public Response<User> EnterMarket(int userId, DateTime date)
         {
             try
             {
-                DomainUser domainUser = facade.EnterMarket(userId);
+                DomainUser domainUser = facade.EnterMarket(userId, date);
                 User serviceUser = new User(domainUser);
                 return new Response<User>(serviceUser, userId);
             }
@@ -305,11 +314,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<KeyValuePair<Member, List<Notification>>> Login(int userId, string username, string password)
+        public Response<KeyValuePair<Member, List<Notification>>> Login(int userId, string username, string password, DateTime date)
         {
             try
             {
-                KeyValuePair<DomainMember, List<DomainNotification>> domainAnswer = facade.Login(userId, username, password);
+                KeyValuePair<DomainMember, List<DomainNotification>> domainAnswer = facade.Login(userId, username, password, date);
                 Member serviceMember = new Member(domainAnswer.Key);
                 List<Notification> notificationList = domainAnswer.Value.Select(n => new Notification(n)).ToList();
                 return new Response<KeyValuePair<Member, List<Notification>>>(new KeyValuePair<Member, List<Notification>>(serviceMember, notificationList), userId);
@@ -347,11 +356,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<StoreOwner> NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId)
+        public Response<StoreOwner> NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId, DateTime date)
         {
             try
             {
-                DomainStoreOwner domainOwner = facade.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId);
+                DomainStoreOwner domainOwner = facade.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId, date);
                 StoreOwner serviceOwner = domainOwner == null ? null : new StoreOwner(domainOwner);
                 return new Response<StoreOwner>(serviceOwner, userId);
             }
@@ -374,11 +383,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<StoreManager> NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId)
+        public Response<StoreManager> NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId, DateTime date)
         {
             try
             {
-                DomainStoreManager domainManager = facade.NominateStoreManager(userId, nominatorUsername, nominatedUsername, storeId);
+                DomainStoreManager domainManager = facade.NominateStoreManager(userId, nominatorUsername, nominatedUsername, storeId, date);
                 StoreManager serviceManager = new StoreManager(domainManager);
                 return new Response<StoreManager>(serviceManager, userId);
             }
@@ -798,6 +807,18 @@ namespace Workshop.ServiceLayer
             catch (Exception e)
             {
                 return new Response<List<PermissionInformation>>(e.Message, userId);
+            }
+        }
+
+        public Response<dynamic> MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end)
+        {
+            try
+            {
+                return new Response<dynamic>(facade.MarketManagerDailyRangeInformation(userId, membername, beginning, end), userId);
+            }
+            catch (Exception e)
+            {
+                return new Response<dynamic>(e.Message, userId);
             }
         }
     }

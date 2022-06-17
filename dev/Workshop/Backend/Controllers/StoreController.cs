@@ -1,6 +1,7 @@
 ﻿using API.Requests;
 using API.Responses;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 using Workshop.ServiceLayer;
 using Workshop.ServiceLayer.ServiceObjects;
 
@@ -50,9 +51,9 @@ namespace API.Controllers
         }
 
         [HttpPost("nominatemanager")]
-        public ActionResult<FrontResponse<StoreManager>> NominateStoreManager([FromBody] NominationRequest request)
+        public ActionResult<FrontResponse<StoreManager>> NominateStoreManager([FromBody] NominationRequestWithDate request)
         {
-            Response<StoreManager> response = Service.NominateStoreManager(request.UserId, request.Membername, request.Nominee, request.StoreId);
+            Response<StoreManager> response = Service.NominateStoreManager(request.UserId, request.Membername, request.Nominee, request.StoreId, DateTime.ParseExact(request.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture));
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<StoreManager>(response.ErrorMessage));
@@ -61,9 +62,9 @@ namespace API.Controllers
         }
 
         [HttpPost("nominateowner")]
-        public ActionResult<FrontResponse<StoreOwner>> NominateStoreOwner([FromBody] NominationRequest request)
+        public ActionResult<FrontResponse<StoreOwner>> NominateStoreOwner([FromBody] NominationRequestWithDate request)
         {
-            Response<StoreOwner> response = Service.NominateStoreOwner(request.UserId, request.Membername, request.Nominee, request.StoreId);
+            Response<StoreOwner> response = Service.NominateStoreOwner(request.UserId, request.Membername, request.Nominee, request.StoreId, DateTime.ParseExact(request.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture));
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<StoreOwner>(response.ErrorMessage));

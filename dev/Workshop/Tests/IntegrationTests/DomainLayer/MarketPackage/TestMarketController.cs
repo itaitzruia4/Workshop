@@ -38,12 +38,12 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             marketController = new MarketController(userController, externalSystem.Object);
             marketController.InitializeSystem();
 
-            userController.EnterMarket(1);
+            userController.EnterMarket(1, DateTime.Now);
 
             userController.Register(1, "member1", "pass1", DateTime.Parse("Aug 22, 1972"));
             userController.Register(1, "member2", "pass2", DateTime.Parse("Aug 22, 1972"));
             userController.Register(1, "Notallowed cohen", "pass", DateTime.Parse("Aug 22, 1972"));
-            userController.Login(1, "member1", "pass1");
+            userController.Login(1, "member1", "pass1", DateTime.Now);
         }
 
         /// Tests for MarketController.CloseStore method
@@ -85,8 +85,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             string member = "member1";
             Store store1 = marketController.CreateNewStore(1, member, "shop1");
             int storeId = store1.GetId();
-            userController.EnterMarket(2);
-            userController.Login(2, "Notallowed cohen", "pass");
+            userController.EnterMarket(2, DateTime.Now);
+            userController.Login(2, "Notallowed cohen", "pass", DateTime.Now);
             Assert.ThrowsException<MemberAccessException>(() => marketController.GetWorkersInformation(2, "Notallowed cohen", storeId));
         }
 
@@ -146,7 +146,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             Store store1 = marketController.CreateNewStore(1, member, "shop1");
             int storeId = store1.GetId();
             userController.Register(1, "coolStoreOwner", "pass", DateTime.Parse("Aug 22, 1972"));
-            marketController.NominateStoreOwner(1, "member1", "coolStoreOwner", storeId);
+            marketController.NominateStoreOwner(1, "member1", "coolStoreOwner", storeId, DateTime.Now);
             List<StoreRole> original_roles = new List<StoreRole>(userController.GetMember("coolStoreOwner").GetStoreRoles(storeId));
             Member res = marketController.RemoveStoreOwnerNomination(1, "member1", "coolStoreOwner", storeId);
             Assert.IsTrue(res.Username == "coolStoreOwner");
@@ -177,8 +177,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [DataRow(0, "adm")]
         public void TestGetDaliyIncomeMarketManager_Success(int userId, string username)
         {
-            userController.EnterMarket(0);
-            userController.Login(0, username, "adm");
+            userController.EnterMarket(0, DateTime.Now);
+            userController.Login(0, username, "adm", DateTime.Now);
 
             int storeId = marketController.CreateNewStore(1, "member1", "store").GetId();
             Product prod1 = marketController.AddProductToStore(1, "member1", storeId, "someName", "someDesc", 10.0, 5, "cat1");
@@ -193,8 +193,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [DataRow(2, "member2")]
         public void TestGetDaliyIncomeStoreOwner_Failure_NotOwner(int userId, string username)
         {
-            userController.EnterMarket(userId);
-            userController.Login(userId, username, "pass2");
+            userController.EnterMarket(userId, DateTime.Now);
+            userController.Login(userId, username, "pass2", DateTime.Now);
             int storeId = marketController.CreateNewStore(1, "member1", "store").GetId();
             Product prod1 = marketController.AddProductToStore(1, "member1", storeId, "someName", "someDesc", 10.0, 5, "cat1");
             ShoppingBagProduct product2 = userController.AddToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);

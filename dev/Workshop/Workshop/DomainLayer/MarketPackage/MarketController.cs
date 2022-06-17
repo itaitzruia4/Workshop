@@ -49,9 +49,13 @@ namespace Workshop.DomainLayer.MarketPackage
             return userController.IsAuthorized(username, storeId, action);
         }
 
-        public StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId)
+        public StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId, DateTime date)
         {
             Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} is trying to nominate {nominatedUsername} to be a store owner of store {storeId}");
+            if (date > DateTime.Now)
+            {
+                throw new ArgumentException($"{date} is not a valid date: you are not from the future!");
+            }
             Store store;
             try
             {
@@ -89,7 +93,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 userController.RegisterToEvent(nominated.Username, new Event("OpenStore" + storeId, "", "MarketController"));
                 userController.RegisterToEvent(nominated.Username, new Event("CloseStore" + storeId, "", "MarketController"));
 
-
+                userController.UpdateUserStatistics(nominated, date);
                 storesLocks[storeId].ReleaseReaderLock();
                 Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} successfuly nominated member {nominatedUsername} as a store owner of store {storeId}");
                 return newRole;
@@ -119,7 +123,7 @@ namespace Workshop.DomainLayer.MarketPackage
             storesLocks[storeId].ReleaseReaderLock();
         }
 
-        public StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId)
+        public StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId, DateTime date)
         {
             Logger.Instance.LogEvent($"{nominatorUsername} is trying to nominate {nominatedUsername} to be a store manager of store {storeId}.");
             userController.AssertCurrentUser(userId, nominatorUsername);
@@ -131,7 +135,7 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            StoreManager storeManager = userController.NominateStoreManager(userId, nominatorUsername, nominatedUsername, storeId);
+            StoreManager storeManager = userController.NominateStoreManager(userId, nominatorUsername, nominatedUsername, storeId, date);
             storesLocks[storeId].ReleaseReaderLock();
             return storeManager;
         }

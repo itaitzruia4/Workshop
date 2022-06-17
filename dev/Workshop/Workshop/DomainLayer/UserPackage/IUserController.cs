@@ -16,16 +16,17 @@ namespace Workshop.DomainLayer.UserPackage
     {
         void AssertUserEnteredMarket(int userId);
         bool IsConnected(int userId);
-        User EnterMarket(int userId);
+        User EnterMarket(int userId, DateTime date);
         void ExitMarket(int userId);
+        void UpdateUserStatistics(User u, DateTime date);
         void Register(int userId, string username, string password, DateTime birthdate);
         bool IsMember(string username);
         Member GetMember(string username);
         int GetAge(int userId);
-        KeyValuePair<Member, List<Notification>> Login(int userId, string username, string password);
+        KeyValuePair<Member, List<Notification>> Login(int userId, string username, string password, DateTime date);
         void Logout(int userId, string username);
         //StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId);
-        StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId);
+        StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId, DateTime date);
         bool IsAuthorized(string username, int storeId, Action action);
         void AssertCurrentUser(int userId, string username);
         List<Member> GetWorkers(int storeId);
@@ -44,5 +45,6 @@ namespace Workshop.DomainLayer.UserPackage
         Dictionary<Member, bool> GetMembersOnlineStats(int userId, string actingUsername);
         void CancelMember(int userId, string actingUsername, string canceledUsername);
         List<ServiceLayer.ServiceObjects.PermissionInformation> GetMemberPermissions(int userId, string membername);
+        dynamic MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end);
     }
 }

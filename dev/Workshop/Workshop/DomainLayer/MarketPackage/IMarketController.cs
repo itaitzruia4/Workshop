@@ -11,9 +11,9 @@ namespace Workshop.DomainLayer.MarketPackage
     public interface IMarketController
     {
         void InitializeSystem();
-        StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId);
+        StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId, DateTime date);
         
-        StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId);
+        StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId, DateTime date);
 
         Member RemoveStoreOwnerNomination(int userId, string nominatorMembername, string nominatedMembername, int storeId);
 
