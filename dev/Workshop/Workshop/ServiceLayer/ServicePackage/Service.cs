@@ -111,8 +111,8 @@ namespace Workshop.ServiceLayer
                                     facade.OpenStore(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]));
                                     break;
                                 case "create-new-store":
-                                    if (actualParams.Length != 3) { throw new ArgumentException(); }
-                                    facade.CreateNewStore(int.Parse(actualParams[0]), actualParams[1], actualParams[2]);
+                                    if (actualParams.Length != 4) { throw new ArgumentException(); }
+                                    facade.CreateNewStore(int.Parse(actualParams[0]), actualParams[1], actualParams[2], DateTime.ParseExact(actualParams[3], "dd/MM/yyyy", CultureInfo.InvariantCulture));
                                     break;
                                 case "review-product":
                                     if (actualParams.Length != 5) { throw new ArgumentException(); }
@@ -463,11 +463,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<Store> CreateNewStore(int userId, string creator, string storeName)
+        public Response<Store> CreateNewStore(int userId, string creator, string storeName, DateTime date)
         {
             try
             {
-                DomainStore domainStore = facade.CreateNewStore(userId, creator, storeName);
+                DomainStore domainStore = facade.CreateNewStore(userId, creator, storeName, date);
                 Store store = new Store(domainStore);
                 return new Response<Store>(store, userId);
             }

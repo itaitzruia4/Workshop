@@ -27,7 +27,6 @@ namespace Workshop.DomainLayer.UserPackage
         private ConcurrentDictionary<string, Member> members;
         private ConcurrentDictionary<int, User> currentUsers;
         public SortedList userCountOnDatePerType;
-        // The userCountOnDatePerType's string -> int map's keys should be: "guest", "member", "manager", "owner", "market"
         public UserController(ISecurityHandler securityHandler, IReviewHandler reviewHandler, List<SystemAdminDTO> systemAdmins)
         {
             this.securityHandler = securityHandler;
@@ -235,10 +234,11 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new ArgumentException("Username or password cannot be empty");
         }
 
-        public void AddStoreFounder(string username, int storeId)
+        public void AddStoreFounder(string username, int storeId, DateTime date)
         {
             Member member = GetMember(username);
             member.AddRole(new StoreFounder(storeId));
+            UpdateUserStatistics(member, date);
         }
 
         // Being called only from MarketController
@@ -606,8 +606,28 @@ namespace Workshop.DomainLayer.UserPackage
 
         public dynamic MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end)
         {
-            // The userCountOnDatePerType's string -> int map's keys should be: "guest", "member", "manager", "owner", "market"
-            throw new NotImplementedException("MarketManagerDailyRangeInformation");
+            AssertCurrentUser(userId, membername);
+            Member m = GetMember(membername);
+            Dictionary<string, dynamic> returnVal = new Dictionary<string, dynamic>()
+            {
+                
+            };
+            if (!m.GetAllRoles().Any(x => x is MarketManager))
+            {
+                throw new ArgumentException($"{membername} is not a market manager and can not request to view this information.");
+            }
+            if (beginning == null || end == null || beginning > DateTime.Now || end > DateTime.Now)
+            {
+                throw new ArgumentException($"Given dates are not correct: {beginning}, {end}");
+            }
+            int STARTING_INDEX = userCountOnDatePerType.IndexOfKey(beginning);
+            int ENDING_INDEX = userCountOnDatePerType.IndexOfKey(end);
+            for (int i = STARTING_INDEX; i < ENDING_INDEX; i++)
+            {
+                UserCountInDate userCountInDate = (UserCountInDate)userCountOnDatePerType.GetByIndex(i);
+                returnVal.Add(userCountInDate.Date.ToShortDateString(), userCountInDate.Information());
+            }
+            return returnVal;
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Workshop.ServiceLayer
         Response<List<Member>> GetWorkersInformation(int userId, string username, int storeId);
         Response CloseStore(int userId, string username, int storeId);
         Response OpenStore(int userId, string username, int storeId);
-        Response<Store> CreateNewStore(int userId, string creator, string storeName);
+        Response<Store> CreateNewStore(int userId, string creator, string storeName, DateTime date);
         Response<ReviewDTO> ReviewProduct(int userId, string user, int productId, string review, int rating);
         Response<List<Product>> SearchProduct(int userId, string keyWords, string catagory, double minPrice, double maxPrice, double productReview);
         Response<List<Store>> GetAllStores(int userId);

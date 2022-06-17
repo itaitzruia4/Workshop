@@ -47,7 +47,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
             userController.Register(1, "member2", "pass2", DateTime.Parse("Aug 22, 1972"));
             userController.Login(1, "member2", "pass2", DateTime.Now);
-            userController.AddStoreFounder("member2", member2StoreId);
+            userController.AddStoreFounder("member2", member2StoreId, DateTime.Now);
 
             userController.NominateStoreManager(1, "member2", "member3", member2StoreId, DateTime.Now);
             userController.AddPermissionToStoreManager(1, "member2", "member3", 1, Action.NominateStoreOwner);

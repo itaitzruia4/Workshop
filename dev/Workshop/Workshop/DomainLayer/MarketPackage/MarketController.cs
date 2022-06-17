@@ -537,7 +537,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
         }
 
-        public Store CreateNewStore(int userId, string creator, string storeName)
+        public Store CreateNewStore(int userId, string creator, string storeName, DateTime date)
         {
             Logger.Instance.LogEvent($"{creator} is trying to create a new store: \"{storeName}\".");
             userController.AssertCurrentUser(userId, creator);
@@ -545,8 +545,12 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException($"User {creator} requestted to create a store with an empty name.");
             }
+            if (date > DateTime.Now)
+            {
+                throw new ArgumentException($"Entered date is not valid: {date}");
+            }
             int storeId = STORE_COUNT;
-            userController.AddStoreFounder(creator, storeId);
+            userController.AddStoreFounder(creator, storeId, date);
             ReaderWriterLock rwl = new ReaderWriterLock();
             rwl.AcquireWriterLock(Timeout.Infinite);
             storesLocks[storeId] = rwl;

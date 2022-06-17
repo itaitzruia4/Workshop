@@ -33,7 +33,7 @@ namespace Workshop.DomainLayer.UserPackage
         ReviewDTO ReviewProduct(int userId, string user, int productId, string review, int rating);
         ShoppingBagProduct AddToCart(int userId, ShoppingBagProduct shoppingBagProduct, int storeId);
         ShoppingCartDTO viewCart(int userId);
-        void AddStoreFounder(string username, int storeId);
+        void AddStoreFounder(string username, int storeId, DateTime date);
         void AddOrder(int userId, OrderDTO order, string username);
         void ClearUserCart(int userId);
         double GetProductRating(int productId);

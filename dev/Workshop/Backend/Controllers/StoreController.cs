@@ -20,7 +20,7 @@ namespace API.Controllers
         [HttpPost("newstore")]
         public ActionResult<FrontResponse<Store>> CreateNewStore([FromBody] StoreCreationRequest request)
         {
-            Response<Store> response = Service.CreateNewStore(request.UserId, request.Membername, request.StoreName);
+            Response<Store> response = Service.CreateNewStore(request.UserId, request.Membername, request.StoreName, DateTime.ParseExact(request.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture));
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<Store>(response.ErrorMessage));

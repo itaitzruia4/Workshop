@@ -37,7 +37,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
         void OpenStore(int userId, string username, int storeId);
         
-        Store CreateNewStore(int userId, string creator, string storeName);
+        Store CreateNewStore(int userId, string creator, string storeName, DateTime date);
 
         bool IsStoreOpen(int userId, string username, int storeId);
 

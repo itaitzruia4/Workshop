@@ -15,7 +15,7 @@ namespace Workshop.DomainLayer.UserPackage
         private int Manager_count;
         private int Owner_count;
         private int Market_count;
-        private DateTime Date;
+        public readonly DateTime Date;
 
         public UserCountInDate(DateTime date)
         {

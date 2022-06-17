@@ -52,7 +52,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         public void TestCloseStore_Success()
         {
             string member = "member1";
-            Store store1 = marketController.CreateNewStore(1, member, "shop1");
+            Store store1 = marketController.CreateNewStore(1, member, "shop1", DateTime.Now);
             int storeId = store1.GetId();
             marketController.CloseStore(1, member, storeId);
             Assert.IsFalse(marketController.IsStoreOpen(1, member, storeId));
@@ -62,7 +62,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         public void TestCloseStore_Failure_StoreAlreadyClosed()
         {
             string member = "member1";
-            Store store1 = marketController.CreateNewStore(1, member, "shop1");
+            Store store1 = marketController.CreateNewStore(1, member, "shop1", DateTime.Now);
             int storeId = store1.GetId();
             marketController.CloseStore(1, member, storeId);
             Assert.ThrowsException<ArgumentException>(() => marketController.CloseStore(1, member, storeId));
@@ -74,7 +74,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         public void TestGetWorkersInformation_Success()
         {
             string member = "member1";
-            Store store1 = marketController.CreateNewStore(1, member, "shop1");
+            Store store1 = marketController.CreateNewStore(1, member, "shop1", DateTime.Now);
             int storeId = store1.GetId();
             CollectionAssert.AreEqual(userController.GetWorkers(storeId), marketController.GetWorkersInformation(1, member, storeId));
         }
@@ -83,7 +83,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         public void TestGetWorkersInformation_Failure_NoPermission()
         {
             string member = "member1";
-            Store store1 = marketController.CreateNewStore(1, member, "shop1");
+            Store store1 = marketController.CreateNewStore(1, member, "shop1", DateTime.Now);
             int storeId = store1.GetId();
             userController.EnterMarket(2, DateTime.Now);
             userController.Login(2, "Notallowed cohen", "pass", DateTime.Now);
@@ -96,7 +96,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         public void TestCreateNewStore_Success()
         {
             string storeName = "Cool store 123";
-            Store result = marketController.CreateNewStore(1, "member1", storeName);
+            Store result = marketController.CreateNewStore(1, "member1", storeName, DateTime.Now);
             Assert.AreEqual(result.GetStoreName(), storeName);
             Assert.AreEqual(result.GetProducts().Count, 0);
             Assert.AreEqual(result.IsOpen(), true);
@@ -108,7 +108,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             string username = "CompletelyRandomNameNoChanceAnyoneWouldEverWriteIt";
             userController.Logout(1, "member1");
             userController.Register(1, username, "pass", DateTime.Parse("Aug 22, 1972"));
-            Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(1, username, "Store123"));
+            Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(1, username, "Store123", DateTime.Now));
         }
 
         [DataTestMethod]
@@ -118,7 +118,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [DataRow("", null)]
         public void TestCreateNewStore_Failure_EmptyOrNullInput(string username, string storeName)
         {
-            Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(1, username, storeName));
+            Assert.ThrowsException<ArgumentException>(() => marketController.CreateNewStore(1, username, storeName, DateTime.Now));
         }
 
         /// Tests for MarketController.BuyCart method
@@ -128,7 +128,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [DataRow("member1", 4, "cat1")]
         public void TestBuyCart_Success(string user, int userQuantity, string category)
         {
-            int storeId = marketController.CreateNewStore(1, user, "store").GetId();
+            int storeId = marketController.CreateNewStore(1, user, "store", DateTime.Now).GetId();
             Product prod1 = marketController.AddProductToStore(1, user, storeId, "someName", "someDesc", 10.0, 5, category);
             ShoppingBagProduct product2 = userController.AddToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, userQuantity, prod1.Category, storeId), storeId);
             int leftovers = marketController.getStoreInfo(1, user, storeId).products[prod1.Id].Quantity;
@@ -143,7 +143,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         public void TestRemoveStoreOwnerNomination_Success()
         {
             string member = "member1";
-            Store store1 = marketController.CreateNewStore(1, member, "shop1");
+            Store store1 = marketController.CreateNewStore(1, member, "shop1", DateTime.Now);
             int storeId = store1.GetId();
             userController.Register(1, "coolStoreOwner", "pass", DateTime.Parse("Aug 22, 1972"));
             marketController.NominateStoreOwner(1, "member1", "coolStoreOwner", storeId, DateTime.Now);
@@ -165,7 +165,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [DataRow(1, "member1")]
         public void TestGetDaliyIncomeMarketManager_Failure_NotAdmin(int userId, string username)
         {
-            int storeId = marketController.CreateNewStore(1, "member1", "store").GetId();
+            int storeId = marketController.CreateNewStore(1, "member1", "store", DateTime.Now).GetId();
             Product prod1 = marketController.AddProductToStore(1, "member1", storeId, "someName", "someDesc", 10.0, 5, "cat1");
             ShoppingBagProduct product2 = userController.AddToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);
             marketController.BuyCart(1, cc, address, DateTime.Now);
@@ -180,7 +180,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             userController.EnterMarket(0, DateTime.Now);
             userController.Login(0, username, "adm", DateTime.Now);
 
-            int storeId = marketController.CreateNewStore(1, "member1", "store").GetId();
+            int storeId = marketController.CreateNewStore(1, "member1", "store", DateTime.Now).GetId();
             Product prod1 = marketController.AddProductToStore(1, "member1", storeId, "someName", "someDesc", 10.0, 5, "cat1");
             ShoppingBagProduct product2 = userController.AddToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);
             marketController.BuyCart(1, cc, address, DateTime.Now);
@@ -195,7 +195,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         {
             userController.EnterMarket(userId, DateTime.Now);
             userController.Login(userId, username, "pass2", DateTime.Now);
-            int storeId = marketController.CreateNewStore(1, "member1", "store").GetId();
+            int storeId = marketController.CreateNewStore(1, "member1", "store", DateTime.Now).GetId();
             Product prod1 = marketController.AddProductToStore(1, "member1", storeId, "someName", "someDesc", 10.0, 5, "cat1");
             ShoppingBagProduct product2 = userController.AddToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);
             marketController.BuyCart(1, cc, address, DateTime.Now);
@@ -206,7 +206,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [DataRow(1, "member1")]
         public void TestGetDaliyIncomeStoreOwner_Success(int userId, string username)
         {
-            int storeId = marketController.CreateNewStore(1, "member1", "store").GetId();
+            int storeId = marketController.CreateNewStore(1, "member1", "store", DateTime.Now).GetId();
             Product prod1 = marketController.AddProductToStore(1, "member1", storeId, "someName", "someDesc", 10.0, 5, "cat1");
             ShoppingBagProduct product2 = userController.AddToCart(1, new ShoppingBagProduct(prod1.Id, prod1.Name, prod1.Description, prod1.Price, 5, prod1.Category, storeId), storeId);
             marketController.BuyCart(1, cc, address, DateTime.Now);
