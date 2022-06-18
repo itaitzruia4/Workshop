@@ -12,6 +12,7 @@ import Tooltip from '@mui/material/Tooltip';
 import ListItem from '@mui/material/ListItem';
 import List from '@mui/material/List';
 import Grid from '@mui/material/Grid';
+import Container from '@mui/material/Container';
 
 import AddStoreDialog from '../Components/Dialogs/addStoreDialog';
 import StoreCard from '../Components/StoreCard';
@@ -33,11 +34,9 @@ import { handleChangeProductCategory, handleChangeProductName, handleChangeProdu
 
 function Profile() {
     const [refreshKey, setRefreshKey] = useState(0);
-    const textStyle = { color: 'black' }
 
     const [stores, setStores] = useState<Store[]>([])
     const [permissionsInfo, setPermissionsInfo] = useState<StorePermission[]>([])
-    const [notifications, setNotifications] = useState<MarketNotification[]>([]);
 
     const location = useLocation();
     const token = location.state as memberToken;
@@ -56,12 +55,19 @@ function Profile() {
         handleNewStore(token, storeName).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     };
 
+    const closeStore = (storeId: number) => {
+        handleCloseStore(token, storeId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+    };
+    const openStore = (storeId: number) => {
+        handleOpenStore(token, storeId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+    };
+
     useEffect(() => {
         refresh();
     }, [refreshKey])
 
     return (
-        <p className="welcome">
+        <Container>
             <AppBar sx={{ position: 'relative' }}>
                 <Toolbar>
                     <IconButton
@@ -81,17 +87,19 @@ function Profile() {
                     </IconButton>                 
                 </Toolbar>
             </AppBar>
-            <p className="welcome_buttons">
-                <Button variant="contained" onClick={() => console.log(permissionsInfo) }> Test </Button>
-            </p>
-            <Grid container item spacing={3}>
+            <Typography sx={{ ml: 2, flex: 1 }} variant="h3" component="div">Your stores</Typography>
+           <Grid container item spacing={3}>
                 {stores.map(store => {
+                    console.log(permissionsInfo)
+                    const permissions = permissionsById(store.storeId, permissionsInfo);
                     return ( 
-                        <Grid item xs={4} sx={{ margin: 1}}>
-                            {StoreCard(store, permissionsById(store.storeId, permissionsInfo).permissions)}
-                        </Grid>)})}
+                        permissions.length > 0 ?
+                            <Grid item >
+                                <StoreCard store={store} actions={permissions}
+                                    closeStore={closeStore} openStore={openStore}/>
+                        </Grid> : null)})}
             </Grid>
-        </p>
+        </Container>
     )
 }
 

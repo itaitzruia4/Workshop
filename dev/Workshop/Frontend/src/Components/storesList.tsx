@@ -37,8 +37,6 @@ export default function StoresList(
     removeProduct: (storeId: number, productId: number) => void,
     updateProduct: (storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => void,
     reviewProduct: (productId: number, review: string, rating: number) => void,
-    closeStore: (storeId: number) => void,
-    openStore: (storeId: number) => void,
     addDiscount: (storeId: number, discountJson: string) => void,
     addProductDiscount: (storeId: number, productId: number, discountJson: string) => void,
     addCategoryDiscount: (storeId: number, category: string, discountJson: string) => void,
@@ -75,17 +73,14 @@ export default function StoresList(
                         unmountOnExit
                     >
                         <Paper elevation={12}>
+                            <Typography sx={{ ml: 2, flex: 1 }}>
+                                {'store id: ' + store.storeId}
+                            </Typography>
                         <ButtonGroup variant="outlined" aria-label="outlined button group">
                             {AddProductDialog(store.storeId, addProduct)}
                             {AddDiscountDialog(store.storeId, addDiscount, addProductDiscount, addCategoryDiscount)}
                             {AddPurchaseDialog(store.storeId, addProductPurchasePolicy, addCategoryPurchasePolicy, addBagPurchasePolicy, addUserPurchasePolicy)}
                             {StoreRolesDialog(store.storeId, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
-                            <div>
-                                <Button onClick={e => closeStore(store.storeId)}>Close store</Button>
-                            </div>
-                            <div>
-                                <Button onClick={e => openStore(store.storeId)}>Open store</Button>
-                            </div>
                         </ButtonGroup>
                         <List component='li' disablePadding key={store.storeId}>
                             {store.products.map( product=> {

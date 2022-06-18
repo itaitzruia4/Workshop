@@ -125,13 +125,6 @@ function Member() {
             });
     }
 
-    const closeStore = (storeId: number) => {
-        handleCloseStore(token, storeId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
-    };
-    const openStore = (storeId: number) => {
-        handleOpenStore(token, storeId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
-    };
-
     const nominateStoreOwner = (storeId: number, nominee: string) => {
         handleNominateStoreOwner(token, storeId, nominee)
             .catch(error => {
@@ -170,7 +163,7 @@ function Member() {
     return (
         <div>
             {Appbar(routeChange,token, token.membername, stores, cart, notifications, editCart, buyCart)}
-            {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct, closeStore, openStore, addDiscount,
+            {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct, addDiscount,
                 addProductDiscount, addCategoryDiscount, addProductPurchasePolicy, addCategoryPurchasePolicy,
                 addBagPurchasePolicy, addUserPurchasePolicy, addToCart, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
             

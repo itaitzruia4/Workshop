@@ -92,12 +92,6 @@ function Guest() {
         alert("Permission Denied");
     };
 
-    const closeStore = (storeId: number) => {
-        alert("Permission Denied");
-    };
-    const openStore = (storeId: number) => {
-        alert("Permission Denied");
-    };
 
     const nominateStoreOwner = (storeId: number, nominee: string) => {
         alert("Permission Denied");
@@ -129,7 +123,7 @@ function Guest() {
     return (
         <div>
             {Appbar(routeChange,token, "guest", stores, cart, [], editCart,buyCart)}
-            {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct, closeStore, openStore, addDiscount,
+            {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct, addDiscount,
                 addProductDiscount, addCategoryDiscount, addProductPurchasePolicy, addCategoryPurchasePolicy,
                 addBagPurchasePolicy, addUserPurchasePolicy, addToCart, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
             <Stack direction="row" spacing={2}>
