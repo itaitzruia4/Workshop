@@ -15,6 +15,7 @@ import { Product } from "../Types/product"
 import { Cart, Bag } from '../Types/shopping';
 import { MarketNotification } from '../Types/Notification';
 
+import StoreAdjust from './Dialogs/StoreAdjust'
 
 export default function StoreCard(
     props: {
@@ -22,8 +23,12 @@ export default function StoreCard(
         actions: Actions[],
         closeStore: (storeId: number) => void,
         openStore: (storeId: number) => void,
+        addProduct: (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => void,
+        removeProduct: (storeId: number, productId: number) => void,
+        updateProduct: (storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => void,
+        reviewProduct: (productId: number, review: string, rating: number) => void,
     }) {
-    const { store, actions, closeStore, openStore } = props
+    const { store, actions, closeStore, openStore, addProduct ,removeProduct, updateProduct, reviewProduct } = props
     const [checked, setChecked] = React.useState(store.open);
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         console.log(checked)
@@ -55,7 +60,8 @@ export default function StoreCard(
                 </Stack>
             </CardContent>
             <CardActions>
-                <Button size="small">View more options</Button>
+                <StoreAdjust store={store} actions={actions} addProduct={addProduct}
+                    removeProduct={removeProduct} updateProduct={updateProduct} reviewProduct={reviewProduct} />
             </CardActions>
         </Card>
     )

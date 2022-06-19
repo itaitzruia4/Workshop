@@ -62,6 +62,25 @@ function Profile() {
         handleOpenStore(token, storeId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     };
 
+    const addProduct = (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => {
+        handleAddProduct(token, storeId, productName, description, price, quantity, category).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+    };
+
+    const removeProduct = (storeId: number, productId: number) => {
+        handleRemoveProduct(token, storeId, productId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+    };
+
+    const updateProduct = (storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => {
+        handleChangeProductName(token, storeId, productId, productName).then(() =>
+            handleChangeProductPrice(token, storeId, productId, price).then(() =>
+                handleChangeProductQuantity(token, storeId, productId, quantity).then(() =>
+                    handleChangeProductCategory(token, storeId, productId, category).then(() => setRefreshKey(oldKey => oldKey + 1))))).catch(error => alert(error));
+    };
+
+    const reviewProduct = (productId: number, review: string, rating: number) => {
+        handleReviewProduct(token, productId, review, rating).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+    }
+
     useEffect(() => {
         refresh();
     }, [refreshKey])
@@ -96,7 +115,8 @@ function Profile() {
                         permissions.length > 0 ?
                             <Grid item >
                                 <StoreCard store={store} actions={permissions}
-                                    closeStore={closeStore} openStore={openStore}/>
+                                    closeStore={closeStore} openStore={openStore} addProduct={addProduct }
+                                    removeProduct={removeProduct} updateProduct={updateProduct} reviewProduct={reviewProduct}                                />
                         </Grid> : null)})}
             </Grid>
         </Container>

@@ -77,7 +77,6 @@ export default function StoresList(
                                 {'store id: ' + store.storeId}
                             </Typography>
                         <ButtonGroup variant="outlined" aria-label="outlined button group">
-                            {AddProductDialog(store.storeId, addProduct)}
                             {AddDiscountDialog(store.storeId, addDiscount, addProductDiscount, addCategoryDiscount)}
                             {AddPurchaseDialog(store.storeId, addProductPurchasePolicy, addCategoryPurchasePolicy, addBagPurchasePolicy, addUserPurchasePolicy)}
                             {StoreRolesDialog(store.storeId, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
@@ -86,7 +85,7 @@ export default function StoresList(
                             {store.products.map( product=> {
                                 return (
                                     <ListItem key={product.id} secondaryAction={AddToCartDialog(store, product, addToCart)} >
-                                        {ProductDialog(store, product, removeProduct, updateProduct, reviewProduct)}
+                                        <ProductDialog store={store} product={product} removeProduct={null} updateProduct={null} reviewProduct={reviewProduct}/>
                                         </ListItem>
                                         )
                                     })
