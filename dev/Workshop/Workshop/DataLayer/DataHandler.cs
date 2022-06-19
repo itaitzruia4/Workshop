@@ -19,8 +19,8 @@ namespace Workshop.DataLayer
         private DataHandler()
         {
             cache = new Context();
-            cache.ChangeTracker.AutoDetectChangesEnabled = false;
-            new Thread(() => upload(2)).Start();
+            //cache.ChangeTracker.AutoDetectChangesEnabled = false;
+            //new Thread(() => upload(2)).Start();
         }
 
         public static DataHandler getDBHandler()
@@ -34,7 +34,7 @@ namespace Workshop.DataLayer
         public T save<T>(T toSave) where T : class, DALObject
         {
             T output = cache.Add(toSave).Entity;
-            //cache.SaveChanges();
+            cache.SaveChanges();
             return output;
         }
 

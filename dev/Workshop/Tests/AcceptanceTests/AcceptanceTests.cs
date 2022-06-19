@@ -82,7 +82,7 @@ namespace Tests.AcceptanceTests
         {
             service.EnterMarket(userId);
             Assert.IsFalse(service.Register(userId, username, password, DateTime.Parse("Aug 22, 1972")).ErrorOccured);
-            Thread.Sleep(60000);
+            //Thread.Sleep(60000);
         }
 
         [DataTestMethod]
