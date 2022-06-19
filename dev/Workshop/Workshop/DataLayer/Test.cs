@@ -13,12 +13,9 @@ namespace Workshop.DataLayer
     {
         public static void Main(string[] args)
         {
-            Context context = new Context();
-            Member member = new Member("pass", "name1", DateTime.Now, new List<Role>(), new DataObjects.Market.ShoppingCart());
-            context.Add(member);
-            context.SaveChanges();
-            //context.Find<Role>(1);
-            Console.ReadKey();
+            DataHandler db = DataHandler.getDBHandler();
+            db.clear();
+            //Console.ReadKey();
         }
     }
 }

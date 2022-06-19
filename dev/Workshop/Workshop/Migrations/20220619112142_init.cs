@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Workshop.Migrations
 {
-    public partial class Initial : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -33,25 +33,39 @@ namespace Workshop.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderHandler<int>",
+                name: "OrderHandlerI",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderHandler<int>", x => x.Id);
+                    table.PrimaryKey("PK_OrderHandlerI", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderHandler<string>",
+                name: "OrderHandlerS",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderHandler<string>", x => x.Id);
+                    table.PrimaryKey("PK_OrderHandlerS", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Review",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false),
+                    review = table.Column<string>(nullable: true),
+                    reviewer = table.Column<string>(nullable: true),
+                    productId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Review", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -133,7 +147,7 @@ namespace Workshop.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MemberToOrders<int>",
+                name: "MemberToOrdersI",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false),
@@ -142,17 +156,17 @@ namespace Workshop.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MemberToOrders<int>", x => x.Id);
+                    table.PrimaryKey("PK_MemberToOrdersI", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MemberToOrders<int>_OrderHandler<int>_OrderHandler<int>Id",
+                        name: "FK_MemberToOrdersI_OrderHandlerI_OrderHandler<int>Id",
                         column: x => x.OrderHandlerintId,
-                        principalTable: "OrderHandler<int>",
+                        principalTable: "OrderHandlerI",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "MemberToOrders<string>",
+                name: "MemberToOrdersS",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false),
@@ -161,11 +175,11 @@ namespace Workshop.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MemberToOrders<string>", x => x.Id);
+                    table.PrimaryKey("PK_MemberToOrdersS", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MemberToOrders<string>_OrderHandler<string>_OrderHandler<string>Id",
+                        name: "FK_MemberToOrdersS_OrderHandlerS_OrderHandler<string>Id",
                         column: x => x.OrderHandlerstringId,
-                        principalTable: "OrderHandler<string>",
+                        principalTable: "OrderHandlerS",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -208,9 +222,9 @@ namespace Workshop.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_userController_OrderHandler<string>_orderHandlerId",
+                        name: "FK_userController_OrderHandlerS_orderHandlerId",
                         column: x => x.orderHandlerId,
-                        principalTable: "OrderHandler<string>",
+                        principalTable: "OrderHandlerS",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -274,15 +288,15 @@ namespace Workshop.Migrations
                 {
                     table.PrimaryKey("PK_OrderDTO", x => x.id);
                     table.ForeignKey(
-                        name: "FK_OrderDTO_MemberToOrders<int>_MemberToOrders<int>Id",
+                        name: "FK_OrderDTO_MemberToOrdersI_MemberToOrders<int>Id",
                         column: x => x.MemberToOrdersintId,
-                        principalTable: "MemberToOrders<int>",
+                        principalTable: "MemberToOrdersI",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_OrderDTO_MemberToOrders<string>_MemberToOrders<string>Id",
+                        name: "FK_OrderDTO_MemberToOrdersS_MemberToOrders<string>Id",
                         column: x => x.MemberToOrdersstringId,
-                        principalTable: "MemberToOrders<string>",
+                        principalTable: "MemberToOrdersS",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -333,9 +347,9 @@ namespace Workshop.Migrations
                 {
                     table.PrimaryKey("PK_marketController", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_marketController_OrderHandler<int>_orderHandlerId",
+                        name: "FK_marketController_OrderHandlerI_orderHandlerId",
                         column: x => x.orderHandlerId,
-                        principalTable: "OrderHandler<int>",
+                        principalTable: "OrderHandlerI",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -752,13 +766,13 @@ namespace Workshop.Migrations
                 column: "NotificationHandlerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MemberToOrders<int>_OrderHandler<int>Id",
-                table: "MemberToOrders<int>",
+                name: "IX_MemberToOrdersI_OrderHandler<int>Id",
+                table: "MemberToOrdersI",
                 column: "OrderHandler<int>Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MemberToOrders<string>_OrderHandler<string>Id",
-                table: "MemberToOrders<string>",
+                name: "IX_MemberToOrdersS_OrderHandler<string>Id",
+                table: "MemberToOrdersS",
                 column: "OrderHandler<string>Id");
 
             migrationBuilder.CreateIndex(
@@ -961,6 +975,9 @@ namespace Workshop.Migrations
                 name: "ProductToReviewDTO");
 
             migrationBuilder.DropTable(
+                name: "Review");
+
+            migrationBuilder.DropTable(
                 name: "ShoppingBagProduct");
 
             migrationBuilder.DropTable(
@@ -997,10 +1014,10 @@ namespace Workshop.Migrations
                 name: "marketController");
 
             migrationBuilder.DropTable(
-                name: "MemberToOrders<int>");
+                name: "MemberToOrdersI");
 
             migrationBuilder.DropTable(
-                name: "MemberToOrders<string>");
+                name: "MemberToOrdersS");
 
             migrationBuilder.DropTable(
                 name: "SupplyAddress");
@@ -1015,7 +1032,7 @@ namespace Workshop.Migrations
                 name: "userController");
 
             migrationBuilder.DropTable(
-                name: "OrderHandler<int>");
+                name: "OrderHandlerI");
 
             migrationBuilder.DropTable(
                 name: "Event");
@@ -1024,7 +1041,7 @@ namespace Workshop.Migrations
                 name: "NotificationHandler");
 
             migrationBuilder.DropTable(
-                name: "OrderHandler<string>");
+                name: "OrderHandlerS");
 
             migrationBuilder.DropTable(
                 name: "ReviewHandler");

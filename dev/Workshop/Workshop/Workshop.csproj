@@ -267,7 +267,6 @@
     <Compile Include="DataLayer\DataHandler.cs" />
     <Compile Include="DataLayer\DataObjects\Controllers\MarketController.cs" />
     <Compile Include="DataLayer\DataObjects\Controllers\UserController.cs" />
-    <Compile Include="DataLayer\DataObjects\Market\Discounts\CompositeDiscount.cs" />
     <Compile Include="DataLayer\DataObjects\Market\Discounts\Discount.cs" />
     <Compile Include="DataLayer\DataObjects\Market\Discounts\DiscountPolicy.cs" />
     <Compile Include="DataLayer\DataObjects\Market\Product.cs" />
@@ -304,9 +303,9 @@
     <Compile Include="DomainLayer\MarketPackage\SupplyAddress.cs" />
     <Compile Include="DomainLayer\UserPackage\Shopping\MemberShoppingBag.cs" />
     <Compile Include="DomainLayer\UserPackage\Shopping\MemberShoppingCart.cs" />
-    <Compile Include="Migrations\20220616210112_Initial.cs" />
-    <Compile Include="Migrations\20220616210112_Initial.designer.cs">
-      <DependentUpon>20220616210112_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\20220619112142_init.cs" />
+    <Compile Include="Migrations\20220619112142_init.designer.cs">
+      <DependentUpon>20220619112142_init.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\ContextModelSnapshot.cs" />
     <Compile Include="ServiceLayer\ExternalSystem.cs" />

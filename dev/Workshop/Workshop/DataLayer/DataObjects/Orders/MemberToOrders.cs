@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Workshop.DataLayer.DataObjects.Orders
 {
-    public class MemberToOrders<T>
+    public class MemberToOrders<T> : DALObject
     {
         private static int nextId = 0;
 

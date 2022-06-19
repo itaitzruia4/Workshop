@@ -29,7 +29,14 @@ namespace Tests.AcceptanceTests
         public void InitSystem()
         {
             string config = "admin~admin~admin~22/08/1972";
+            //Workshop.DataLayer.DataHandler.getDBHandler().clear();
             service = new Service(externalSystem.Object, config);
+        }
+
+        [TestCleanup]
+        public void TestCleanup() 
+        {
+            //Workshop.DataLayer.DataHandler.getDBHandler().clear();
         }
 
         [TestMethod]

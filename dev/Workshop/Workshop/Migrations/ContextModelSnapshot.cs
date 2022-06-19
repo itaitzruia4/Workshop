@@ -527,7 +527,7 @@ namespace Workshop.Migrations
 
                     b.HasIndex("OrderHandler<int>Id");
 
-                    b.ToTable("MemberToOrders<int>");
+                    b.ToTable("MemberToOrdersI");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Orders.MemberToOrders<string>", b =>
@@ -545,7 +545,7 @@ namespace Workshop.Migrations
 
                     b.HasIndex("OrderHandler<string>Id");
 
-                    b.ToTable("MemberToOrders<string>");
+                    b.ToTable("MemberToOrdersS");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Orders.OrderDTO", b =>
@@ -586,7 +586,7 @@ namespace Workshop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("OrderHandler<int>");
+                    b.ToTable("OrderHandlerI");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Orders.OrderHandler<string>", b =>
@@ -596,7 +596,7 @@ namespace Workshop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("OrderHandler<string>");
+                    b.ToTable("OrderHandlerS");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.ProductReviews", b =>
@@ -638,6 +638,25 @@ namespace Workshop.Migrations
                     b.HasIndex("UserReviewsId");
 
                     b.ToTable("ProductToReviewDTO");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.Review", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("productId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("review")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("reviewer")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Review");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Reviews.ReviewDTO", b =>

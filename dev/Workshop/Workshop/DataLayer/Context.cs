@@ -14,19 +14,60 @@ using Workshop.DataLayer.DataObjects.Market.Purchases;
 using Workshop.DataLayer.DataObjects.Reviews;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Workshop.DomainLayer.Loggers;
+using Workshop.DataLayer.DataObjects.Notifications;
+using Workshop.DataLayer.DataObjects.Orders;
 
 namespace Workshop.DataLayer
 {
     public class Context: DbContext
     {
+        public List<DbSet<DALObject>> DbSetList;
         public DbSet<MarketController> marketController { get; set; }
         public DbSet<UserController> userController { get; set; }
+        public DbSet<Discount> Discount { get; set; }
+        public DbSet<DiscountPolicy> DiscountPolicy { get; set; }
+        public DbSet<PurchasePolicy> PurchasePolicy { get; set; }
+        public DbSet<Term> Term { get; set; }
+        public DbSet<Product> Product { get; set; }
+        public DbSet<ProductDTO> ProductDTO { get; set; }
+        public DbSet<ShoppingBag> ShoppingBag { get; set; }
+        public DbSet<ShoppingBagProduct> ShoppingBagProduct { get; set; }
+        public DbSet<ShoppingCart> ShoppingCart { get; set; }
+        public DbSet<Store> Store { get; set; }
+        public DbSet<SupplyAddress> SupplyAddress { get; set; }
+        public DbSet<Action> Action { get; set; }
+        public DbSet<Member> Member { get; set; }
+        public DbSet<NameToRole> NameToRole { get; set; }
+        public DbSet<Role> Role { get; set; }
+        public DbSet<Event> Event { get; set; }
+        public DbSet<EventObservers> EventObservers { get; set; }
+        public DbSet<MemberNotifications> MemberNotifications { get; set; }
+        public DbSet<Notification> Notification { get; set; }
+        public DbSet<NotificationHandler> NotificationHandler { get; set; }
+        public DbSet<MemberToOrders<int>> MemberToOrdersI { get; set; }
+        public DbSet<MemberToOrders<string>> MemberToOrdersS { get; set; }
+        public DbSet<OrderDTO> OrderDTO { get; set; }
+        public DbSet<OrderHandler<int>> OrderHandlerI { get; set; }
+        public DbSet<OrderHandler<string>> OrderHandlerS { get; set; }
+        public DbSet<ProductReviews> ProductReviews { get; set; }
+        public DbSet<ProductToReviewDTO> ProductToReviewDTO { get; set; }
+        public DbSet<Review> Review { get; set; }
+        public DbSet<ReviewDTO> ReviewDTO { get; set; }
+        public DbSet<ReviewHandler> ReviewHandler { get; set; }
+        public DbSet<UserReviews> UserReviews { get; set; }
+        public DbSet<UserToReviewDTO> UserToReviewDTO { get; set; }
+
+
+
+        
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             
             optionsBuilder.UseSqlServer("Data Source = 34.107.89.228;Initial Catalog=WorkshopDB; Integrated Security = False; User Id = sqlserver; Password = workshop; Encrypt = True; TrustServerCertificate = True; MultipleActiveResultSets = True");
             optionsBuilder.EnableSensitiveDataLogging();
+
+            
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
