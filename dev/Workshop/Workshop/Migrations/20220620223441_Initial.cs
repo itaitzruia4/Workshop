@@ -3,10 +3,22 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Workshop.Migrations
 {
-    public partial class init : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Discount",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false),
+                    discountJson = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Discount", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Event",
                 columns: table => new
@@ -119,6 +131,24 @@ namespace Workshop.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SupplyAddress", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DiscountPolicy",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false),
+                    store_discountId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DiscountPolicy", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DiscountPolicy_Discount_store_discountId",
+                        column: x => x.store_discountId,
+                        principalTable: "Discount",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -269,6 +299,58 @@ namespace Workshop.Migrations
                         name: "FK_ShoppingBag_ShoppingCart_ShoppingCartId",
                         column: x => x.ShoppingCartId,
                         principalTable: "ShoppingCart",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CategoryDiscount",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    DiscountId = table.Column<int>(nullable: true),
+                    DiscountPolicyId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CategoryDiscount", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CategoryDiscount_Discount_DiscountId",
+                        column: x => x.DiscountId,
+                        principalTable: "Discount",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CategoryDiscount_DiscountPolicy_DiscountPolicyId",
+                        column: x => x.DiscountPolicyId,
+                        principalTable: "DiscountPolicy",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductDiscount",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false),
+                    ProductId = table.Column<int>(nullable: false),
+                    DiscountId = table.Column<int>(nullable: true),
+                    DiscountPolicyId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductDiscount", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProductDiscount_Discount_DiscountId",
+                        column: x => x.DiscountId,
+                        principalTable: "Discount",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ProductDiscount_DiscountPolicy_DiscountPolicyId",
+                        column: x => x.DiscountPolicyId,
+                        principalTable: "DiscountPolicy",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -572,44 +654,6 @@ namespace Workshop.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DiscountPolicy",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false),
-                    store_discountId = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DiscountPolicy", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Discount",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false),
-                    discountJson = table.Column<string>(nullable: true),
-                    DiscountPolicyId = table.Column<int>(nullable: true),
-                    DiscountPolicyId1 = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Discount", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Discount_DiscountPolicy_DiscountPolicyId",
-                        column: x => x.DiscountPolicyId,
-                        principalTable: "DiscountPolicy",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Discount_DiscountPolicy_DiscountPolicyId1",
-                        column: x => x.DiscountPolicyId1,
-                        principalTable: "DiscountPolicy",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Store",
                 columns: table => new
                 {
@@ -706,14 +750,14 @@ namespace Workshop.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Discount_DiscountPolicyId",
-                table: "Discount",
-                column: "DiscountPolicyId");
+                name: "IX_CategoryDiscount_DiscountId",
+                table: "CategoryDiscount",
+                column: "DiscountId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Discount_DiscountPolicyId1",
-                table: "Discount",
-                column: "DiscountPolicyId1");
+                name: "IX_CategoryDiscount_DiscountPolicyId",
+                table: "CategoryDiscount",
+                column: "DiscountPolicyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DiscountPolicy_store_discountId",
@@ -804,6 +848,16 @@ namespace Workshop.Migrations
                 name: "IX_Product_StoreId",
                 table: "Product",
                 column: "StoreId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductDiscount_DiscountId",
+                table: "ProductDiscount",
+                column: "DiscountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductDiscount_DiscountPolicyId",
+                table: "ProductDiscount",
+                column: "DiscountPolicyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductDTO_OrderDTOid",
@@ -906,14 +960,6 @@ namespace Workshop.Migrations
                 column: "ReviewId");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_DiscountPolicy_Discount_store_discountId",
-                table: "DiscountPolicy",
-                column: "store_discountId",
-                principalTable: "Discount",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
-
-            migrationBuilder.AddForeignKey(
                 name: "FK_Store_PurchasePolicy_PurchasePolicyId",
                 table: "Store",
                 column: "PurchasePolicyId",
@@ -941,14 +987,6 @@ namespace Workshop.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Discount_DiscountPolicy_DiscountPolicyId",
-                table: "Discount");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Discount_DiscountPolicy_DiscountPolicyId1",
-                table: "Discount");
-
-            migrationBuilder.DropForeignKey(
                 name: "FK_PurchasePolicy_Term_store_termsId",
                 table: "PurchasePolicy");
 
@@ -960,6 +998,9 @@ namespace Workshop.Migrations
                 name: "Action");
 
             migrationBuilder.DropTable(
+                name: "CategoryDiscount");
+
+            migrationBuilder.DropTable(
                 name: "NameToRole");
 
             migrationBuilder.DropTable(
@@ -967,6 +1008,9 @@ namespace Workshop.Migrations
 
             migrationBuilder.DropTable(
                 name: "Product");
+
+            migrationBuilder.DropTable(
+                name: "ProductDiscount");
 
             migrationBuilder.DropTable(
                 name: "ProductDTO");
@@ -1011,6 +1055,9 @@ namespace Workshop.Migrations
                 name: "Member");
 
             migrationBuilder.DropTable(
+                name: "DiscountPolicy");
+
+            migrationBuilder.DropTable(
                 name: "marketController");
 
             migrationBuilder.DropTable(
@@ -1029,6 +1076,9 @@ namespace Workshop.Migrations
                 name: "ShoppingCart");
 
             migrationBuilder.DropTable(
+                name: "Discount");
+
+            migrationBuilder.DropTable(
                 name: "userController");
 
             migrationBuilder.DropTable(
@@ -1045,12 +1095,6 @@ namespace Workshop.Migrations
 
             migrationBuilder.DropTable(
                 name: "ReviewHandler");
-
-            migrationBuilder.DropTable(
-                name: "DiscountPolicy");
-
-            migrationBuilder.DropTable(
-                name: "Discount");
 
             migrationBuilder.DropTable(
                 name: "Term");

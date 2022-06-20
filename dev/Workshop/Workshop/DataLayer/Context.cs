@@ -21,6 +21,7 @@ namespace Workshop.DataLayer
 {
     public class Context: DbContext
     {
+        public static bool USE_DB = true;
         public List<DbSet<DALObject>> DbSetList;
         public DbSet<MarketController> marketController { get; set; }
         public DbSet<UserController> userController { get; set; }
@@ -63,10 +64,11 @@ namespace Workshop.DataLayer
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            
-            optionsBuilder.UseSqlServer("Data Source = 34.107.89.228;Initial Catalog=WorkshopDB; Integrated Security = False; User Id = sqlserver; Password = workshop; Encrypt = True; TrustServerCertificate = True; MultipleActiveResultSets = True");
-            optionsBuilder.EnableSensitiveDataLogging();
-
+            if(USE_DB)
+            {
+                optionsBuilder.UseSqlServer("Data Source = 34.107.89.228;Initial Catalog=WorkshopDB; Integrated Security = False; User Id = sqlserver; Password = workshop; Encrypt = True; TrustServerCertificate = True; MultipleActiveResultSets = True");
+                optionsBuilder.EnableSensitiveDataLogging();
+            }
             
         }
 
@@ -74,7 +76,7 @@ namespace Workshop.DataLayer
         {
             base.OnModelCreating(modelBuilder);
 
-            foreach (var item in modelBuilder.Model.GetEntityTypes())
+            /*foreach (var item in modelBuilder.Model.GetEntityTypes())
             {
                 var p = item.FindPrimaryKey().Properties.FirstOrDefault(i => i.ValueGenerated != Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.Never);
                 if (p != null)
@@ -82,7 +84,7 @@ namespace Workshop.DataLayer
                     p.ValueGenerated = Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.Never;
                 }
 
-            }
+            }*/
         }
 
         public override EntityEntry<TEntity> Update<TEntity>(TEntity entity)

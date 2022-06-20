@@ -14,17 +14,19 @@ namespace Workshop.DataLayer.DataObjects.Market.Discounts
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
-        public List<Discount> products_discounts { get; set; }
-        public List<Discount> category_discounts { get; set; }
+        public List<ProductDiscount> products_discounts { get; set; }
+        public List<CategoryDiscount> category_discounts { get; set; }
         public Discount store_discount { get; set; }
 
         public DiscountPolicy()
         {
             this.Id = nextId;
             nextId++;
+            this.products_discounts = new List<ProductDiscount>();
+            this.category_discounts = new List<CategoryDiscount>();
         }
 
-        public DiscountPolicy(List<Discount> products_discounts, List<Discount> category_discounts, Discount store_discount)
+        public DiscountPolicy(List<ProductDiscount> products_discounts, List<CategoryDiscount> category_discounts, Discount store_discount)
         {
             this.products_discounts = products_discounts;
             this.category_discounts = category_discounts;

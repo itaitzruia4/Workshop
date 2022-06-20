@@ -33,6 +33,7 @@ namespace Workshop.DataLayer.DataObjects.Members
             this.Actions = actions;
             this.RoleType = RoleType;
             Actions = new List<Action>();
+            nominees = new List<NameToRole>();
             this.Id = nextId;
             nextId++;
         }

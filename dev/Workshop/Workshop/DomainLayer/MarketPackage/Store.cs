@@ -68,7 +68,7 @@ namespace Workshop.DomainLayer.MarketPackage
             this.products = new Dictionary<int, Product>();
             this.open = true; //TODO: check if on init store supposed to be open or closed.
             this.rwl = new ReaderWriterLock();
-            this.discountPolicy = new DiscountPolicy(storeDAL.DiscountPolicy);
+            this.discountPolicy = new DiscountPolicy(storeDAL.DiscountPolicy, this);
             this.purchasePolicy = new PurchasePolicy(storeDAL.PurchasePolicy);
 
             foreach(ProductDAL product in storeDAL.Products)

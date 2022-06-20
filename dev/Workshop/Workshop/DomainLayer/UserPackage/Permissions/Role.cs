@@ -41,7 +41,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
                     return new StoreManager(roleDAL);
                 case "StoreOwner":
                     return new StoreOwner(roleDAL);
-                case "StoreRole":
+                //case "StoreRole":
                 case "Role":
                     throw new ArgumentException("Can't reate such role");
                 default:

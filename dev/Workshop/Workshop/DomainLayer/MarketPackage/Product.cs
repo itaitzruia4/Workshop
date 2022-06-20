@@ -8,11 +8,41 @@ namespace Workshop.DomainLayer.MarketPackage
     public class Product : IPersistentObject<ProductDAL>
     {
         public int Id { get; set; }
-        public string Name { get => Name; set => setName(Name); }
-        public double Price { get => Price; set => setPrice(Price); }
-        public int Quantity { get => Quantity; set => setQuantity(Quantity); }
-        public string Description { get => Name; set => setDescription(Description); }
-        public string Category { get => Category; set => setCategory(Category); }
+
+        private string _name;
+        public string Name { get => _name; set {
+                this._name = value;
+                productDAL.Name = value;
+                DataHandler.getDBHandler().update(productDAL);
+            } }
+
+        private double _price;
+        public double Price { get => _price; set {
+                this._price = value;
+                productDAL.Price = value;
+                DataHandler.getDBHandler().update(productDAL);
+            } }
+
+        private int _quantity;
+        public int Quantity { get => _quantity; set {
+                this._quantity = value;
+                productDAL.Quantity = value;
+                DataHandler.getDBHandler().update(productDAL);
+            } }
+
+        private string _description;
+        public string Description { get => _description; set {
+                this._description = value;
+                productDAL.Description = value;
+                DataHandler.getDBHandler().update(productDAL);
+            } }
+
+        private string _category;
+        public string Category { get => _category; set {
+                this._category = value;
+                productDAL.Category = value;
+                DataHandler.getDBHandler().update(productDAL);
+            } }
         public int StoreId { get; set; }
 
         private ProductDAL productDAL;
@@ -20,11 +50,11 @@ namespace Workshop.DomainLayer.MarketPackage
         public Product(int id, string name, string description, double price, int quantity, string category, int StoreId)
         {
             this.Id = id;
-            this.Name = name;
-            this.Description = description;
-            this.Price = price;
-            this.Quantity = quantity;
-            this.Category = category;
+            this._name = name;
+            this._description = description;
+            this._price = price;
+            this._quantity = quantity;
+            this._category = category;
             this.StoreId = StoreId;
             this.productDAL = new ProductDAL(Id, StoreId, Name, Description, Price, Quantity, Category);
         }
@@ -32,48 +62,13 @@ namespace Workshop.DomainLayer.MarketPackage
         public Product(ProductDAL productDAL)
         {
             this.Id = productDAL.Id;
-            this.Name = productDAL.Name;
-            this.Description = productDAL.Description;
-            this.Price = productDAL.Price;
-            this.Quantity = productDAL.Quantity;
-            this.Category = productDAL.Category;
+            this._name = productDAL.Name;
+            this._description = productDAL.Description;
+            this._price = productDAL.Price;
+            this._quantity = productDAL.Quantity;
+            this._category = productDAL.Category;
             this.StoreId = productDAL.Store;
             this.productDAL = productDAL;
-        }
-
-        private void setName(string Name)
-        {
-            this.Name = Name;
-            productDAL.Name = Name;
-            DataHandler.getDBHandler().update(productDAL);
-        }
-
-        private void setPrice(double Price)
-        {
-            this.Price = Price;
-            productDAL.Price = Price;
-            DataHandler.getDBHandler().update(productDAL);
-        }
-
-        private void setQuantity(int Quantity)
-        {
-            this.Quantity = Quantity;
-            productDAL.Quantity = Quantity;
-            DataHandler.getDBHandler().update(productDAL);
-        }
-
-        private void setDescription(string Description)
-        {
-            this.Description = Description;
-            productDAL.Description = Description;
-            DataHandler.getDBHandler().update(productDAL);
-        }
-
-        private void setCategory(string Category)
-        {
-            this.Category = Category;
-            productDAL.Category = Category;
-            DataHandler.getDBHandler().update(productDAL);
         }
 
         public ProductDAL ToDAL()

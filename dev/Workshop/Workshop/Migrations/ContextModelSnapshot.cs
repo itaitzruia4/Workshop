@@ -70,25 +70,38 @@ namespace Workshop.Migrations
                     b.ToTable("userController");
                 });
 
-            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.Discount", b =>
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.CategoryDiscount", b =>
                 {
                     b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DiscountId")
                         .HasColumnType("int");
 
                     b.Property<int?>("DiscountPolicyId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("DiscountPolicyId1")
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiscountId");
+
+                    b.HasIndex("DiscountPolicyId");
+
+                    b.ToTable("CategoryDiscount");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.Discount", b =>
+                {
+                    b.Property<int>("Id")
                         .HasColumnType("int");
 
                     b.Property<string>("discountJson")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DiscountPolicyId");
-
-                    b.HasIndex("DiscountPolicyId1");
 
                     b.ToTable("Discount");
                 });
@@ -106,6 +119,29 @@ namespace Workshop.Migrations
                     b.HasIndex("store_discountId");
 
                     b.ToTable("DiscountPolicy");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.ProductDiscount", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DiscountId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DiscountPolicyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiscountId");
+
+                    b.HasIndex("DiscountPolicyId");
+
+                    b.ToTable("ProductDiscount");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Product", b =>
@@ -758,15 +794,15 @@ namespace Workshop.Migrations
                         .HasForeignKey("reviewHandlerId");
                 });
 
-            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.Discount", b =>
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.CategoryDiscount", b =>
                 {
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Discounts.Discount", "Discount")
+                        .WithMany()
+                        .HasForeignKey("DiscountId");
+
                     b.HasOne("Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy", null)
                         .WithMany("category_discounts")
                         .HasForeignKey("DiscountPolicyId");
-
-                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy", null)
-                        .WithMany("products_discounts")
-                        .HasForeignKey("DiscountPolicyId1");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy", b =>
@@ -774,6 +810,17 @@ namespace Workshop.Migrations
                     b.HasOne("Workshop.DataLayer.DataObjects.Market.Discounts.Discount", "store_discount")
                         .WithMany()
                         .HasForeignKey("store_discountId");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Discounts.ProductDiscount", b =>
+                {
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Discounts.Discount", "Discount")
+                        .WithMany()
+                        .HasForeignKey("DiscountId");
+
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy", null)
+                        .WithMany("products_discounts")
+                        .HasForeignKey("DiscountPolicyId");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Product", b =>
