@@ -45,17 +45,6 @@ function Guest() {
         refresh();
     }, [refreshKey])
 
-    const addProduct = (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => {
-        alert("Permission Denied");
-    };
-    const removeProduct = (storeId: number, productId: number) => {
-        alert("Permission Denied");
-    };
-
-    const updateProduct = (storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => {
-        alert("Permission Denied");
-    };
-
     const reviewProduct = (productId: number, review: string, rating: number) => {
         alert("Permission Denied");
     };
@@ -123,7 +112,7 @@ function Guest() {
     return (
         <div>
             {Appbar(routeChange,token, "guest", stores, cart, [], editCart,buyCart)}
-            {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct, addDiscount,
+            {StoresList(stores, reviewProduct, addDiscount,
                 addProductDiscount, addCategoryDiscount, addProductPurchasePolicy, addCategoryPurchasePolicy,
                 addBagPurchasePolicy, addUserPurchasePolicy, addToCart, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
             <Stack direction="row" spacing={2}>

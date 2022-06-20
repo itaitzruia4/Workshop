@@ -27,8 +27,17 @@ export default function StoreCard(
         removeProduct: (storeId: number, productId: number) => void,
         updateProduct: (storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => void,
         reviewProduct: (productId: number, review: string, rating: number) => void,
+        addDiscount: (storeId: number, discountJson: string) => void,
+        addProductDiscount: (storeId: number, productId: number, discountJson: string) => void,
+        addCategoryDiscount: (storeId: number, category: string, discountJson: string) => void,
+        addProductPurchasePolicy: (storeId: number, productId: number, purchaseJson: string) => void,
+        addCategoryPurchasePolicy: (storeId: number, category: string, purchaseJson: string) => void,
+        addBagPurchasePolicy: (storeId: number, purchaseJson: string) => void,
+        addUserPurchasePolicy: (storeId: number, purchaseJson: string) => void
     }) {
-    const { store, actions, closeStore, openStore, addProduct ,removeProduct, updateProduct, reviewProduct } = props
+    const { store, actions, closeStore, openStore, addProduct, removeProduct, updateProduct, reviewProduct,
+        addDiscount, addProductDiscount, addCategoryDiscount, addProductPurchasePolicy, addCategoryPurchasePolicy,
+        addBagPurchasePolicy, addUserPurchasePolicy} = props
     const [checked, setChecked] = React.useState(store.open);
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         console.log(checked)
@@ -61,7 +70,11 @@ export default function StoreCard(
             </CardContent>
             <CardActions>
                 <StoreAdjust store={store} actions={actions} addProduct={addProduct}
-                    removeProduct={removeProduct} updateProduct={updateProduct} reviewProduct={reviewProduct} />
+                    removeProduct={removeProduct} updateProduct={updateProduct} reviewProduct={reviewProduct}
+                    addDiscount={addDiscount} addProductDiscount={addProductDiscount} addCategoryDiscount={addCategoryDiscount}
+                    addProductPurchasePolicy={addProductPurchasePolicy} addCategoryPurchasePolicy={addCategoryPurchasePolicy}
+                    addBagPurchasePolicy={addBagPurchasePolicy} addUserPurchasePolicy={addUserPurchasePolicy}
+                    />
             </CardActions>
         </Card>
     )

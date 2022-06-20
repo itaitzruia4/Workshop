@@ -81,6 +81,56 @@ function Profile() {
         handleReviewProduct(token, productId, review, rating).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     }
 
+
+    const addDiscount = (storeId: number, discountJson: string) => {
+        handleAddDiscount(token, storeId, discountJson)
+            .catch(error => {
+                alert(error)
+            });
+    };
+
+    const addProductDiscount = (storeId: number, productId: number, discountJson: string) => {
+        handleAddProductDiscount(token, storeId, productId, discountJson)
+            .catch(error => {
+                alert(error)
+            });
+    };
+
+    const addCategoryDiscount = (storeId: number, category: string, discountJson: string) => {
+        handleAddCategoryDiscount(token, storeId, category, discountJson)
+            .catch(error => {
+                alert(error)
+            });
+    };
+
+    const addProductPurchasePolicy = (storeId: number, productId: number, purchaseJson: string): void => {
+        handleAddProductPurchasePolicy(token, storeId, productId, purchaseJson)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
+    const addCategoryPurchasePolicy = (storeId: number, category: string, purchaseJson: string): void => {
+        handleAddCategoryPurchasePolicy(token, storeId, category, purchaseJson)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
+    const addBagPurchasePolicy = (storeId: number, purchaseJson: string): void => {
+        handleAddStorePurchasePolicy(token, storeId, purchaseJson)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
+    const addUserPurchasePolicy = (storeId: number, purchaseJson: string): void => {
+        handleAddUserPurchasePolicy(token, storeId, purchaseJson)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
     useEffect(() => {
         refresh();
     }, [refreshKey])
@@ -115,8 +165,12 @@ function Profile() {
                         permissions.length > 0 ?
                             <Grid item >
                                 <StoreCard store={store} actions={permissions}
-                                    closeStore={closeStore} openStore={openStore} addProduct={addProduct }
-                                    removeProduct={removeProduct} updateProduct={updateProduct} reviewProduct={reviewProduct}                                />
+                                    closeStore={closeStore} openStore={openStore} addProduct={addProduct}
+                                    removeProduct={removeProduct} updateProduct={updateProduct} reviewProduct={reviewProduct}
+                                    addDiscount={addDiscount} addProductDiscount={addProductDiscount} addCategoryDiscount={addCategoryDiscount}
+                                    addProductPurchasePolicy={addProductPurchasePolicy} addCategoryPurchasePolicy={addCategoryPurchasePolicy}
+                                    addBagPurchasePolicy={addBagPurchasePolicy} addUserPurchasePolicy={addUserPurchasePolicy }
+                                />
                         </Grid> : null)})}
             </Grid>
         </Container>

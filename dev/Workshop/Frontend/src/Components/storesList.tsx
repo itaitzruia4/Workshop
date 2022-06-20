@@ -33,9 +33,6 @@ import AddPurchaseDialog from './Dialogs/AddPurchaseDialog';
 
 export default function StoresList(
     stores: Store[],
-    addProduct: (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => void,
-    removeProduct: (storeId: number, productId: number) => void,
-    updateProduct: (storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => void,
     reviewProduct: (productId: number, review: string, rating: number) => void,
     addDiscount: (storeId: number, discountJson: string) => void,
     addProductDiscount: (storeId: number, productId: number, discountJson: string) => void,
@@ -77,8 +74,6 @@ export default function StoresList(
                                 {'store id: ' + store.storeId}
                             </Typography>
                         <ButtonGroup variant="outlined" aria-label="outlined button group">
-                            {AddDiscountDialog(store.storeId, addDiscount, addProductDiscount, addCategoryDiscount)}
-                            {AddPurchaseDialog(store.storeId, addProductPurchasePolicy, addCategoryPurchasePolicy, addBagPurchasePolicy, addUserPurchasePolicy)}
                             {StoreRolesDialog(store.storeId, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
                         </ButtonGroup>
                         <List component='li' disablePadding key={store.storeId}>

@@ -58,19 +58,6 @@ function Member() {
         refresh();
     }, [refreshKey])
 
-    const addProduct = (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => {
-        handleAddProduct(token, storeId, productName, description, price, quantity, category).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
-    };
-    const removeProduct = (storeId: number, productId: number) => {
-        handleRemoveProduct(token, storeId, productId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
-    };
-
-    const updateProduct = (storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => {
-        handleChangeProductName(token, storeId, productId, productName).then(() =>
-            handleChangeProductPrice(token, storeId, productId, price).then(() =>
-                handleChangeProductQuantity(token, storeId, productId, quantity).then(() =>
-                    handleChangeProductCategory(token, storeId, productId, category).then(() => setRefreshKey(oldKey => oldKey + 1))))).catch(error => alert(error));
-    };
 
     const reviewProduct = (productId: number, review: string, rating: number) => {
         handleReviewProduct(token, productId, review, rating).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
@@ -163,7 +150,7 @@ function Member() {
     return (
         <div>
             {Appbar(routeChange,token, token.membername, stores, cart, notifications, editCart, buyCart)}
-            {StoresList(stores, addProduct, removeProduct, updateProduct, reviewProduct, addDiscount,
+            {StoresList(stores, reviewProduct, addDiscount,
                 addProductDiscount, addCategoryDiscount, addProductPurchasePolicy, addCategoryPurchasePolicy,
                 addBagPurchasePolicy, addUserPurchasePolicy, addToCart, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
             
