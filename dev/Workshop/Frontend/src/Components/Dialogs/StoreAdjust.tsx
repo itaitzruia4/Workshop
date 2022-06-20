@@ -12,25 +12,8 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantityLimits';
 import { TransitionProps } from '@mui/material/transitions';
-import Rating from '@mui/material/Rating';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Box from '@mui/material/Box';
-import Collapse from '@mui/material/Collapse';
-import ShoppingCart from '@mui/icons-material/ShoppingCart';
-import Badge from '@mui/material/Badge';
-import TextField from '@mui/material/TextField';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 
@@ -38,6 +21,7 @@ import ProductDialog from './ProductDialog';
 import AddProductDialog from './addProductDialog';
 import AddDiscountDialog from './AddDiscountDialog';
 import AddPurchaseDialog from './AddPurchaseDialog';
+import StoreRolesDialog from './StoreRolesDialog';
 
 import { memberToken, Actions, StorePermission } from '../../Types/roles';
 import { Store } from "../../Types/store"
@@ -104,11 +88,14 @@ export default function StoreAdjust(
         addProductPurchasePolicy: (storeId: number, productId: number, purchaseJson: string) => void,
         addCategoryPurchasePolicy: (storeId: number, category: string, purchaseJson: string) => void,
         addBagPurchasePolicy: (storeId: number, purchaseJson: string) => void,
-        addUserPurchasePolicy: (storeId: number, purchaseJson: string) => void
+        addUserPurchasePolicy: (storeId: number, purchaseJson: string) => void,
+        nominateStoreOwner: (storeId: number, nominee: string) => void,
+        nominateStoreManager: (storeId: number, nominee: string) => void,
+        removeStoreOwnerNomination: (storeId: number, nominee: string) => void
     }) {
     const { store, actions, addProduct, removeProduct, updateProduct, reviewProduct,
         addDiscount, addProductDiscount, addCategoryDiscount, addProductPurchasePolicy, addCategoryPurchasePolicy,
-        addBagPurchasePolicy, addUserPurchasePolicy } = props
+        addBagPurchasePolicy, addUserPurchasePolicy, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination } = props
     const [open, setOpen] = React.useState(false);
     const handleClose = () => {
         setOpen(false);
@@ -170,6 +157,12 @@ export default function StoreAdjust(
                             })
                             }
                         </List>
+                    </TabPanel>
+                    <TabPanel value={value} index={1}>
+                        <ButtonGroup variant="outlined" aria-label="outlined button group">
+                            <StoreRolesDialog storeId={store.storeId} nominateStoreOwner={nominateStoreOwner}
+                                nominateStoreManager={nominateStoreManager} removeStoreOwnerNomination={removeStoreOwnerNomination } />
+                        </ButtonGroup>
                     </TabPanel>
                     <TabPanel value={value} index={2}>
                         <ButtonGroup variant="outlined" aria-label="outlined button group">

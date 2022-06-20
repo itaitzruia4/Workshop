@@ -131,6 +131,27 @@ function Profile() {
             });
     }
 
+    const nominateStoreOwner = (storeId: number, nominee: string) => {
+        handleNominateStoreOwner(token, storeId, nominee)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
+    const nominateStoreManager = (storeId: number, nominee: string) => {
+        handleNominateStoreManager(token, storeId, nominee)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
+    const removeStoreOwnerNomination = (storeId: number, nominee: string) => {
+        handleRemoveStoreOwnerNomination(token, storeId, nominee)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
     useEffect(() => {
         refresh();
     }, [refreshKey])
@@ -149,6 +170,9 @@ function Profile() {
                     </IconButton>
                     <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
                         {token.membername + "'s profile"}
+                    </Typography>
+                    <Typography sx={{ ml: 2, flex: 1 }} variant="button" component="div">
+                        {"userId("+ token.userId + ")"}
                     </Typography>
                     {AddStoreDialog(addStore)}
                     <IconButton autoFocus color="inherit" onClick={() => setRefreshKey(oldKey => oldKey + 1)}>
@@ -169,7 +193,8 @@ function Profile() {
                                     removeProduct={removeProduct} updateProduct={updateProduct} reviewProduct={reviewProduct}
                                     addDiscount={addDiscount} addProductDiscount={addProductDiscount} addCategoryDiscount={addCategoryDiscount}
                                     addProductPurchasePolicy={addProductPurchasePolicy} addCategoryPurchasePolicy={addCategoryPurchasePolicy}
-                                    addBagPurchasePolicy={addBagPurchasePolicy} addUserPurchasePolicy={addUserPurchasePolicy }
+                                    addBagPurchasePolicy={addBagPurchasePolicy} addUserPurchasePolicy={addUserPurchasePolicy}
+                                    nominateStoreOwner={nominateStoreOwner} nominateStoreManager={nominateStoreManager} removeStoreOwnerNomination={removeStoreOwnerNomination}
                                 />
                         </Grid> : null)})}
             </Grid>

@@ -34,17 +34,7 @@ import AddPurchaseDialog from './Dialogs/AddPurchaseDialog';
 export default function StoresList(
     stores: Store[],
     reviewProduct: (productId: number, review: string, rating: number) => void,
-    addDiscount: (storeId: number, discountJson: string) => void,
-    addProductDiscount: (storeId: number, productId: number, discountJson: string) => void,
-    addCategoryDiscount: (storeId: number, category: string, discountJson: string) => void,
-    addProductPurchasePolicy: (storeId: number, productId: number, purchaseJson: string) => void,
-    addCategoryPurchasePolicy: (storeId: number, category: string, purchaseJson: string) => void,
-    addBagPurchasePolicy: (storeId: number, purchaseJson: string) => void,
-    addUserPurchasePolicy: (storeId: number, purchaseJson: string) => void,
     addToCart: (storeId: number, productId: number, quantity: number) => void,
-    nominateStoreOwner: (storeId: number, nominee: string) => void,
-    nominateStoreManager: (storeId: number, nominee: string) => void,
-    removeStoreOwnerNomination: (storeId: number, nominee: string) => void
     ){
         const CustomizedListItem: React.FC<{
             store: Store
@@ -73,9 +63,6 @@ export default function StoresList(
                             <Typography sx={{ ml: 2, flex: 1 }}>
                                 {'store id: ' + store.storeId}
                             </Typography>
-                        <ButtonGroup variant="outlined" aria-label="outlined button group">
-                            {StoreRolesDialog(store.storeId, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
-                        </ButtonGroup>
                         <List component='li' disablePadding key={store.storeId}>
                             {store.products.map( product=> {
                                 return (

@@ -49,51 +49,6 @@ function Guest() {
         alert("Permission Denied");
     };
 
-    const addDiscount = (storeId: number, discountJson: string) => {
-        alert("Permission Denied");
-    };
-
-    const addProductDiscount = (storeId: number, productId: number, discountJson: string) => {
-        alert("Permission Denied");
-    };
-
-    const addCategoryDiscount = (storeId: number, category: string, discountJson: string) => {
-        alert("Permission Denied");
-    };
-
-    const addPurchasePolicy = (storeId: number, purchaseJson: string) => {
-        alert("Permission Denied");
-    };
-
-    const addProductPurchasePolicy = (storeId: number, productId: number, purchaseJson: string) => {
-        alert("Permission Denied");
-    };
-
-    const addCategoryPurchasePolicy = (storeId: number, category: string, purchaseJson: string) => {
-        alert("Permission Denied");
-    };
-
-    const addBagPurchasePolicy = (storeId: number, purchaseJson: string) => {
-        alert("Permission Denied");
-    };
-
-    const addUserPurchasePolicy = (storeId: number, purchaseJson: string) => {
-        alert("Permission Denied");
-    };
-
-
-    const nominateStoreOwner = (storeId: number, nominee: string) => {
-        alert("Permission Denied");
-    }
-
-    const nominateStoreManager = (storeId: number, nominee: string) => {
-        alert("Permission Denied");
-    }
-
-    const removeStoreOwnerNomination = (storeId: number, nominee: string) => {
-        alert("Permission Denied");
-    }
-
     //cart actions 
 
     const addToCart = (storeId: number, productId: number, quantity: number) => {
@@ -112,9 +67,7 @@ function Guest() {
     return (
         <div>
             {Appbar(routeChange,token, "guest", stores, cart, [], editCart,buyCart)}
-            {StoresList(stores, reviewProduct, addDiscount,
-                addProductDiscount, addCategoryDiscount, addProductPurchasePolicy, addCategoryPurchasePolicy,
-                addBagPurchasePolicy, addUserPurchasePolicy, addToCart, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
+            {StoresList(stores, reviewProduct, addToCart)}
             <Stack direction="row" spacing={2}>
                 <Button variant='contained' onClick={e =>
                     handleExitMarket(token)

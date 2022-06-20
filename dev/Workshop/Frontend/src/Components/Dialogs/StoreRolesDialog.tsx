@@ -9,12 +9,13 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { makeCategoryPriceActionSimple, makeProductPriceActionSimple, makeSimpleDiscount, makeStorePriceActionSimple, SimpleDiscount } from '../../Types/discount';
 
 export default function StoreRolesDialog(
-    storeId: number,
-    nominateStoreOwner: (storeId: number, nominee: string) => void,
-    nominateStoreManager: (storeId: number, nominee: string) => void,
-    removeStoreOwnerNomination: (storeId: number, nominee: string) => void
-    ){
-
+    props: {
+        storeId: number,
+        nominateStoreOwner: (storeId: number, nominee: string) => void,
+        nominateStoreManager: (storeId: number, nominee: string) => void,
+        removeStoreOwnerNomination: (storeId: number, nominee: string) => void
+    }){
+    const { storeId, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination } = props
     const [open, setOpen] = React.useState(false);
     const [nominateStoreOwnerOpen, setNominateStoreOwnerOpen] = React.useState(false);
     const [nominateStoreManagerOpen, setNominateStoreManagerOpen] = React.useState(false);
