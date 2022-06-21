@@ -23,7 +23,7 @@ import AddDiscountDialog from './AddDiscountDialog';
 import AddPurchaseDialog from './AddPurchaseDialog';
 import StoreRolesDialog from './StoreRolesDialog';
 
-import { memberToken, Actions, StorePermission } from '../../Types/roles';
+import { memberToken, Actions, StorePermission, hasPermission } from '../../Types/roles';
 import { Store } from "../../Types/store"
 import { Product } from "../../Types/product"
 import { Cart, Bag } from '../../Types/shopping';
@@ -77,7 +77,7 @@ function a11yProps(index: number) {
 export default function StoreAdjust( 
     props: {
         store: Store,
-        actions: Actions[],
+        permissions: Actions[],
         addProduct: (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => void,
         removeProduct: (storeId: number, productId: number) => void,
         updateProduct: (storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => void,
@@ -91,11 +91,12 @@ export default function StoreAdjust(
         addUserPurchasePolicy: (storeId: number, purchaseJson: string) => void,
         nominateStoreOwner: (storeId: number, nominee: string) => void,
         nominateStoreManager: (storeId: number, nominee: string) => void,
-        removeStoreOwnerNomination: (storeId: number, nominee: string) => void
+        removeStoreOwnerNomination: (storeId: number, nominee: string) => void,
+        addActionToManager: (nominee: string, storeId: number, action: string) => void
     }) {
-    const { store, actions, addProduct, removeProduct, updateProduct, reviewProduct,
+    const { store, permissions, addProduct, removeProduct, updateProduct, reviewProduct,
         addDiscount, addProductDiscount, addCategoryDiscount, addProductPurchasePolicy, addCategoryPurchasePolicy,
-        addBagPurchasePolicy, addUserPurchasePolicy, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination } = props
+        addBagPurchasePolicy, addUserPurchasePolicy, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination, addActionToManager } = props
     const [open, setOpen] = React.useState(false);
     const handleClose = () => {
         setOpen(false);
@@ -144,8 +145,8 @@ export default function StoreAdjust(
                         </Tabs>
                     </Box>
                     <TabPanel value={value} index={0}>
-                        <ButtonGroup variant="outlined" aria-label="outlined button group">
-                            <AddProductDialog storeId={store.storeId} addProduct = {addProduct }/>
+                        <ButtonGroup variant="outlined" aria-label="outlined button group" disabled={!hasPermission(Actions.AddProduct, permissions)}>
+                            <AddProductDialog storeId={store.storeId} addProduct={addProduct}/>
                         </ButtonGroup>
                         <List component='li' disablePadding key={store.storeId}>
                             {store.products.map(product => {
@@ -161,7 +162,7 @@ export default function StoreAdjust(
                     <TabPanel value={value} index={1}>
                         <ButtonGroup variant="outlined" aria-label="outlined button group">
                             <StoreRolesDialog storeId={store.storeId} nominateStoreOwner={nominateStoreOwner}
-                                nominateStoreManager={nominateStoreManager} removeStoreOwnerNomination={removeStoreOwnerNomination } />
+                                nominateStoreManager={nominateStoreManager} removeStoreOwnerNomination={removeStoreOwnerNomination} addActionToManager={addActionToManager} />
                         </ButtonGroup>
                     </TabPanel>
                     <TabPanel value={value} index={2}>

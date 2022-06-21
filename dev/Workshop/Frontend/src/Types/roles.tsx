@@ -47,7 +47,8 @@ export enum Actions {
     GetMarketStatistics = 16,
     CancelMember = 17,
     GetMembersOnlineStats = 18,
-    AddPurchaseTerm = 19
+    AddPurchaseTerm = 19,
+    ViewStorePurchaseHistory = 20
 }
 
 export interface StorePermission {userId: number, membername: string, storeId: number, permissions: Actions[] }
@@ -57,5 +58,19 @@ export const permissionsById = (id: number, storePermissions: StorePermission[])
     if (storePermissions.length > 0 && storePermissions[0].storeId === -1) { return actions }
     const storePermission = storePermissions.filter(sp => sp.storeId === id)
     return storePermission.length > 0 ? storePermission[0].permissions : [];
+}
+export const isManager = (id: number, storePermissions: StorePermission[]) => {
+    return storePermissions.filter(sp => sp.storeId === id).length > 0
+}
+
+export const actionNames = (): string[] => {
+    const actions = Object.keys(Actions).filter((item) => {
+        return isNaN(Number(item));
+    });
+    return actions
+}
+
+export const hasPermission = (permission: Actions, storePermission: Actions[]): boolean => {
+    return storePermission.includes(permission)
 }
 

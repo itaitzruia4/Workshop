@@ -17,7 +17,7 @@ import Container from '@mui/material/Container';
 import AddStoreDialog from '../Components/Dialogs/addStoreDialog';
 import StoreCard from '../Components/StoreCard';
 
-import { memberToken, Actions, StorePermission, permissionsById } from '../Types/roles';
+import { memberToken, Actions, StorePermission, permissionsById, isManager } from '../Types/roles';
 import { Store, storeById } from "../Types/store"
 import { Product } from "../Types/product"
 import { Cart, Bag } from '../Types/shopping';
@@ -27,7 +27,7 @@ import { MarketNotification } from '../Types/Notification';
 import {
     handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleOpenStore, handleRemoveProduct, handleAddDiscount,
     handleAddProductDiscount, handleAddCategoryDiscount, handleNominateStoreOwner, handleNominateStoreManager, handleRemoveStoreOwnerNomination,
-    handleAddProductPurchasePolicy, handleAddCategoryPurchasePolicy, handleAddStorePurchasePolicy, handleAddUserPurchasePolicy
+    handleAddProductPurchasePolicy, handleAddCategoryPurchasePolicy, handleAddStorePurchasePolicy, handleAddUserPurchasePolicy, handleAddActionToManager
 } from '../Actions/StoreActions';
 import { handleAddToCart, handleViewCart, handleBuyCart, handleReviewProduct, handleUpdateNotifications, handleEditCart, handleGetMemberPermissions } from '../Actions/UserActions';
 import { handleChangeProductCategory, handleChangeProductName, handleChangeProductPrice, handleChangeProductQuantity } from '../Actions/ProductActions';
@@ -152,6 +152,13 @@ function Profile() {
             });
     }
 
+    const addActionToManager = (nominee: string, storeId: number, action: string) => {
+        handleAddActionToManager(token,nominee ,storeId, action)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
     useEffect(() => {
         refresh();
     }, [refreshKey])
@@ -186,15 +193,16 @@ function Profile() {
                     console.log(permissionsInfo)
                     const permissions = permissionsById(store.storeId, permissionsInfo);
                     return ( 
-                        permissions.length > 0 ?
+                        isManager(store.storeId, permissionsInfo) ?
                             <Grid item >
-                                <StoreCard store={store} actions={permissions}
+                                <StoreCard store={store} permissions={permissions}
                                     closeStore={closeStore} openStore={openStore} addProduct={addProduct}
                                     removeProduct={removeProduct} updateProduct={updateProduct} reviewProduct={reviewProduct}
                                     addDiscount={addDiscount} addProductDiscount={addProductDiscount} addCategoryDiscount={addCategoryDiscount}
                                     addProductPurchasePolicy={addProductPurchasePolicy} addCategoryPurchasePolicy={addCategoryPurchasePolicy}
                                     addBagPurchasePolicy={addBagPurchasePolicy} addUserPurchasePolicy={addUserPurchasePolicy}
-                                    nominateStoreOwner={nominateStoreOwner} nominateStoreManager={nominateStoreManager} removeStoreOwnerNomination={removeStoreOwnerNomination}
+                                    nominateStoreOwner={nominateStoreOwner} nominateStoreManager={nominateStoreManager}
+                                    removeStoreOwnerNomination={removeStoreOwnerNomination} addActionToManager={addActionToManager }
                                 />
                         </Grid> : null)})}
             </Grid>

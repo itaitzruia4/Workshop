@@ -20,7 +20,7 @@ import StoreAdjust from './Dialogs/StoreAdjust'
 export default function StoreCard(
     props: {
         store: Store,
-        actions: Actions[],
+        permissions: Actions[],
         closeStore: (storeId: number) => void,
         openStore: (storeId: number) => void,
         addProduct: (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => void,
@@ -36,11 +36,12 @@ export default function StoreCard(
         addUserPurchasePolicy: (storeId: number, purchaseJson: string) => void,
         nominateStoreOwner: (storeId: number, nominee: string) => void,
         nominateStoreManager: (storeId: number, nominee: string) => void,
-        removeStoreOwnerNomination: (storeId: number, nominee: string) => void
+        removeStoreOwnerNomination: (storeId: number, nominee: string) => void,
+        addActionToManager:(nominee: string, storeId: number, action: string) => void
     }) {
-    const { store, actions, closeStore, openStore, addProduct, removeProduct, updateProduct, reviewProduct,
+    const { store, permissions, closeStore, openStore, addProduct, removeProduct, updateProduct, reviewProduct,
         addDiscount, addProductDiscount, addCategoryDiscount, addProductPurchasePolicy, addCategoryPurchasePolicy,
-        addBagPurchasePolicy, addUserPurchasePolicy, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination } = props
+        addBagPurchasePolicy, addUserPurchasePolicy, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination, addActionToManager } = props
     const [checked, setChecked] = React.useState(store.open);
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         console.log(checked)
@@ -60,7 +61,7 @@ export default function StoreCard(
                     {'store id: ' + store.storeId}
                 </Typography>
                 <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                    {actions}
+                    {permissions}
                 </Typography>
                 <Stack direction="row" spacing={1} alignItems="center">
                     <Typography>Close</Typography>
@@ -72,12 +73,13 @@ export default function StoreCard(
                 </Stack>
             </CardContent>
             <CardActions>
-                <StoreAdjust store={store} actions={actions} addProduct={addProduct}
+                <StoreAdjust store={store} permissions={permissions} addProduct={addProduct}
                     removeProduct={removeProduct} updateProduct={updateProduct} reviewProduct={reviewProduct}
                     addDiscount={addDiscount} addProductDiscount={addProductDiscount} addCategoryDiscount={addCategoryDiscount}
                     addProductPurchasePolicy={addProductPurchasePolicy} addCategoryPurchasePolicy={addCategoryPurchasePolicy}
                     addBagPurchasePolicy={addBagPurchasePolicy} addUserPurchasePolicy={addUserPurchasePolicy}
-                    nominateStoreOwner={nominateStoreOwner} nominateStoreManager={nominateStoreManager} removeStoreOwnerNomination={removeStoreOwnerNomination }
+                    nominateStoreOwner={nominateStoreOwner} nominateStoreManager={nominateStoreManager}
+                    removeStoreOwnerNomination={removeStoreOwnerNomination} addActionToManager={addActionToManager}
                     />
             </CardActions>
         </Card>

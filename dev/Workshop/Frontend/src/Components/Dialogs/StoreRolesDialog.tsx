@@ -6,7 +6,15 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 import { makeCategoryPriceActionSimple, makeProductPriceActionSimple, makeSimpleDiscount, makeStorePriceActionSimple, SimpleDiscount } from '../../Types/discount';
+import { memberToken, Actions, StorePermission, actionNames } from '../../Types/roles';
+
+
 
 export default function StoreRolesDialog(
     props: {
@@ -14,14 +22,19 @@ export default function StoreRolesDialog(
         nominateStoreOwner: (storeId: number, nominee: string) => void,
         nominateStoreManager: (storeId: number, nominee: string) => void,
         removeStoreOwnerNomination: (storeId: number, nominee: string) => void
+        addActionToManager: (nominee: string, storeId: number, action: string) => void
     }){
-    const { storeId, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination } = props
+    const { storeId, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination, addActionToManager } = props
     const [open, setOpen] = React.useState(false);
     const [nominateStoreOwnerOpen, setNominateStoreOwnerOpen] = React.useState(false);
     const [nominateStoreManagerOpen, setNominateStoreManagerOpen] = React.useState(false);
     const [removeStoreOwnerNominationOpen, setRemoveStoreOwnerNominationOpen] = React.useState(false);
+    const [addActionToManagerOpen, setAddActionToManagerOpen] = React.useState(false);
 
     const [nominee, setNominee] = React.useState("");
+    const [action, setAction] = React.useState("");
+
+    const actions = actionNames();
 
     const handleOpenStoreRoles = () => {
         setOpen(true);
@@ -57,9 +70,24 @@ export default function StoreRolesDialog(
     };
 
     const handleCloseRemoveStoreOwnerNomination = () => {
-        setNominateStoreOwnerOpen(false);
+        setRemoveStoreOwnerNominationOpen(false);
         setOpen(true);
     };
+
+    const handleOpenAddActionToManager = () => {
+        setOpen(false);
+        setAddActionToManagerOpen(true);
+    };
+
+    const handleCloseAddActionToManager = () => {
+        setAddActionToManagerOpen(false);
+        setOpen(true);
+    };
+
+
+
+
+
 
     const handleNominateStoreOwner = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -85,6 +113,14 @@ export default function StoreRolesDialog(
         handleCloseRemoveStoreOwnerNomination();
     };
 
+    const handleAddActionToManager = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        
+        addActionToManager(nominee, storeId, action);
+        setNominee("");
+        handleCloseAddActionToManager();
+    };
+
     return (
         <div>
             <Button onClick={handleOpenStoreRoles}>
@@ -96,6 +132,7 @@ export default function StoreRolesDialog(
                     <Button onClick={handleOpenNominateStoreOwner}>Nominate Store Owner</Button>
                     <Button onClick={handleOpenNominateStoreManager}>Nominate Store Manager</Button>
                     <Button onClick={handleOpenRemoveStoreOwnerNomination}>Remove Store Owner Nomination</Button>
+                    <Button onClick={handleOpenAddActionToManager}>Add action to Manager</Button>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseStoreRoles}>Close</Button>
@@ -176,6 +213,48 @@ export default function StoreRolesDialog(
                     <Button variant="contained" type="submit" form="removeOwnerForm">Remove Nomination</Button>
                 </DialogActions>
             </Dialog>
+
+            <Dialog open={addActionToManagerOpen} onClose={handleAddActionToManager}>
+                <DialogTitle>Add action to Member</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Please insert store manager name to be nominated and action:
+                    </DialogContentText>
+                    <form onSubmit={handleAddActionToManager} id="removeOwnerForm" >
+                        <TextField
+                            value={nominee}
+                            autoFocus
+                            margin="dense"
+                            id="owner_nominee"
+                            label="Store manager's name to be nominated:"
+                            fullWidth
+                            variant="standard"
+                            onChange={(e) => setNominee(e.target.value)}
+                        />
+                        <FormControl>
+                            <FormLabel>Action</FormLabel>
+                            <RadioGroup
+                                aria-labelledby="demo-controlled-radio-buttons-group"
+                                name="controlled-radio-buttons-group"
+                                value={action}
+                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                    setAction((event.target as HTMLInputElement).value);
+                                }}
+                            >
+                                {actions.map(action => {
+                                    return (<FormControlLabel value={action} control={<Radio />} label={action } />);
+                                    })
+                                }
+                            </RadioGroup>
+                        </FormControl>
+                    </form>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseAddActionToManager}>Back</Button>
+                    <Button variant="contained" type="submit" form="removeOwnerForm">Add action</Button>
+                </DialogActions>
+            </Dialog>
+
         </div>
     );
 }
