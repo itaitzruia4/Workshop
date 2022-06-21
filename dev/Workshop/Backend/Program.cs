@@ -32,7 +32,7 @@ namespace API.Controllers
             Console.WriteLine($"WS server started on ws://127.0.0.1:{WEBSOCKET_PORT}");
 
             builder.Services.AddSingleton(service);
-            builder.Services.AddSingleton(_ => wsserver);
+            builder.Services.AddSingleton(wsserver);
             builder.Services.AddControllers();
             builder.Services.AddCors(options =>
             {

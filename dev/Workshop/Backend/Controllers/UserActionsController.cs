@@ -160,7 +160,7 @@ namespace API.Controllers
                 if (adminDailyService.WebSocketServices[relativeServicePath] == null)
                     adminDailyService.AddWebSocketService<AdminDailyService>(relativeServicePath);
             }
-            catch (ArgumentException ex)
+            catch
             {
                 return BadRequest(new FrontResponse<int>("Sorry, but it seems that we cant connect you"));
             }
