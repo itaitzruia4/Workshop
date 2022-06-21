@@ -117,14 +117,16 @@ namespace API.Controllers
         }
 
         [HttpPost("getmembersonlinestats")]
-        public ActionResult<FrontResponse<Dictionary<Member, bool>>> GetMembersOnlineStats([FromBody] MemberRequest request)
+        public ActionResult<FrontResponse<KeyValuePair<Member[], Member[]>>> GetMembersOnlineStats([FromBody] MemberRequest request)
         {
             Response<Dictionary<Member, bool>> response = Service.GetMembersOnlineStats(request.UserId, request.Membername);
             if (response.ErrorOccured)
             {
-                return BadRequest(new FrontResponse<Dictionary<Member, bool>>(response.ErrorMessage));
+                return BadRequest(new FrontResponse<KeyValuePair<Member[], Member[]>>(response.ErrorMessage));
             }
-            return Ok(new FrontResponse<Dictionary<Member, bool>>(response.Value));
+            Member[] onlineMembers = response.Value.Where((KeyValuePair<Member, bool> curr) => curr.Value).Select((KeyValuePair<Member, bool> curr) => curr.Key).ToArray();
+            Member[] offlineMembers = response.Value.Where((KeyValuePair<Member, bool> curr) => !curr.Value).Select((KeyValuePair<Member, bool> curr) => curr.Key).ToArray();
+            return Ok(new FrontResponse<KeyValuePair<Member[], Member[]>>(new KeyValuePair<Member[], Member[]>(onlineMembers, offlineMembers)));
         }
 
         [HttpPost("getmemberpermissions")]
