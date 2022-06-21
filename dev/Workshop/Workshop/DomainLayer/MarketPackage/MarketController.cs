@@ -220,6 +220,10 @@ namespace Workshop.DomainLayer.MarketPackage
                     {
                         storeRole.AddAction(actualAction);
                     }
+                    else
+                    {
+                        throw new ArgumentException($"{manager} already has the permission for action {action}");
+                    }
                 }
             }
             Logger.Instance.LogEvent($"{owner} successfuly added action {action} to manager {manager} in store {storeId}.");
