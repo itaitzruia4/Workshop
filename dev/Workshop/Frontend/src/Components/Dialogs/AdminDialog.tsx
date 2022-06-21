@@ -6,15 +6,12 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { getStorePurchaseHistory, removeMember, viewStatistics } from '../../Actions/AdminActions';
+import { memberToken } from '../../Types/roles';
 
-export default function AdminDialog(
-    removeMember: (membername: string) => void,
-    getStorePurchaseHistory: (storeId: number) => void,
-    getMemberInformation: () => void,
-    getDailyIncome: () => void,
-    viewStatistics: (fromDate: string, toDate: string) => void) {
+export default function AdminDialog(isOpen: boolean, token: memberToken) {
 
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = React.useState(isOpen);
     const [removeMemberOpen, setRemoveMemberOpen] = React.useState(false);
     const [historyOpen, setHistoryOpen] = React.useState(false);
     const [memberInfoOpen, setMemberInfoOpen] = React.useState(false);
@@ -88,7 +85,7 @@ export default function AdminDialog(
     const handleRemoveMember = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        removeMember(membername);
+        removeMember(token, membername);
         setMembername("");
         handleCloseRemoveMember();
     };
@@ -96,7 +93,7 @@ export default function AdminDialog(
     const handleGetStorePurchaseHistory = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         // TODO figure out how to load purchase history into the dialog
-        getStorePurchaseHistory(storeId);
+        getStorePurchaseHistory(token, storeId);
         setStoreId(0);
         handleCloseHistory();
     };
@@ -115,7 +112,7 @@ export default function AdminDialog(
 
     const handleViewStats = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        viewStatistics(fromDate, toDate);
+        viewStatistics(token, fromDate, toDate);
         setFromDate("");
         setToDate("");
         handleCloseStats();
@@ -127,7 +124,7 @@ export default function AdminDialog(
                 Manager Menu
             </Button>
             <Dialog open={open} onClose={handleCloseManager}>
-                <DialogTitle>Add Discount</DialogTitle>
+                <DialogTitle>Manager Menu</DialogTitle>
                 <DialogContent>
                     <Button onClick={handleOpenRemoveMember}>Remove Member</Button>
                     <Button onClick={handleOpenHistory}>View Store Purchase History</Button>

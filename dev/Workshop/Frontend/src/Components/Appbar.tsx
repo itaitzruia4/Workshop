@@ -26,6 +26,7 @@ import { isMemberToken, token, memberToken } from '../Types/roles';
 import { MarketNotification } from '../Types/Notification';
 import { NotificationsList } from './NotificationsList';
 import AdminDialog from './Dialogs/AdminDialog';
+import { isAdmin } from '../Actions/AdminActions';
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -77,14 +78,15 @@ export default function Appbar(
     nots: MarketNotification[],
     editCart: (productId: number, quantity: number) => void,
     buyCart: (number: string, year: string, month: string, ccv: string, holder: string, id: string, name: string, address: string,
-                city: string, country: string, zip: string) => void
-    ) {
+                city: string, country: string, zip: string) => void) {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
         React.useState<null | HTMLElement>(null);
 
     const [notificationsAnchorElem, setNotificationsAnchorElem] =
         React.useState<null | HTMLElement>(null);
+
+    const [adminOpen, setAdminOpen] = React.useState<boolean>(false);
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -113,17 +115,12 @@ export default function Appbar(
         }
     }
 
-    const handleOpenAdminMenu = () => {
-        // TODO support multiple admins besides 'admin'
-        if (isMemberToken(token) && token.membername === "admin") {
-
-        }
-    }
 
     const menuId = 'primary-search-account-menu';
     const mobileMenuId = 'primary-search-account-menu-mobile';
     return (
         <Box sx={{ flexGrow: 1 }}>
+            {AdminDialog(adminOpen, token as memberToken) }
             <AppBar position="static">
                 <Toolbar>
                     <IconButton
@@ -132,7 +129,7 @@ export default function Appbar(
                         color="inherit"
                         aria-label="open drawer"
                         sx={{ mr: 2 }}
-                        onClick={handleOpenAdminMenu}
+                        onClick={(event: React.MouseEvent<HTMLElement>) => setAdminOpen(isAdmin(token as memberToken))}
                     >
                         <MenuIcon />
                     </IconButton>
