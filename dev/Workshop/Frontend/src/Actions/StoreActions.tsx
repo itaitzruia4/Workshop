@@ -172,14 +172,14 @@ export function handleAddProductDiscount(token: memberToken, storeId: number, pr
             JsonDiscount: discountJson,
             productId: productId
         })
-    }).then(async response => {
-        const data = await response.json();
-        if (!response.ok) {
-            return Promise.reject(data.error);
-        }
-        alert(`Product discount for product ${productId} in store ${storeId} has been added successfully`);
-        return Promise.resolve(data.value)
-    })
+    }).then(response => response.json()
+        .then(data => {
+            if(!response.ok) {
+                return Promise.reject(data.error);
+            }
+            alert(`Product discount for product ${productId} in store ${storeId} has been added successfully`);
+            return Promise.resolve(data.value)
+        }))
 }
 
 export function handleAddCategoryDiscount(token: memberToken, storeId: number, category: string, discountJson: string) {

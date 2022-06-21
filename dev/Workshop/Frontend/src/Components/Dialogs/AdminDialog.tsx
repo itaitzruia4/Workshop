@@ -6,7 +6,16 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { getStorePurchaseHistory, removeMember, viewStatistics } from '../../Actions/AdminActions';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+
+
+import { handleGetMemberInformation, getStorePurchaseHistory, removeMember, viewStatistics } from '../../Actions/AdminActions';
 import { memberToken } from '../../Types/roles';
 
 export default function AdminDialog(isOpen: boolean, token: memberToken) {
@@ -22,6 +31,9 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
     const [membername, setMembername] = React.useState("");
     const [fromDate, setFromDate] = React.useState("");
     const [toDate, setToDate] = React.useState("");
+
+    const [onlineMembers, setOnlineMembers] = React.useState([]);
+    const [offlineMembers, setOfflineMembers] = React.useState([]);
 
 
     const handleOpenManager = () => {
@@ -54,6 +66,7 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
 
     const handleOpenMemberInfo = () => {
         setOpen(false);
+        handleGetMemberInfo();
         setMemberInfoOpen(true);
     };
 
@@ -98,9 +111,15 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
         handleCloseHistory();
     };
 
-    const handleGetMemberInfo = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        // TODO implement
+    const handleGetMemberInfo = () => {
+        handleGetMemberInformation(token)
+            .then(data => {
+                setOnlineMembers(data.key);
+                setOfflineMembers(data.value);
+            })
+            .catch(error => {
+                alert(error)
+            });
         handleCloseMemberInfo();
     };
 
@@ -121,10 +140,10 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
     return (
         <div>
             <Button onClick={handleOpenManager}>
-                Manager Menu
+                Admin Menu
             </Button>
             <Dialog open={open} onClose={handleCloseManager}>
-                <DialogTitle>Manager Menu</DialogTitle>
+                <DialogTitle>Admin Menu</DialogTitle>
                 <DialogContent>
                     <Button onClick={handleOpenRemoveMember}>Remove Member</Button>
                     <Button onClick={handleOpenHistory}>View Store Purchase History</Button>
@@ -185,6 +204,42 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
                 <DialogActions>
                     <Button onClick={handleCloseHistory}>Back</Button>
                     <Button variant="contained" type="submit" form="historyForm">OK</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={memberInfoOpen} onClose={handleCloseMemberInfo}>
+                <DialogTitle>Members Information</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Members Information
+                    </DialogContentText>
+                    <TableContainer component={Paper}>
+                        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell align="right">Online</TableCell>
+                                    <TableCell align="right">Offline</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {onlineMembers.map((row) => (
+                                    <TableRow
+                                        key={row}
+                                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                    >
+                                        <TableCell component="th" scope="row">
+                                            {row}
+                                        </TableCell>
+                                        <TableCell align="right">Online</TableCell>
+                                        <TableCell align="right">Offline</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseMemberInfo}>Back</Button>
                 </DialogActions>
             </Dialog>
 

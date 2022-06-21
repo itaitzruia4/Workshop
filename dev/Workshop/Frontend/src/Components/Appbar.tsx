@@ -25,8 +25,6 @@ import { Cart, Bag } from '../Types/shopping';
 import { isMemberToken, token, memberToken } from '../Types/roles';
 import { MarketNotification } from '../Types/Notification';
 import { NotificationsList } from './NotificationsList';
-import AdminDialog from './Dialogs/AdminDialog';
-import { isAdmin } from '../Actions/AdminActions';
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -86,8 +84,6 @@ export default function Appbar(
     const [notificationsAnchorElem, setNotificationsAnchorElem] =
         React.useState<null | HTMLElement>(null);
 
-    const [adminOpen, setAdminOpen] = React.useState<boolean>(false);
-
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
@@ -120,19 +116,8 @@ export default function Appbar(
     const mobileMenuId = 'primary-search-account-menu-mobile';
     return (
         <Box sx={{ flexGrow: 1 }}>
-            {AdminDialog(adminOpen, token as memberToken) }
             <AppBar position="static">
                 <Toolbar>
-                    <IconButton
-                        size="large"
-                        edge="start"
-                        color="inherit"
-                        aria-label="open drawer"
-                        sx={{ mr: 2 }}
-                        onClick={(event: React.MouseEvent<HTMLElement>) => setAdminOpen(isAdmin(token as memberToken))}
-                    >
-                        <MenuIcon />
-                    </IconButton>
                     <Typography
                         variant="h6"
                         noWrap

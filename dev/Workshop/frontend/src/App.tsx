@@ -5,6 +5,7 @@ import Welcome from './Pages/Welcome'
 import Member from './Pages/Member'
 import Guest from './Pages/Guest'
 import Profile from './Pages/Profile'
+import Admin from './Pages/Admin'
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Login from './Pages/Login'
 import CssBaseline from '@mui/material/CssBaseline';
@@ -31,6 +32,7 @@ function App() {
                     <Route path="/member" element={<Member />} />
                     <Route path="/guest" element={<Guest />} />\
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/admin" element={<Admin />} />
                 </Routes>
                 </Router>
              </Grid>

@@ -90,8 +90,8 @@ export const getStorePurchaseHistory = (token: memberToken, storeId: number): vo
         });
 }
 
-function handleGetMemberInformation(token: memberToken): Promise<any> {
-    let url = "http://localhost:5165/api/useractions/getonlinemembers";
+export function handleGetMemberInformation(token: memberToken): Promise<any> {
+    let url = "http://localhost:5165/api/useractions/getmembersonlinestats";
 
     return fetch(url, {
         method: 'POST',
@@ -108,13 +108,6 @@ function handleGetMemberInformation(token: memberToken): Promise<any> {
         }
         return Promise.resolve(data.value)
     })
-}
-
-export const getMembersInformation = (token: memberToken): void => {
-    handleGetMemberInformation(token)
-        .catch(error => {
-            alert(error)
-        });
 }
 
 function handleGetDailyIncome(token: memberToken): Promise<any> {
