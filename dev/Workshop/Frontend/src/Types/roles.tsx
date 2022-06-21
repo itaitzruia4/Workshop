@@ -52,7 +52,10 @@ export enum Actions {
 
 export interface StorePermission {userId: number, membername: string, storeId: number, permissions: Actions[] }
 
-export const permissionsById = (id: number, storePermissions: StorePermission[]): StorePermission => {
-    return storePermissions.filter(sp => sp.storeId === id)[0];
+export const permissionsById = (id: number, storePermissions: StorePermission[]): Actions[] => {
+    const actions = [...Array(Math.ceil(Object.keys(Actions).length / 2))].map((_, i) => i as Actions);
+    if (storePermissions.length > 0 && storePermissions[0].storeId === -1) { return actions }
+    const storePermission = storePermissions.filter(sp => sp.storeId === id)
+    return storePermission.length > 0 ? storePermission[0].permissions : [];
 }
 

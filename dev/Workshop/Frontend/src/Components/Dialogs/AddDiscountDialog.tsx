@@ -9,11 +9,14 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { makeCategoryPriceActionSimple, makeProductPriceActionSimple, makeSimpleDiscount, makeStorePriceActionSimple, SimpleDiscount } from '../../Types/discount';
 
 export default function AddDiscountDialog(
-    storeId: number,
-    addDiscount: (storeId: number, discountJson: string) => void,
-    addProductDiscount: (storeId: number, productId: number, discountJson: string) => void,
-    addCategoryDiscount: (storeId: number, category: string, discountJson: string) => void) {
+    props: {
+        storeId: number,
+        addDiscount: (storeId: number, discountJson: string) => void,
+        addProductDiscount: (storeId: number, productId: number, discountJson: string) => void,
+        addCategoryDiscount: (storeId: number, category: string, discountJson: string) => void
+    }) {
 
+    const { storeId, addDiscount, addProductDiscount, addCategoryDiscount } = props;
     const [open, setOpen] = React.useState(false);
     const [productOpen, setProductOpen] = React.useState(false);
     const [categoryOpen, setCategoryOpen] = React.useState(false);

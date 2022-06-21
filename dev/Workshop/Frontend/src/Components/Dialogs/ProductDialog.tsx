@@ -45,12 +45,14 @@ const StyledBadge = styled(Badge)<BadgeProps>(({ theme }) => ({
 }));
 
 export default function ProductDialog(
-    store: Store,
-    product: Product,
-    removeProduct: (storeId: number, productId: number) => void,
-    updateProduct: (storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => void,
-    reviewProduct: (productId: number, review: string, rating: number) => void
-) {
+    props: {
+        store: Store,
+        product: Product,
+        removeProduct: null | ((storeId: number, productId: number) => void),
+        updateProduct: null | ((storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => void),
+        reviewProduct: (productId: number, review: string, rating: number) => void
+    }) {
+    const {store, product, removeProduct, updateProduct, reviewProduct} = props
     const [open, setOpen] = React.useState(false);
     const [rating, setRating] = React.useState(0);
     const [review, setReview] = React.useState("");
@@ -76,17 +78,21 @@ export default function ProductDialog(
     };
 
     const handleSave = () => {
-        updateProduct(store.storeId, product.id, name, price, quantity, category);
+        if (updateProduct != null) {
+            updateProduct(store.storeId, product.id, name, price, quantity, category);
+        }
         if (rated) { reviewProduct(product.id, review, rating); }
         setOpen(false);
     }
 
     const handleRemove = () => {
-        removeProduct(store.storeId, product.id);
+        if (removeProduct != null) {
+            removeProduct(store.storeId, product.id);
+        }
         handleClose();
     }
 
-  
+    const disableInput = updateProduct === null
 
     return (
         <div>
@@ -124,13 +130,13 @@ export default function ProductDialog(
                         <Button autoFocus color="inherit" onClick={handleClose}>
                             Cancel
                         </Button>
-                        <Button variant="contained" color="error" onClick={handleRemove}>
+                        <Button variant="contained" color="error" onClick={handleRemove} disabled={removeProduct === null}>
                             Delete product
                         </Button>
                     </Toolbar>
                 </AppBar>
                 <List>
-                    {InputDialog("name", name, setName)}
+                    {InputDialog("name", name, setName, disableInput)}
                     <Divider />
                     <ListItem button>
                         <ListItemText
@@ -139,11 +145,11 @@ export default function ProductDialog(
                         />
                     </ListItem>
                     <Divider />
-                    {InputDialog("category", category, setCategory)}
+                    {InputDialog("category", category, setCategory, disableInput)}
                     <Divider />
-                    {InputDialog("price", price, setPrice)}
+                    {InputDialog("price", price, setPrice, disableInput)}
                     <Divider />
-                    {InputDialog("quantity", quantity, setQuantity)}
+                    {InputDialog("quantity", quantity, setQuantity, disableInput)}
                     <Typography component="legend">Rate this product</Typography>
                     <Rating
                         size="large"

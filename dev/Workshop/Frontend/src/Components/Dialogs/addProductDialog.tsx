@@ -8,9 +8,11 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 export default function AddProductDialog(
-    storeId : number,
-    addProduct: (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => void ) {
-
+    props: {
+        storeId : number,
+        addProduct: (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => void 
+    }){
+    const { storeId, addProduct } = props;
     const [open, setOpen] = React.useState(false);
     const [name, setName] = React.useState("");
     const [description, setDescription] = React.useState("");
@@ -39,7 +41,7 @@ export default function AddProductDialog(
 
     return (
         <div>
-            <Button onClick={handleClickOpen}>
+            <Button onClick={handleClickOpen} variant="contained">
                 Add Product
             </Button>
             <Dialog open={open} onClose={handleClose}>

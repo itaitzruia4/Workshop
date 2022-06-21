@@ -12,6 +12,7 @@ import Tooltip from '@mui/material/Tooltip';
 import ListItem from '@mui/material/ListItem';
 import List from '@mui/material/List';
 import Grid from '@mui/material/Grid';
+import Container from '@mui/material/Container';
 
 import AddStoreDialog from '../Components/Dialogs/addStoreDialog';
 import StoreCard from '../Components/StoreCard';
@@ -33,11 +34,9 @@ import { handleChangeProductCategory, handleChangeProductName, handleChangeProdu
 
 function Profile() {
     const [refreshKey, setRefreshKey] = useState(0);
-    const textStyle = { color: 'black' }
 
     const [stores, setStores] = useState<Store[]>([])
     const [permissionsInfo, setPermissionsInfo] = useState<StorePermission[]>([])
-    const [notifications, setNotifications] = useState<MarketNotification[]>([]);
 
     const location = useLocation();
     const token = location.state as memberToken;
@@ -56,12 +55,109 @@ function Profile() {
         handleNewStore(token, storeName).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     };
 
+    const closeStore = (storeId: number) => {
+        handleCloseStore(token, storeId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+    };
+    const openStore = (storeId: number) => {
+        handleOpenStore(token, storeId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+    };
+
+    const addProduct = (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => {
+        handleAddProduct(token, storeId, productName, description, price, quantity, category).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+    };
+
+    const removeProduct = (storeId: number, productId: number) => {
+        handleRemoveProduct(token, storeId, productId).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+    };
+
+    const updateProduct = (storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => {
+        handleChangeProductName(token, storeId, productId, productName).then(() =>
+            handleChangeProductPrice(token, storeId, productId, price).then(() =>
+                handleChangeProductQuantity(token, storeId, productId, quantity).then(() =>
+                    handleChangeProductCategory(token, storeId, productId, category).then(() => setRefreshKey(oldKey => oldKey + 1))))).catch(error => alert(error));
+    };
+
+    const reviewProduct = (productId: number, review: string, rating: number) => {
+        handleReviewProduct(token, productId, review, rating).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
+    }
+
+
+    const addDiscount = (storeId: number, discountJson: string) => {
+        handleAddDiscount(token, storeId, discountJson)
+            .catch(error => {
+                alert(error)
+            });
+    };
+
+    const addProductDiscount = (storeId: number, productId: number, discountJson: string) => {
+        handleAddProductDiscount(token, storeId, productId, discountJson)
+            .catch(error => {
+                alert(error)
+            });
+    };
+
+    const addCategoryDiscount = (storeId: number, category: string, discountJson: string) => {
+        handleAddCategoryDiscount(token, storeId, category, discountJson)
+            .catch(error => {
+                alert(error)
+            });
+    };
+
+    const addProductPurchasePolicy = (storeId: number, productId: number, purchaseJson: string): void => {
+        handleAddProductPurchasePolicy(token, storeId, productId, purchaseJson)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
+    const addCategoryPurchasePolicy = (storeId: number, category: string, purchaseJson: string): void => {
+        handleAddCategoryPurchasePolicy(token, storeId, category, purchaseJson)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
+    const addBagPurchasePolicy = (storeId: number, purchaseJson: string): void => {
+        handleAddStorePurchasePolicy(token, storeId, purchaseJson)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
+    const addUserPurchasePolicy = (storeId: number, purchaseJson: string): void => {
+        handleAddUserPurchasePolicy(token, storeId, purchaseJson)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
+    const nominateStoreOwner = (storeId: number, nominee: string) => {
+        handleNominateStoreOwner(token, storeId, nominee)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
+    const nominateStoreManager = (storeId: number, nominee: string) => {
+        handleNominateStoreManager(token, storeId, nominee)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
+    const removeStoreOwnerNomination = (storeId: number, nominee: string) => {
+        handleRemoveStoreOwnerNomination(token, storeId, nominee)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
     useEffect(() => {
         refresh();
     }, [refreshKey])
 
     return (
-        <p className="welcome">
+        <Container>
             <AppBar sx={{ position: 'relative' }}>
                 <Toolbar>
                     <IconButton
@@ -75,23 +171,34 @@ function Profile() {
                     <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
                         {token.membername + "'s profile"}
                     </Typography>
+                    <Typography sx={{ ml: 2, flex: 1 }} variant="button" component="div">
+                        {"userId("+ token.userId + ")"}
+                    </Typography>
                     {AddStoreDialog(addStore)}
                     <IconButton autoFocus color="inherit" onClick={() => setRefreshKey(oldKey => oldKey + 1)}>
                         <RefreshIcon />
                     </IconButton>                 
                 </Toolbar>
             </AppBar>
-            <p className="welcome_buttons">
-                <Button variant="contained" onClick={() => console.log(permissionsInfo) }> Test </Button>
-            </p>
-            <Grid container item spacing={3}>
+            <Typography sx={{ ml: 2, flex: 1 }} variant="h3" component="div">Your stores</Typography>
+           <Grid container item spacing={3}>
                 {stores.map(store => {
+                    console.log(permissionsInfo)
+                    const permissions = permissionsById(store.storeId, permissionsInfo);
                     return ( 
-                        <Grid item xs={4} sx={{ margin: 1}}>
-                            {StoreCard(store, permissionsById(store.storeId, permissionsInfo).permissions)}
-                        </Grid>)})}
+                        permissions.length > 0 ?
+                            <Grid item >
+                                <StoreCard store={store} actions={permissions}
+                                    closeStore={closeStore} openStore={openStore} addProduct={addProduct}
+                                    removeProduct={removeProduct} updateProduct={updateProduct} reviewProduct={reviewProduct}
+                                    addDiscount={addDiscount} addProductDiscount={addProductDiscount} addCategoryDiscount={addCategoryDiscount}
+                                    addProductPurchasePolicy={addProductPurchasePolicy} addCategoryPurchasePolicy={addCategoryPurchasePolicy}
+                                    addBagPurchasePolicy={addBagPurchasePolicy} addUserPurchasePolicy={addUserPurchasePolicy}
+                                    nominateStoreOwner={nominateStoreOwner} nominateStoreManager={nominateStoreManager} removeStoreOwnerNomination={removeStoreOwnerNomination}
+                                />
+                        </Grid> : null)})}
             </Grid>
-        </p>
+        </Container>
     )
 }
 

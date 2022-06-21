@@ -158,7 +158,6 @@ export default function Appbar(
                                 aria-label="show notifications"
                                 color="inherit"
                                 onClick={routeChange('/profile', token as memberToken)}
-                                aria-hashpopup="true"
                             >
                                 <AccountCircleIcon />
                             </IconButton> : null
