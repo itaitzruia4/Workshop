@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.Reviews;
@@ -613,7 +611,7 @@ namespace Workshop.DomainLayer.UserPackage
             while (low < high)
             {
                 int mid = low + (high - low) / 2;
-                if (((DateTime)l[mid]) < ((DateTime)val))
+                if (l[mid] < val)
                 {
                     low = mid + 1;
                 }
@@ -631,7 +629,7 @@ namespace Workshop.DomainLayer.UserPackage
             while (low < high)
             {
                 int mid = low + (high - low) / 2;
-                if (((DateTime)l[mid]) > ((DateTime)val))
+                if (l[mid] > val)
                 {
                     high = mid;
                 }
@@ -643,16 +641,13 @@ namespace Workshop.DomainLayer.UserPackage
             return low;
         }
 
-        public Dictionary<string, Dictionary<string, dynamic>> MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end)
+        public List<UserCountInDate> MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end)
         {
             beginning = beginning.Date;
             end = end.Date;
             AssertCurrentUser(userId, membername);
             Member m = GetMember(membername);
-            Dictionary<string, Dictionary<string, dynamic>> returnVal = new Dictionary<string, Dictionary<string, dynamic>>()
-            {
-                
-            };
+            List<UserCountInDate> returnVal = new List<UserCountInDate>();
             if (!m.GetAllRoles().Any(x => x is MarketManager))
             {
                 throw new ArgumentException($"{membername} is not a market manager and can not request to view this information.");
@@ -663,16 +658,12 @@ namespace Workshop.DomainLayer.UserPackage
             }
             lock (userCountOnDatePerType.SyncRoot)
             {
-                /*foreach (DateTime date in userCountOnDatePerType.Keys.Cast<DateTime>().Where(d => d >= beginning && d <= end))
-                {
-                    returnVal.Add(date.ToShortDateString(), ((UserCountInDate)userCountOnDatePerType[date]).Information());
-                } WORKING BUT NOT UTILIZING BINARY SEARCH*/
-                int STARTING_INDEX = bisect_left(userCountOnDatePerType.Keys.Cast<DateTime>().ToArray<DateTime>(), beginning);
-                int ENDING_INDEX = bisect_right(userCountOnDatePerType.Keys.Cast<DateTime>().ToArray<DateTime>(), end);
+                DateTime[] dates = userCountOnDatePerType.Keys.Cast<DateTime>().ToArray();
+                int STARTING_INDEX = bisect_left(dates, beginning);
+                int ENDING_INDEX = bisect_right(dates, end);
                 for (int i = STARTING_INDEX; i < ENDING_INDEX; i++)
                 {
-                    UserCountInDate userCountInDate = (UserCountInDate)userCountOnDatePerType.GetByIndex(i);
-                    returnVal.Add(userCountInDate.Date.ToShortDateString(), userCountInDate.Information());
+                    returnVal.Add((UserCountInDate)userCountOnDatePerType.GetByIndex(i));
                 }
             }
             return returnVal;

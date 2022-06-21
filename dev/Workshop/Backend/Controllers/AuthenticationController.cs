@@ -2,7 +2,6 @@
 using API.Requests;
 using API.Responses;
 using Microsoft.AspNetCore.Mvc;
-using System.Globalization;
 using Workshop.ServiceLayer;
 using Workshop.ServiceLayer.ServiceObjects;
 using WebSocketSharp.Server;
@@ -14,12 +13,12 @@ namespace API.Controllers
     public class AuthenticationController : ControllerBase
     {
         IService Service;
-        WebSocketServer WsServer;
+        StaisticsViewingServer StatsServer;
         static volatile int userId = 0;
-        public AuthenticationController(IService service, WebSocketServer wsServer)
+        public AuthenticationController(IService service, StaisticsViewingServer statsServer)
         {
             Service = service;
-            WsServer = wsServer;
+            this.StatsServer = statsServer;
         }
 
         [HttpGet("entermarket")]
@@ -31,10 +30,10 @@ namespace API.Controllers
                 return BadRequest(new FrontResponse<int>(response.ErrorMessage));
             }
             int CURR_ID = userId++;
-            foreach (string path in WsServer.WebSocketServices.Paths)
+            /*foreach (string path in StatsServer.WebSocketServices.Paths)
             {
-                WsServer.WebSocketServices[path].Sessions.Broadcast(BitConverter.GetBytes(CURR_ID).Reverse().ToArray());
-            }
+                StatsServer.WebSocketServices[path].Sessions.Broadcast(BitConverter.GetBytes(CURR_ID).Reverse().ToArray());
+            }*/
             return Ok(new FrontResponse<int>(CURR_ID));
         }
 

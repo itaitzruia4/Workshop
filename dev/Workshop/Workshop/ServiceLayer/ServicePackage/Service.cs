@@ -810,15 +810,15 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<Dictionary<string, Dictionary<string, dynamic>>> MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end)
+        public Response<List<StatisticsInformation>> MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end)
         {
             try
             {
-                return new Response<Dictionary<string, Dictionary<string, dynamic>>>(facade.MarketManagerDailyRangeInformation(userId, membername, beginning, end), userId);
+                return new Response<List<StatisticsInformation>>(facade.MarketManagerDailyRangeInformation(userId, membername, beginning, end).Select(ucd => new StatisticsInformation(ucd)).ToList(), userId);
             }
             catch (Exception e)
             {
-                return new Response<Dictionary<string, Dictionary<string, dynamic>>>(e.Message, userId);
+                return new Response<List<StatisticsInformation>>(e.Message, userId);
             }
         }
     }

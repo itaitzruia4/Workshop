@@ -27,12 +27,12 @@ namespace API.Controllers
                 throw new ArgumentException("API needs to receive at most one command line arguments.");
             }
             int WEBSOCKET_PORT = service.GetPort();
-            WebSocketServer wsserver = new WebSocketServer(System.Net.IPAddress.Parse("127.0.0.1"), WEBSOCKET_PORT);
-            wsserver.Start();
+            StaisticsViewingServer statistics_server = new StaisticsViewingServer(System.Net.IPAddress.Parse("127.0.0.1"), WEBSOCKET_PORT);
+            statistics_server.Start();
             Console.WriteLine($"WS server started on ws://127.0.0.1:{WEBSOCKET_PORT}");
 
             builder.Services.AddSingleton(service);
-            builder.Services.AddSingleton(wsserver);
+            builder.Services.AddSingleton(statistics_server);
             builder.Services.AddControllers();
             builder.Services.AddCors(options =>
             {

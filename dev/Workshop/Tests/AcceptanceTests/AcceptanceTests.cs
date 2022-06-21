@@ -2488,7 +2488,7 @@ namespace Tests.AcceptanceTests
             Assert.AreEqual(0, service.GetMemberPermissions(3, "mem3").Value.Count);
         }
 
-        private void ValidateDailyRangeInformation(Dictionary<string, Dictionary<string, dynamic>> data, 
+        private void ValidateDailyRangeInformation(List<StatisticsInformation> input, 
             DateTime begin,
             DateTime end,
             int EXPECTED_GUEST_COUNT, 
@@ -2503,42 +2503,20 @@ namespace Tests.AcceptanceTests
             int CURR_OWNER_COUNT = 0;
             int CURR_MARKET_COUNT = 0;
 
+            Dictionary<string, StatisticsInformation> data = input.ToDictionary(si => si.Date);
+
             foreach (string date in data.Keys)
             {
-                bool NOT_TRASH_VALUE_FLAG = false;
                 DateTime currentDate = DateTime.Parse(date);
                 Assert.IsTrue(currentDate >= begin && currentDate <= end);
-                Dictionary<string, dynamic> dateEntries = data[date];
-                foreach (string value in dateEntries.Keys)
-                {
-                    switch (value)
-                    {
-                        case "date":
-                            Assert.AreEqual(date, ((DateTime)dateEntries[value]).ToShortDateString());
-                            break;
-                        case "guest":
-                            if (dateEntries[value] != 0) NOT_TRASH_VALUE_FLAG = true;
-                            CURR_GUEST_COUNT += dateEntries[value];
-                            break;
-                        case "member":
-                            if (dateEntries[value] != 0) NOT_TRASH_VALUE_FLAG = true;
-                            CURR_MEMBER_COUNT += dateEntries[value];
-                            break;
-                        case "manager":
-                            if (dateEntries[value] != 0) NOT_TRASH_VALUE_FLAG = true;
-                            CURR_MANAGER_COUNT += dateEntries[value];
-                            break;
-                        case "owner":
-                            if (dateEntries[value] != 0) NOT_TRASH_VALUE_FLAG = true;
-                            CURR_OWNER_COUNT += dateEntries[value];
-                            break;
-                        case "market":
-                            if (dateEntries[value] != 0) NOT_TRASH_VALUE_FLAG = true;
-                            CURR_MARKET_COUNT += dateEntries[value];
-                            break;
-                    }
-                }
-                Assert.IsTrue(NOT_TRASH_VALUE_FLAG);
+                StatisticsInformation si = data[date];
+                Assert.AreEqual(date, si.Date);
+                Assert.IsTrue(si.Guests != 0 || si.Members != 0 || si.StoreManagers != 0 || si.StoreOwners != 0 || si.MarketManagers != 0);
+                CURR_GUEST_COUNT += si.Guests;
+                CURR_MEMBER_COUNT += si.Members;
+                CURR_MANAGER_COUNT += si.StoreManagers;
+                CURR_OWNER_COUNT += si.StoreOwners;
+                CURR_MARKET_COUNT += si.MarketManagers;
             }
             Assert.AreEqual(CURR_GUEST_COUNT, EXPECTED_GUEST_COUNT);
             Assert.AreEqual(CURR_MEMBER_COUNT, EXPECTED_MEMBER_COUNT);
@@ -2602,7 +2580,7 @@ namespace Tests.AcceptanceTests
             Store st = service.CreateNewStore(1, "mem1", "s1", DateTime.Parse("Jun 14, 2022")).Value;
             service.NominateStoreManager(1, "mem1", "mem2", st.StoreId, DateTime.Parse("Jun 15, 2022"));
 
-            Response<Dictionary<string, Dictionary<string, dynamic>>> resp = service.MarketManagerDailyRangeInformation(2, "admin", DateTime.Parse(begin), DateTime.Parse(end));
+            Response<List<StatisticsInformation>> resp = service.MarketManagerDailyRangeInformation(2, "admin", DateTime.Parse(begin), DateTime.Parse(end));
             Assert.IsFalse(resp.ErrorOccured);
             Assert.IsNotNull(resp.Value);
             ValidateDailyRangeInformation(resp.Value, DateTime.Parse(begin), DateTime.Parse(end), guest, member, manager, owner, market);
@@ -2627,7 +2605,7 @@ namespace Tests.AcceptanceTests
             Store st = service.CreateNewStore(1, "mem1", "s1", DateTime.Parse("Jun 14, 2022")).Value;
             service.NominateStoreManager(1, "mem1", "mem2", st.StoreId, DateTime.Parse("Jun 15, 2022"));
 
-            Response<Dictionary<string, Dictionary<string, dynamic>>> resp = service.MarketManagerDailyRangeInformation(2, "admin", DateTime.Parse("Jun 14, 2022"), DateTime.Parse("Jun 15, 2022"));
+            Response<List<StatisticsInformation>> resp = service.MarketManagerDailyRangeInformation(2, "admin", DateTime.Parse("Jun 14, 2022"), DateTime.Parse("Jun 15, 2022"));
             Assert.IsTrue(resp.ErrorOccured);
             Assert.IsNotNull(resp.Value);
         }
@@ -2662,7 +2640,7 @@ namespace Tests.AcceptanceTests
             Store st = service.CreateNewStore(1, "mem1", "s1", DateTime.Parse("Jun 14, 2022")).Value;
             service.NominateStoreManager(1, "mem1", "mem2", st.StoreId, DateTime.Parse("Jun 15, 2022"));
 
-            Response<Dictionary<string, Dictionary<string, dynamic>>> resp = service.MarketManagerDailyRangeInformation(2, "admin", DateTime.Parse(begin), DateTime.Parse(end));
+            Response<List<StatisticsInformation>> resp = service.MarketManagerDailyRangeInformation(2, "admin", DateTime.Parse(begin), DateTime.Parse(end));
             Assert.IsFalse(resp.ErrorOccured);
             Assert.IsNotNull(resp.Value);
             ValidateDailyRangeInformation(resp.Value, DateTime.Parse(begin), DateTime.Parse(end), 0, 0, 0, 0, 0);
