@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Workshop.DomainLayer.MarketPackage;
+using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Permissions;
@@ -231,6 +232,11 @@ namespace Workshop.DomainLayer
         internal List<UserCountInDate> MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end)
         {
             return UserController.MarketManagerDailyRangeInformation(userId, membername, beginning, end);
+        }
+
+        internal List<OrderDTO> GetStorePurchaseHistory(int userId, string membername, int storeId)
+        {
+            return MarketController.GetStorePurchaseHistory(userId, membername, storeId);
         }
     }
 }

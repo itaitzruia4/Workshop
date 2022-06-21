@@ -821,5 +821,17 @@ namespace Workshop.ServiceLayer
                 return new Response<List<StatisticsInformation>>(e.Message, userId);
             }
         }
+
+        public Response<List<Order>> GetStorePurchaseHistory(int userId, string membername, int storeId)
+        {
+            try
+            {
+                return new Response<List<Order>>(facade.GetStorePurchaseHistory(userId, membername, storeId).Select(dor => new Order(dor)).ToList(), userId);
+            }
+            catch (Exception ex)
+            {
+                return new Response<List<Order>>(ex.Message, userId);
+            }
+        }
     }
 }

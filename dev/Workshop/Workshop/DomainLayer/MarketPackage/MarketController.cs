@@ -554,10 +554,10 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new ArgumentException($"Entered date is not valid: {date}");
             }
             int storeId = STORE_COUNT;
-            userController.AddStoreFounder(creator, storeId, date);
             ReaderWriterLock rwl = new ReaderWriterLock();
-            rwl.AcquireWriterLock(Timeout.Infinite);
             storesLocks[storeId] = rwl;
+            rwl.AcquireWriterLock(Timeout.Infinite);
+            userController.AddStoreFounder(creator, storeId, date);
             Store store = new Store(storeId, storeName, userController.GetMember(creator));
             stores[storeId] = store;
             STORE_COUNT++;
@@ -973,7 +973,6 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new MemberAccessException("User " + user + " is not allowed to add purchase terms in store " + storeId);
             stores[storeId].AddUserTerm(json_term);
             storesLocks[storeId].ReleaseWriterLock();
-
         }
 
         public List<Store> GetAllStores(int userId)
@@ -1033,6 +1032,17 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             throw new ArgumentException("user " + username + " is not a market manager");
 
+        }
+
+        public List<OrderDTO> GetStorePurchaseHistory(int userId, string membername, int storeId)
+        {
+            userController.AssertCurrentUser(userId, membername);
+            Member member = userController.GetMember(membername);
+            if (!member.GetAllRoles().Any(r => r is MarketManager) && !member.GetStoreRoles(storeId).Any(r => r.IsAuthorized(Action.ViewStorePurchaseHistory)))
+            {
+                throw new ArgumentException($"{membername} is not authorized to view the purchase history of store {storeId}");
+            }
+            return orderHandler.GetOrders(storeId);
         }
     }
 }

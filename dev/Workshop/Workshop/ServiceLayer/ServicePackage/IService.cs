@@ -54,5 +54,6 @@ namespace Workshop.ServiceLayer
         Response<Dictionary<Member, bool>> GetMembersOnlineStats(int userId, string actingUsername);
         Response<List<PermissionInformation>> GetMemberPermissions(int userId, string membername);
         Response<List<StatisticsInformation>> MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end);
+        Response<List<Order>> GetStorePurchaseHistory(int userId, string membername, int storeId);
     }
 }

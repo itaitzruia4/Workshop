@@ -2645,5 +2645,136 @@ namespace Tests.AcceptanceTests
             Assert.IsNotNull(resp.Value);
             ValidateDailyRangeInformation(resp.Value, DateTime.Parse(begin), DateTime.Parse(end), 0, 0, 0, 0, 0);
         }
+
+        [TestMethod]
+        public void Test_GetStorePurhcaseHistory_Success()
+        {
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
+            string member1 = "member1";
+            Test_Login_Good(1, member1, "password1");
+            DateTime PURCHASE_DATE = DateTime.Now;
+
+            Store store = service.CreateNewStore(1, member1, "Store1", PURCHASE_DATE).Value;
+            Product p1 = service.AddProduct(1, member1, store.StoreId, "Product1", "Description1", 100.0, 3, "no_cat").Value;
+            Product p2 = service.AddProduct(1, member1, store.StoreId, "Product2", "Description2", 200.0, 2, "Cat1").Value;
+            Product p3 = service.AddProduct(1, member1, store.StoreId, "Product3", "Description3", 50.0, 5, "Cat2").Value;
+            service.AddProductDiscount(1, member1, store.StoreId, makeSimpleProductDiscount(10)(p1.Id), p1.Id);
+            service.AddProductDiscount(1, member1, store.StoreId, makeSimpleProductDiscount(20)(p2.Id), p2.Id);
+            service.AddCategoryDiscount(1, member1, store.StoreId, makeSimpleCategoryDiscount(50)("Cat1"), "Cat1");
+            service.AddCategoryDiscount(1, member1, store.StoreId, makeSimpleCategoryDiscount(10)("Cat2"), "Cat2");
+            service.AddToCart(1, p1.Id, store.StoreId, 3);
+            service.AddToCart(1, p2.Id, store.StoreId, 2);
+            service.AddToCart(1, p3.Id, store.StoreId, 5);
+            double expected_price = 615;
+            Assert.AreEqual(expected_price, service.BuyCart(1, cc, address, PURCHASE_DATE).Value);
+
+            Response<List<Order>> adminResponse = service.GetStorePurchaseHistory(1, member1, store.StoreId);
+            Assert.IsFalse(adminResponse.ErrorOccured);
+            List<Order> orderHistory = adminResponse.Value;
+            Assert.IsNotNull(orderHistory);
+            Assert.AreEqual(1, orderHistory.Count);
+            Assert.AreEqual(PURCHASE_DATE.ToShortDateString(), orderHistory[0].Date);
+            Assert.AreEqual("Store1", orderHistory[0].StoreName);
+            Assert.AreEqual("member1", orderHistory[0].BuyerName);
+            Assert.AreEqual(address, orderHistory[0].Address);
+            Assert.AreEqual(expected_price, orderHistory[0].Price);
+            Assert.AreEqual(3, orderHistory[0].Products.Count);
+            Assert.IsTrue(orderHistory[0].Products.Select(p => p.Id).Contains(p1.Id));
+            Assert.IsTrue(orderHistory[0].Products.Select(p => p.Id).Contains(p2.Id));
+            Assert.IsTrue(orderHistory[0].Products.Select(p => p.Id).Contains(p3.Id));
+
+            Test_Login_Good(2, "admin", "admin");
+            List<Order> orderHistory1 = service.GetStorePurchaseHistory(2, "admin", store.StoreId).Value;
+            Assert.IsNotNull(orderHistory1);
+            Assert.AreEqual(1, orderHistory1.Count);
+            Assert.AreEqual(PURCHASE_DATE.ToShortDateString(), orderHistory1[0].Date);
+            Assert.AreEqual("Store1", orderHistory1[0].StoreName);
+            Assert.AreEqual("member1", orderHistory1[0].BuyerName);
+            Assert.AreEqual(address, orderHistory1[0].Address);
+            Assert.AreEqual(expected_price, orderHistory1[0].Price);
+            Assert.AreEqual(3, orderHistory1[0].Products.Count);
+            Assert.IsTrue(orderHistory1[0].Products.Select(p => p.Id).Contains(p1.Id));
+            Assert.IsTrue(orderHistory1[0].Products.Select(p => p.Id).Contains(p2.Id));
+            Assert.IsTrue(orderHistory1[0].Products.Select(p => p.Id).Contains(p3.Id));
+        }
+
+        [TestMethod]
+        public void Test_GetStorePurhcaseHistory_Success_MultipleOrders_MultipleStores()
+        {
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
+            string member1 = "member1";
+            Test_Login_Good(1, member1, "password1");
+            DateTime PURCHASE_DATE = DateTime.Now;
+
+            Store store = service.CreateNewStore(1, member1, "Store1", PURCHASE_DATE).Value;
+            Product p1 = service.AddProduct(1, member1, store.StoreId, "Product1", "Description1", 100.0, 6, "no_cat").Value;
+            Product p2 = service.AddProduct(1, member1, store.StoreId, "Product2", "Description2", 200.0, 4, "Cat1").Value;
+            Product p3 = service.AddProduct(1, member1, store.StoreId, "Product3", "Description3", 50.0, 10, "Cat2").Value;
+            service.AddProductDiscount(1, member1, store.StoreId, makeSimpleProductDiscount(10)(p1.Id), p1.Id);
+            service.AddProductDiscount(1, member1, store.StoreId, makeSimpleProductDiscount(20)(p2.Id), p2.Id);
+            service.AddCategoryDiscount(1, member1, store.StoreId, makeSimpleCategoryDiscount(50)("Cat1"), "Cat1");
+            service.AddCategoryDiscount(1, member1, store.StoreId, makeSimpleCategoryDiscount(10)("Cat2"), "Cat2");
+
+
+            service.AddToCart(1, p1.Id, store.StoreId, 3);
+            service.AddToCart(1, p2.Id, store.StoreId, 2);
+            service.AddToCart(1, p3.Id, store.StoreId, 5);
+            double expected_price = 615;
+            Assert.AreEqual(expected_price, service.BuyCart(1, cc, address, PURCHASE_DATE).Value);
+
+            service.AddToCart(1, p1.Id, store.StoreId, 3);
+            service.AddToCart(1, p2.Id, store.StoreId, 2);
+            service.AddToCart(1, p3.Id, store.StoreId, 5);
+            Assert.IsFalse(service.BuyCart(1, cc, address, PURCHASE_DATE).ErrorOccured);
+
+            // NOT INCLUDED IN HISTORY, NOT THE SAME STORE!
+            Store store2 = service.CreateNewStore(1, member1, "Store2", PURCHASE_DATE).Value;
+            Product p4 = service.AddProduct(1, member1, store2.StoreId, "Product4", "Description4", 100.0, 3, "no_cat").Value;
+            Product p5 = service.AddProduct(1, member1, store2.StoreId, "Product5", "Description5", 200.0, 2, "Cat1").Value;
+            Product p6 = service.AddProduct(1, member1, store2.StoreId, "Product6", "Description6", 50.0, 5, "Cat2").Value;
+            service.AddToCart(1, p4.Id, store2.StoreId, 3);
+            service.AddToCart(1, p5.Id, store2.StoreId, 2);
+            service.AddToCart(1, p6.Id, store2.StoreId, 5);
+            Assert.IsFalse(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
+            // NOT INCLUDED IN HISTORY, NOT THE SAME STORE!
+
+
+            Response<List<Order>> adminResponse = service.GetStorePurchaseHistory(1, member1, store.StoreId);
+            Assert.IsFalse(adminResponse.ErrorOccured);
+            List<Order> orderHistory = adminResponse.Value;
+            Assert.IsNotNull(orderHistory);
+            Assert.AreEqual(2, orderHistory.Count);
+
+            Test_Login_Good(2, "admin", "admin");
+            List<Order> orderHistory1 = service.GetStorePurchaseHistory(2, "admin", store.StoreId).Value;
+            Assert.IsNotNull(orderHistory1);
+            Assert.AreEqual(2, orderHistory.Count);
+        }
+
+        [TestMethod]
+        public void Test_GetStorePurhcaseHistory_Failure_NoPermissions()
+        {
+            string member1 = "member1";
+            Test_Login_Good(1, member1, "password1");
+            DateTime PURCHASE_DATE = DateTime.Now;
+
+            Store store = service.CreateNewStore(1, member1, "Store1", PURCHASE_DATE).Value;
+            Product p1 = service.AddProduct(1, member1, store.StoreId, "Product1", "Description1", 100.0, 3, "no_cat").Value;
+            Product p2 = service.AddProduct(1, member1, store.StoreId, "Product2", "Description2", 200.0, 2, "Cat1").Value;
+            Product p3 = service.AddProduct(1, member1, store.StoreId, "Product3", "Description3", 50.0, 5, "Cat2").Value;
+            service.AddProductDiscount(1, member1, store.StoreId, makeSimpleProductDiscount(10)(p1.Id), p1.Id);
+            service.AddProductDiscount(1, member1, store.StoreId, makeSimpleProductDiscount(20)(p2.Id), p2.Id);
+            service.AddCategoryDiscount(1, member1, store.StoreId, makeSimpleCategoryDiscount(50)("Cat1"), "Cat1");
+            service.AddCategoryDiscount(1, member1, store.StoreId, makeSimpleCategoryDiscount(10)("Cat2"), "Cat2");
+            service.AddToCart(1, p1.Id, store.StoreId, 3);
+            service.AddToCart(1, p2.Id, store.StoreId, 2);
+            service.AddToCart(1, p3.Id, store.StoreId, 5);
+            double expected_price = 615;
+            Assert.AreEqual(expected_price, service.BuyCart(1, cc, address, DateTime.Now).Value);
+
+            Test_Login_Good(2, "member2", "pass");
+            Response<List<Order>> response = service.GetStorePurchaseHistory(2, "member2", store.StoreId);
+            Assert.IsTrue(response.ErrorOccured);
+        }
     }
 }
