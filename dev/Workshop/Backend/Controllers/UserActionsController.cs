@@ -117,16 +117,16 @@ namespace API.Controllers
         }
 
         [HttpPost("getmembersonlinestats")]
-        public ActionResult<FrontResponse<KeyValuePair<Member[], Member[]>>> GetMembersOnlineStats([FromBody] MemberRequest request)
+        public ActionResult<FrontResponse<KeyValuePair<string[], string[]>>> GetMembersOnlineStats([FromBody] MemberRequest request)
         {
             Response<Dictionary<Member, bool>> response = Service.GetMembersOnlineStats(request.UserId, request.Membername);
             if (response.ErrorOccured)
             {
-                return BadRequest(new FrontResponse<KeyValuePair<Member[], Member[]>>(response.ErrorMessage));
+                return BadRequest(new FrontResponse<KeyValuePair<string[], string[]>>(response.ErrorMessage));
             }
-            Member[] onlineMembers = response.Value.Where((KeyValuePair<Member, bool> curr) => curr.Value).Select((KeyValuePair<Member, bool> curr) => curr.Key).ToArray();
-            Member[] offlineMembers = response.Value.Where((KeyValuePair<Member, bool> curr) => !curr.Value).Select((KeyValuePair<Member, bool> curr) => curr.Key).ToArray();
-            return Ok(new FrontResponse<KeyValuePair<Member[], Member[]>>(new KeyValuePair<Member[], Member[]>(onlineMembers, offlineMembers)));
+            string[] onlineMembers = response.Value.Where((KeyValuePair<Member, bool> curr) => curr.Value).Select((KeyValuePair<Member, bool> curr) => curr.Key.Username).ToArray();
+            string[] offlineMembers = response.Value.Where((KeyValuePair<Member, bool> curr) => !curr.Value).Select((KeyValuePair<Member, bool> curr) => curr.Key.Username).ToArray();
+            return Ok(new FrontResponse<KeyValuePair<string[], string[]>>(new KeyValuePair<string[], string[]>(onlineMembers, offlineMembers)));
         }
 
         [HttpPost("getmemberpermissions")]

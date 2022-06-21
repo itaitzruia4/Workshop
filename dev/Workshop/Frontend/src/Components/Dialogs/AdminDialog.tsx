@@ -210,15 +210,11 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
             <Dialog open={memberInfoOpen} onClose={handleCloseMemberInfo}>
                 <DialogTitle>Members Information</DialogTitle>
                 <DialogContent>
-                    <DialogContentText>
-                        Members Information
-                    </DialogContentText>
                     <TableContainer component={Paper}>
-                        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                        <Table sx={{ minWidth: 100 }} aria-label="online table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell align="right">Online</TableCell>
-                                    <TableCell align="right">Offline</TableCell>
+                                    <TableCell align="center" size="medium">ONLINE</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -230,8 +226,26 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
                                         <TableCell component="th" scope="row">
                                             {row}
                                         </TableCell>
-                                        <TableCell align="right">Online</TableCell>
-                                        <TableCell align="right">Offline</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                        <br/>
+                        <Table sx={{ minWidth: 100 }} aria-label="offline table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell align="center" size="medium">OFFLINE</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {offlineMembers.map((row) => (
+                                    <TableRow
+                                        key={row}
+                                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                    >
+                                        <TableCell component="th" scope="row">
+                                            {row}
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
