@@ -217,6 +217,26 @@ namespace Workshop.ServiceLayer
                                     facade.RejectStoreOwnerNomination(int.Parse(actualParams[0]), actualParams[1], actualParams[2], int.Parse(actualParams[3]));
                                     break;
                                 case "offer-bid":
+                                    if (actualParams.Length != 5) { throw new ArgumentException(); }
+                                    facade.OfferBid(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]), double.Parse(actualParams[4]));
+                                    break;
+                                case "counter-bid":
+                                    if (actualParams.Length != 5) { throw new ArgumentException(); }
+                                    facade.CounterBid(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]), double.Parse(actualParams[4]));
+                                    break;
+                                case "vote-for-bid":
+                                    if (actualParams.Length != 5) { throw new ArgumentException(); }
+                                    facade.VoteForBid(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]), bool.Parse(actualParams[4]));
+                                    break;
+                                case "buy-bid-product":
+                                    if (actualParams.Length != 16) { throw new ArgumentException(); }
+                                    CreditCard cc1 = new CreditCard(actualParams[1], actualParams[2], actualParams[3], actualParams[4], actualParams[5], actualParams[6]);
+                                    SupplyAddress address1 = new SupplyAddress(actualParams[7], actualParams[8], actualParams[9], actualParams[10], actualParams[11]);
+                                    facade.BuyBidProduct(int.Parse(actualParams[0]), actualParams[12], int.Parse(actualParams[13]), int.Parse(actualParams[14]), cc1, address1, DateTime.ParseExact(actualParams[15], "dd/MM/yyyy", CultureInfo.InvariantCulture));
+                                    break;
+                                case "get-bids-status":
+                                    if (actualParams.Length != 3) { throw new ArgumentException(); }
+                                    facade.GetBidsStatus(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]));
                                     break;
                                 default:
                                     throw new ArgumentException();
