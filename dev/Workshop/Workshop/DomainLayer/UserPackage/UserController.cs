@@ -301,6 +301,7 @@ namespace Workshop.DomainLayer.UserPackage
             RegisterToEvent(nominated.Username, new Event("RemoveStoreOwnerNominationFrom" + nominatedUsername, "", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("OpenStore" + storeId, "", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("CloseStore" + storeId, "", "MarketController"));
+            RegisterToEvent(nominated.Username, new Event("BidOfferInStore" + storeId, "", "MarketController"));
             Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} successfuly nominated member {nominatedUsername} as a store manager of store {storeId}");
             return newRole;
         }

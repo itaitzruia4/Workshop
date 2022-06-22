@@ -12,6 +12,7 @@ using System.Collections.Concurrent;
 using Workshop.DomainLayer.UserPackage.Notifications;
 using Workshop.ServiceLayer;
 using User = Workshop.DomainLayer.UserPackage.User;
+using Workshop.DomainLayer.MarketPackage.Biding;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
@@ -1007,6 +1008,154 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             throw new ArgumentException("user " + username + " is not a market manager");
 
+        }
+
+        public void VoteForBid(int userId, string username, int storeId, int bidId, bool vote)
+        {
+            userController.AssertCurrentUser(userId, username);
+            Member member = userController.GetMember(username);
+            foreach (StoreRole role in member.GetStoreRoles(storeId))
+            {
+                if (role.GetType() == typeof(StoreOwner) | role.GetType() == typeof(StoreFounder))
+                {
+                    if(stores[storeId].VoteForBid(member,vote,bidId))
+                    {
+                        Bid bid = stores[storeId].biding_votes[bidId];
+                        //bid is accepted
+                        BuyProduct(userId, bid.cc, bid.address, DateTime.Now, bid.product, bid.price, storeId);
+                        userController.notify(new Event("BidAccept" + bidId + "OfStore" + storeId, "Bid offer in store " + storeId + " to the product " + bid.product.Name + " in price of " + bid.price + " is accepted", "MarketController"));
+                    }
+                    else
+                    {
+                        Bid bid = stores[storeId].biding_votes[bidId];
+                        if (vote)
+                        {
+                            //vote is still on
+                        }
+                        else
+                        {
+                            //rejected vote
+                            userController.notify(new Event("BidReject" + bidId + "OfStore" + storeId, "Bid offer in store " + storeId + " to the product " + bid.product.Name + " in price of " + bid.price+ " is rejected", "MarketController"));
+                        }
+                    }
+                }
+            }
+            throw new ArgumentException("user " + username + " is not a store owner of store " + storeId);
+
+        }
+
+        public double BuyProduct(int userId, CreditCard cc, SupplyAddress address, DateTime buyTime,Product product, double price, int storeId)
+        {
+            Logger.Instance.LogEvent($"User {userId} is trying to buy {product.Name} in price of {price}.");
+            
+            if (buyTime > DateTime.Now)
+            {
+                throw new ArgumentException("Can not purchase from the future!");
+            }
+
+            List<ProductDTO> Products = new List<ProductDTO>();
+            Products.Add(product.GetProductDTO());
+            List<Event> events = new List<Event>();
+            Dictionary<int, List<OrderDTO>> storeOrdersSoFar = new Dictionary<int, List<OrderDTO>>();
+            Dictionary<string, List<OrderDTO>> userOrdersSoFar = new Dictionary<string, List<OrderDTO>>();
+            try
+            {
+                storesLocks[storeId].AcquireWriterLock(Timeout.Infinite);
+            }
+            catch
+            {
+                throw new ArgumentException($"Store {storeId} does not exist");
+            }
+            try
+            {
+                User currentUser = userController.GetUser(userId);
+                string username = currentUser is Member ? ((Member)currentUser).Username : "A guest";
+
+                events.Add(new Event("SaleInStore" + storeId, $"Prouduct with the name {product.Name} were bought from store {storeId} by {username}", "marketController"));
+                OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetStoreName(), Products, buyTime, price);
+                if (storeOrdersSoFar.ContainsKey(storeId))
+                {
+                    storeOrdersSoFar[storeId].Add(order);
+                }
+                else
+                {
+                    storeOrdersSoFar.Add(storeId, new List<OrderDTO>() { order });
+                }
+                if (userOrdersSoFar.ContainsKey(username))
+                {
+                    userOrdersSoFar[username].Add(order);
+                }
+                else
+                {
+                    userOrdersSoFar.Add(username, new List<OrderDTO>() { order });
+                }
+
+                storesLocks[storeId].ReleaseWriterLock();
+            }
+            catch (Exception e)
+            {
+                storesLocks[storeId].ReleaseWriterLock();
+                storesLocks[storeId].AcquireWriterLock(Timeout.Infinite);
+                stores[storeId].restoreProduct(product.GetProductDTO());
+                storesLocks[storeId].ReleaseWriterLock();
+                throw e;
+            }
+            
+            if (ExternalSystem.IsExternalSystemOnline())
+            {
+                int pay_trans_id = ExternalSystem.Pay(cc.Card_number, cc.Month, cc.Year, cc.Holder, cc.Ccv, cc.Id);
+                if (pay_trans_id != -1)
+                {
+                    int supply_trans_id = ExternalSystem.Supply(address.Name, address.Address, address.City, address.Country, address.Zip);
+                    if (supply_trans_id != -1)
+                    {
+                        double cartPrice = price;
+                        events.ForEach(e => userController.notify(e));
+
+                        
+                        foreach (OrderDTO order in storeOrdersSoFar[storeId])
+                        {
+                            orderHandler.addOrder(order, storeId);
+                        }
+                        foreach (string username in userOrdersSoFar.Keys)
+                        {
+                            foreach (OrderDTO order in userOrdersSoFar[username])
+                            {
+
+                                userController.AddOrder(userId, order, username);
+                            }
+                        }
+
+                        Logger.Instance.LogEvent($"User {userId} successfuly paid {price} and purchased his product.");
+                        return cartPrice;
+                    }
+                    else
+                    {
+                        ExternalSystem.Cancel_Pay(pay_trans_id);
+                    }
+                }
+            }
+            storesLocks[storeId].AcquireWriterLock(Timeout.Infinite);
+            stores[storeId].restoreProduct(product.GetProductDTO());
+            storesLocks[storeId].ReleaseWriterLock();
+            throw new ArgumentException("Buying product failed due to failures with the external system we're using!");
+        }
+
+        public void OfferBid(int userId, string username, int storeId, Product product, int price, CreditCard cc, SupplyAddress address)
+        {
+            userController.AssertCurrentUser(userId, username);
+            int bidId = stores[storeId].OfferBid(username, storeId, product, price, cc, address);
+            userController.notify(new Event("BidOfferInStore"+ storeId, "Bid offer in store " + storeId + " to the product " + product.Name + " in price of " + price, "MarketController"));
+            userController.RegisterToEvent(username, new Event("BidAccept" + bidId+ "OfStore"+storeId, "", "MarketController"));
+            userController.RegisterToEvent(username, new Event("BidReject" + bidId + "OfStore" + storeId, "", "MarketController"));
+            userController.RegisterToEvent(username, new Event("BidCounter" + bidId + "OfStore" + storeId, "", "MarketController"));
+        }
+
+        public void CounterBid(int userId, string username, int storeId, int bidId, int newPrice)
+        {
+            userController.AssertCurrentUser(userId, username);
+            Bid oldBid = stores[storeId].biding_votes[bidId];
+            userController.notify(new Event("BidCounter" + bidId + "OfStore" + storeId, "The counter price to your bid on product " + oldBid.product.Name + " in the store " + storeId + " is " + newPrice, "MarketController"));
         }
     }
 }

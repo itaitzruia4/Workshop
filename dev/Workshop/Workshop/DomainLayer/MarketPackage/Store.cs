@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using Member = Workshop.DomainLayer.UserPackage.Permissions.Member;
+using Bid = Workshop.DomainLayer.MarketPackage.Biding.Bid;
+
 namespace Workshop.DomainLayer.MarketPackage
 {
     public class Store
@@ -14,6 +16,8 @@ namespace Workshop.DomainLayer.MarketPackage
         private DiscountPolicy discountPolicy { get; set; }
         private PurchasePolicy purchasePolicy { get; set; }
         public HashSet<Member> owners { get; }
+        public ConcurrentDictionary<int,Bid> biding_votes { get; set; }
+        private int bid_id_count;
         public ConcurrentDictionary<Member, KeyValuePair<Member, HashSet<Member>>> owner_voting { get; }
         public Store(int id, string name, Member founder)
         {
@@ -27,6 +31,7 @@ namespace Workshop.DomainLayer.MarketPackage
             purchasePolicy = new PurchasePolicy(this);
             owners = new HashSet<Member>();
             owners.Add(founder);
+            bid_id_count = 0;
             owner_voting = new ConcurrentDictionary<Member, KeyValuePair<Member, HashSet<Member>>>();
         }
 
@@ -317,6 +322,42 @@ namespace Workshop.DomainLayer.MarketPackage
             double price = CalaculatePrice(shoppingBag);
             if (!purchasePolicy.CanPurchase(shoppingBag, age))
                 throw new Exception("Cannot purchase shopping bag because it violates our purchase policy.");
+        }
+
+        public bool VoteForBid(Member voter, bool answer, int bid_id)
+        {
+            // Returns true if bid was accepted
+            if (!owners.Contains(voter))
+            {
+                throw new ArgumentException($"{voter.Username} is not a store owner of store {id}, hence he can not vote about a bid.");
+            }
+            Bid bid;
+            if (!biding_votes.TryGetValue(bid_id, out bid))
+            {
+                throw new ArgumentException($"{bid_id} is not id of a bid in this store.");
+            }
+            if(answer)
+            {
+                if(bid.AddOwnerVote(voter))
+                {
+                    return true;
+                }
+                return false;
+            }
+            else
+            {
+                biding_votes.TryRemove(bid_id, out bid);
+                //todo triger remove?
+                return false;
+            }
+        }
+
+        internal int OfferBid(string username, int storeId, Product product, int price, CreditCard cc, SupplyAddress address)
+        {
+            biding_votes.TryAdd(bid_id_count, new Bid(product, price, username, owners, cc, address));
+            //registered to event of reject or accept of the bid
+
+            return bid_id_count++;
         }
     }
 }
