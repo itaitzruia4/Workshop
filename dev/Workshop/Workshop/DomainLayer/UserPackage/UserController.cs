@@ -284,6 +284,7 @@ namespace Workshop.DomainLayer.UserPackage
             RegisterToEvent(nominated.Username, new Event("RemoveStoreOwnerNominationFrom" + nominatedUsername, "", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("OpenStore" + storeId, "", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("CloseStore" + storeId, "", "MarketController"));
+            RegisterToEvent(nominated.Username, new Event("BidOfferInStore" + storeId, "", "MarketController"));
             UpdateUserStatistics(nominated, date);
             Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} successfuly nominated member {nominatedUsername} as a store manager of store {storeId}");
             return newRole;
@@ -437,7 +438,7 @@ namespace Workshop.DomainLayer.UserPackage
 
         public ReviewDTO ReviewProduct(int userId, string user, int productId, string review, int rating)
         {
-            Logger.Instance.LogEvent("User " + user + " is trying to review product " + productId);
+            Logger.Instance.LogEvent("User " + user + " is trying to review Product " + productId);
             AssertCurrentUser(userId, user);
             List<OrderDTO> orders = orderHandler.GetOrders(user);
             bool purchasedProduct = false;
@@ -451,10 +452,10 @@ namespace Workshop.DomainLayer.UserPackage
             }
             if (!purchasedProduct)
             {
-                Logger.Instance.LogEvent("User " + user + " FAILED to review product " + productId);
-                throw new ArgumentException($"Username {user} did not purchase product {productId}");
+                Logger.Instance.LogEvent("User " + user + " FAILED to review Product " + productId);
+                throw new ArgumentException($"Username {user} did not purchase Product {productId}");
             }
-            Logger.Instance.LogEvent("User " + user + " successfuly reviewed product " + productId);
+            Logger.Instance.LogEvent("User " + user + " successfuly reviewed Product " + productId);
             return reviewHandler.AddReview(user, productId, review, rating);
         }
 
@@ -462,7 +463,7 @@ namespace Workshop.DomainLayer.UserPackage
         public ShoppingBagProduct AddToCart(int userId, ShoppingBagProduct product, int storeId)
         {
             //ShoppingBagProduct 
-            Logger.Instance.LogEvent("User " + userId + " is trying to add a product to his cart from store " + storeId);
+            Logger.Instance.LogEvent("User " + userId + " is trying to add a Product to his cart from store " + storeId);
             return this.currentUsers[userId].AddToCart(product, storeId);
         }
 

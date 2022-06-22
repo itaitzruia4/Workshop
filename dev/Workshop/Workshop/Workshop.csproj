@@ -63,6 +63,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DomainLayer\MarketPackage\Biding\Bid.cs" />
     <Compile Include="DomainLayer\MarketPackage\CreditCard.cs" />
     <Compile Include="DomainLayer\MarketPackage\SupplyAddress.cs" />
     <Compile Include="DomainLayer\UserPackage\UserCountInDate.cs" />

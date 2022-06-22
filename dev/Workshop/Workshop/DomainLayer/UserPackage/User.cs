@@ -43,7 +43,7 @@ namespace Workshop.DomainLayer.UserPackage
             {
                 shoppingCart.deleteProduct(productId, bagNum);
             }
-            else throw new ArgumentException("product doesnt exist in cart");
+            else throw new ArgumentException("Product doesnt exist in cart");
         }
 
         internal int GetQuantityInCart(int productId)
@@ -63,7 +63,7 @@ namespace Workshop.DomainLayer.UserPackage
             {
                 shoppingCart.changeQuantity(productId, newQuantity,bagNum);
             }
-            else throw new ArgumentException("product doesnt exist in cart");
+            else throw new ArgumentException("Product doesnt exist in cart");
         }
 
         internal void ClearCart()
