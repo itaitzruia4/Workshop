@@ -17,7 +17,7 @@ namespace Workshop.DomainLayer.MarketPackage
         private PurchasePolicy purchasePolicy { get; set; }
         public HashSet<Member> owners { get; }
         public ConcurrentDictionary<int,Bid> biding_votes { get; set; }
-        private int bid_id_count;
+        private volatile int bid_id_count;
         public ConcurrentDictionary<Member, KeyValuePair<Member, HashSet<Member>>> owner_voting { get; }
         public Store(int id, string name, Member founder)
         {
@@ -33,6 +33,7 @@ namespace Workshop.DomainLayer.MarketPackage
             owners.Add(founder);
             bid_id_count = 0;
             owner_voting = new ConcurrentDictionary<Member, KeyValuePair<Member, HashSet<Member>>>();
+            biding_votes = new ConcurrentDictionary<int,Bid>();
         }
 
         public bool AddOwner(Member owner)
@@ -251,7 +252,7 @@ namespace Workshop.DomainLayer.MarketPackage
             if (!products.ContainsKey(productId))
                 throw new ArgumentException($"Product with ID {productId} does not exist in the store.");
             if (products[productId].Quantity < quantity)
-                throw new ArgumentException($"There is not enough quantity from product with ID {productId}.");
+                throw new ArgumentException($"There is not enough quantity from Product with ID {productId}.");
             products[productId].Quantity -= quantity;
             return products[productId].GetShoppingBagProduct(quantity);
         }
@@ -279,7 +280,7 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 products[productId].Quantity += quantity;
             }
-            else throw new ArgumentException($"Store {id} does not have product {productId}");
+            else throw new ArgumentException($"Store {id} does not have Product {productId}");
         }
 
         internal void RemoveFromProductQuantity(int productId, int quantity)
@@ -288,11 +289,11 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 if (products[productId].Quantity < quantity)
                 {
-                    throw new ArgumentException($"Store {name} does not have enough to provide {quantity} of product {productId}");
+                    throw new ArgumentException($"Store {name} does not have enough to provide {quantity} of Product {productId}");
                 }
                 products[productId].Quantity -= quantity;
             }
-            else throw new ArgumentException($"Store {id} does not have product {productId}");
+            else throw new ArgumentException($"Store {id} does not have Product {productId}");
         }
 
         internal StoreDTO GetStoreDTO()
@@ -324,40 +325,55 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new Exception("Cannot purchase shopping bag because it violates our purchase policy.");
         }
 
-        public bool VoteForBid(Member voter, bool answer, int bid_id)
+        public bool VoteForBid(Member voter, bool vote, int bid_id)
         {
-            // Returns true if bid was accepted
             if (!owners.Contains(voter))
             {
-                throw new ArgumentException($"{voter.Username} is not a store owner of store {id}, hence he can not vote about a bid.");
+                throw new ArgumentException($"{voter.Username} is not a store owner of store {id}, hence he can not vote on a bid.");
             }
             Bid bid;
             if (!biding_votes.TryGetValue(bid_id, out bid))
             {
                 throw new ArgumentException($"{bid_id} is not id of a bid in this store.");
             }
-            if(answer)
+            if(vote)
             {
-                if(bid.AddOwnerVote(voter))
-                {
-                    return true;
-                }
-                return false;
+                return bid.AddOwnerVote(voter) == owners.Count;
             }
             else
             {
                 biding_votes.TryRemove(bid_id, out bid);
-                //todo triger remove?
                 return false;
             }
         }
 
-        internal int OfferBid(string username, int storeId, Product product, int price, CreditCard cc, SupplyAddress address)
+        internal int OfferBid(string username, int storeId, Product product, double price)
         {
-            biding_votes.TryAdd(bid_id_count, new Bid(product, price, username, owners, cc, address));
-            //registered to event of reject or accept of the bid
+            int curr_id = bid_id_count++;
+            while (!biding_votes.TryAdd(curr_id, new Bid(curr_id, storeId, product, price, username)))
+            {
+                curr_id = bid_id_count++;
+            }
+            return curr_id;
+        }
 
-            return bid_id_count++;
+        internal void RemoveBid(int bidId)
+        {
+            biding_votes.TryRemove(bidId, out var val);
+        }
+
+        internal void ChangeBidPrice(int bidId, double newPrice)
+        {
+            if (biding_votes[bidId].OwnerVotes.Count == owners.Count)
+            {
+                throw new ArgumentException("Every owner has accepted the bid offer, you can not change the price now!");
+            }
+            biding_votes[bidId].OfferedPrice = newPrice;
+        }
+
+        internal bool CanBuyBid(string requester, int bidId)
+        {
+            return biding_votes[bidId].OwnerVotes.Count == owners.Count && biding_votes[bidId].OfferingMembername.Equals(requester);
         }
     }
 }

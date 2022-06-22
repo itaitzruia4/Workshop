@@ -94,11 +94,11 @@ namespace Workshop.DomainLayer.MarketPackage
                 nominatorStoreOwner.AddNominee(nominatedUsername, newRole);
 
                 userController.RegisterToEvent(nominated.Username, new Event("RemoveStoreOwnerNominationFrom" + nominatedUsername, "", "MarketController"));
+                userController.RegisterToEvent(nominated.Username, new Event("StoreOwnerVoting" + storeId, "", "MarketController"));
                 userController.RegisterToEvent(nominated.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
                 userController.RegisterToEvent(nominated.Username, new Event("OpenStore" + storeId, "", "MarketController"));
                 userController.RegisterToEvent(nominated.Username, new Event("CloseStore" + storeId, "", "MarketController"));
-
-
+                userController.RegisterToEvent(nominated.Username, new Event("BidOfferInStore" + storeId, "", "MarketController"));
                 storesLocks[storeId].ReleaseReaderLock();
                 Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} successfuly nominated member {nominatedUsername} as a store owner of store {storeId}");
                 return newRole;
@@ -167,8 +167,11 @@ namespace Workshop.DomainLayer.MarketPackage
             FOUND_NOMINATOR_ROLE.RemoveNominee(FOUND_NOMINATED_ROLE);
             stores[storeId].RemoveOwner(nominatedMember);
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
+            userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("RemoveStoreOwnerNominationFrom" + nominatedMember.Username, "", "MarketController"));
+            userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("StoreOwnerVoting" + storeId, "", "MarketController"));
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("OpenStore" + storeId, "", "MarketController"));
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("CloseStore" + storeId, "", "MarketController"));
+            userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("BidOfferInStore" + storeId, "", "MarketController"));
             userController.notify(new Event("RemoveStoreOwnerNominationFrom" + nominated, "Removed store owner nomination from member " + nominated, "MarketController"));
             Logger.Instance.LogEvent($"Member {nominator} successfuly removed store owner nomination from {nominated} in store {storeId}.");
             return nominatedMember;
@@ -266,7 +269,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
         public Product AddProductToStore(int userId, string username, int storeId, string name, string description, double price, int quantity, string category)
         {
-            Logger.Instance.LogEvent($"{username} is trying to add product {name} to store {storeId}.");
+            Logger.Instance.LogEvent($"{username} is trying to add Product {name} to store {storeId}.");
             userController.AssertCurrentUser(userId, username);
             Product product = null;
             try
@@ -282,13 +285,13 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new MemberAccessException("This user is not authorized for adding products to the specified store.");
             product = stores[storeId].AddProduct(name, PRODUCT_COUNT++, description, price, quantity, category);
             storesLocks[storeId].ReleaseWriterLock();
-            Logger.Instance.LogEvent($"{username} successfuly added product {name} to store {storeId}.");
+            Logger.Instance.LogEvent($"{username} successfuly added Product {name} to store {storeId}.");
             return product;
         }
 
         public void RemoveProductFromStore(int userId, string username, int storeId, int productID)
         {
-            Logger.Instance.LogEvent($"{username} is trying to remove product {productID} to store {storeId}.");
+            Logger.Instance.LogEvent($"{username} is trying to remove Product {productID} to store {storeId}.");
             userController.AssertCurrentUser(userId, username);
             try
             {
@@ -303,12 +306,12 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new MemberAccessException("This user is not authorized for removing products from the specified store.");
             stores[storeId].RemoveProduct(productID);
             storesLocks[storeId].ReleaseWriterLock();
-            Logger.Instance.LogEvent($"{username} successfuly removed product {productID} from store {storeId}.");
+            Logger.Instance.LogEvent($"{username} successfuly removed Product {productID} from store {storeId}.");
         }
 
         public void ChangeProductDescription(int userId, string username, int storeId, int productID, string description)
         {
-            Logger.Instance.LogEvent($"{username} is trying to change the description of product {productID} in store {storeId}.");
+            Logger.Instance.LogEvent($"{username} is trying to change the description of Product {productID} in store {storeId}.");
             userController.AssertCurrentUser(userId, username);
             try
             {
@@ -323,12 +326,12 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new MemberAccessException("This user is not authorized for changing products descriptions in the specified store.");
             stores[storeId].ChangeProductDescription(productID, description);
             storesLocks[storeId].ReleaseWriterLock();
-            Logger.Instance.LogEvent($"{username} successfuly changed the description of product {productID} in store {storeId}.");
+            Logger.Instance.LogEvent($"{username} successfuly changed the description of Product {productID} in store {storeId}.");
         }
 
         public void ChangeProductName(int userId, string username, int storeId, int productID, string name)
         {
-            Logger.Instance.LogEvent($"{username} is trying to change the name of product {productID} in store {storeId}.");
+            Logger.Instance.LogEvent($"{username} is trying to change the name of Product {productID} in store {storeId}.");
             userController.AssertCurrentUser(userId, username);
             try
             {
@@ -343,12 +346,12 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new MemberAccessException("This user is not authorized for changing products names in the specified store.");
             stores[storeId].ChangeProductName(productID, name);
             storesLocks[storeId].ReleaseWriterLock();
-            Logger.Instance.LogEvent($"{username} successfuly changed the name of product {productID} in store {storeId}.");
+            Logger.Instance.LogEvent($"{username} successfuly changed the name of Product {productID} in store {storeId}.");
         }
 
         public void ChangeProductPrice(int userId, string username, int storeId, int productID, double price)
         {
-            Logger.Instance.LogEvent($"{username} is trying to change the price of product {productID} in store {storeId}.");
+            Logger.Instance.LogEvent($"{username} is trying to change the OfferedPrice of Product {productID} in store {storeId}.");
             userController.AssertCurrentUser(userId, username);
             try
             {
@@ -363,12 +366,12 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new MemberAccessException("This user is not authorized for changing products prices in the specified store.");
             stores[storeId].ChangeProductPrice(productID, price);
             storesLocks[storeId].ReleaseWriterLock();
-            Logger.Instance.LogEvent($"{username} successfuly changed the price of product {productID} in store {storeId}.");
+            Logger.Instance.LogEvent($"{username} successfuly changed the OfferedPrice of Product {productID} in store {storeId}.");
         }
 
         public void ChangeProductQuantity(int userId, string username, int storeId, int productID, int quantity)
         {
-            Logger.Instance.LogEvent($"{username} is trying to change the quantity of product {productID} in store {storeId}.");
+            Logger.Instance.LogEvent($"{username} is trying to change the quantity of Product {productID} in store {storeId}.");
             userController.AssertCurrentUser(userId, username);
             try
             {
@@ -383,12 +386,12 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
             stores[storeId].ChangeProductQuantity(productID, quantity);
             storesLocks[storeId].ReleaseWriterLock();
-            Logger.Instance.LogEvent($"{username} successfuly changed the quantity of product {productID} in store {storeId}.");
+            Logger.Instance.LogEvent($"{username} successfuly changed the quantity of Product {productID} in store {storeId}.");
         }
 
         public void ChangeProductCategory(int userId, string username, int storeId, int productID, string category)
         {
-            Logger.Instance.LogEvent($"{username} is trying to change the quantity of product {productID} in store {storeId}.");
+            Logger.Instance.LogEvent($"{username} is trying to change the quantity of Product {productID} in store {storeId}.");
             userController.AssertCurrentUser(userId, username);
             try
             {
@@ -403,7 +406,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
             stores[storeId].ChangeProductCategory(productID, category);
             storesLocks[storeId].ReleaseWriterLock();
-            Logger.Instance.LogEvent($"{username} successfuly changed the quantity of product {productID} in store {storeId}.");
+            Logger.Instance.LogEvent($"{username} successfuly changed the quantity of Product {productID} in store {storeId}.");
         }
 
         public List<OrderDTO> GetStoreOrdersList(int userId, string username, int storeId)
@@ -478,9 +481,6 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new ArgumentException($"Store {storeId} is already opened.");
             }
             storesLocks[storeId].ReleaseWriterLock();
-            //userController.RegisterToEvent(userId, new Event("SaleInStore" + storeId, "", "MarketController"));
-            //userController.RegisterToEvent(userId, new Event("OpenStore" + storeId, "", "MarketController"));
-            //userController.RegisterToEvent(userId, new Event("CloseStore" + storeId, "", "MarketController"));
             Logger.Instance.LogEvent($"{membername} successfuly opened store {storeId}.");
         }
 
@@ -541,6 +541,8 @@ namespace Workshop.DomainLayer.MarketPackage
             userController.RegisterToEvent(creator, new Event("SaleInStore" + storeId, "", "MarketController"));
             userController.RegisterToEvent(creator, new Event("OpenStore" + storeId, "", "MarketController"));
             userController.RegisterToEvent(creator, new Event("CloseStore" + storeId, "", "MarketController"));
+            userController.RegisterToEvent(creator, new Event("BidOfferInStore" + storeId, "", "MarketController"));
+            userController.RegisterToEvent(creator, new Event("StoreOwnerVoting" + storeId, "", "MarketController"));
             Logger.Instance.LogEvent($"{creator} successfuly created store \"{storeName}\", and received a new store ID: {storeId}.");
             return store;
         }
@@ -1010,43 +1012,9 @@ namespace Workshop.DomainLayer.MarketPackage
 
         }
 
-        public void VoteForBid(int userId, string username, int storeId, int bidId, bool vote)
-        {
-            userController.AssertCurrentUser(userId, username);
-            Member member = userController.GetMember(username);
-            foreach (StoreRole role in member.GetStoreRoles(storeId))
-            {
-                if (role.GetType() == typeof(StoreOwner) | role.GetType() == typeof(StoreFounder))
-                {
-                    if(stores[storeId].VoteForBid(member,vote,bidId))
-                    {
-                        Bid bid = stores[storeId].biding_votes[bidId];
-                        //bid is accepted
-                        BuyProduct(userId, bid.cc, bid.address, DateTime.Now, bid.product, bid.price, storeId);
-                        userController.notify(new Event("BidAccept" + bidId + "OfStore" + storeId, "Bid offer in store " + storeId + " to the product " + bid.product.Name + " in price of " + bid.price + " is accepted", "MarketController"));
-                    }
-                    else
-                    {
-                        Bid bid = stores[storeId].biding_votes[bidId];
-                        if (vote)
-                        {
-                            //vote is still on
-                        }
-                        else
-                        {
-                            //rejected vote
-                            userController.notify(new Event("BidReject" + bidId + "OfStore" + storeId, "Bid offer in store " + storeId + " to the product " + bid.product.Name + " in price of " + bid.price+ " is rejected", "MarketController"));
-                        }
-                    }
-                }
-            }
-            throw new ArgumentException("user " + username + " is not a store owner of store " + storeId);
-
-        }
-
         public double BuyProduct(int userId, CreditCard cc, SupplyAddress address, DateTime buyTime,Product product, double price, int storeId)
         {
-            Logger.Instance.LogEvent($"User {userId} is trying to buy {product.Name} in price of {price}.");
+            Logger.Instance.LogEvent($"User {userId} is trying to buy {product.Name} in OfferedPrice of {price}.");
             
             if (buyTime > DateTime.Now)
             {
@@ -1126,7 +1094,7 @@ namespace Workshop.DomainLayer.MarketPackage
                             }
                         }
 
-                        Logger.Instance.LogEvent($"User {userId} successfuly paid {price} and purchased his product.");
+                        Logger.Instance.LogEvent($"User {userId} successfuly paid {price} and purchased his Product.");
                         return cartPrice;
                     }
                     else
@@ -1138,24 +1106,114 @@ namespace Workshop.DomainLayer.MarketPackage
             storesLocks[storeId].AcquireWriterLock(Timeout.Infinite);
             stores[storeId].restoreProduct(product.GetProductDTO());
             storesLocks[storeId].ReleaseWriterLock();
-            throw new ArgumentException("Buying product failed due to failures with the external system we're using!");
+            throw new ArgumentException("Buying Product failed due to failures with the external system we're using!");
         }
 
-        public void OfferBid(int userId, string username, int storeId, Product product, int price, CreditCard cc, SupplyAddress address)
+        public Bid OfferBid(int userId, string username, int storeId, int productId, double price)
         {
             userController.AssertCurrentUser(userId, username);
-            int bidId = stores[storeId].OfferBid(username, storeId, product, price, cc, address);
-            userController.notify(new Event("BidOfferInStore"+ storeId, "Bid offer in store " + storeId + " to the product " + product.Name + " in price of " + price, "MarketController"));
+            try
+            {
+                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
+            }
+            catch
+            {
+                throw new ArgumentException($"No such store {storeId}");
+            }
+
+            Product product = stores[storeId].GetProduct(productId);
+            int bidId = stores[storeId].OfferBid(username, storeId, product, price);
+
+            userController.notify(new Event("BidOfferInStore"+ storeId, "Bid offer in store " + storeId + " to Product " + product.Name + ", offered OfferedPrice: " + price, "MarketController"));
+            
             userController.RegisterToEvent(username, new Event("BidAccept" + bidId+ "OfStore"+storeId, "", "MarketController"));
             userController.RegisterToEvent(username, new Event("BidReject" + bidId + "OfStore" + storeId, "", "MarketController"));
             userController.RegisterToEvent(username, new Event("BidCounter" + bidId + "OfStore" + storeId, "", "MarketController"));
+
+            storesLocks[storeId].ReleaseReaderLock();
+
+            return stores[storeId].biding_votes[bidId];
         }
 
-        public void CounterBid(int userId, string username, int storeId, int bidId, int newPrice)
+        public Bid CounterBid(int userId, string membername, int storeId, int bidId, double newPrice)
+        {
+            userController.AssertCurrentUser(userId, membername);
+            try
+            {
+                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
+            }
+            catch
+            {
+                throw new ArgumentException($"No such store {storeId}");
+            }
+            foreach (StoreRole role in userController.GetMember(membername).GetStoreRoles(storeId))
+            {
+                if (role is StoreOwner)
+                {
+                    stores[storeId].ChangeBidPrice(bidId, newPrice);
+                    Bid oldBid = stores[storeId].biding_votes[bidId];
+                    userController.notify(new Event("BidCounter" + bidId + "OfStore" + storeId, "The counter OfferedPrice to your bid on Product " + oldBid.Product.Name + " in the store " + storeId + " is " + newPrice, "MarketController"));
+                    storesLocks[storeId].ReleaseReaderLock();
+                    return oldBid;
+                }
+            }
+            storesLocks[storeId].ReleaseReaderLock();
+            throw new ArgumentException($"{membername} is not a store owner of store {storeId} hence he can not give counter offers to bids in the store.");
+        }
+
+        public Bid VoteForBid(int userId, string username, int storeId, int bidId, bool vote)
         {
             userController.AssertCurrentUser(userId, username);
-            Bid oldBid = stores[storeId].biding_votes[bidId];
-            userController.notify(new Event("BidCounter" + bidId + "OfStore" + storeId, "The counter price to your bid on product " + oldBid.product.Name + " in the store " + storeId + " is " + newPrice, "MarketController"));
+            Member member = userController.GetMember(username);
+            foreach (StoreRole role in member.GetStoreRoles(storeId))
+            {
+                if (role is StoreOwner)
+                {
+                    Bid bid = stores[storeId].biding_votes[bidId];
+                    if (stores[storeId].VoteForBid(member, vote, bidId)) // Bid was accepted
+                    {
+                        stores[storeId].RemoveBid(bidId);
+                        userController.notify(new Event("BidAccept" + bidId + "OfStore" + storeId, "Bid offer in store " + storeId + " to the Product " + bid.Product.Name + " in OfferedPrice of " + bid.OfferedPrice + " is accepted", "MarketController"));
+                    }
+                    else if (!vote)
+                    {
+                        stores[storeId].RemoveBid(bidId);
+                        userController.notify(new Event("BidReject" + bidId + "OfStore" + storeId, "Bid offer in store " + storeId + " to the Product " + bid.Product.Name + " in OfferedPrice of " + bid.OfferedPrice + " is rejected", "MarketController"));
+                    }
+                    return bid;
+                }
+            }
+            throw new ArgumentException("user " + username + " is not a store owner of store " + storeId);
         }
-    }
+
+        public double BuyBidProduct(int userId, string username, int storeId, int bidId, CreditCard cc, SupplyAddress address, DateTime buyTime)
+        {
+            userController.AssertCurrentUser(userId, username);
+            try { storesLocks[storeId].AcquireReaderLock(Timeout.Infinite); }
+            catch { throw new ArgumentException($"Store does not exist: {storeId}"); }
+            Store store = stores[storeId];
+            if (store.CanBuyBid(username, bidId)){
+                Bid bid = store.biding_votes[bidId];
+                double retValue = BuyProduct(userId, cc, address, buyTime, bid.Product, bid.OfferedPrice, storeId);
+                store.RemoveBid(bidId);
+                storesLocks[storeId].ReleaseReaderLock();
+                return retValue;
+            }
+            storesLocks[storeId].ReleaseReaderLock();
+            throw new ArgumentException($"{username} can not buy bid {bidId} since it's not accepted by all store owners or he is not the one who submitted the bid.");
+        }
+
+        public List<Bid> GetBidsStatus(int userId, string username, int storeId)
+        {
+            userController.AssertCurrentUser(userId, username);
+            Member member = userController.GetMember(username);
+            foreach (StoreRole role in member.GetStoreRoles(storeId))
+            {
+                if (role is StoreOwner)
+                {
+                    return stores[storeId].biding_votes.Select(kvp => kvp.Value).ToList();
+                }
+            }
+            throw new ArgumentException($"{username} is not a store owner of store {storeId} and can not view the status of bids in it");
+        }
 }

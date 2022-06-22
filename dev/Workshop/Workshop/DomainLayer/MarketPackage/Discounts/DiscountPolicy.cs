@@ -125,7 +125,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 return ParseCategoryPriceActionSimple(data);
             if (tag.Equals(STORE_PRICE_ACT_TAG))
                 return ParseStorePriceActionSimple(data);
-            throw new Exception("Unknown price action tag: " + tag);
+            throw new Exception("Unknown OfferedPrice action tag: " + tag);
         }
 
         private PriceAction ParsePriceActionComposite(dynamic data)
@@ -135,7 +135,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 return new SumComposite(ParsePriceAction(data.lhs), ParsePriceAction(data.rhs));
             if (action.Equals("max"))
                 return new MaxComposite(ParsePriceAction(data.lhs), ParsePriceAction(data.rhs));
-            throw new Exception("Unknown price action: " + action);
+            throw new Exception("Unknown OfferedPrice action: " + action);
         }
 
         private PriceAction ParseProductPriceActionSimple(dynamic data)
@@ -152,7 +152,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 }
                 catch (Exception)
                 {
-                    throw new Exception("Invalid product id: " + data.productId);
+                    throw new Exception("Invalid Product id: " + data.productId);
                 }
             }
             catch (Exception) { 
@@ -195,7 +195,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             catch (Exception)
             {
-                throw new Exception("Invalid product id: " + data.category);
+                throw new Exception("Invalid Product id: " + data.category);
             }
             if (percentage <= 0 || percentage > 100)
                 throw new Exception("Discount percentage must be between 0 and 100");
@@ -265,7 +265,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 }
                 catch (Exception)
                 {
-                    throw new Exception("Invalid product id: " + data.productId);
+                    throw new Exception("Invalid Product id: " + data.productId);
                 }
             }
             catch (Exception)
@@ -277,7 +277,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
             if (!store.ProductExists(product_id))
                 throw new Exception("Product id: " + product_id + "does not exist in store: " + store.GetId());
-            // The term is related to price of the product
+            // The term is related to OfferedPrice of the Product
             if (type.Equals("p"))
             {
                 if (action.Equals("<"))
@@ -333,7 +333,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 else
                     throw new Exception("Unknown term action: " + action);
             }
-            // The term is related to quantity of the product
+            // The term is related to quantity of the Product
             else if (type.Equals("q"))
             {
                 if (value - (int)(value) > 0)
@@ -418,7 +418,7 @@ namespace Workshop.DomainLayer.MarketPackage
             if (category == null || category.Equals(""))
                 throw new Exception("Discount term category must be non-empty.");
 
-            // The term is related to price of the product
+            // The term is related to OfferedPrice of the Product
             if (type.Equals("p"))
             {
                 if (action.Equals("<"))
@@ -474,7 +474,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 else
                     throw new Exception("Unknown term action: " + action);
             }
-            // The term is related to quantity of the product
+            // The term is related to quantity of the Product
             else if (type.Equals("q"))
             {
                 if (value - (int)(value) > 0)
@@ -555,7 +555,7 @@ namespace Workshop.DomainLayer.MarketPackage
             if (value <= 0)
                 throw new Exception("Discount term value must be above 0.");
 
-            // The term is related to price of the product
+            // The term is related to OfferedPrice of the Product
             if (type.Equals("p"))
             {
                 if (action.Equals("<"))
@@ -606,7 +606,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 else
                     throw new Exception("Unknown term action: " + action);
             }
-            // The term is related to quantity of the product
+            // The term is related to quantity of the Product
             else if (type.Equals("q"))
             {
                 if (value - (int)(value) > 0)

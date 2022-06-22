@@ -10,34 +10,26 @@ namespace Workshop.DomainLayer.MarketPackage.Biding
 {
     public class Bid
     {
-        public Product product { get; set; }
-        public int price { get; set; }
-        public string presenter_name { get; set; }
-        public CreditCard cc { get; set; }
-        public SupplyAddress address { get; set; }
-        public HashSet<Member> owner_votes { get; set; }
-        public HashSet<Member> owners;
-        public Bid(Product product, int price, string presenter_name,HashSet<Member> owners, CreditCard cc, SupplyAddress address)
+        public int BidId { get; set; }
+        public int StoreId { get; set; }
+        public Product Product { get; set; }
+        public double OfferedPrice { get; set; }
+        public string OfferingMembername { get; set; }
+        public HashSet<Member> OwnerVotes { get; set; }
+        public Bid(int bidId, int storeId, Product product, double price, string presenter_name)
         {
-            this.product = product;
-            this.price = price;
-            this.presenter_name = presenter_name;
-            this.owners = owners;
-            this.cc = cc;
-            this.address = address;
+            BidId = bidId;
+            StoreId = storeId;
+            Product = product;
+            OfferedPrice = price;
+            OfferingMembername = presenter_name;
+            OwnerVotes = new HashSet<Member>();
         }
 
-        public bool AddOwnerVote(Member owner_name)
+        public int AddOwnerVote(Member owner_name)
         {
-            if(owners.Contains(owner_name))
-            {
-                owner_votes.Add(owner_name);
-                if(owner_votes.Count == owners.Count)
-                {
-                    return true;
-                }
-            }
-            return false;
+            OwnerVotes.Add(owner_name);
+            return OwnerVotes.Count;
         }
     }
 }

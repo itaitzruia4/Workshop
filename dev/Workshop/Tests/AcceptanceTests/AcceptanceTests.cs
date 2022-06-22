@@ -20,7 +20,7 @@ namespace Tests.AcceptanceTests
         IService service;
         private const string username = "Goodun";
         private const string password = "Goodp";
-        private const string product = "product";
+        private const string product = "Product";
         private SupplyAddress address = new SupplyAddress("Ronmi", "Mayor 1", "Ashkelon", "Israel", "784112");
         private CreditCard cc = new CreditCard("001122334455667788", "11", "26", "LeBron Michal", "555", "208143751");
         private Mock<IExternalSystem> externalSystem = new Mock<IExternalSystem>();
@@ -1521,7 +1521,7 @@ namespace Tests.AcceptanceTests
             Assert.IsFalse(service.AddToCart(3, p1.Id, store.StoreId, 2).ErrorOccured); // 200 before discount, 180 after
             Assert.IsFalse(service.AddToCart(3, p2.Id, store.StoreId, 3).ErrorOccured); // 30 before discount, 24 after
             Assert.AreEqual(204, service.BuyCart(3, cc, address, DateTime.Now).Value);
-            string review_string = "Good product, that is!";
+            string review_string = "Good Product, that is!";
             ReviewDTO rev = service.ReviewProduct(3, member3, p1.Id, review_string, 4).Value;
             Assert.AreEqual(review_string, rev.Review);
             Assert.AreEqual(4, rev.Rating);
