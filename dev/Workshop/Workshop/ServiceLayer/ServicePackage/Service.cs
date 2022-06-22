@@ -216,6 +216,8 @@ namespace Workshop.ServiceLayer
                                     if (actualParams.Length != 4) { throw new ArgumentException(); }
                                     facade.RejectStoreOwnerNomination(int.Parse(actualParams[0]), actualParams[1], actualParams[2], int.Parse(actualParams[3]));
                                     break;
+                                case "offer-bid":
+                                    break;
                                 default:
                                     throw new ArgumentException();
                             }
@@ -831,6 +833,66 @@ namespace Workshop.ServiceLayer
             catch (Exception ex)
             {
                 return new Response<List<Order>>(ex.Message, userId);
+            }
+        }
+
+        public Response<Bid> OfferBid(int userId, string username, int storeId, int productId, double price)
+        {
+            try
+            {
+                return new Response<Bid>(new Bid(facade.OfferBid(userId, username, storeId, productId, price)), userId);
+            }
+            catch (Exception ex)
+            {
+                return new Response<Bid>(ex.Message, userId);
+            }
+        }
+
+        public Response<Bid> CounterBid(int userId, string membername, int storeId, int bidId, double newPrice)
+        {
+            try
+            {
+                return new Response<Bid>(new Bid(facade.CounterBid(userId, membername, storeId, bidId, newPrice)), userId);
+            }
+            catch (Exception ex)
+            {
+                return new Response<Bid>(ex.Message, userId);
+            }
+        }
+
+        public Response<Bid> VoteForBid(int userId, string username, int storeId, int bidId, bool vote)
+        {
+            try
+            {
+                return new Response<Bid>(new Bid(facade.VoteForBid(userId, username, storeId, bidId, vote)), userId);
+            }
+            catch (Exception ex)
+            {
+                return new Response<Bid>(ex.Message, userId);
+            }        
+        }
+
+        public Response<double> BuyBidProduct(int userId, string username, int storeId, int bidId, CreditCard cc, SupplyAddress address, DateTime buyTime)
+        {
+            try
+            {
+                return new Response<double>(facade.BuyBidProduct(userId, username, storeId, bidId, cc, address, buyTime), userId);
+            }
+            catch (Exception ex)
+            {
+                return new Response<double>(ex.Message, userId);
+            }
+        }
+
+        public Response<List<Bid>> GetBidsStatus(int userId, string username, int storeId)
+        {
+            try
+            {
+                return new Response<List<Bid>>(facade.GetBidsStatus(userId, username, storeId).Select(db => new Bid(db)).ToList(), userId);
+            }
+            catch (Exception ex)
+            {
+                return new Response<List<Bid>>(ex.Message, userId);
             }
         }
     }

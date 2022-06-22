@@ -117,7 +117,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         }
 
         [DataTestMethod]
-        [DataRow("User1", 2, 1, 3)] //wrong id;
+        [DataRow("User1", 2, 1, 3)] //wrong Id;
         [DataRow("User1", 1, 0, 3)] //wrong store;
         [DataRow("User1", 1, 1, 4)] //wrong quantity;
         public void TestAddToBag_Failure_WrongArguments(string user, int productId, int storeId, int quantity)

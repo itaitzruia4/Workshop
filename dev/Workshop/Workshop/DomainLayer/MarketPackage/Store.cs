@@ -11,7 +11,7 @@ namespace Workshop.DomainLayer.MarketPackage
     public class Store
     {
         private bool open { get; set; }
-        private int id { get; set; }
+        public readonly int id;
         private string name { get; set; }
         private Dictionary<int, Product> products { get; set; }
         private DiscountPolicy discountPolicy { get; set; }

@@ -102,6 +102,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} successfuly nominated member {nominatedUsername} as a store owner of store {storeId}");
                 return newRole;
             }
+            userController.notify(new Event("StoreOwnerVoting" + storeId, "There is a store owner voting taking place in store " + storeId, "MarketController"));
             return null;
         }
 
@@ -1039,7 +1040,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
         }
 
-        public double BuyProduct(int userId, CreditCard cc, SupplyAddress address, DateTime buyTime,Product product, double price, int storeId)
+        private double BuyProduct(int userId, CreditCard cc, SupplyAddress address, DateTime buyTime,Product product, double price, int storeId)
         {
             Logger.Instance.LogEvent($"User {userId} is trying to buy {product.Name} in OfferedPrice of {price}.");
             
@@ -1199,7 +1200,6 @@ namespace Workshop.DomainLayer.MarketPackage
                     Bid bid = stores[storeId].biding_votes[bidId];
                     if (stores[storeId].VoteForBid(member, vote, bidId)) // Bid was accepted
                     {
-                        stores[storeId].RemoveBid(bidId);
                         userController.notify(new Event("BidAccept" + bidId + "OfStore" + storeId, "Bid offer in store " + storeId + " to the Product " + bid.Product.Name + " in OfferedPrice of " + bid.OfferedPrice + " is accepted", "MarketController"));
                     }
                     else if (!vote)
@@ -1216,17 +1216,13 @@ namespace Workshop.DomainLayer.MarketPackage
         public double BuyBidProduct(int userId, string username, int storeId, int bidId, CreditCard cc, SupplyAddress address, DateTime buyTime)
         {
             userController.AssertCurrentUser(userId, username);
-            try { storesLocks[storeId].AcquireReaderLock(Timeout.Infinite); }
-            catch { throw new ArgumentException($"Store does not exist: {storeId}"); }
             Store store = stores[storeId];
             if (store.CanBuyBid(username, bidId)){
                 Bid bid = store.biding_votes[bidId];
                 double retValue = BuyProduct(userId, cc, address, buyTime, bid.Product, bid.OfferedPrice, storeId);
                 store.RemoveBid(bidId);
-                storesLocks[storeId].ReleaseReaderLock();
                 return retValue;
             }
-            storesLocks[storeId].ReleaseReaderLock();
             throw new ArgumentException($"{username} can not buy bid {bidId} since it's not accepted by all store owners or he is not the one who submitted the bid.");
         }
 

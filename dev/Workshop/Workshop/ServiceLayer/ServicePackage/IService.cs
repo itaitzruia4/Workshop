@@ -55,5 +55,10 @@ namespace Workshop.ServiceLayer
         Response<List<PermissionInformation>> GetMemberPermissions(int userId, string membername);
         Response<List<StatisticsInformation>> MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end);
         Response<List<Order>> GetStorePurchaseHistory(int userId, string membername, int storeId);
+        Response<Bid> OfferBid(int userId, string username, int storeId, int productId, double price);
+        Response<Bid> CounterBid(int userId, string membername, int storeId, int bidId, double newPrice);
+        Response<Bid> VoteForBid(int userId, string username, int storeId, int bidId, bool vote);
+        Response<double> BuyBidProduct(int userId, string username, int storeId, int bidId, CreditCard cc, SupplyAddress address, DateTime buyTime);
+        Response<List<Bid>> GetBidsStatus(int userId, string username, int storeId);
     }
 }

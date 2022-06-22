@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DomainLayer.MarketPackage.Biding;
 using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Shopping;
@@ -75,5 +76,10 @@ namespace Workshop.DomainLayer.MarketPackage
         double GetCartPrice(ShoppingCartDTO shoppingCart);
         void RejectStoreOwnerNomination(int userId, string nominatorUsername, string nominatedUsername, int storeId);
         List<OrderDTO> GetStorePurchaseHistory(int userId, string membername, int storeId);
+        Bid OfferBid(int userId, string username, int storeId, int productId, double price);
+        Bid CounterBid(int userId, string membername, int storeId, int bidId, double newPrice);
+        Bid VoteForBid(int userId, string username, int storeId, int bidId, bool vote);
+        double BuyBidProduct(int userId, string username, int storeId, int bidId, CreditCard cc, SupplyAddress address, DateTime buyTime);
+        List<Bid> GetBidsStatus(int userId, string username, int storeId);
     }
 }

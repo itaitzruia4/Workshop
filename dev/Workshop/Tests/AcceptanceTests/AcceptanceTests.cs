@@ -1802,6 +1802,8 @@ namespace Tests.AcceptanceTests
             Store store1 = service.CreateNewStore(0, "Member1", "Store1", DateTime.Now).Value;
             service.NominateStoreOwner(0, "Member1", "Member4", store1.StoreId, DateTime.Now);
             service.NominateStoreOwner(3, "Member4", "Member2", store1.StoreId, DateTime.Now);
+            Assert.AreEqual(1, service.TakeNotifications(0, "Member1").Value.Count);
+            Assert.AreEqual(1, service.TakeNotifications(3, "Member4").Value.Count);
             service.NominateStoreOwner(0, "Member1", "Member2", store1.StoreId, DateTime.Now);
             service.NominateStoreManager(3, "Member4", "Member3", store1.StoreId, DateTime.Now);
             service.Logout(3, "Member4");
