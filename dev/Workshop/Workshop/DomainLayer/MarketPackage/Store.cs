@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using Member = Workshop.DomainLayer.UserPackage.Permissions.Member;
 using Bid = Workshop.DomainLayer.MarketPackage.Biding.Bid;
@@ -70,6 +71,18 @@ namespace Workshop.DomainLayer.MarketPackage
                 temp.Add(voter);
                 owner_voting.TryAdd(nominee, new KeyValuePair<Member, HashSet<Member>>(voter, temp));
                 return 1 == owners.Count ? voter : null;
+            }
+        }
+
+        internal void RejectStoreOwnerNomination(Member rejecter, Member nominee)
+        {
+            if (!owners.Contains(rejecter))
+            {
+                throw new ArgumentException($"{rejecter.Username} is not a store owner of store {id}, hence he can not reject to nominate {nominee.Username} as a store owner.");
+            }
+            if (!owner_voting.TryRemove(nominee, out var value))
+            {
+                throw new ArgumentException($"{nominee.Username} is not being voted to be a store owner of store {id}, hence you can not reject his nomination.");
             }
         }
 

@@ -33,9 +33,9 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             review = reviewMock.Object;
 
             userController = new UserController(security, review, new List<SystemAdminDTO>());
-            userController.EnterMarket(1);
+            userController.EnterMarket(1, DateTime.Now);
             userController.Register(1, "nirdan", "12345", DateTime.Parse("Aug 22, 1972"));
-            this.member = userController.Login(1, "nirdan", "12345").Key;
+            this.member = userController.Login(1, "nirdan", "12345", DateTime.Now).Key;
         }
 
         /// Tests for Role.IsAuthorized method

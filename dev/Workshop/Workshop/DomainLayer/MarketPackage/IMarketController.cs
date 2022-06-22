@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Shopping;
 
@@ -11,9 +12,9 @@ namespace Workshop.DomainLayer.MarketPackage
     public interface IMarketController
     {
         void InitializeSystem();
-        StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId);
+        StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId, DateTime date);
         
-        StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId);
+        StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId, DateTime date);
 
         Member RemoveStoreOwnerNomination(int userId, string nominatorMembername, string nominatedMembername, int storeId);
 
@@ -37,7 +38,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
         void OpenStore(int userId, string username, int storeId);
         
-        Store CreateNewStore(int userId, string creator, string storeName);
+        Store CreateNewStore(int userId, string creator, string storeName, DateTime date);
 
         bool IsStoreOpen(int userId, string username, int storeId);
 
@@ -72,5 +73,7 @@ namespace Workshop.DomainLayer.MarketPackage
         double GetDailyIncomeStoreOwner(int userId, string username, int storeId);
         double GetDailyIncomeMarketManager(int userId, string username);
         double GetCartPrice(ShoppingCartDTO shoppingCart);
+        void RejectStoreOwnerNomination(int userId, string nominatorUsername, string nominatedUsername, int storeId);
+        List<OrderDTO> GetStorePurchaseHistory(int userId, string membername, int storeId);
     }
 }

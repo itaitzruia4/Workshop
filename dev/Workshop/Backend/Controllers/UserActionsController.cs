@@ -2,6 +2,7 @@
 using API.Responses;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
+using WebSocketSharp.Server;
 using Workshop.DomainLayer.Reviews;
 using Workshop.ServiceLayer;
 using Workshop.ServiceLayer.ServiceObjects;
@@ -15,9 +16,12 @@ namespace API.Controllers
     public class UserActionsController : ControllerBase
     {
         IService Service;
-        public UserActionsController(IService service)
+        private StaisticsViewingServer StatsServer;
+
+        public UserActionsController(IService service, StaisticsViewingServer serv)
         {
             Service = service;
+            StatsServer = serv;
         }
 
         [HttpPost("takenotifications")]
@@ -109,14 +113,16 @@ namespace API.Controllers
         }
 
         [HttpPost("getmembersonlinestats")]
-        public ActionResult<FrontResponse<Dictionary<Member, bool>>> GetMembersOnlineStats([FromBody] MemberRequest request)
+        public ActionResult<FrontResponse<KeyValuePair<Member[], Member[]>>> GetMembersOnlineStats([FromBody] MemberRequest request)
         {
             Response<Dictionary<Member, bool>> response = Service.GetMembersOnlineStats(request.UserId, request.Membername);
             if (response.ErrorOccured)
             {
-                return BadRequest(new FrontResponse<Dictionary<Member, bool>>(response.ErrorMessage));
+                return BadRequest(new FrontResponse<KeyValuePair<Member[], Member[]>>(response.ErrorMessage));
             }
-            return Ok(new FrontResponse<Dictionary<Member, bool>>(response.Value));
+            Member[] onlineMembers = response.Value.Where((KeyValuePair<Member, bool> curr) => curr.Value).Select((KeyValuePair<Member, bool> curr) => curr.Key).ToArray();
+            Member[] offlineMembers = response.Value.Where((KeyValuePair<Member, bool> curr) => !curr.Value).Select((KeyValuePair<Member, bool> curr) => curr.Key).ToArray();
+            return Ok(new FrontResponse<KeyValuePair<Member[], Member[]>>(new KeyValuePair<Member[], Member[]>(onlineMembers, offlineMembers)));
         }
 
         [HttpPost("getmemberpermissions")]
@@ -139,6 +145,50 @@ namespace API.Controllers
                 return BadRequest(new FrontResponse<double>(response.ErrorMessage));
             }
             return Ok(new FrontResponse<double>(response.Value));
+        }
+
+        [HttpPost("marketmanagerdaily")]
+        public ActionResult<FrontResponse<List<StatisticsInformation>>> MarketManagerDailyStatistics([FromBody] DailyStatisticsRequest request)
+        {
+            Response<List<StatisticsInformation>> resp = Service.MarketManagerDailyRangeInformation(request.UserId, request.Membername, DateTime.ParseExact(request.StartDate, "dd/MM/yyyy", CultureInfo.InvariantCulture).Date, DateTime.ParseExact(request.EndDate, "dd/MM/yyyy", CultureInfo.InvariantCulture).Date);
+            if (resp.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<List<StatisticsInformation>>(resp.ErrorMessage));
+            }
+            try
+            {
+                StatsServer.AddAdminPath(request.Membername);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            return Ok(new FrontResponse<List<StatisticsInformation>>(resp.Value));
+
+            /*Func<string[], bool> notifier = (msgs) =>
+            {
+                string username = request.Membername;
+
+                // Try send, if not - add to unsent messages
+                if (adminDailyService.WebSocketServices[relativeServicePath] == null || adminDailyService.WebSocketServices[relativeServicePath].Sessions.Count < 1)
+                {
+                    IList<string> unsentMsgs = new List<string>();
+                    if (buyerUnsentMessages.ContainsKey(username))
+                        unsentMsgs = buyerUnsentMessages[username];
+
+                    // Adding new unsent messages
+                    foreach (string msg in msgs)
+                        unsentMsgs.Add(msg);
+
+                    //this.buyerUnsentMessages[username] = unsentMsgs;
+                    AddUnsentMessage(username, unsentMsgs);
+                    return true; // So msgs delete on member msgs queue
+                }
+
+                foreach (string msg in msgs)
+                    notificationServer.WebSocketServices[relativeServicePath].Sessions.Broadcast(msg);
+                return true;
+            };*/
 
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Workshop.DomainLayer.MarketPackage;
+using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Permissions;
@@ -23,9 +24,9 @@ namespace Workshop.DomainLayer
             MarketController = new MarketController(UserController, externalSystem);
         }
 
-        public User EnterMarket(int userId)
+        public User EnterMarket(int userId, DateTime date)
         {
-            return UserController.EnterMarket(userId);
+            return UserController.EnterMarket(userId, date);
         }
 
         public void ExitMarket(int userId)
@@ -33,9 +34,9 @@ namespace Workshop.DomainLayer
             UserController.ExitMarket(userId);
         }
 
-        public KeyValuePair<Member, List<Notification>> Login(int userId, string membername, string password)
+        public KeyValuePair<Member, List<Notification>> Login(int userId, string membername, string password, DateTime date)
         {
-            return UserController.Login(userId, membername, password);
+            return UserController.Login(userId, membername, password, date);
         }
 
         public void Logout(int userId, string membername)
@@ -53,14 +54,14 @@ namespace Workshop.DomainLayer
             return MarketController.AddProductToStore(userId, membername, storeId, productName, description, price, quantity, category);
         }
 
-        internal StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId)
+        internal StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId, DateTime date)
         {
-            return MarketController.NominateStoreManager(userId, nominatorUsername, nominatedUsername, storeId);
+            return MarketController.NominateStoreManager(userId, nominatorUsername, nominatedUsername, storeId, date);
         }
 
-        internal StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId)
+        internal StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId, DateTime date)
         {
-            return MarketController.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId);
+            return MarketController.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId, date);
         }
 
         internal Member RemoveStoreOwnerNomination(int userId, string nominatorMembername, string nominatedMembername, int storeId)
@@ -87,9 +88,9 @@ namespace Workshop.DomainLayer
             MarketController.OpenStore(userId, membername, storeId);
         }
 
-        internal Store CreateNewStore(int userId, string creator, string storeName)
+        internal Store CreateNewStore(int userId, string creator, string storeName, DateTime date)
         {
-            return MarketController.CreateNewStore(userId, creator, storeName);
+            return MarketController.CreateNewStore(userId, creator, storeName, date);
         }
 
         internal ReviewDTO ReviewProduct(int userId, string user, int productId, string review, int rating)
@@ -221,6 +222,21 @@ namespace Workshop.DomainLayer
         internal double GetCartPrice(ShoppingCartDTO shoppingCart)
         {
             return MarketController.GetCartPrice(shoppingCart);
+        }
+
+        internal void RejectStoreOwnerNomination(int userId, string nominatorUsername, string nominatedUsername, int storeId)
+        {
+            MarketController.RejectStoreOwnerNomination(userId, nominatorUsername, nominatedUsername, storeId);
+        }
+
+        internal List<UserCountInDate> MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end)
+        {
+            return UserController.MarketManagerDailyRangeInformation(userId, membername, beginning, end);
+        }
+
+        internal List<OrderDTO> GetStorePurchaseHistory(int userId, string membername, int storeId)
+        {
+            return MarketController.GetStorePurchaseHistory(userId, membername, storeId);
         }
     }
 }

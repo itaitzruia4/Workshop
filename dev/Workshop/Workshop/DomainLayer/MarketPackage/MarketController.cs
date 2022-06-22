@@ -50,21 +50,17 @@ namespace Workshop.DomainLayer.MarketPackage
             return userController.IsAuthorized(username, storeId, action);
         }
 
-        public StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId)
+        public StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId, DateTime date)
         {
             Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} is trying to nominate {nominatedUsername} to be a store owner of store {storeId}");
-            try
+            if (date > DateTime.Now)
             {
-                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
+                throw new ArgumentException($"{date} is not a valid date: you are not from the future!");
             }
-            catch
-            {
-                throw new ArgumentException($"Store ID does not exist: {storeId}");
-            }
-
             Store store;
             try
             {
+                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
                 store = stores[storeId];
             }
             catch
@@ -75,7 +71,7 @@ namespace Workshop.DomainLayer.MarketPackage
             userController.AssertCurrentUser(userId, nominatorUsername);
             Member nominator = userController.GetMember(nominatorUsername), nominated = userController.GetMember(nominatedUsername);
 
-            if (!nominator.IsAuthorized(storeId, Action.NominateStoreOwner))
+            if (!nominator.GetStoreRoles(storeId).Any(x => x is StoreOwner))
                 throw new MemberAccessException($"Member {nominatorUsername} is not allowed to nominate owners in store #{storeId}.");
 
             if (nominatorUsername.Equals(nominatedUsername))
@@ -99,6 +95,9 @@ namespace Workshop.DomainLayer.MarketPackage
                 userController.RegisterToEvent(nominated.Username, new Event("OpenStore" + storeId, "", "MarketController"));
                 userController.RegisterToEvent(nominated.Username, new Event("CloseStore" + storeId, "", "MarketController"));
                 userController.RegisterToEvent(nominated.Username, new Event("BidOfferInStore" + storeId, "", "MarketController"));
+
+                userController.UpdateUserStatistics(nominated, date);
+
                 storesLocks[storeId].ReleaseReaderLock();
                 Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} successfuly nominated member {nominatedUsername} as a store owner of store {storeId}");
                 return newRole;
@@ -106,7 +105,29 @@ namespace Workshop.DomainLayer.MarketPackage
             return null;
         }
 
-        public StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId)
+        public void RejectStoreOwnerNomination(int userId, string nominatorUsername, string nominatedUsername, int storeId)
+        {
+            Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} is trying to reject the nomination of {nominatedUsername} to be a store owner of store {storeId}");
+            Store store;
+            try
+            {
+                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
+                store = stores[storeId];
+            }
+            catch
+            {
+                throw new ArgumentException($"Store ID does not exist: {storeId}");
+            }
+
+            userController.AssertCurrentUser(userId, nominatorUsername);
+            Member nominator = userController.GetMember(nominatorUsername), nominated = userController.GetMember(nominatedUsername);
+
+            store.RejectStoreOwnerNomination(nominator, nominated);
+
+            storesLocks[storeId].ReleaseReaderLock();
+        }
+
+        public StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId, DateTime date)
         {
             Logger.Instance.LogEvent($"{nominatorUsername} is trying to nominate {nominatedUsername} to be a store manager of store {storeId}.");
             userController.AssertCurrentUser(userId, nominatorUsername);
@@ -118,7 +139,7 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException("Store ID does not exist");
             }
-            StoreManager storeManager = userController.NominateStoreManager(userId, nominatorUsername, nominatedUsername, storeId);
+            StoreManager storeManager = userController.NominateStoreManager(userId, nominatorUsername, nominatedUsername, storeId, date);
             storesLocks[storeId].ReleaseReaderLock();
             return storeManager;
         }
@@ -205,6 +226,10 @@ namespace Workshop.DomainLayer.MarketPackage
                     if (!storeRole.IsAuthorized(actualAction))
                     {
                         storeRole.AddAction(actualAction);
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"{manager} already has the permission for action {action}");
                     }
                 }
             }
@@ -520,7 +545,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
         }
 
-        public Store CreateNewStore(int userId, string creator, string storeName)
+        public Store CreateNewStore(int userId, string creator, string storeName, DateTime date)
         {
             Logger.Instance.LogEvent($"{creator} is trying to create a new store: \"{storeName}\".");
             userController.AssertCurrentUser(userId, creator);
@@ -528,11 +553,15 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException($"User {creator} requestted to create a store with an empty name.");
             }
+            if (date > DateTime.Now)
+            {
+                throw new ArgumentException($"Entered date is not valid: {date}");
+            }
             int storeId = STORE_COUNT;
-            userController.AddStoreFounder(creator, storeId);
             ReaderWriterLock rwl = new ReaderWriterLock();
-            rwl.AcquireWriterLock(Timeout.Infinite);
             storesLocks[storeId] = rwl;
+            rwl.AcquireWriterLock(Timeout.Infinite);
+            userController.AddStoreFounder(creator, storeId, date);
             Store store = new Store(storeId, storeName, userController.GetMember(creator));
             stores[storeId] = store;
             STORE_COUNT++;
@@ -950,7 +979,6 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new MemberAccessException("User " + user + " is not allowed to add purchase terms in store " + storeId);
             stores[storeId].AddUserTerm(json_term);
             storesLocks[storeId].ReleaseWriterLock();
-
         }
 
         public List<Store> GetAllStores(int userId)
@@ -1216,4 +1244,16 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             throw new ArgumentException($"{username} is not a store owner of store {storeId} and can not view the status of bids in it");
         }
+
+        public List<OrderDTO> GetStorePurchaseHistory(int userId, string membername, int storeId)
+        {
+            userController.AssertCurrentUser(userId, membername);
+            Member member = userController.GetMember(membername);
+            if (!member.GetAllRoles().Any(r => r is MarketManager) && !member.GetStoreRoles(storeId).Any(r => r.IsAuthorized(Action.ViewStorePurchaseHistory)))
+            {
+                throw new ArgumentException($"{membername} is not authorized to view the purchase history of store {storeId}");
+            }
+            return orderHandler.GetOrders(storeId);
+        }
+    }
 }

@@ -9,8 +9,10 @@ When starting the system, you can choose to pass the path to a config file as a 
 
 # The config file format
 You can type commands of the type:
-admin~[ADMIN_NAME]~[ADMIN_PASS]~[ADMIN_BIRTHDATE]
-ss~[STARTING_STATE_FILE_PATH]
+
+admin\~[ADMIN_NAME]\~[ADMIN_PASS]\~[ADMIN_BIRTHDATE]
+
+ss\~[STARTING_STATE_FILE_PATH]
 
 Note, the admin command can be entered multiple times
 
