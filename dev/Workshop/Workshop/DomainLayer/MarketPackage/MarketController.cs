@@ -1180,6 +1180,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 {
                     stores[storeId].ChangeBidPrice(bidId, newPrice);
                     Bid oldBid = stores[storeId].biding_votes[bidId];
+                    oldBid.CounterOfferred = true;
                     userController.notify(new Event("BidCounter" + bidId + "OfStore" + storeId, "The counter OfferedPrice to your bid on Product " + oldBid.Product.Name + " in the store " + storeId + " is " + newPrice, "MarketController"));
                     storesLocks[storeId].ReleaseReaderLock();
                     return oldBid;

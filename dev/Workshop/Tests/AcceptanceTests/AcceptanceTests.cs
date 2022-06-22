@@ -2778,5 +2778,435 @@ namespace Tests.AcceptanceTests
             Response<List<Order>> response = service.GetStorePurchaseHistory(2, "member2", store.StoreId);
             Assert.IsTrue(response.ErrorOccured);
         }
+
+        [TestMethod]
+        public void Test_OfferBid_Success_AndCheckOwnersAndManagersReceiveNotification_AndCanCheckBidsStatus()
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                Test_Login_Good(i, $"member{i}", $"pass{i}");
+            }
+            Store store = service.CreateNewStore(1, "member1", "Store1", DateTime.Now).Value;
+            Product product = service.AddProduct(1, "member1", store.StoreId, "Product1", "Description1", 15.0, 3, "Category1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", store.StoreId, DateTime.Now);
+            service.NominateStoreManager(1, "member1", "member3", store.StoreId, DateTime.Now);
+
+            service.OfferBid(4, "member4", store.StoreId, product.Id, 8.0);
+
+            // Make sure the store owners and managers were notified
+
+            for (int i = 1; i < 4; i++)
+            {
+                Assert.AreEqual(1, service.TakeNotifications(i, $"member{i}").Value.Count);
+            }
+
+            // Make sure the bid was added
+            List<Bid> storeBids = service.GetBidsStatus(1, "member1", store.StoreId).Value;
+            Assert.IsNotNull(storeBids);
+            Assert.AreEqual(1, storeBids.Count);
+            Bid bid = storeBids[0];
+
+            Assert.AreEqual(8.0, bid.OfferedPrice);
+            Assert.AreEqual("member4", bid.OfferingMembername);
+            Assert.AreEqual(product.Id, bid.Product.Id);
+            Assert.AreEqual(store.StoreId, bid.StoreId);
+            Assert.AreEqual(0, bid.OwnerVotes.Count);
+
+            Assert.IsTrue(service.GetBidsStatus(3, "member3", store.StoreId).ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_CantBuyWithoutAcceptedBidFromAllOwners()
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                Test_Login_Good(i, $"member{i}", $"pass{i}");
+            }
+            Store store = service.CreateNewStore(1, "member1", "Store1", DateTime.Now).Value;
+            Product product = service.AddProduct(1, "member1", store.StoreId, "Product1", "Description1", 15.0, 3, "Category1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", store.StoreId, DateTime.Now);
+            service.NominateStoreManager(1, "member1", "member3", store.StoreId, DateTime.Now);
+
+            service.OfferBid(4, "member4", store.StoreId, product.Id, 8.0);
+
+            // Make sure the store owners and managers were notified
+
+            for (int i = 1; i < 4; i++)
+            {
+                Assert.AreEqual(1, service.TakeNotifications(i, $"member{i}").Value.Count);
+            }
+
+            // Make sure the bid was added
+            List<Bid> storeBids = service.GetBidsStatus(1, "member1", store.StoreId).Value;
+            Assert.IsNotNull(storeBids);
+            Assert.AreEqual(1, storeBids.Count);
+            Bid bid = storeBids[0];
+
+            Assert.AreEqual(8.0, bid.OfferedPrice);
+            Assert.AreEqual("member4", bid.OfferingMembername);
+            Assert.AreEqual(product.Id, bid.Product.Id);
+            Assert.AreEqual(store.StoreId, bid.StoreId);
+            Assert.AreEqual(0, bid.OwnerVotes.Count);
+
+            Assert.IsTrue(service.GetBidsStatus(3, "member3", store.StoreId).ErrorOccured);
+
+            int bidId = bid.BidId;
+            Assert.IsTrue(service.BuyBidProduct(4, "member4", store.StoreId, bidId, cc, address, DateTime.Now).ErrorOccured);
+
+            Assert.IsFalse(service.VoteForBid(1, "member1", store.StoreId, bidId, true).ErrorOccured);
+
+            Assert.IsTrue(service.BuyBidProduct(4, "member4", store.StoreId, bidId, cc, address, DateTime.Now).ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_ReceiveNotificationForDecliningBid_Holded()
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                Test_Login_Good(i, $"member{i}", $"pass{i}");
+            }
+            Store store = service.CreateNewStore(1, "member1", "Store1", DateTime.Now).Value;
+            Product product = service.AddProduct(1, "member1", store.StoreId, "Product1", "Description1", 15.0, 3, "Category1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", store.StoreId, DateTime.Now);
+            service.NominateStoreManager(1, "member1", "member3", store.StoreId, DateTime.Now);
+
+            service.OfferBid(4, "member4", store.StoreId, product.Id, 8.0);
+
+            // Make sure the store owners and managers were notified
+
+            for (int i = 1; i < 4; i++)
+            {
+                Assert.AreEqual(1, service.TakeNotifications(i, $"member{i}").Value.Count);
+            }
+
+            // Make sure the bid was added
+            List<Bid> storeBids = service.GetBidsStatus(1, "member1", store.StoreId).Value;
+            Assert.IsNotNull(storeBids);
+            Assert.AreEqual(1, storeBids.Count);
+            Bid bid = storeBids[0];
+
+            Assert.AreEqual(8.0, bid.OfferedPrice);
+            Assert.AreEqual("member4", bid.OfferingMembername);
+            Assert.AreEqual(product.Id, bid.Product.Id);
+            Assert.AreEqual(store.StoreId, bid.StoreId);
+            Assert.AreEqual(0, bid.OwnerVotes.Count);
+
+            Assert.IsTrue(service.GetBidsStatus(3, "member3", store.StoreId).ErrorOccured);
+
+            int bidId = bid.BidId;
+            service.Logout(4, "member4");
+            Assert.IsFalse(service.VoteForBid(1, "member1", store.StoreId, bidId, false).ErrorOccured);
+
+            Assert.AreEqual(1, service.Login(4, "member4", "pass4", DateTime.Now).Value.Value.Count);
+        }
+
+
+        [TestMethod]
+        public void Test_ReceiveNotificationForDecliningBid()
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                Test_Login_Good(i, $"member{i}", $"pass{i}");
+            }
+            Store store = service.CreateNewStore(1, "member1", "Store1", DateTime.Now).Value;
+            Product product = service.AddProduct(1, "member1", store.StoreId, "Product1", "Description1", 15.0, 3, "Category1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", store.StoreId, DateTime.Now);
+            service.NominateStoreManager(1, "member1", "member3", store.StoreId, DateTime.Now);
+
+            service.OfferBid(4, "member4", store.StoreId, product.Id, 8.0);
+
+            // Make sure the store owners and managers were notified
+
+            for (int i = 1; i < 4; i++)
+            {
+                Assert.AreEqual(1, service.TakeNotifications(i, $"member{i}").Value.Count);
+            }
+
+            // Make sure the bid was added
+            List<Bid> storeBids = service.GetBidsStatus(1, "member1", store.StoreId).Value;
+            Assert.IsNotNull(storeBids);
+            Assert.AreEqual(1, storeBids.Count);
+            Bid bid = storeBids[0];
+
+            Assert.AreEqual(8.0, bid.OfferedPrice);
+            Assert.AreEqual("member4", bid.OfferingMembername);
+            Assert.AreEqual(product.Id, bid.Product.Id);
+            Assert.AreEqual(store.StoreId, bid.StoreId);
+            Assert.AreEqual(0, bid.OwnerVotes.Count);
+
+            Assert.IsTrue(service.GetBidsStatus(3, "member3", store.StoreId).ErrorOccured);
+
+            int bidId = bid.BidId;
+
+            Assert.IsFalse(service.VoteForBid(1, "member1", store.StoreId, bidId, false).ErrorOccured);
+            Assert.AreEqual(1, service.TakeNotifications(4, "member4").Value.Count);
+        }
+
+        [TestMethod]
+        public void Test_ReceiveNotificationForAcceptingBid_Holded()
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                Test_Login_Good(i, $"member{i}", $"pass{i}");
+            }
+            Store store = service.CreateNewStore(1, "member1", "Store1", DateTime.Now).Value;
+            Product product = service.AddProduct(1, "member1", store.StoreId, "Product1", "Description1", 15.0, 3, "Category1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", store.StoreId, DateTime.Now);
+            service.NominateStoreManager(1, "member1", "member3", store.StoreId, DateTime.Now);
+
+            service.OfferBid(4, "member4", store.StoreId, product.Id, 8.0);
+
+            // Make sure the store owners and managers were notified
+
+            for (int i = 1; i < 4; i++)
+            {
+                Assert.AreEqual(1, service.TakeNotifications(i, $"member{i}").Value.Count);
+            }
+
+            // Make sure the bid was added
+            List<Bid> storeBids = service.GetBidsStatus(1, "member1", store.StoreId).Value;
+            Assert.IsNotNull(storeBids);
+            Assert.AreEqual(1, storeBids.Count);
+            Bid bid = storeBids[0];
+
+            Assert.AreEqual(8.0, bid.OfferedPrice);
+            Assert.AreEqual("member4", bid.OfferingMembername);
+            Assert.AreEqual(product.Id, bid.Product.Id);
+            Assert.AreEqual(store.StoreId, bid.StoreId);
+            Assert.AreEqual(0, bid.OwnerVotes.Count);
+
+            Assert.IsTrue(service.GetBidsStatus(3, "member3", store.StoreId).ErrorOccured);
+
+            int bidId = bid.BidId;
+
+            Assert.IsFalse(service.VoteForBid(1, "member1", store.StoreId, bidId, true).ErrorOccured);
+            Assert.AreEqual(0, service.TakeNotifications(4, "member4").Value.Count);
+
+            service.Logout(4, "member4");
+            Assert.IsFalse(service.VoteForBid(2, "member2", store.StoreId, bidId, true).ErrorOccured);
+
+            Assert.AreEqual(1, service.Login(4, "member4", "pass4", DateTime.Now).Value.Value.Count);
+        }
+
+        [TestMethod]
+        public void Test_ReceiveNotificationForAcceptingBid()
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                Test_Login_Good(i, $"member{i}", $"pass{i}");
+            }
+            Store store = service.CreateNewStore(1, "member1", "Store1", DateTime.Now).Value;
+            Product product = service.AddProduct(1, "member1", store.StoreId, "Product1", "Description1", 15.0, 3, "Category1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", store.StoreId, DateTime.Now);
+            service.NominateStoreManager(1, "member1", "member3", store.StoreId, DateTime.Now);
+
+            service.OfferBid(4, "member4", store.StoreId, product.Id, 8.0);
+
+            // Make sure the store owners and managers were notified
+
+            for (int i = 1; i < 4; i++)
+            {
+                Assert.AreEqual(1, service.TakeNotifications(i, $"member{i}").Value.Count);
+            }
+
+            // Make sure the bid was added
+            List<Bid> storeBids = service.GetBidsStatus(1, "member1", store.StoreId).Value;
+            Assert.IsNotNull(storeBids);
+            Assert.AreEqual(1, storeBids.Count);
+            Bid bid = storeBids[0];
+
+            Assert.AreEqual(8.0, bid.OfferedPrice);
+            Assert.AreEqual("member4", bid.OfferingMembername);
+            Assert.AreEqual(product.Id, bid.Product.Id);
+            Assert.AreEqual(store.StoreId, bid.StoreId);
+            Assert.AreEqual(0, bid.OwnerVotes.Count);
+
+            Assert.IsTrue(service.GetBidsStatus(3, "member3", store.StoreId).ErrorOccured);
+
+            int bidId = bid.BidId;
+
+            Assert.IsFalse(service.VoteForBid(1, "member1", store.StoreId, bidId, true).ErrorOccured);
+            Assert.AreEqual(0, service.TakeNotifications(4, "member4").Value.Count);
+            Assert.IsFalse(service.VoteForBid(2, "member2", store.StoreId, bidId, true).ErrorOccured);
+            Assert.AreEqual(1, service.TakeNotifications(4, "member4").Value.Count);
+        }
+
+        [TestMethod]
+        public void Test_CanBuyAfterAccepting()
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                Test_Login_Good(i, $"member{i}", $"pass{i}");
+            }
+            Store store = service.CreateNewStore(1, "member1", "Store1", DateTime.Now).Value;
+            Product product = service.AddProduct(1, "member1", store.StoreId, "Product1", "Description1", 15.0, 3, "Category1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", store.StoreId, DateTime.Now);
+            service.NominateStoreManager(1, "member1", "member3", store.StoreId, DateTime.Now);
+
+            service.OfferBid(4, "member4", store.StoreId, product.Id, 8.0);
+
+            // Make sure the store owners and managers were notified
+
+            for (int i = 1; i < 4; i++)
+            {
+                Assert.AreEqual(1, service.TakeNotifications(i, $"member{i}").Value.Count);
+            }
+
+            // Make sure the bid was added
+            List<Bid> storeBids = service.GetBidsStatus(1, "member1", store.StoreId).Value;
+            Assert.IsNotNull(storeBids);
+            Assert.AreEqual(1, storeBids.Count);
+            Bid bid = storeBids[0];
+
+            Assert.AreEqual(8.0, bid.OfferedPrice);
+            Assert.AreEqual("member4", bid.OfferingMembername);
+            Assert.AreEqual(product.Id, bid.Product.Id);
+            Assert.AreEqual(store.StoreId, bid.StoreId);
+            Assert.AreEqual(0, bid.OwnerVotes.Count);
+
+            Assert.IsTrue(service.GetBidsStatus(3, "member3", store.StoreId).ErrorOccured);
+
+            int bidId = bid.BidId;
+
+            Assert.IsFalse(service.VoteForBid(1, "member1", store.StoreId, bidId, true).ErrorOccured);
+            Assert.AreEqual(0, service.TakeNotifications(4, "member4").Value.Count);
+            Assert.IsFalse(service.VoteForBid(2, "member2", store.StoreId, bidId, true).ErrorOccured);
+            Assert.AreEqual(1, service.TakeNotifications(4, "member4").Value.Count);
+            Assert.AreEqual(8.0, service.BuyBidProduct(4, "member4", store.StoreId, bidId, cc, address, DateTime.Now).Value);
+        }
+
+        [TestMethod]
+        public void Test_CantBuyAfterDeclining()
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                Test_Login_Good(i, $"member{i}", $"pass{i}");
+            }
+            Store store = service.CreateNewStore(1, "member1", "Store1", DateTime.Now).Value;
+            Product product = service.AddProduct(1, "member1", store.StoreId, "Product1", "Description1", 15.0, 3, "Category1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", store.StoreId, DateTime.Now);
+            service.NominateStoreManager(1, "member1", "member3", store.StoreId, DateTime.Now);
+
+            service.OfferBid(4, "member4", store.StoreId, product.Id, 8.0);
+
+            // Make sure the store owners and managers were notified
+
+            for (int i = 1; i < 4; i++)
+            {
+                Assert.AreEqual(1, service.TakeNotifications(i, $"member{i}").Value.Count);
+            }
+
+            // Make sure the bid was added
+            List<Bid> storeBids = service.GetBidsStatus(1, "member1", store.StoreId).Value;
+            Assert.IsNotNull(storeBids);
+            Assert.AreEqual(1, storeBids.Count);
+            Bid bid = storeBids[0];
+
+            Assert.AreEqual(8.0, bid.OfferedPrice);
+            Assert.AreEqual("member4", bid.OfferingMembername);
+            Assert.AreEqual(product.Id, bid.Product.Id);
+            Assert.AreEqual(store.StoreId, bid.StoreId);
+            Assert.AreEqual(0, bid.OwnerVotes.Count);
+
+            Assert.IsTrue(service.GetBidsStatus(3, "member3", store.StoreId).ErrorOccured);
+
+            int bidId = bid.BidId;
+
+            Assert.IsFalse(service.VoteForBid(1, "member1", store.StoreId, bidId, true).ErrorOccured);
+            Assert.AreEqual(0, service.TakeNotifications(4, "member4").Value.Count);
+            Assert.IsFalse(service.VoteForBid(2, "member2", store.StoreId, bidId, false).ErrorOccured);
+            Assert.AreEqual(1, service.TakeNotifications(4, "member4").Value.Count);
+            Assert.IsTrue(service.BuyBidProduct(4, "member4", store.StoreId, bidId, cc, address, DateTime.Now).ErrorOccured);
+        }
+
+
+        [TestMethod]
+        public void Test_CantBuyTwiceAfterBidAccepting()
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                Test_Login_Good(i, $"member{i}", $"pass{i}");
+            }
+            Store store = service.CreateNewStore(1, "member1", "Store1", DateTime.Now).Value;
+            Product product = service.AddProduct(1, "member1", store.StoreId, "Product1", "Description1", 15.0, 3, "Category1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", store.StoreId, DateTime.Now);
+            service.NominateStoreManager(1, "member1", "member3", store.StoreId, DateTime.Now);
+
+            service.OfferBid(4, "member4", store.StoreId, product.Id, 8.0);
+
+            // Make sure the store owners and managers were notified
+
+            for (int i = 1; i < 4; i++)
+            {
+                Assert.AreEqual(1, service.TakeNotifications(i, $"member{i}").Value.Count);
+            }
+
+            // Make sure the bid was added
+            List<Bid> storeBids = service.GetBidsStatus(1, "member1", store.StoreId).Value;
+            Assert.IsNotNull(storeBids);
+            Assert.AreEqual(1, storeBids.Count);
+            Bid bid = storeBids[0];
+
+            Assert.AreEqual(8.0, bid.OfferedPrice);
+            Assert.AreEqual("member4", bid.OfferingMembername);
+            Assert.AreEqual(product.Id, bid.Product.Id);
+            Assert.AreEqual(store.StoreId, bid.StoreId);
+            Assert.AreEqual(0, bid.OwnerVotes.Count);
+
+            Assert.IsTrue(service.GetBidsStatus(3, "member3", store.StoreId).ErrorOccured);
+
+            int bidId = bid.BidId;
+
+            Assert.IsFalse(service.VoteForBid(1, "member1", store.StoreId, bidId, true).ErrorOccured);
+            Assert.AreEqual(0, service.TakeNotifications(4, "member4").Value.Count);
+            Assert.IsFalse(service.VoteForBid(2, "member2", store.StoreId, bidId, true).ErrorOccured);
+            Assert.AreEqual(1, service.TakeNotifications(4, "member4").Value.Count);
+            Assert.AreEqual(8.0, service.BuyBidProduct(4, "member4", store.StoreId, bidId, cc, address, DateTime.Now).Value);
+            Assert.IsTrue(service.BuyBidProduct(4, "member4", store.StoreId, bidId, cc, address, DateTime.Now).ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_CanBuyAfterPriceOfferFromOwner()
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                Test_Login_Good(i, $"member{i}", $"pass{i}");
+            }
+            Store store = service.CreateNewStore(1, "member1", "Store1", DateTime.Now).Value;
+            Product product = service.AddProduct(1, "member1", store.StoreId, "Product1", "Description1", 15.0, 3, "Category1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", store.StoreId, DateTime.Now);
+            service.NominateStoreManager(1, "member1", "member3", store.StoreId, DateTime.Now);
+
+            service.OfferBid(4, "member4", store.StoreId, product.Id, 8.0);
+
+            // Make sure the store owners and managers were notified
+
+            for (int i = 1; i < 4; i++)
+            {
+                Assert.AreEqual(1, service.TakeNotifications(i, $"member{i}").Value.Count);
+            }
+
+            // Make sure the bid was added
+            List<Bid> storeBids = service.GetBidsStatus(1, "member1", store.StoreId).Value;
+            Assert.IsNotNull(storeBids);
+            Assert.AreEqual(1, storeBids.Count);
+            Bid bid = storeBids[0];
+
+            Assert.AreEqual(8.0, bid.OfferedPrice);
+            Assert.AreEqual("member4", bid.OfferingMembername);
+            Assert.AreEqual(product.Id, bid.Product.Id);
+            Assert.AreEqual(store.StoreId, bid.StoreId);
+            Assert.AreEqual(0, bid.OwnerVotes.Count);
+
+            Assert.IsTrue(service.GetBidsStatus(3, "member3", store.StoreId).ErrorOccured);
+
+            int bidId = bid.BidId;
+
+            Assert.IsFalse(service.VoteForBid(1, "member1", store.StoreId, bidId, true).ErrorOccured);
+            Assert.AreEqual(0, service.TakeNotifications(4, "member4").Value.Count);
+            Assert.IsFalse(service.CounterBid(2, "member2", store.StoreId, bidId, 10.0).ErrorOccured);
+            Assert.AreEqual(1, service.TakeNotifications(4, "member4").Value.Count);
+            Assert.AreEqual(10.0, service.BuyBidProduct(4, "member4", store.StoreId, bidId, cc, address, DateTime.Now).Value);
+        }
     }
 }

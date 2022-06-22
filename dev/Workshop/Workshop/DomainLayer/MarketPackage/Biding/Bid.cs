@@ -16,6 +16,7 @@ namespace Workshop.DomainLayer.MarketPackage.Biding
         public double OfferedPrice { get; set; }
         public string OfferingMembername { get; set; }
         public HashSet<Member> OwnerVotes { get; set; }
+        public bool CounterOfferred { get; set; }
         public Bid(int bidId, int storeId, Product product, double price, string presenter_name)
         {
             BidId = bidId;
@@ -24,6 +25,7 @@ namespace Workshop.DomainLayer.MarketPackage.Biding
             OfferedPrice = price;
             OfferingMembername = presenter_name;
             OwnerVotes = new HashSet<Member>();
+            CounterOfferred = false;
         }
 
         public int AddOwnerVote(Member owner_name)

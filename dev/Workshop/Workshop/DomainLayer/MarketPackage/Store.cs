@@ -386,7 +386,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
         internal bool CanBuyBid(string requester, int bidId)
         {
-            return biding_votes[bidId].OwnerVotes.Count == owners.Count && biding_votes[bidId].OfferingMembername.Equals(requester);
+            return (biding_votes[bidId].OwnerVotes.Count == owners.Count && biding_votes[bidId].OfferingMembername.Equals(requester)) || biding_votes[bidId].CounterOfferred;
         }
     }
 }
