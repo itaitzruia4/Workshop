@@ -152,7 +152,7 @@ export default function StoreAdjust(
                             {store.products.map(product => {
                                 return (
                                     <ListItem key={product.id}>
-                                        <ProductDialog store={store} product={product} removeProduct={removeProduct} updateProduct={updateProduct} reviewProduct={reviewProduct} />
+                                        <ProductDialog store={store} product={product} permissions={permissions } removeProduct={removeProduct} updateProduct={updateProduct} reviewProduct={null} />
                                     </ListItem>
                                 )
                             })

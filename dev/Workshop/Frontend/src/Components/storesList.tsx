@@ -27,6 +27,7 @@ import AddToCartDialog from '../Components/Dialogs/addToCartDialog';
 
 import { Store } from "../Types/store"
 import { Product } from "../Types/product"
+import { Actions } from "../Types/roles"
 import StoreRolesDialog from './Dialogs/StoreRolesDialog';
 import AddPurchaseDialog from './Dialogs/AddPurchaseDialog';
 
@@ -67,7 +68,7 @@ export default function StoresList(
                             {store.products.map( product=> {
                                 return (
                                     <ListItem key={product.id} secondaryAction={AddToCartDialog(store, product, addToCart)} >
-                                        <ProductDialog store={store} product={product} removeProduct={null} updateProduct={null} reviewProduct={reviewProduct}/>
+                                        <ProductDialog store={store} product={product} permissions={[]} removeProduct={null} updateProduct={null} reviewProduct={reviewProduct}/>
                                         </ListItem>
                                         )
                                     })

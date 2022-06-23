@@ -48,7 +48,8 @@ export enum Actions {
     CancelMember = 17,
     GetMembersOnlineStats = 18,
     AddPurchaseTerm = 19,
-    ViewStorePurchaseHistory = 20
+    ViewStorePurchaseHistory = 20,
+    ChangeProductCategory = 21,
 }
 
 export interface StorePermission {userId: number, membername: string, storeId: number, permissions: Actions[] }
