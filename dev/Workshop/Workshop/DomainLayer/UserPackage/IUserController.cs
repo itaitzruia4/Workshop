@@ -10,6 +10,7 @@ using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 using Notification = Workshop.DomainLayer.UserPackage.Notifications.Notification;
+
 namespace Workshop.DomainLayer.UserPackage
 {
     public interface IUserController
@@ -45,6 +46,6 @@ namespace Workshop.DomainLayer.UserPackage
         Dictionary<Member, bool> GetMembersOnlineStats(int userId, string actingUsername);
         void CancelMember(int userId, string actingUsername, string canceledUsername);
         List<ServiceLayer.ServiceObjects.PermissionInformation> GetMemberPermissions(int userId, string membername);
-        Dictionary<string, Dictionary<string, dynamic>> MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end);
+        List<UserCountInDate> MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end);
     }
 }

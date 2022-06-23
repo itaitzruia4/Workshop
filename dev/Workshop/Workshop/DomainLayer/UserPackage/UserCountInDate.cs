@@ -5,28 +5,54 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.UserPackage.Permissions;
-
+using StatisticsInformation = Workshop.ServiceLayer.ServiceObjects.StatisticsInformation;
 namespace Workshop.DomainLayer.UserPackage
 {
     public class UserCountInDate
     {
-        private int Guest_count;
-        private int Member_count;
-        private int Manager_count;
-        private int Owner_count;
-        private int Market_count;
-        public readonly DateTime Date;
+        private int Guests;
+        private int Members;
+        private int StoreManagers;
+        private int StoreOwners;
+        private int MarketManagers;
+        private string Date;
 
         public UserCountInDate(DateTime date)
         {
-            Date = date;
-            Guest_count = 0;
-            Member_count = 0;
-            Manager_count = 0;
-            Owner_count = 0;
-            Market_count = 0;
+            Date = date.ToShortDateString();
+            Guests = 0;
+            Members = 0;
+            StoreManagers = 0;
+            StoreOwners = 0;
+            MarketManagers = 0;
         }
-        
+
+        public int GetGuests()
+        {
+            return Guests;
+        }
+
+        public int GetMembers()
+        {
+            return Members;
+        }
+        public int GetStoreManagers()
+        {
+            return StoreManagers;
+        }
+        public int GetStoreOwners()
+        {
+            return StoreOwners;
+        }
+        public int GetMarketManagers()
+        {
+            return MarketManagers;
+        }
+        public string GetDate()
+        {
+            return Date;
+        }
+
         public void IncreaseCount(User u)
         {
             IncreaseCount(HighestRank(u));
@@ -67,37 +93,23 @@ namespace Workshop.DomainLayer.UserPackage
             switch (type)
             {
                 case "guest":
-                    Interlocked.Increment(ref Guest_count);
+                    Interlocked.Increment(ref Guests);
                     break;
                 case "member":
-                    Interlocked.Increment(ref Member_count);
+                    Interlocked.Increment(ref Members);
                     break;
                 case "manager":
-                    Interlocked.Increment(ref Manager_count);
+                    Interlocked.Increment(ref StoreManagers);
                     break;
                 case "owner":
-                    Interlocked.Increment(ref Owner_count);
+                    Interlocked.Increment(ref StoreOwners);
                     break;
                 case "market":
-                    Interlocked.Increment(ref Market_count);
+                    Interlocked.Increment(ref MarketManagers);
                     break;
                 default:
                     throw new ArgumentException($"A user type {type} is not recognized!");
             }
-        }
-
-        public Dictionary<string, dynamic> Information()
-        {
-            dynamic result = new Dictionary<string, dynamic>()
-            {
-                {"date", Date},
-                {"guest", Guest_count },
-                {"member", Member_count },
-                {"manager", Manager_count },
-                {"owner", Owner_count },
-                {"market", Market_count }
-            };
-            return result;
         }
     }
 }

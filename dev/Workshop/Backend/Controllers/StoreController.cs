@@ -206,7 +206,17 @@ namespace API.Controllers
                 return BadRequest(new FrontResponse<double>(response.ErrorMessage));
             }
             return Ok(new FrontResponse<double>(response.Value));
+        }
 
+        [HttpPost("getstorepurchasehistory")]
+        public ActionResult<FrontResponse<List<Order>>> GetStorePurchaseHistory([FromBody] StoreRequest request)
+        {
+            Response<List<Order>> response = Service.GetStorePurchaseHistory(request.UserId, request.Membername, request.StoreId);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<List<Order>>(response.ErrorMessage));
+            }
+            return Ok(new FrontResponse<List<Order>>(response.Value));
         }
     }
 }

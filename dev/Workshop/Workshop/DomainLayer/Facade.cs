@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Workshop.DomainLayer.MarketPackage;
+using Workshop.DomainLayer.MarketPackage.Biding;
+using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Permissions;
@@ -228,9 +230,36 @@ namespace Workshop.DomainLayer
             MarketController.RejectStoreOwnerNomination(userId, nominatorUsername, nominatedUsername, storeId);
         }
 
-        internal Dictionary<string, Dictionary<string, dynamic>> MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end)
+        internal List<UserCountInDate> MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end)
         {
             return UserController.MarketManagerDailyRangeInformation(userId, membername, beginning, end);
         }
+
+        internal List<OrderDTO> GetStorePurchaseHistory(int userId, string membername, int storeId)
+        {
+            return MarketController.GetStorePurchaseHistory(userId, membername, storeId);
+        }
+
+        internal Bid OfferBid(int userId, string username, int storeId, int productId, double price)
+        {
+            return MarketController.OfferBid(userId, username, storeId, productId, price);
+        }
+        internal Bid CounterBid(int userId, string membername, int storeId, int bidId, double newPrice)
+        {
+            return MarketController.CounterBid(userId, membername, storeId, bidId, newPrice);
+        }
+        internal Bid VoteForBid(int userId, string username, int storeId, int bidId, bool vote)
+        {
+            return MarketController.VoteForBid(userId, username, storeId, bidId, vote);
+        }
+        internal double BuyBidProduct(int userId, string username, int storeId, int bidId, CreditCard cc, SupplyAddress address, DateTime buyTime)
+        {
+            return MarketController.BuyBidProduct(userId, username, storeId, bidId, cc, address, buyTime);
+        }
+        internal List<Bid> GetBidsStatus(int userId, string username, int storeId)
+        {
+            return MarketController.GetBidsStatus(userId, username, storeId);
+        }
+
     }
 }

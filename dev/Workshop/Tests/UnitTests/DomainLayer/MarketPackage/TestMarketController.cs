@@ -106,7 +106,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         }
 
         [DataTestMethod]
-        [DataRow("member1", "", "", 2, 9, -1)] //wrong price
+        [DataRow("member1", "", "", 2, 9, -1)] //wrong OfferedPrice
         [DataRow("member1", "keyword", "", -1, -1, -1)] //not the right keyword
         [DataRow("member1", "", "differentCateogry", -1, -1, -1)] //not the right catagory
         public void TestSearchProduct_Failure_WrongArguments(string user, string keyWords, string catagory, int minPrice, int maxPrice, int productReview)
@@ -117,7 +117,7 @@ namespace Tests.UnitTests.DomainLayer.MarketPackage
         }
 
         [DataTestMethod]
-        [DataRow("User1", 2, 1, 3)] //wrong id;
+        [DataRow("User1", 2, 1, 3)] //wrong Id;
         [DataRow("User1", 1, 0, 3)] //wrong store;
         [DataRow("User1", 1, 1, 4)] //wrong quantity;
         public void TestAddToBag_Failure_WrongArguments(string user, int productId, int storeId, int quantity)
