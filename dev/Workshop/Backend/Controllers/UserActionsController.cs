@@ -93,7 +93,7 @@ namespace API.Controllers
         [HttpPost("buycart")]
         public ActionResult<FrontResponse<double>> BuyCart([FromBody] BuyCartRequest request)
         {
-            Response<double> response = Service.BuyCart(request.UserId, new CreditCard(request.Card_number, request.Month, request.Year, request.Holder, request.Ccv, request.Id), new SupplyAddress(request.Name, request.Address, request.City, request.Country, request.Zip), DateTime.ParseExact(request.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture));
+            Response<double> response = Service.BuyCart(request.UserId, new CreditCard(request.Card_number, request.Month, request.Year, request.Holder, request.Ccv, request.Id), new SupplyAddress(request.Name, request.Address, request.City, request.Country, request.Zip), DateTime.Now);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<double>(response.ErrorMessage));
