@@ -16,16 +16,12 @@ namespace API.Controllers
     public class UserActionsController : ControllerBase
     {
         IService Service;
-        private WebSocketServer adminDailyService;
-        private class AdminDailyService : WebSocketBehavior
-        {
+        private StaisticsViewingServer StatsServer;
 
-        }
-
-        public UserActionsController(IService service, WebSocketServer serv)
+        public UserActionsController(IService service, StaisticsViewingServer serv)
         {
             Service = service;
-            adminDailyService = serv;
+            StatsServer = serv;
         }
 
         [HttpPost("takenotifications")]
@@ -152,21 +148,22 @@ namespace API.Controllers
         }
 
         [HttpPost("marketmanagerdaily")]
-        public ActionResult<FrontResponse<int>> MarketManagerDailyStatistics([FromBody] MemberRequest request)
+        public ActionResult<FrontResponse<List<StatisticsInformation>>> MarketManagerDailyStatistics([FromBody] DailyStatisticsRequest request)
         {
-            string relativeServicePath = "/" + request.Membername + "-live_view";
+            Response<List<StatisticsInformation>> resp = Service.MarketManagerDailyRangeInformation(request.UserId, request.Membername, DateTime.ParseExact(request.StartDate, "dd/MM/yyyy", CultureInfo.InvariantCulture).Date, DateTime.ParseExact(request.EndDate, "dd/MM/yyyy", CultureInfo.InvariantCulture).Date);
+            if (resp.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<List<StatisticsInformation>>(resp.ErrorMessage));
+            }
             try
             {
-                if (adminDailyService.WebSocketServices[relativeServicePath] == null)
-                    adminDailyService.AddWebSocketService<AdminDailyService>(relativeServicePath);
+                StatsServer.AddAdminPath(request.Membername);
             }
-            catch (ArgumentException ex)
+            catch (Exception ex)
             {
-                return BadRequest(new FrontResponse<int>("Sorry, but it seems that we cant connect you"));
+                return BadRequest(ex.Message);
             }
-            return Ok(new FrontResponse<int>(16666)); // TODO REMOVE
-            
-            // in case the client tries to login again
+            return Ok(new FrontResponse<List<StatisticsInformation>>(resp.Value));
 
             /*Func<string[], bool> notifier = (msgs) =>
             {
@@ -191,17 +188,8 @@ namespace API.Controllers
                 foreach (string msg in msgs)
                     notificationServer.WebSocketServices[relativeServicePath].Sessions.Broadcast(msg);
                 return true;
-            };
-            Response<int> response = buyerFacade.Login(request.UserName, request.Password, notifier);
+            };*/
 
-            if (response.IsErrorOccured())
-            {
-                notificationServer.RemoveWebSocketService(relativeServicePath);
-                return BadRequest(response);
-            }
-
-            buyerIdToRelativeNotificationPath.Add(response.Value, relativeServicePath);
-            return Ok(response);*/
         }
     }
 }

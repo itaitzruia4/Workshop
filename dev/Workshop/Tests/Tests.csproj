@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AcceptanceTests\AcceptanceTests.cs" />
+    <Compile Include="IntegrationTests\DomainLayer\MarketPackage\TestBid.cs" />
     <Compile Include="IntegrationTests\DomainLayer\MarketPackage\TestDiscountPolicy.cs" />
     <Compile Include="IntegrationTests\DomainLayer\MarketPackage\TestMarketController.cs" />
     <Compile Include="IntegrationTests\DomainLayer\MarketPackage\TestPurchasePolicy.cs" />

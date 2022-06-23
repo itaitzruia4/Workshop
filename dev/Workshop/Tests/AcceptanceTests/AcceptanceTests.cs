@@ -20,7 +20,7 @@ namespace Tests.AcceptanceTests
         IService service;
         private const string username = "Goodun";
         private const string password = "Goodp";
-        private const string product = "product";
+        private const string product = "Product";
         private SupplyAddress address = new SupplyAddress("Ronmi", "Mayor 1", "Ashkelon", "Israel", "784112");
         private CreditCard cc = new CreditCard("001122334455667788", "11", "26", "LeBron Michal", "555", "208143751");
         private Mock<IExternalSystem> externalSystem = new Mock<IExternalSystem>();
@@ -1521,7 +1521,7 @@ namespace Tests.AcceptanceTests
             Assert.IsFalse(service.AddToCart(3, p1.Id, store.StoreId, 2).ErrorOccured); // 200 before discount, 180 after
             Assert.IsFalse(service.AddToCart(3, p2.Id, store.StoreId, 3).ErrorOccured); // 30 before discount, 24 after
             Assert.AreEqual(204, service.BuyCart(3, cc, address, DateTime.Now).Value);
-            string review_string = "Good product, that is!";
+            string review_string = "Good Product, that is!";
             ReviewDTO rev = service.ReviewProduct(3, member3, p1.Id, review_string, 4).Value;
             Assert.AreEqual(review_string, rev.Review);
             Assert.AreEqual(4, rev.Rating);
@@ -1802,6 +1802,8 @@ namespace Tests.AcceptanceTests
             Store store1 = service.CreateNewStore(0, "Member1", "Store1", DateTime.Now).Value;
             service.NominateStoreOwner(0, "Member1", "Member4", store1.StoreId, DateTime.Now);
             service.NominateStoreOwner(3, "Member4", "Member2", store1.StoreId, DateTime.Now);
+            Assert.AreEqual(1, service.TakeNotifications(0, "Member1").Value.Count);
+            Assert.AreEqual(1, service.TakeNotifications(3, "Member4").Value.Count);
             service.NominateStoreOwner(0, "Member1", "Member2", store1.StoreId, DateTime.Now);
             service.NominateStoreManager(3, "Member4", "Member3", store1.StoreId, DateTime.Now);
             service.Logout(3, "Member4");
@@ -2488,7 +2490,7 @@ namespace Tests.AcceptanceTests
             Assert.AreEqual(0, service.GetMemberPermissions(3, "mem3").Value.Count);
         }
 
-        private void ValidateDailyRangeInformation(Dictionary<string, Dictionary<string, dynamic>> data, 
+        private void ValidateDailyRangeInformation(List<StatisticsInformation> input, 
             DateTime begin,
             DateTime end,
             int EXPECTED_GUEST_COUNT, 
@@ -2503,42 +2505,20 @@ namespace Tests.AcceptanceTests
             int CURR_OWNER_COUNT = 0;
             int CURR_MARKET_COUNT = 0;
 
+            Dictionary<string, StatisticsInformation> data = input.ToDictionary(si => si.Date);
+
             foreach (string date in data.Keys)
             {
-                bool NOT_TRASH_VALUE_FLAG = false;
                 DateTime currentDate = DateTime.Parse(date);
                 Assert.IsTrue(currentDate >= begin && currentDate <= end);
-                Dictionary<string, dynamic> dateEntries = data[date];
-                foreach (string value in dateEntries.Keys)
-                {
-                    switch (value)
-                    {
-                        case "date":
-                            Assert.AreEqual(date, ((DateTime)dateEntries[value]).ToShortDateString());
-                            break;
-                        case "guest":
-                            if (dateEntries[value] != 0) NOT_TRASH_VALUE_FLAG = true;
-                            CURR_GUEST_COUNT += dateEntries[value];
-                            break;
-                        case "member":
-                            if (dateEntries[value] != 0) NOT_TRASH_VALUE_FLAG = true;
-                            CURR_MEMBER_COUNT += dateEntries[value];
-                            break;
-                        case "manager":
-                            if (dateEntries[value] != 0) NOT_TRASH_VALUE_FLAG = true;
-                            CURR_MANAGER_COUNT += dateEntries[value];
-                            break;
-                        case "owner":
-                            if (dateEntries[value] != 0) NOT_TRASH_VALUE_FLAG = true;
-                            CURR_OWNER_COUNT += dateEntries[value];
-                            break;
-                        case "market":
-                            if (dateEntries[value] != 0) NOT_TRASH_VALUE_FLAG = true;
-                            CURR_MARKET_COUNT += dateEntries[value];
-                            break;
-                    }
-                }
-                Assert.IsTrue(NOT_TRASH_VALUE_FLAG);
+                StatisticsInformation si = data[date];
+                Assert.AreEqual(date, si.Date);
+                Assert.IsTrue(si.Guests != 0 || si.Members != 0 || si.StoreManagers != 0 || si.StoreOwners != 0 || si.MarketManagers != 0);
+                CURR_GUEST_COUNT += si.Guests;
+                CURR_MEMBER_COUNT += si.Members;
+                CURR_MANAGER_COUNT += si.StoreManagers;
+                CURR_OWNER_COUNT += si.StoreOwners;
+                CURR_MARKET_COUNT += si.MarketManagers;
             }
             Assert.AreEqual(CURR_GUEST_COUNT, EXPECTED_GUEST_COUNT);
             Assert.AreEqual(CURR_MEMBER_COUNT, EXPECTED_MEMBER_COUNT);
@@ -2602,7 +2582,7 @@ namespace Tests.AcceptanceTests
             Store st = service.CreateNewStore(1, "mem1", "s1", DateTime.Parse("Jun 14, 2022")).Value;
             service.NominateStoreManager(1, "mem1", "mem2", st.StoreId, DateTime.Parse("Jun 15, 2022"));
 
-            Response<Dictionary<string, Dictionary<string, dynamic>>> resp = service.MarketManagerDailyRangeInformation(2, "admin", DateTime.Parse(begin), DateTime.Parse(end));
+            Response<List<StatisticsInformation>> resp = service.MarketManagerDailyRangeInformation(2, "admin", DateTime.Parse(begin), DateTime.Parse(end));
             Assert.IsFalse(resp.ErrorOccured);
             Assert.IsNotNull(resp.Value);
             ValidateDailyRangeInformation(resp.Value, DateTime.Parse(begin), DateTime.Parse(end), guest, member, manager, owner, market);
@@ -2627,7 +2607,7 @@ namespace Tests.AcceptanceTests
             Store st = service.CreateNewStore(1, "mem1", "s1", DateTime.Parse("Jun 14, 2022")).Value;
             service.NominateStoreManager(1, "mem1", "mem2", st.StoreId, DateTime.Parse("Jun 15, 2022"));
 
-            Response<Dictionary<string, Dictionary<string, dynamic>>> resp = service.MarketManagerDailyRangeInformation(2, "admin", DateTime.Parse("Jun 14, 2022"), DateTime.Parse("Jun 15, 2022"));
+            Response<List<StatisticsInformation>> resp = service.MarketManagerDailyRangeInformation(2, "admin", DateTime.Parse("Jun 14, 2022"), DateTime.Parse("Jun 15, 2022"));
             Assert.IsTrue(resp.ErrorOccured);
             Assert.IsNotNull(resp.Value);
         }
@@ -2662,10 +2642,571 @@ namespace Tests.AcceptanceTests
             Store st = service.CreateNewStore(1, "mem1", "s1", DateTime.Parse("Jun 14, 2022")).Value;
             service.NominateStoreManager(1, "mem1", "mem2", st.StoreId, DateTime.Parse("Jun 15, 2022"));
 
-            Response<Dictionary<string, Dictionary<string, dynamic>>> resp = service.MarketManagerDailyRangeInformation(2, "admin", DateTime.Parse(begin), DateTime.Parse(end));
+            Response<List<StatisticsInformation>> resp = service.MarketManagerDailyRangeInformation(2, "admin", DateTime.Parse(begin), DateTime.Parse(end));
             Assert.IsFalse(resp.ErrorOccured);
             Assert.IsNotNull(resp.Value);
             ValidateDailyRangeInformation(resp.Value, DateTime.Parse(begin), DateTime.Parse(end), 0, 0, 0, 0, 0);
+        }
+
+        [TestMethod]
+        public void Test_GetStorePurhcaseHistory_Success()
+        {
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
+            string member1 = "member1";
+            Test_Login_Good(1, member1, "password1");
+            DateTime PURCHASE_DATE = DateTime.Now;
+
+            Store store = service.CreateNewStore(1, member1, "Store1", PURCHASE_DATE).Value;
+            Product p1 = service.AddProduct(1, member1, store.StoreId, "Product1", "Description1", 100.0, 3, "no_cat").Value;
+            Product p2 = service.AddProduct(1, member1, store.StoreId, "Product2", "Description2", 200.0, 2, "Cat1").Value;
+            Product p3 = service.AddProduct(1, member1, store.StoreId, "Product3", "Description3", 50.0, 5, "Cat2").Value;
+            service.AddProductDiscount(1, member1, store.StoreId, makeSimpleProductDiscount(10)(p1.Id), p1.Id);
+            service.AddProductDiscount(1, member1, store.StoreId, makeSimpleProductDiscount(20)(p2.Id), p2.Id);
+            service.AddCategoryDiscount(1, member1, store.StoreId, makeSimpleCategoryDiscount(50)("Cat1"), "Cat1");
+            service.AddCategoryDiscount(1, member1, store.StoreId, makeSimpleCategoryDiscount(10)("Cat2"), "Cat2");
+            service.AddToCart(1, p1.Id, store.StoreId, 3);
+            service.AddToCart(1, p2.Id, store.StoreId, 2);
+            service.AddToCart(1, p3.Id, store.StoreId, 5);
+            double expected_price = 615;
+            Assert.AreEqual(expected_price, service.BuyCart(1, cc, address, PURCHASE_DATE).Value);
+
+            Response<List<Order>> adminResponse = service.GetStorePurchaseHistory(1, member1, store.StoreId);
+            Assert.IsFalse(adminResponse.ErrorOccured);
+            List<Order> orderHistory = adminResponse.Value;
+            Assert.IsNotNull(orderHistory);
+            Assert.AreEqual(1, orderHistory.Count);
+            Assert.AreEqual(PURCHASE_DATE.ToShortDateString(), orderHistory[0].Date);
+            Assert.AreEqual("Store1", orderHistory[0].StoreName);
+            Assert.AreEqual("member1", orderHistory[0].BuyerName);
+            Assert.AreEqual(address, orderHistory[0].Address);
+            Assert.AreEqual(expected_price, orderHistory[0].Price);
+            Assert.AreEqual(3, orderHistory[0].Products.Count);
+            Assert.IsTrue(orderHistory[0].Products.Select(p => p.Id).Contains(p1.Id));
+            Assert.IsTrue(orderHistory[0].Products.Select(p => p.Id).Contains(p2.Id));
+            Assert.IsTrue(orderHistory[0].Products.Select(p => p.Id).Contains(p3.Id));
+
+            Test_Login_Good(2, "admin", "admin");
+            List<Order> orderHistory1 = service.GetStorePurchaseHistory(2, "admin", store.StoreId).Value;
+            Assert.IsNotNull(orderHistory1);
+            Assert.AreEqual(1, orderHistory1.Count);
+            Assert.AreEqual(PURCHASE_DATE.ToShortDateString(), orderHistory1[0].Date);
+            Assert.AreEqual("Store1", orderHistory1[0].StoreName);
+            Assert.AreEqual("member1", orderHistory1[0].BuyerName);
+            Assert.AreEqual(address, orderHistory1[0].Address);
+            Assert.AreEqual(expected_price, orderHistory1[0].Price);
+            Assert.AreEqual(3, orderHistory1[0].Products.Count);
+            Assert.IsTrue(orderHistory1[0].Products.Select(p => p.Id).Contains(p1.Id));
+            Assert.IsTrue(orderHistory1[0].Products.Select(p => p.Id).Contains(p2.Id));
+            Assert.IsTrue(orderHistory1[0].Products.Select(p => p.Id).Contains(p3.Id));
+        }
+
+        [TestMethod]
+        public void Test_GetStorePurhcaseHistory_Success_MultipleOrders_MultipleStores()
+        {
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
+            string member1 = "member1";
+            Test_Login_Good(1, member1, "password1");
+            DateTime PURCHASE_DATE = DateTime.Now;
+
+            Store store = service.CreateNewStore(1, member1, "Store1", PURCHASE_DATE).Value;
+            Product p1 = service.AddProduct(1, member1, store.StoreId, "Product1", "Description1", 100.0, 6, "no_cat").Value;
+            Product p2 = service.AddProduct(1, member1, store.StoreId, "Product2", "Description2", 200.0, 4, "Cat1").Value;
+            Product p3 = service.AddProduct(1, member1, store.StoreId, "Product3", "Description3", 50.0, 10, "Cat2").Value;
+            service.AddProductDiscount(1, member1, store.StoreId, makeSimpleProductDiscount(10)(p1.Id), p1.Id);
+            service.AddProductDiscount(1, member1, store.StoreId, makeSimpleProductDiscount(20)(p2.Id), p2.Id);
+            service.AddCategoryDiscount(1, member1, store.StoreId, makeSimpleCategoryDiscount(50)("Cat1"), "Cat1");
+            service.AddCategoryDiscount(1, member1, store.StoreId, makeSimpleCategoryDiscount(10)("Cat2"), "Cat2");
+
+
+            service.AddToCart(1, p1.Id, store.StoreId, 3);
+            service.AddToCart(1, p2.Id, store.StoreId, 2);
+            service.AddToCart(1, p3.Id, store.StoreId, 5);
+            double expected_price = 615;
+            Assert.AreEqual(expected_price, service.BuyCart(1, cc, address, PURCHASE_DATE).Value);
+
+            service.AddToCart(1, p1.Id, store.StoreId, 3);
+            service.AddToCart(1, p2.Id, store.StoreId, 2);
+            service.AddToCart(1, p3.Id, store.StoreId, 5);
+            Assert.IsFalse(service.BuyCart(1, cc, address, PURCHASE_DATE).ErrorOccured);
+
+            // NOT INCLUDED IN HISTORY, NOT THE SAME STORE!
+            Store store2 = service.CreateNewStore(1, member1, "Store2", PURCHASE_DATE).Value;
+            Product p4 = service.AddProduct(1, member1, store2.StoreId, "Product4", "Description4", 100.0, 3, "no_cat").Value;
+            Product p5 = service.AddProduct(1, member1, store2.StoreId, "Product5", "Description5", 200.0, 2, "Cat1").Value;
+            Product p6 = service.AddProduct(1, member1, store2.StoreId, "Product6", "Description6", 50.0, 5, "Cat2").Value;
+            service.AddToCart(1, p4.Id, store2.StoreId, 3);
+            service.AddToCart(1, p5.Id, store2.StoreId, 2);
+            service.AddToCart(1, p6.Id, store2.StoreId, 5);
+            Assert.IsFalse(service.BuyCart(1, cc, address, DateTime.Now).ErrorOccured);
+            // NOT INCLUDED IN HISTORY, NOT THE SAME STORE!
+
+
+            Response<List<Order>> adminResponse = service.GetStorePurchaseHistory(1, member1, store.StoreId);
+            Assert.IsFalse(adminResponse.ErrorOccured);
+            List<Order> orderHistory = adminResponse.Value;
+            Assert.IsNotNull(orderHistory);
+            Assert.AreEqual(2, orderHistory.Count);
+
+            Test_Login_Good(2, "admin", "admin");
+            List<Order> orderHistory1 = service.GetStorePurchaseHistory(2, "admin", store.StoreId).Value;
+            Assert.IsNotNull(orderHistory1);
+            Assert.AreEqual(2, orderHistory.Count);
+        }
+
+        [TestMethod]
+        public void Test_GetStorePurhcaseHistory_Failure_NoPermissions()
+        {
+            string member1 = "member1";
+            Test_Login_Good(1, member1, "password1");
+            DateTime PURCHASE_DATE = DateTime.Now;
+
+            Store store = service.CreateNewStore(1, member1, "Store1", PURCHASE_DATE).Value;
+            Product p1 = service.AddProduct(1, member1, store.StoreId, "Product1", "Description1", 100.0, 3, "no_cat").Value;
+            Product p2 = service.AddProduct(1, member1, store.StoreId, "Product2", "Description2", 200.0, 2, "Cat1").Value;
+            Product p3 = service.AddProduct(1, member1, store.StoreId, "Product3", "Description3", 50.0, 5, "Cat2").Value;
+            service.AddProductDiscount(1, member1, store.StoreId, makeSimpleProductDiscount(10)(p1.Id), p1.Id);
+            service.AddProductDiscount(1, member1, store.StoreId, makeSimpleProductDiscount(20)(p2.Id), p2.Id);
+            service.AddCategoryDiscount(1, member1, store.StoreId, makeSimpleCategoryDiscount(50)("Cat1"), "Cat1");
+            service.AddCategoryDiscount(1, member1, store.StoreId, makeSimpleCategoryDiscount(10)("Cat2"), "Cat2");
+            service.AddToCart(1, p1.Id, store.StoreId, 3);
+            service.AddToCart(1, p2.Id, store.StoreId, 2);
+            service.AddToCart(1, p3.Id, store.StoreId, 5);
+            double expected_price = 615;
+            Assert.AreEqual(expected_price, service.BuyCart(1, cc, address, DateTime.Now).Value);
+
+            Test_Login_Good(2, "member2", "pass");
+            Response<List<Order>> response = service.GetStorePurchaseHistory(2, "member2", store.StoreId);
+            Assert.IsTrue(response.ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_OfferBid_Success_AndCheckOwnersAndManagersReceiveNotification_AndCanCheckBidsStatus()
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                Test_Login_Good(i, $"member{i}", $"pass{i}");
+            }
+            Store store = service.CreateNewStore(1, "member1", "Store1", DateTime.Now).Value;
+            Product product = service.AddProduct(1, "member1", store.StoreId, "Product1", "Description1", 15.0, 3, "Category1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", store.StoreId, DateTime.Now);
+            service.NominateStoreManager(1, "member1", "member3", store.StoreId, DateTime.Now);
+
+            service.OfferBid(4, "member4", store.StoreId, product.Id, 8.0);
+
+            // Make sure the store owners and managers were notified
+
+            for (int i = 1; i < 4; i++)
+            {
+                Assert.AreEqual(1, service.TakeNotifications(i, $"member{i}").Value.Count);
+            }
+
+            // Make sure the bid was added
+            List<Bid> storeBids = service.GetBidsStatus(1, "member1", store.StoreId).Value;
+            Assert.IsNotNull(storeBids);
+            Assert.AreEqual(1, storeBids.Count);
+            Bid bid = storeBids[0];
+
+            Assert.AreEqual(8.0, bid.OfferedPrice);
+            Assert.AreEqual("member4", bid.OfferingMembername);
+            Assert.AreEqual(product.Id, bid.Product.Id);
+            Assert.AreEqual(store.StoreId, bid.StoreId);
+            Assert.AreEqual(0, bid.OwnerVotes.Count);
+
+            Assert.IsTrue(service.GetBidsStatus(3, "member3", store.StoreId).ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_CantBuyWithoutAcceptedBidFromAllOwners()
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                Test_Login_Good(i, $"member{i}", $"pass{i}");
+            }
+            Store store = service.CreateNewStore(1, "member1", "Store1", DateTime.Now).Value;
+            Product product = service.AddProduct(1, "member1", store.StoreId, "Product1", "Description1", 15.0, 3, "Category1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", store.StoreId, DateTime.Now);
+            service.NominateStoreManager(1, "member1", "member3", store.StoreId, DateTime.Now);
+
+            service.OfferBid(4, "member4", store.StoreId, product.Id, 8.0);
+
+            // Make sure the store owners and managers were notified
+
+            for (int i = 1; i < 4; i++)
+            {
+                Assert.AreEqual(1, service.TakeNotifications(i, $"member{i}").Value.Count);
+            }
+
+            // Make sure the bid was added
+            List<Bid> storeBids = service.GetBidsStatus(1, "member1", store.StoreId).Value;
+            Assert.IsNotNull(storeBids);
+            Assert.AreEqual(1, storeBids.Count);
+            Bid bid = storeBids[0];
+
+            Assert.AreEqual(8.0, bid.OfferedPrice);
+            Assert.AreEqual("member4", bid.OfferingMembername);
+            Assert.AreEqual(product.Id, bid.Product.Id);
+            Assert.AreEqual(store.StoreId, bid.StoreId);
+            Assert.AreEqual(0, bid.OwnerVotes.Count);
+
+            Assert.IsTrue(service.GetBidsStatus(3, "member3", store.StoreId).ErrorOccured);
+
+            int bidId = bid.BidId;
+            Assert.IsTrue(service.BuyBidProduct(4, "member4", store.StoreId, bidId, cc, address, DateTime.Now).ErrorOccured);
+
+            Assert.IsFalse(service.VoteForBid(1, "member1", store.StoreId, bidId, true).ErrorOccured);
+
+            Assert.IsTrue(service.BuyBidProduct(4, "member4", store.StoreId, bidId, cc, address, DateTime.Now).ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_ReceiveNotificationForDecliningBid_Holded()
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                Test_Login_Good(i, $"member{i}", $"pass{i}");
+            }
+            Store store = service.CreateNewStore(1, "member1", "Store1", DateTime.Now).Value;
+            Product product = service.AddProduct(1, "member1", store.StoreId, "Product1", "Description1", 15.0, 3, "Category1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", store.StoreId, DateTime.Now);
+            service.NominateStoreManager(1, "member1", "member3", store.StoreId, DateTime.Now);
+
+            service.OfferBid(4, "member4", store.StoreId, product.Id, 8.0);
+
+            // Make sure the store owners and managers were notified
+
+            for (int i = 1; i < 4; i++)
+            {
+                Assert.AreEqual(1, service.TakeNotifications(i, $"member{i}").Value.Count);
+            }
+
+            // Make sure the bid was added
+            List<Bid> storeBids = service.GetBidsStatus(1, "member1", store.StoreId).Value;
+            Assert.IsNotNull(storeBids);
+            Assert.AreEqual(1, storeBids.Count);
+            Bid bid = storeBids[0];
+
+            Assert.AreEqual(8.0, bid.OfferedPrice);
+            Assert.AreEqual("member4", bid.OfferingMembername);
+            Assert.AreEqual(product.Id, bid.Product.Id);
+            Assert.AreEqual(store.StoreId, bid.StoreId);
+            Assert.AreEqual(0, bid.OwnerVotes.Count);
+
+            Assert.IsTrue(service.GetBidsStatus(3, "member3", store.StoreId).ErrorOccured);
+
+            int bidId = bid.BidId;
+            service.Logout(4, "member4");
+            Assert.IsFalse(service.VoteForBid(1, "member1", store.StoreId, bidId, false).ErrorOccured);
+
+            Assert.AreEqual(1, service.Login(4, "member4", "pass4", DateTime.Now).Value.Value.Count);
+        }
+
+
+        [TestMethod]
+        public void Test_ReceiveNotificationForDecliningBid()
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                Test_Login_Good(i, $"member{i}", $"pass{i}");
+            }
+            Store store = service.CreateNewStore(1, "member1", "Store1", DateTime.Now).Value;
+            Product product = service.AddProduct(1, "member1", store.StoreId, "Product1", "Description1", 15.0, 3, "Category1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", store.StoreId, DateTime.Now);
+            service.NominateStoreManager(1, "member1", "member3", store.StoreId, DateTime.Now);
+
+            service.OfferBid(4, "member4", store.StoreId, product.Id, 8.0);
+
+            // Make sure the store owners and managers were notified
+
+            for (int i = 1; i < 4; i++)
+            {
+                Assert.AreEqual(1, service.TakeNotifications(i, $"member{i}").Value.Count);
+            }
+
+            // Make sure the bid was added
+            List<Bid> storeBids = service.GetBidsStatus(1, "member1", store.StoreId).Value;
+            Assert.IsNotNull(storeBids);
+            Assert.AreEqual(1, storeBids.Count);
+            Bid bid = storeBids[0];
+
+            Assert.AreEqual(8.0, bid.OfferedPrice);
+            Assert.AreEqual("member4", bid.OfferingMembername);
+            Assert.AreEqual(product.Id, bid.Product.Id);
+            Assert.AreEqual(store.StoreId, bid.StoreId);
+            Assert.AreEqual(0, bid.OwnerVotes.Count);
+
+            Assert.IsTrue(service.GetBidsStatus(3, "member3", store.StoreId).ErrorOccured);
+
+            int bidId = bid.BidId;
+
+            Assert.IsFalse(service.VoteForBid(1, "member1", store.StoreId, bidId, false).ErrorOccured);
+            Assert.AreEqual(1, service.TakeNotifications(4, "member4").Value.Count);
+        }
+
+        [TestMethod]
+        public void Test_ReceiveNotificationForAcceptingBid_Holded()
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                Test_Login_Good(i, $"member{i}", $"pass{i}");
+            }
+            Store store = service.CreateNewStore(1, "member1", "Store1", DateTime.Now).Value;
+            Product product = service.AddProduct(1, "member1", store.StoreId, "Product1", "Description1", 15.0, 3, "Category1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", store.StoreId, DateTime.Now);
+            service.NominateStoreManager(1, "member1", "member3", store.StoreId, DateTime.Now);
+
+            service.OfferBid(4, "member4", store.StoreId, product.Id, 8.0);
+
+            // Make sure the store owners and managers were notified
+
+            for (int i = 1; i < 4; i++)
+            {
+                Assert.AreEqual(1, service.TakeNotifications(i, $"member{i}").Value.Count);
+            }
+
+            // Make sure the bid was added
+            List<Bid> storeBids = service.GetBidsStatus(1, "member1", store.StoreId).Value;
+            Assert.IsNotNull(storeBids);
+            Assert.AreEqual(1, storeBids.Count);
+            Bid bid = storeBids[0];
+
+            Assert.AreEqual(8.0, bid.OfferedPrice);
+            Assert.AreEqual("member4", bid.OfferingMembername);
+            Assert.AreEqual(product.Id, bid.Product.Id);
+            Assert.AreEqual(store.StoreId, bid.StoreId);
+            Assert.AreEqual(0, bid.OwnerVotes.Count);
+
+            Assert.IsTrue(service.GetBidsStatus(3, "member3", store.StoreId).ErrorOccured);
+
+            int bidId = bid.BidId;
+
+            Assert.IsFalse(service.VoteForBid(1, "member1", store.StoreId, bidId, true).ErrorOccured);
+            Assert.AreEqual(0, service.TakeNotifications(4, "member4").Value.Count);
+
+            service.Logout(4, "member4");
+            Assert.IsFalse(service.VoteForBid(2, "member2", store.StoreId, bidId, true).ErrorOccured);
+
+            Assert.AreEqual(1, service.Login(4, "member4", "pass4", DateTime.Now).Value.Value.Count);
+        }
+
+        [TestMethod]
+        public void Test_ReceiveNotificationForAcceptingBid()
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                Test_Login_Good(i, $"member{i}", $"pass{i}");
+            }
+            Store store = service.CreateNewStore(1, "member1", "Store1", DateTime.Now).Value;
+            Product product = service.AddProduct(1, "member1", store.StoreId, "Product1", "Description1", 15.0, 3, "Category1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", store.StoreId, DateTime.Now);
+            service.NominateStoreManager(1, "member1", "member3", store.StoreId, DateTime.Now);
+
+            service.OfferBid(4, "member4", store.StoreId, product.Id, 8.0);
+
+            // Make sure the store owners and managers were notified
+
+            for (int i = 1; i < 4; i++)
+            {
+                Assert.AreEqual(1, service.TakeNotifications(i, $"member{i}").Value.Count);
+            }
+
+            // Make sure the bid was added
+            List<Bid> storeBids = service.GetBidsStatus(1, "member1", store.StoreId).Value;
+            Assert.IsNotNull(storeBids);
+            Assert.AreEqual(1, storeBids.Count);
+            Bid bid = storeBids[0];
+
+            Assert.AreEqual(8.0, bid.OfferedPrice);
+            Assert.AreEqual("member4", bid.OfferingMembername);
+            Assert.AreEqual(product.Id, bid.Product.Id);
+            Assert.AreEqual(store.StoreId, bid.StoreId);
+            Assert.AreEqual(0, bid.OwnerVotes.Count);
+
+            Assert.IsTrue(service.GetBidsStatus(3, "member3", store.StoreId).ErrorOccured);
+
+            int bidId = bid.BidId;
+
+            Assert.IsFalse(service.VoteForBid(1, "member1", store.StoreId, bidId, true).ErrorOccured);
+            Assert.AreEqual(0, service.TakeNotifications(4, "member4").Value.Count);
+            Assert.IsFalse(service.VoteForBid(2, "member2", store.StoreId, bidId, true).ErrorOccured);
+            Assert.AreEqual(1, service.TakeNotifications(4, "member4").Value.Count);
+        }
+
+        [TestMethod]
+        public void Test_CanBuyAfterAccepting()
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                Test_Login_Good(i, $"member{i}", $"pass{i}");
+            }
+            Store store = service.CreateNewStore(1, "member1", "Store1", DateTime.Now).Value;
+            Product product = service.AddProduct(1, "member1", store.StoreId, "Product1", "Description1", 15.0, 3, "Category1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", store.StoreId, DateTime.Now);
+            service.NominateStoreManager(1, "member1", "member3", store.StoreId, DateTime.Now);
+
+            service.OfferBid(4, "member4", store.StoreId, product.Id, 8.0);
+
+            // Make sure the store owners and managers were notified
+
+            for (int i = 1; i < 4; i++)
+            {
+                Assert.AreEqual(1, service.TakeNotifications(i, $"member{i}").Value.Count);
+            }
+
+            // Make sure the bid was added
+            List<Bid> storeBids = service.GetBidsStatus(1, "member1", store.StoreId).Value;
+            Assert.IsNotNull(storeBids);
+            Assert.AreEqual(1, storeBids.Count);
+            Bid bid = storeBids[0];
+
+            Assert.AreEqual(8.0, bid.OfferedPrice);
+            Assert.AreEqual("member4", bid.OfferingMembername);
+            Assert.AreEqual(product.Id, bid.Product.Id);
+            Assert.AreEqual(store.StoreId, bid.StoreId);
+            Assert.AreEqual(0, bid.OwnerVotes.Count);
+
+            Assert.IsTrue(service.GetBidsStatus(3, "member3", store.StoreId).ErrorOccured);
+
+            int bidId = bid.BidId;
+
+            Assert.IsFalse(service.VoteForBid(1, "member1", store.StoreId, bidId, true).ErrorOccured);
+            Assert.AreEqual(0, service.TakeNotifications(4, "member4").Value.Count);
+            Assert.IsFalse(service.VoteForBid(2, "member2", store.StoreId, bidId, true).ErrorOccured);
+            Assert.AreEqual(1, service.TakeNotifications(4, "member4").Value.Count);
+            Assert.AreEqual(8.0, service.BuyBidProduct(4, "member4", store.StoreId, bidId, cc, address, DateTime.Now).Value);
+        }
+
+        [TestMethod]
+        public void Test_CantBuyAfterDeclining()
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                Test_Login_Good(i, $"member{i}", $"pass{i}");
+            }
+            Store store = service.CreateNewStore(1, "member1", "Store1", DateTime.Now).Value;
+            Product product = service.AddProduct(1, "member1", store.StoreId, "Product1", "Description1", 15.0, 3, "Category1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", store.StoreId, DateTime.Now);
+            service.NominateStoreManager(1, "member1", "member3", store.StoreId, DateTime.Now);
+
+            service.OfferBid(4, "member4", store.StoreId, product.Id, 8.0);
+
+            // Make sure the store owners and managers were notified
+
+            for (int i = 1; i < 4; i++)
+            {
+                Assert.AreEqual(1, service.TakeNotifications(i, $"member{i}").Value.Count);
+            }
+
+            // Make sure the bid was added
+            List<Bid> storeBids = service.GetBidsStatus(1, "member1", store.StoreId).Value;
+            Assert.IsNotNull(storeBids);
+            Assert.AreEqual(1, storeBids.Count);
+            Bid bid = storeBids[0];
+
+            Assert.AreEqual(8.0, bid.OfferedPrice);
+            Assert.AreEqual("member4", bid.OfferingMembername);
+            Assert.AreEqual(product.Id, bid.Product.Id);
+            Assert.AreEqual(store.StoreId, bid.StoreId);
+            Assert.AreEqual(0, bid.OwnerVotes.Count);
+
+            Assert.IsTrue(service.GetBidsStatus(3, "member3", store.StoreId).ErrorOccured);
+
+            int bidId = bid.BidId;
+
+            Assert.IsFalse(service.VoteForBid(1, "member1", store.StoreId, bidId, true).ErrorOccured);
+            Assert.AreEqual(0, service.TakeNotifications(4, "member4").Value.Count);
+            Assert.IsFalse(service.VoteForBid(2, "member2", store.StoreId, bidId, false).ErrorOccured);
+            Assert.AreEqual(1, service.TakeNotifications(4, "member4").Value.Count);
+            Assert.IsTrue(service.BuyBidProduct(4, "member4", store.StoreId, bidId, cc, address, DateTime.Now).ErrorOccured);
+        }
+
+
+        [TestMethod]
+        public void Test_CantBuyTwiceAfterBidAccepting()
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                Test_Login_Good(i, $"member{i}", $"pass{i}");
+            }
+            Store store = service.CreateNewStore(1, "member1", "Store1", DateTime.Now).Value;
+            Product product = service.AddProduct(1, "member1", store.StoreId, "Product1", "Description1", 15.0, 3, "Category1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", store.StoreId, DateTime.Now);
+            service.NominateStoreManager(1, "member1", "member3", store.StoreId, DateTime.Now);
+
+            service.OfferBid(4, "member4", store.StoreId, product.Id, 8.0);
+
+            // Make sure the store owners and managers were notified
+
+            for (int i = 1; i < 4; i++)
+            {
+                Assert.AreEqual(1, service.TakeNotifications(i, $"member{i}").Value.Count);
+            }
+
+            // Make sure the bid was added
+            List<Bid> storeBids = service.GetBidsStatus(1, "member1", store.StoreId).Value;
+            Assert.IsNotNull(storeBids);
+            Assert.AreEqual(1, storeBids.Count);
+            Bid bid = storeBids[0];
+
+            Assert.AreEqual(8.0, bid.OfferedPrice);
+            Assert.AreEqual("member4", bid.OfferingMembername);
+            Assert.AreEqual(product.Id, bid.Product.Id);
+            Assert.AreEqual(store.StoreId, bid.StoreId);
+            Assert.AreEqual(0, bid.OwnerVotes.Count);
+
+            Assert.IsTrue(service.GetBidsStatus(3, "member3", store.StoreId).ErrorOccured);
+
+            int bidId = bid.BidId;
+
+            Assert.IsFalse(service.VoteForBid(1, "member1", store.StoreId, bidId, true).ErrorOccured);
+            Assert.AreEqual(0, service.TakeNotifications(4, "member4").Value.Count);
+            Assert.IsFalse(service.VoteForBid(2, "member2", store.StoreId, bidId, true).ErrorOccured);
+            Assert.AreEqual(1, service.TakeNotifications(4, "member4").Value.Count);
+            Assert.AreEqual(8.0, service.BuyBidProduct(4, "member4", store.StoreId, bidId, cc, address, DateTime.Now).Value);
+            Assert.IsTrue(service.BuyBidProduct(4, "member4", store.StoreId, bidId, cc, address, DateTime.Now).ErrorOccured);
+        }
+
+        [TestMethod]
+        public void Test_CanBuyAfterPriceOfferFromOwner()
+        {
+            for (int i = 1; i < 5; i++)
+            {
+                Test_Login_Good(i, $"member{i}", $"pass{i}");
+            }
+            Store store = service.CreateNewStore(1, "member1", "Store1", DateTime.Now).Value;
+            Product product = service.AddProduct(1, "member1", store.StoreId, "Product1", "Description1", 15.0, 3, "Category1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", store.StoreId, DateTime.Now);
+            service.NominateStoreManager(1, "member1", "member3", store.StoreId, DateTime.Now);
+
+            service.OfferBid(4, "member4", store.StoreId, product.Id, 8.0);
+
+            // Make sure the store owners and managers were notified
+
+            for (int i = 1; i < 4; i++)
+            {
+                Assert.AreEqual(1, service.TakeNotifications(i, $"member{i}").Value.Count);
+            }
+
+            // Make sure the bid was added
+            List<Bid> storeBids = service.GetBidsStatus(1, "member1", store.StoreId).Value;
+            Assert.IsNotNull(storeBids);
+            Assert.AreEqual(1, storeBids.Count);
+            Bid bid = storeBids[0];
+
+            Assert.AreEqual(8.0, bid.OfferedPrice);
+            Assert.AreEqual("member4", bid.OfferingMembername);
+            Assert.AreEqual(product.Id, bid.Product.Id);
+            Assert.AreEqual(store.StoreId, bid.StoreId);
+            Assert.AreEqual(0, bid.OwnerVotes.Count);
+
+            Assert.IsTrue(service.GetBidsStatus(3, "member3", store.StoreId).ErrorOccured);
+
+            int bidId = bid.BidId;
+
+            Assert.IsFalse(service.VoteForBid(1, "member1", store.StoreId, bidId, true).ErrorOccured);
+            Assert.AreEqual(0, service.TakeNotifications(4, "member4").Value.Count);
+            Assert.IsFalse(service.CounterBid(2, "member2", store.StoreId, bidId, 10.0).ErrorOccured);
+            Assert.AreEqual(1, service.TakeNotifications(4, "member4").Value.Count);
+            Assert.AreEqual(10.0, service.BuyBidProduct(4, "member4", store.StoreId, bidId, cc, address, DateTime.Now).Value);
         }
     }
 }

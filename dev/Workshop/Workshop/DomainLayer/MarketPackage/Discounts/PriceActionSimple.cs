@@ -12,7 +12,7 @@ namespace Workshop.DomainLayer.MarketPackage.Discounts
         private double percentage;
         private Filter filter;
 
-        // The filter recieves a product and returns true if the discount is valid for the product
+        // The filter recieves a Product and returns true if the discount is valid for the Product
         public delegate bool Filter(ProductDTO product);
 
         public PriceActionSimple(double percentage, Filter filter) 
