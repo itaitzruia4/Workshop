@@ -407,8 +407,8 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new ArgumentException("Store ID does not exist");
             }
             ViewStorePermission(userId, username, storeId);
-            if (!IsAuthorized(userId, username, storeId, Action.ChangeProductName))
-                throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
+            if (!IsAuthorized(userId, username, storeId, Action.ChangeProductQuantity))
+                throw new MemberAccessException("This user is not authorized for changing product's qunatity in the specified store.");
             stores[storeId].ChangeProductQuantity(productID, quantity);
             storesLocks[storeId].ReleaseWriterLock();
             Logger.Instance.LogEvent($"{username} successfuly changed the quantity of Product {productID} in store {storeId}.");
@@ -427,8 +427,8 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new ArgumentException("Store ID does not exist");
             }
             ViewStorePermission(userId, username, storeId);
-            if (!IsAuthorized(userId, username, storeId, Action.ChangeProductName))
-                throw new MemberAccessException("This user is not authorized for changing products qunatities in the specified store.");
+            if (!IsAuthorized(userId, username, storeId, Action.ChangeProductCategory))
+                throw new MemberAccessException("This user is not authorized for changing product's category in the specified store.");
             stores[storeId].ChangeProductCategory(productID, category);
             storesLocks[storeId].ReleaseWriterLock();
             Logger.Instance.LogEvent($"{username} successfuly changed the quantity of Product {productID} in store {storeId}.");

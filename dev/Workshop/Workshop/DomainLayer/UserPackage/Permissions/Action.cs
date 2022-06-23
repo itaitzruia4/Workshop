@@ -28,6 +28,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         CancelMember,
         GetMembersOnlineStats,
         AddPurchaseTerm,
-        ViewStorePurchaseHistory
+        ViewStorePurchaseHistory,
+        ChangeProductCategory
     }
 }
