@@ -25,7 +25,6 @@ import { Product } from "../Types/product"
 import { Cart, Bag } from '../Types/shopping';
 import { MarketNotification } from '../Types/Notification';
 import AdminDialog from '../Components/Dialogs/AdminDialog';
-import { isAdmin } from '../Actions/AdminActions';
 
 // Admin page
 function Admin() {

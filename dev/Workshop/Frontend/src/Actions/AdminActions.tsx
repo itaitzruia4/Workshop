@@ -1,6 +1,6 @@
 import { memberToken } from "../Types/roles"
 
-function handleIsAdmin(token: memberToken): Promise<boolean> {
+export function handleIsAdmin(token: memberToken): Promise<any> {
     let url = "http://localhost:5165/api/useractions/GetMemberPermissions";
 
     return fetch(url, {
@@ -11,27 +11,13 @@ function handleIsAdmin(token: memberToken): Promise<boolean> {
             userId: token.userId,
             membername: token.membername
         })
-    }).then(async response => {
-        const data = await response.json();
-        if (!response.ok) {
-            return Promise.reject(data.error);
-        }
-        //if (data.filter(perm => perm.storeId === -1).length > 0) {
-        //    return Promise.resolve(true);
-        //}
-        return Promise.resolve(false);
-    })
-}
-
-export const isAdmin = (token: memberToken): boolean => {
-    return token.membername === "admin";
-
-    // TODO fix this
-    //return handleIsAdmin(token)
-    //    .then((b: boolean) => b)
-    //    .catch(error => {
-    //        return false;
-    //    });
+    }).then(response => response.json()
+        .then(data => {
+            if (!response.ok) {
+                return Promise.reject(data.error);
+            }
+            return Promise.resolve((data.value as Array<{storeId: number}>).filter(elem => elem.storeId === -1).length > 0);
+        }))
 }
 
 function handleRemoveMember(token: memberToken, memberToRemove: string): Promise<any> {
