@@ -8,7 +8,10 @@ using Workshop.DomainLayer.MarketPackage.Terms;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using DALObject = Workshop.DataLayer.DALObject;
 using PurchasePolicyDAL = Workshop.DataLayer.DataObjects.Market.Purchases.PurchasePolicy;
-
+using DALTerm = Workshop.DataLayer.DataObjects.Market.Purchases.Term;
+using DALProductTerm = Workshop.DataLayer.DataObjects.Market.Purchases.ProductTerm;
+using DALCategoryTerm = Workshop.DataLayer.DataObjects.Market.Purchases.CategoryTerm;
+using DataHandler = Workshop.DataLayer.DataHandler;
 
 
 namespace Workshop.DomainLayer.MarketPackage
@@ -19,6 +22,7 @@ namespace Workshop.DomainLayer.MarketPackage
         private Dictionary<string, Term> category_terms;
         private Term user_terms;
         private Term store_terms;
+        private PurchasePolicyDAL purchasePolicyDAL;
 
         private const string PURCHASE_COMP_TERM_TAG = "PurchaseCompositeTerm";
         private const string PRODUCT_SIMPLE_TERM_TAG = "ProductPurchaseSimpleTerm";
@@ -32,16 +36,36 @@ namespace Workshop.DomainLayer.MarketPackage
             this.store = store;
             this.products_terms = new Dictionary<int, Term>();
             this.category_terms = new Dictionary<string, Term>();
+            this.user_terms = null;
+            this.store_terms = null;
+            this.purchasePolicyDAL = new PurchasePolicyDAL(new List<DALProductTerm>(), new List<DALCategoryTerm>(), null, null);
+            DataHandler.getDBHandler().save(purchasePolicyDAL);
         }
 
-        public PurchasePolicy(PurchasePolicyDAL purchasePolicyDAL)
+        public PurchasePolicy(PurchasePolicyDAL purchasePolicyDAL, Store store)
         {
-            throw new NotImplementedException();
+            this.store = store;
+            this.products_terms = new Dictionary<int, Term>();
+            this.category_terms = new Dictionary<string, Term>();
+            this.user_terms = null;
+            this.store_terms = null;
+            this.purchasePolicyDAL = null;
+            foreach (DALProductTerm product_term in purchasePolicyDAL.products_terms)
+            {
+                AddProductTerm(product_term.Term.TermJson, product_term.ProductId, null);
+            }
+            foreach (DALCategoryTerm category_term in purchasePolicyDAL.category_terms)
+            {
+                AddCategoryTerm(category_term.Term.TermJson, category_term.CategoryName, null);
+            }
+            AddUserTerm(purchasePolicyDAL.user_terms.TermJson);
+            AddStoreTerm(purchasePolicyDAL.store_terms.TermJson);
+            this.purchasePolicyDAL = purchasePolicyDAL;
         }
 
         public PurchasePolicyDAL ToDAL()
         {
-            return new PurchasePolicyDAL();
+            return this.purchasePolicyDAL;
         }
 
         public bool CanPurchase(ShoppingBagDTO shoppingBag, int age)
@@ -67,39 +91,115 @@ namespace Workshop.DomainLayer.MarketPackage
         }
 
         public void AddProductTerm(string json_term, int product_id)
+        { 
+            AddProductTerm(json_term, product_id, null);
+        }
+
+        private void AddProductTerm(string json_term, int product_id, DALTerm dalterm)
         {
             Term term = ParseTerm(json_term);
+            term.DALTerm = dalterm;
             if (!products_terms.ContainsKey(product_id))
+            {
                 products_terms.Add(product_id, term);
+                if (this.purchasePolicyDAL != null)
+                {
+                    products_terms[product_id].DALTerm = new DALTerm(json_term);
+                    DataHandler.getDBHandler().save(products_terms[product_id].DALTerm);
+                    this.purchasePolicyDAL.products_terms.Add(new DALProductTerm(product_id, term.ToDAL()));
+                    DataHandler.getDBHandler().update(purchasePolicyDAL);
+                }
+            }
             else
+            {
                 products_terms[product_id] = new OrTerm(products_terms[product_id], term);
+                if (this.purchasePolicyDAL != null)
+                {
+                    products_terms[product_id].DALTerm = new DALTerm(json_term);
+                    DataHandler.getDBHandler().save(products_terms[product_id].DALTerm);
+                    DALProductTerm dal_term = this.purchasePolicyDAL.products_terms.Find(d => d.ProductId == product_id);
+                    dal_term.Term = products_terms[product_id].ToDAL();
+                    DataHandler.getDBHandler().update(dal_term);
+                }
+            }
         }
 
         public void AddCategoryTerm(string json_term, string category_name)
+        { 
+            AddCategoryTerm(json_term, category_name, null);
+        }
+
+        private void AddCategoryTerm(string json_term, string category_name, DALTerm dalterm)
         {
             Term term = ParseTerm(json_term);
+            term.DALTerm = dalterm;
             if (!category_terms.ContainsKey(category_name))
+            {
                 category_terms.Add(category_name, term);
+                if (this.purchasePolicyDAL != null)
+                {
+                    category_terms[category_name].DALTerm = new DALTerm(json_term);
+                    DataHandler.getDBHandler().save(category_terms[category_name].DALTerm);
+                    this.purchasePolicyDAL.category_terms.Add(new DALCategoryTerm(category_name, term.ToDAL()));
+                    DataHandler.getDBHandler().update(purchasePolicyDAL);
+                }
+            }
             else
+            {
                 category_terms[category_name] = new OrTerm(category_terms[category_name], term);
+                if (this.purchasePolicyDAL != null)
+                {
+                    category_terms[category_name].DALTerm = new DALTerm(json_term);
+                    DataHandler.getDBHandler().save(category_terms[category_name].DALTerm);
+                    DALCategoryTerm dal_term = this.purchasePolicyDAL.category_terms.Find(d => d.CategoryName == category_name);
+                    dal_term.Term = category_terms[category_name].ToDAL();
+                    DataHandler.getDBHandler().update(dal_term);
+                }
+            }
         }
 
         public void AddStoreTerm(string json_term)
+        { 
+            AddStoreTerm(json_term, null);
+        }
+
+        private void AddStoreTerm(string json_term, DALTerm dalterm)
         {
             Term term = ParseTerm(json_term);
+            term.DALTerm = dalterm;
             if (store_terms == null)
                 store_terms = term;
             else
                 store_terms = new AndTerm(store_terms, term);
+            if (this.purchasePolicyDAL != null)
+            {
+                store_terms.DALTerm = new DALTerm(json_term);
+                DataHandler.getDBHandler().save(store_terms.DALTerm);
+                this.purchasePolicyDAL.store_terms = store_terms.ToDAL();
+                DataHandler.getDBHandler().update(purchasePolicyDAL);
+            }
         }
 
         public void AddUserTerm(string json_term)
         {
+            AddUserTerm(json_term, null);
+        }
+
+        public void AddUserTerm(string json_term, DALTerm dalterm)
+        {
             Term term = ParseTerm(json_term);
+            term.DALTerm = dalterm;
             if (user_terms == null)
                 user_terms = term;
             else
                 user_terms = new OrTerm(user_terms, term);
+            if (this.purchasePolicyDAL != null)
+            {
+                user_terms.DALTerm = new DALTerm(json_term);
+                DataHandler.getDBHandler().save(user_terms.DALTerm);
+                this.purchasePolicyDAL.user_terms = user_terms.ToDAL();
+                DataHandler.getDBHandler().update(purchasePolicyDAL);
+            }
         }
 
         private Term ParseTerm(string json_discount)

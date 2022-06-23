@@ -12,10 +12,13 @@ using System.Collections.Concurrent;
 using Workshop.DomainLayer.UserPackage.Notifications;
 using Workshop.ServiceLayer;
 using User = Workshop.DomainLayer.UserPackage.User;
+using DALMarketController = Workshop.DataLayer.DataObjects.Controllers.MarketController;
+using DALStore = Workshop.DataLayer.DataObjects.Market.Store;
+using DataHandler = Workshop.DataLayer.DataHandler;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
-    public class MarketController : IMarketController
+    public class MarketController : IMarketController, IPersistentObject<DALMarketController>
     {
         private IUserController userController;
         private OrderHandler<int> orderHandler;
@@ -24,6 +27,7 @@ namespace Workshop.DomainLayer.MarketPackage
         private IExternalSystem ExternalSystem;
         private int STORE_COUNT = 0;
         private int PRODUCT_COUNT = 1;
+        private DALMarketController dalMarketController;
         public MarketController(IUserController userController, IExternalSystem externalSystem)
         {
             this.userController = userController;
@@ -33,6 +37,26 @@ namespace Workshop.DomainLayer.MarketPackage
             this.storesLocks = new ConcurrentDictionary<int, ReaderWriterLock>();
             STORE_COUNT = 0;
             PRODUCT_COUNT = 1;
+            this.dalMarketController = new DALMarketController(userController.ToDAL(), orderHandler.ToDAL(), new List<DALStore>(), STORE_COUNT, PRODUCT_COUNT);
+            DataHandler.getDBHandler().save(dalMarketController);
+        }
+
+        public MarketController(DALMarketController DALMarketController, IUserController userController, IExternalSystem externalSystem)
+        {
+            this.userController = userController;
+            this.ExternalSystem= externalSystem;
+            this.orderHandler = new OrderHandler<int>(DALMarketController.orderHandler);
+            this.stores = new ConcurrentDictionary<int, Store>();
+            this.storesLocks = new ConcurrentDictionary<int, ReaderWriterLock>();
+            this.STORE_COUNT = DALMarketController.STORE_COUNT;
+            this.PRODUCT_COUNT = DALMarketController.PRODUCT_COUNT;
+            foreach (DALStore dal_store in DALMarketController.stores)
+            {
+                this.stores.TryAdd(dal_store.Id, new Store(dal_store));
+                ReaderWriterLock rwl = new ReaderWriterLock();
+                this.storesLocks.TryAdd(dal_store.Id, rwl);
+            }
+            this.dalMarketController = DALMarketController;
         }
         
         public void InitializeSystem()
@@ -41,6 +65,11 @@ namespace Workshop.DomainLayer.MarketPackage
             Logger.Instance.LogEvent("Started initializing the system - Market Controller");
             Logger.Instance.LogEvent("Finished initializing the system - Market Controller");
 
+        }
+
+        public DALMarketController ToDAL()
+        {
+            return this.dalMarketController;
         }
 
         private bool IsAuthorized(int userId, string username, int storeId, Action action)
@@ -279,6 +308,8 @@ namespace Workshop.DomainLayer.MarketPackage
             if (!IsAuthorized(userId, username, storeId, Action.AddProduct))
                 throw new MemberAccessException("This user is not authorized for adding products to the specified store.");
             product = stores[storeId].AddProduct(name, PRODUCT_COUNT++, description, price, quantity, category);
+            this.dalMarketController.PRODUCT_COUNT = PRODUCT_COUNT;
+            DataHandler.getDBHandler().update(this.dalMarketController);
             storesLocks[storeId].ReleaseWriterLock();
             Logger.Instance.LogEvent($"{username} successfuly added product {name} to store {storeId}.");
             return product;
@@ -534,6 +565,8 @@ namespace Workshop.DomainLayer.MarketPackage
             Store store = new Store(storeId, storeName, userController.GetMember(creator));
             stores[storeId] = store;
             STORE_COUNT++;
+            this.dalMarketController.STORE_COUNT = STORE_COUNT;
+            DataHandler.getDBHandler().update(this.dalMarketController);
             rwl.ReleaseWriterLock();
 
             userController.RegisterToEvent(creator, new Event("SaleInStore" + storeId, "", "MarketController"));
@@ -874,5 +907,6 @@ namespace Workshop.DomainLayer.MarketPackage
         }
         return new List<Store>(stores.Values);
     }
-}
+
+    }
 }

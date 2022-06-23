@@ -8,23 +8,25 @@ using System.Threading.Tasks;
 
 namespace Workshop.DataLayer.DataObjects.Market.Purchases
 {
-    public class Term: DALObject
+    public class CategoryTerm: DALObject
     {
         private static int nextId = 0;
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
-        public string TermJson { get; set; }
+        public string CategoryName { get; set; }
+        public Term Term { get; set; }
 
-        public Term()
+        public CategoryTerm()
         {
             this.Id = nextId;
             nextId++;
         }
 
-        public Term(string TermJson)
+        public CategoryTerm(string CategoryName, Term Term)
         {
-            this.TermJson = TermJson;
+            this.CategoryName = CategoryName;
+            this.Term = Term;
             this.Id = nextId;
             nextId++;
         }

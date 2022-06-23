@@ -24,6 +24,7 @@ namespace Workshop.DataLayer.DataObjects.Market.Discounts
             nextId++;
             this.products_discounts = new List<ProductDiscount>();
             this.category_discounts = new List<CategoryDiscount>();
+            store_discount = null;
         }
 
         public DiscountPolicy(List<ProductDiscount> products_discounts, List<CategoryDiscount> category_discounts, Discount store_discount)

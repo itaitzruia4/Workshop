@@ -10,8 +10,9 @@ using Workshop.DataLayer.DataObjects.Orders;
 
 namespace Workshop.DataLayer.DataObjects.Controllers
 {
-    public class MarketController
+    public class MarketController: DALObject
     {
+        private static int nextId = 0;
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
@@ -23,6 +24,24 @@ namespace Workshop.DataLayer.DataObjects.Controllers
 
         public MarketController()
         {
+            this.Id = nextId;
+            nextId++;
+            userController = new UserController();
+            orderHandler = new OrderHandler<int>();
+            stores = new List<Store>();
+            STORE_COUNT = 0;
+            PRODUCT_COUNT = 0;
+        }
+
+        public MarketController(UserController userController, OrderHandler<int> orderHandler, List<Store> stores, int STORE_COUNT, int PRODUCT_COUNT)
+        {
+            this.userController = userController;
+            this.orderHandler = orderHandler;
+            this.stores = stores;
+            this.STORE_COUNT = STORE_COUNT;
+            this.PRODUCT_COUNT = PRODUCT_COUNT;
+            this.Id = nextId;
+            nextId++;
         }
     }
 }

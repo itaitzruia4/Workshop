@@ -56,66 +56,97 @@ namespace Workshop.DomainLayer.MarketPackage
             this.category_discounts = new Dictionary<string, Discount>();
             this.store_discount = null;
             this.store = store;
-            this.discountPolicyDAL = discountPolicyDAL;
+            this.discountPolicyDAL = null;
             foreach(ProductDiscountDAL productDiscount in discountPolicyDAL.products_discounts)
-                AddProductDiscount(productDiscount.Discount.discountJson, productDiscount.ProductId);
+                AddProductDiscount(productDiscount.Discount.discountJson, productDiscount.ProductId, productDiscount.Discount);
             foreach(CategoryDiscountDAL categoryDiscount in discountPolicyDAL.category_discounts)
-                AddCategoryDiscount(categoryDiscount.Discount.discountJson, categoryDiscount.Name);
+                AddCategoryDiscount(categoryDiscount.Discount.discountJson, categoryDiscount.Name, categoryDiscount.Discount);
             AddStoreDiscount(discountPolicyDAL.store_discount.discountJson);
+            this.discountPolicyDAL = discountPolicyDAL;
         }
 
         public DiscountPolicyDAL ToDAL()
         {
-            return new DiscountPolicyDAL(null, null, null);
+            return this.discountPolicyDAL;
         }
 
         public void AddProductDiscount(string json_discount, int product_id)
         {
+            AddProductDiscount(json_discount, product_id, null);
+        }
+
+        private void AddProductDiscount(string json_discount, int product_id, DiscountDAL discountDAL)
+        {
             Discount discount = ParseDiscount(json_discount);
+            discount.DALDiscount = discountDAL;
             if (!products_discounts.ContainsKey(product_id))
             {
                 products_discounts.Add(product_id, discount);
-                products_discounts[product_id].DALDiscount = new DiscountDAL(json_discount);
-                DataHandler.getDBHandler().save(products_discounts[product_id].DALDiscount);
-                this.discountPolicyDAL.products_discounts.Add(new ProductDiscountDAL(product_id, discount.ToDAL()));
-                DataHandler.getDBHandler().update(discountPolicyDAL);
+                if (this.discountPolicyDAL != null)
+                {
+                    products_discounts[product_id].DALDiscount = new DiscountDAL(json_discount);
+                    DataHandler.getDBHandler().save(products_discounts[product_id].DALDiscount);
+                    this.discountPolicyDAL.products_discounts.Add(new ProductDiscountDAL(product_id, discount.ToDAL()));
+                    DataHandler.getDBHandler().update(discountPolicyDAL);
+                }
             }
             else
             {
                 products_discounts[product_id] = new OrDiscount(products_discounts[product_id], discount);
-                products_discounts[product_id].DALDiscount = new DiscountDAL(json_discount);
-                DataHandler.getDBHandler().save(products_discounts[product_id].DALDiscount);
-                ProductDiscountDAL dal_discount = this.discountPolicyDAL.products_discounts.Find(d => d.ProductId == product_id);
-                dal_discount.Discount = products_discounts[product_id].ToDAL();
-                DataHandler.getDBHandler().update(dal_discount);
+                if (this.discountPolicyDAL != null)
+                {
+                    products_discounts[product_id].DALDiscount = new DiscountDAL(json_discount);
+                    DataHandler.getDBHandler().save(products_discounts[product_id].DALDiscount);
+                    ProductDiscountDAL dal_discount = this.discountPolicyDAL.products_discounts.Find(d => d.ProductId == product_id);
+                    dal_discount.Discount = products_discounts[product_id].ToDAL();
+                    DataHandler.getDBHandler().update(dal_discount);
+                }
             }
         }
 
         public void AddCategoryDiscount(string json_discount, string category_name)
         {
+            AddCategoryDiscount(json_discount, category_name, null);
+        }
+
+        private void AddCategoryDiscount(string json_discount, string category_name, DiscountDAL discountDAL)
+        {
             Discount discount = ParseDiscount(json_discount);
+            discount.DALDiscount = discountDAL;
             if (!category_discounts.ContainsKey(category_name))
             {
                 category_discounts.Add(category_name, discount);
-                category_discounts[category_name].DALDiscount = new DiscountDAL(json_discount);
-                DataHandler.getDBHandler().save(category_discounts[category_name].DALDiscount);
-                this.discountPolicyDAL.category_discounts.Add(new CategoryDiscountDAL(category_name, discount.ToDAL()));
-                DataHandler.getDBHandler().update(discountPolicyDAL);
+                if (this.discountPolicyDAL != null)
+                {
+                    category_discounts[category_name].DALDiscount = new DiscountDAL(json_discount);
+                    DataHandler.getDBHandler().save(category_discounts[category_name].DALDiscount);
+                    this.discountPolicyDAL.category_discounts.Add(new CategoryDiscountDAL(category_name, discount.ToDAL()));
+                    DataHandler.getDBHandler().update(discountPolicyDAL);
+                }
             }
             else
             {
                 category_discounts[category_name] = new OrDiscount(category_discounts[category_name], discount);
-                category_discounts[category_name].DALDiscount = new DiscountDAL(json_discount);
-                DataHandler.getDBHandler().save(category_discounts[category_name].DALDiscount);
-                CategoryDiscountDAL dal_discount = this.discountPolicyDAL.category_discounts.Find(d => d.Name == category_name);
-                dal_discount.Discount = category_discounts[category_name].ToDAL();
-                DataHandler.getDBHandler().update(dal_discount);
+                if (this.discountPolicyDAL != null)
+                {
+                    category_discounts[category_name].DALDiscount = new DiscountDAL(json_discount);
+                    DataHandler.getDBHandler().save(category_discounts[category_name].DALDiscount);
+                    CategoryDiscountDAL dal_discount = this.discountPolicyDAL.category_discounts.Find(d => d.Name == category_name);
+                    dal_discount.Discount = category_discounts[category_name].ToDAL();
+                    DataHandler.getDBHandler().update(dal_discount);
+                }
             }
         }
 
         public void AddStoreDiscount(string json_discount)
         {
+            AddStoreDiscount(json_discount, null);
+        }
+
+        public void AddStoreDiscount(string json_discount, DiscountDAL discountDAL)
+        {
             Discount discount = ParseDiscount(json_discount);
+            discount.DALDiscount = discountDAL;
             if (store_discount == null)
             {
                 store_discount = discount;
@@ -124,18 +155,24 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 store_discount = new OrDiscount(store_discount, discount);
             }
-            store_discount.DALDiscount = new DiscountDAL(json_discount);
-            DataHandler.getDBHandler().save(store_discount.DALDiscount);
-            this.discountPolicyDAL.store_discount = store_discount.ToDAL();
-            DataHandler.getDBHandler().update(discountPolicyDAL);
+            if (this.discountPolicyDAL != null)
+            {
+                store_discount.DALDiscount = new DiscountDAL(json_discount);
+                DataHandler.getDBHandler().save(store_discount.DALDiscount);
+                this.discountPolicyDAL.store_discount = store_discount.ToDAL();
+                DataHandler.getDBHandler().update(discountPolicyDAL);
+            }
         }
 
         private Discount ParseDiscount(string json_discount)
         {
             dynamic discount_data = JObject.Parse(json_discount);
             Discount discount = ParseDiscount(discount_data);
-            discount.DALDiscount = new DiscountDAL(json_discount);
-            DataHandler.getDBHandler().save(discount.DALDiscount);
+            /*if (this.discountPolicyDAL != null)
+            {
+                discount.DALDiscount = new DiscountDAL(json_discount);
+                DataHandler.getDBHandler().save(discount.DALDiscount);
+            }*/
             return discount;
         }
 

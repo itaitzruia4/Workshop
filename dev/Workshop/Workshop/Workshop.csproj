@@ -273,6 +273,8 @@
     <Compile Include="DataLayer\DataObjects\Market\Discounts\ProductDiscount.cs" />
     <Compile Include="DataLayer\DataObjects\Market\Product.cs" />
     <Compile Include="DataLayer\DataObjects\Market\ProductDTO.cs" />
+    <Compile Include="DataLayer\DataObjects\Market\Purchases\CategoryTerm.cs" />
+    <Compile Include="DataLayer\DataObjects\Market\Purchases\ProductTerm.cs" />
     <Compile Include="DataLayer\DataObjects\Market\Purchases\PurchasePolicy.cs" />
     <Compile Include="DataLayer\DataObjects\Market\Purchases\Term.cs" />
     <Compile Include="DataLayer\DataObjects\Market\ShoppingBag.cs" />

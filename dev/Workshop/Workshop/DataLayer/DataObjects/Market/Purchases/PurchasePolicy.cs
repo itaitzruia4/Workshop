@@ -14,18 +14,22 @@ namespace Workshop.DataLayer.DataObjects.Market.Purchases
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
-        public List<Term> products_terms { get; set; }
-        public List<Term> category_terms { get; set; }
+        public List<ProductTerm> products_terms { get; set; }
+        public List<CategoryTerm> category_terms { get; set; }
         public Term user_terms { get; set; }
         public Term store_terms { get; set; }
 
         public PurchasePolicy()
         {
+            products_terms = new List<ProductTerm>();
+            category_terms = new List<CategoryTerm>();
+            user_terms = null;
+            store_terms = null;
             this.Id = nextId;
             nextId++;
         }
 
-        public PurchasePolicy(List<Term> products_terms, List<Term> category_terms, Term user_terms, Term store_terms)
+        public PurchasePolicy(List<ProductTerm> products_terms, List<CategoryTerm> category_terms, Term user_terms, Term store_terms)
         {
             this.products_terms = products_terms;
             this.category_terms = category_terms;
