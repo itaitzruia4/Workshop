@@ -6,7 +6,7 @@ import Appbar from '../Components/Appbar';
 import StoresList from '../Components/storesList'
 import { Stack } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { useNavigate, useLocation} from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import AddStoreDialog from '../Components/Dialogs/addStoreDialog';
 import { useState, useEffect } from 'react';
 
@@ -24,9 +24,11 @@ import { Store } from "../Types/store"
 import { Product } from "../Types/product"
 import { Cart, Bag } from '../Types/shopping';
 import { MarketNotification } from '../Types/Notification';
+import AdminDialog from '../Components/Dialogs/AdminDialog';
+import { isAdmin } from '../Actions/AdminActions';
 
-// Member page
-function Member() {
+// Admin page
+function Admin() {
     const [refreshKey, setRefreshKey] = useState(0);
 
     const location = useLocation();
@@ -40,6 +42,8 @@ function Member() {
     const [stores, setStores] = useState<Store[]>([])
     const [cart, setCart] = useState<Cart>({ shoppingBags: [] })
     const [notifications, setNotifications] = useState<MarketNotification[]>(token.notifications);
+
+    const [adminOpen, setAdminOpen] = useState<boolean>(false);
 
 
     const refresh = () => {
@@ -70,19 +74,20 @@ function Member() {
         handleAddToCart(makeUserToken(token.userId), storeId, productId, quantity).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     }
     const buyCart = (number: string, year: string, month: string, ccv: string, holder: string, id: string, name: string, address: string,
-        city: string, country: string, zip: string) => { 
+        city: string, country: string, zip: string) => {
         handleBuyCart(makeUserToken(token.userId), number, year, month, ccv, holder, id, name, address, city, country, zip)
             .then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     }
     const editCart = (productId: number, quantity: number): void => {
         handleEditCart(makeUserToken(token.userId), productId, quantity).then(() => setRefreshKey(oldKey => oldKey + 1)).catch(error => alert(error));
     }
-   
+
     return (
         <div>
-            {Appbar(routeChange,token, token.membername, stores, cart, notifications, editCart, buyCart)}
+            {AdminDialog(adminOpen, token as memberToken)}
+            {Appbar(routeChange, token, token.membername, stores, cart, notifications, editCart, buyCart)}
             {StoresList(stores, reviewProduct, addToCart)}
-            
+
             <Stack direction="row" spacing={2}>
                 <Button variant='contained' onClick={e =>
                     handleLogout(token)
@@ -99,9 +104,9 @@ function Member() {
                         })
                 } >Exit market </Button>
             </Stack>
-            </div>
+        </div>
     );
 
 }
 
-export default Member;
+export default Admin;

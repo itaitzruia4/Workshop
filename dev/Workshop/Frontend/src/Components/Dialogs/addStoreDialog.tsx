@@ -6,6 +6,10 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import IconButton from '@mui/material/IconButton';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import AddBusinessIcon from '@mui/icons-material/AddBusiness';
+import Tooltip from '@mui/material/Tooltip';
 
 export default function AddStoreDialog(
     addStore: (storeName: string) => void) {
@@ -35,9 +39,11 @@ export default function AddStoreDialog(
 
     return (
         <div>
-            <Button onClick={handleClickOpen}>
-                Add store
-            </Button>
+            <IconButton autoFocus color="inherit" onClick={handleClickOpen}>
+                <Tooltip title="Add new store">
+                    <AddBusinessIcon />
+                </Tooltip>
+              </IconButton>
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>New Store</DialogTitle>
                 <DialogContent>

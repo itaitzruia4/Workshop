@@ -27,29 +27,15 @@ import AddToCartDialog from '../Components/Dialogs/addToCartDialog';
 
 import { Store } from "../Types/store"
 import { Product } from "../Types/product"
+import { Actions } from "../Types/roles"
 import StoreRolesDialog from './Dialogs/StoreRolesDialog';
 import AddPurchaseDialog from './Dialogs/AddPurchaseDialog';
 
 
 export default function StoresList(
     stores: Store[],
-    addProduct: (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => void,
-    removeProduct: (storeId: number, productId: number) => void,
-    updateProduct: (storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => void,
     reviewProduct: (productId: number, review: string, rating: number) => void,
-    closeStore: (storeId: number) => void,
-    openStore: (storeId: number) => void,
-    addDiscount: (storeId: number, discountJson: string) => void,
-    addProductDiscount: (storeId: number, productId: number, discountJson: string) => void,
-    addCategoryDiscount: (storeId: number, category: string, discountJson: string) => void,
-    addProductPurchasePolicy: (storeId: number, productId: number, purchaseJson: string) => void,
-    addCategoryPurchasePolicy: (storeId: number, category: string, purchaseJson: string) => void,
-    addBagPurchasePolicy: (storeId: number, purchaseJson: string) => void,
-    addUserPurchasePolicy: (storeId: number, purchaseJson: string) => void,
     addToCart: (storeId: number, productId: number, quantity: number) => void,
-    nominateStoreOwner: (storeId: number, nominee: string) => void,
-    nominateStoreManager: (storeId: number, nominee: string) => void,
-    removeStoreOwnerNomination: (storeId: number, nominee: string) => void
     ){
         const CustomizedListItem: React.FC<{
             store: Store
@@ -75,23 +61,14 @@ export default function StoresList(
                         unmountOnExit
                     >
                         <Paper elevation={12}>
-                        <ButtonGroup variant="outlined" aria-label="outlined button group">
-                            {AddProductDialog(store.storeId, addProduct)}
-                            {AddDiscountDialog(store.storeId, addDiscount, addProductDiscount, addCategoryDiscount)}
-                            {AddPurchaseDialog(store.storeId, addProductPurchasePolicy, addCategoryPurchasePolicy, addBagPurchasePolicy, addUserPurchasePolicy)}
-                            {StoreRolesDialog(store.storeId, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination)}
-                            <div>
-                                <Button onClick={e => closeStore(store.storeId)}>Close store</Button>
-                            </div>
-                            <div>
-                                <Button onClick={e => openStore(store.storeId)}>Open store</Button>
-                            </div>
-                        </ButtonGroup>
+                            <Typography sx={{ ml: 2, flex: 1 }}>
+                                {'store id: ' + store.storeId}
+                            </Typography>
                         <List component='li' disablePadding key={store.storeId}>
                             {store.products.map( product=> {
                                 return (
                                     <ListItem key={product.id} secondaryAction={AddToCartDialog(store, product, addToCart)} >
-                                        {ProductDialog(store, product, removeProduct, updateProduct, reviewProduct)}
+                                        <ProductDialog store={store} product={product} permissions={[]} removeProduct={null} updateProduct={null} reviewProduct={reviewProduct}/>
                                         </ListItem>
                                         )
                                     })

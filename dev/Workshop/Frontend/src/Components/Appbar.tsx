@@ -76,8 +76,7 @@ export default function Appbar(
     nots: MarketNotification[],
     editCart: (productId: number, quantity: number) => void,
     buyCart: (number: string, year: string, month: string, ccv: string, holder: string, id: string, name: string, address: string,
-        city: string, country: string, zip: string) => void
-) {
+                city: string, country: string, zip: string) => void) {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
         React.useState<null | HTMLElement>(null);
@@ -112,21 +111,13 @@ export default function Appbar(
         }
     }
 
+
     const menuId = 'primary-search-account-menu';
     const mobileMenuId = 'primary-search-account-menu-mobile';
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static">
                 <Toolbar>
-                    <IconButton
-                        size="large"
-                        edge="start"
-                        color="inherit"
-                        aria-label="open drawer"
-                        sx={{ mr: 2 }}
-                    >
-                        <MenuIcon />
-                    </IconButton>
                     <Typography
                         variant="h6"
                         noWrap
@@ -152,7 +143,6 @@ export default function Appbar(
                                 aria-label="show notifications"
                                 color="inherit"
                                 onClick={routeChange('/profile', token as memberToken)}
-                                aria-hashpopup="true"
                             >
                                 <AccountCircleIcon />
                             </IconButton> : null

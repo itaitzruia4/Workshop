@@ -20,19 +20,17 @@ function Welcome() {
         }
         
     return (
-        <p className="welcome">
+        <div>
             <div className="welcome_title" style={textStyle}> Welcome to the Trading System website! </div>
-            <p className="welcome_buttons">
                 <Button variant="contained"
                     onClick={() =>
                         handleEnterMarket()
                             .then(value => routeChange('/login', makeUserToken(value as number))())
                             .catch(error => {
-                                alert("Couldnt connect to server")
+                                alert("Couldn't connect to server")
                             })
                     }> Enter Market </Button>
-            </p>
-        </p>
+            </div>
     )
 }
 
