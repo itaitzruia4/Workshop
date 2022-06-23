@@ -56,7 +56,7 @@ namespace API.Controllers
         [HttpPost("buybidproduct")]
         public ActionResult<FrontResponse<double>> BuyBidProduct([FromBody] BuyBidRequest request)
         {
-            Response<double> response = Service.BuyBidProduct(request.UserId, request.Membername, request.StoreId, request.BidId, new CreditCard(request.Card_number, request.Month, request.Year, request.Holder, request.Ccv, request.Id), new SupplyAddress(request.Name, request.Address, request.City, request.Country, request.Zip), DateTime.ParseExact(request.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture));
+            Response<double> response = Service.BuyBidProduct(request.UserId, request.Membername, request.StoreId, request.BidId, new CreditCard(request.Card_number, request.Month, request.Year, request.Holder, request.Ccv, request.Id), new SupplyAddress(request.Name, request.Address, request.City, request.Country, request.Zip), DateTime.Now);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<double>(response.ErrorMessage));
