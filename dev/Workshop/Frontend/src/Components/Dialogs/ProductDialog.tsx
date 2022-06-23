@@ -21,6 +21,7 @@ import TextField from '@mui/material/TextField';
 import Badge, { BadgeProps } from '@mui/material/Badge';
 import { styled } from '@mui/material/styles';
 
+import { Actions, hasPermission } from '../../Types/roles';
 import { Product } from '../../Types/product';
 import { Store } from '../../Types/store';
 
@@ -48,11 +49,12 @@ export default function ProductDialog(
     props: {
         store: Store,
         product: Product,
+        permissions: Actions[],
         removeProduct: null | ((storeId: number, productId: number) => void),
         updateProduct: null | ((storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => void),
-        reviewProduct: (productId: number, review: string, rating: number) => void
+        reviewProduct: null | ((productId: number, review: string, rating: number) => void)
     }) {
-    const {store, product, removeProduct, updateProduct, reviewProduct} = props
+    const { store, product, permissions ,removeProduct, updateProduct, reviewProduct} = props
     const [open, setOpen] = React.useState(false);
     const [rating, setRating] = React.useState(0);
     const [review, setReview] = React.useState("");
@@ -81,7 +83,7 @@ export default function ProductDialog(
         if (updateProduct != null) {
             updateProduct(store.storeId, product.id, name, price, quantity, category);
         }
-        if (rated) { reviewProduct(product.id, review, rating); }
+        if (rated && reviewProduct !=null) { reviewProduct(product.id, review, rating); }
         setOpen(false);
     }
 
@@ -91,8 +93,6 @@ export default function ProductDialog(
         }
         handleClose();
     }
-
-    const disableInput = updateProduct === null
 
     return (
         <div>
@@ -124,19 +124,19 @@ export default function ProductDialog(
                         <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
                             {product.name}
                         </Typography>
-                        <Button autoFocus color="inherit" onClick={handleSave}>
+                        <Button autoFocus color="inherit" onClick={handleSave} disabled={updateProduct == null && reviewProduct == null}>
                             Save
                         </Button>
                         <Button autoFocus color="inherit" onClick={handleClose}>
                             Cancel
                         </Button>
-                        <Button variant="contained" color="error" onClick={handleRemove} disabled={removeProduct === null}>
+                        <Button variant="contained" color="error" onClick={handleRemove} disabled={!hasPermission(Actions.RemoveProduct, permissions)}>
                             Delete product
                         </Button>
                     </Toolbar>
                 </AppBar>
                 <List>
-                    {InputDialog("name", name, setName, disableInput)}
+                    {InputDialog("name", name, setName, !hasPermission(Actions.ChangeProductName, permissions))}
                     <Divider />
                     <ListItem button>
                         <ListItemText
@@ -145,17 +145,18 @@ export default function ProductDialog(
                         />
                     </ListItem>
                     <Divider />
-                    {InputDialog("category", category, setCategory, disableInput)}
+                    {InputDialog("category", category, setCategory, !hasPermission(Actions.ChangeProductCategory, permissions))}
                     <Divider />
-                    {InputDialog("price", price, setPrice, disableInput)}
+                    {InputDialog("price", price, setPrice, !hasPermission(Actions.ChangeProductPrice, permissions))}
                     <Divider />
-                    {InputDialog("quantity", quantity, setQuantity, disableInput)}
+                    {InputDialog("quantity", quantity, setQuantity, !hasPermission(Actions.ChangeProductQuantity, permissions))}
                     <Typography component="legend">Rate this product</Typography>
                     <Rating
                         size="large"
                         precision={0.5}
                         name="simple-controlled"
                         value={rating}
+                        disabled={reviewProduct === null }
                         onChange={(event, newValue) => {
                             setRated(true);
                             newValue ? setRating(newValue) : setRating(0);
@@ -167,6 +168,7 @@ export default function ProductDialog(
                         }}
                     >
                         <TextField
+                            disabled={reviewProduct === null}
                             fullWidth
                             label="Review"
                             value={review}
