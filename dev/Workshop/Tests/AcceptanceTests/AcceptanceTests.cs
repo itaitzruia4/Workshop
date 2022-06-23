@@ -21,9 +21,6 @@ namespace Tests.AcceptanceTests
         private const string username = "Goodun";
         private const string password = "Goodp";
         private const string product = "Product";
-        private SupplyAddress address = new SupplyAddress("Ronmi", "Mayor 1", "Ashkelon", "Israel", "784112");
-        private CreditCard cc = new CreditCard("001122334455667788", "11", "26", "LeBron Michal", "555", "208143751");
-        private const string product = "product";
         private SupplyAddress address;
         private CreditCard cc;
         private Mock<IExternalSystem> externalSystem = new Mock<IExternalSystem>();

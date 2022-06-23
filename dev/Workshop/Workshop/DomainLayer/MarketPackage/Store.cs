@@ -68,7 +68,6 @@ namespace Workshop.DomainLayer.MarketPackage
             return owners.Add(owner);
         }
 
-        public Member VoteForStoreOwnerNominee(Member voter, Member nominee)
         public Store(StoreDAL storeDAL)
         {
             this.id = storeDAL.Id;
@@ -94,7 +93,8 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             return this.rwl;
         }
-        public bool VoteForStoreOwnerNominee(Member voter, Member nominee)
+
+        public Member VoteForStoreOwnerNominee(Member voter, Member nominee)
         {
             // Returns the nominator of nominee if he was successfuly voted on by all parties, else returns null
             if (!owners.Contains(voter))

@@ -54,13 +54,12 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
             return shoppingBags.ContainsKey(StoreId);
         }
 
-        internal virtual void Clear()
         internal int GetQuantityInCart(int productId, int bagNum)
         {
             return shoppingBags[bagNum].GetQuantity(productId);
         }
 
-        internal void Clear()
+        internal virtual void Clear()
         {
             shoppingBags.Clear();
         }

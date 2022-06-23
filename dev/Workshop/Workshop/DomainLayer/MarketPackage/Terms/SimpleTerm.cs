@@ -17,11 +17,11 @@ namespace Workshop.DomainLayer.MarketPackage.Terms
         {
             this.simpleTerm = simpleTerm;
         }
-        public bool IsEligible(ShoppingBagDTO shoppingBag)
+        public override bool IsEligible(ShoppingBagDTO shoppingBag)
         {
             return simpleTerm(shoppingBag, 0);
         }
-        public bool IsEligible(ShoppingBagDTO shoppingBag, int age)
+        public override bool IsEligible(ShoppingBagDTO shoppingBag, int age)
         {
             return simpleTerm(shoppingBag, age);
         }

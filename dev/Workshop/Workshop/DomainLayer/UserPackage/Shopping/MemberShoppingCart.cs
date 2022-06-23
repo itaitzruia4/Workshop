@@ -40,7 +40,7 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
             DataHandler.getDBHandler().save(shoppingCartDAL);
         }
 
-        public override ShoppingBagProduct addToCart(ShoppingBagProduct product, int storeId)
+        public override ShoppingBagProduct AddToCart(ShoppingBagProduct product, int storeId)
         {
             if (!checkIfStoreHasBag(storeId))
             {

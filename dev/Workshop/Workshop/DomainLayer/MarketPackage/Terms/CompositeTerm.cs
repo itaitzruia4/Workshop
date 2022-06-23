@@ -18,7 +18,7 @@ namespace Workshop.DomainLayer.MarketPackage.Terms
             this.secondTerm = secondTerm;
         }
 
-        public abstract bool IsEligible(ShoppingBagDTO shoppingBag);
-        public abstract bool IsEligible(ShoppingBagDTO shoppingBag, int age);
+        public override abstract bool IsEligible(ShoppingBagDTO shoppingBag);
+        public override abstract bool IsEligible(ShoppingBagDTO shoppingBag, int age);
     }
 }
