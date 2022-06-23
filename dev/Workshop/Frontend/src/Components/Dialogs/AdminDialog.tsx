@@ -15,7 +15,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
 
-import { handleGetMemberInformation, getStorePurchaseHistory, removeMember, viewStatistics } from '../../Actions/AdminActions';
+import { handleGetMemberInformation, getStorePurchaseHistory, removeMember, viewStatistics, getDailyIncome } from '../../Actions/AdminActions';
 import { memberToken } from '../../Types/roles';
 
 export default function AdminDialog(isOpen: boolean, token: memberToken) {
@@ -123,10 +123,14 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
         handleCloseMemberInfo();
     };
 
-    const handleGetDailyIncome = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        // TODO implement
-        handleCloseIncome();
+    const handleGetDailyIncome = (e: React.MouseEvent<HTMLElement>) => {
+        getDailyIncome(token)
+            .then(data => {
+                alert(`Daily market income is ${data}`);
+            })
+            .catch(error => {
+                alert(error)
+            });
     };
 
     const handleViewStats = (e: React.FormEvent<HTMLFormElement>) => {
@@ -148,7 +152,7 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
                     <Button onClick={handleOpenRemoveMember}>Remove Member</Button>
                     <Button onClick={handleOpenHistory}>View Store Purchase History</Button>
                     <Button onClick={handleOpenMemberInfo}>Members Information</Button>
-                    <Button onClick={handleOpenIncome}>Daily Market Income</Button>
+                    <Button onClick={handleGetDailyIncome}>Daily Market Income</Button>
                     <Button onClick={handleOpenStats}>Market Statistics</Button>
                 </DialogContent>
                 <DialogActions>

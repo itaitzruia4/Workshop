@@ -85,14 +85,17 @@ export function handleBuyCart(token: userToken, number: string, year: string, mo
             country: country,
             zip: zip
         })
-    }).then(async response => {
-        const data = await response.json();
-        if (!response.ok) {
-            return Promise.reject(data.error);
-        }
-        alert("Bought cart successfully!")
-        return Promise.resolve(data.value)
-    })
+    }).then(response => response.json()
+        .then(data => {
+            if (!response.ok) {
+                return Promise.reject(data.error);
+            }
+            alert("Bought cart successfully!")
+            return Promise.resolve(data.value)
+        }))
+        .catch(error => {
+            alert(error)
+        });
 }
 
 export function handleReviewProduct(token: memberToken, productId: number, review: string, rating: number) {

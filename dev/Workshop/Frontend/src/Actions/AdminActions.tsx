@@ -110,16 +110,24 @@ export function handleGetMemberInformation(token: memberToken): Promise<any> {
     })
 }
 
-function handleGetDailyIncome(token: memberToken): Promise<any> {
-    // TODO add daily income API request
-    return Promise.reject("Not yet implemented");
-}
+export function getDailyIncome(token: memberToken): Promise<any> {
+    let url = "http://localhost:5165/api/useractions/getdailyincomemarketmanager";
 
-export const getDailyIncome = (token: memberToken): void => {
-    handleGetDailyIncome(token)
-        .catch(error => {
-            alert(error)
-        });
+    return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            userId: token.userId,
+            membername: token.membername
+        })
+    }).then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            return Promise.reject(data.error);
+        }
+        return Promise.resolve(data.value);
+    })
 }
 
 function handleViewStatistics(token: memberToken, fromDate: string, toDate: string): Promise<any> {
