@@ -9,12 +9,14 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { BagPurchaseSimpleTerm, CategoryPurchaseSimpleTerm, makeBagPurchaseSimpleTerm, makeCategoryPurchaseSimpleTerm, makeProductPurchaseSimpleTerm, ProductPurchaseSimpleTerm, UserPurchaseSimpleTerm, makeUserPurchaseSimpleTerm } from '../../Types/purchase';
 
 export default function AddPurchaseDialog(
-    storeId: number,
-    addProductPurchase: (storeId: number, productId: number, purchaseJson: string) => void,
-    addCategoryPurchase: (storeId: number, category: string, purchaseJson: string) => void,
-    addBagPurchase: (storeId: number, purchaseJson: string) => void,
-    addUserPurchase: (storeId: number, purchaseJson: string) => void) {
-
+    props: {
+        storeId: number,
+        addProductPurchase: (storeId: number, productId: number, purchaseJson: string) => void,
+        addCategoryPurchase: (storeId: number, category: string, purchaseJson: string) => void,
+        addBagPurchase: (storeId: number, purchaseJson: string) => void,
+        addUserPurchase: (storeId: number, purchaseJson: string) => void
+    }) {
+    const { storeId, addProductPurchase, addCategoryPurchase, addBagPurchase, addUserPurchase } = props;
     const PURCHASE_TYPES = ["p", "q", "h", "d"]
     const NON_USER_PURCHASE_ACTIONS = ["<", ">", "=", "!=", ">=", "<="]
     const USER_PURCHASE_ACTIONS = [">", "!=", ">="]

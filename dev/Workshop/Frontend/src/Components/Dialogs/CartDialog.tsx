@@ -29,6 +29,7 @@ import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import ShoppingCart from '@mui/icons-material/ShoppingCart';
 import Badge from '@mui/material/Badge';
+import TextField from '@mui/material/TextField';
 
 
 import { Product } from '../../Types/product';
@@ -47,38 +48,9 @@ const Transition = React.forwardRef(function Transition(
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function createData(
-    name: string,
-    calories: number,
-    fat: number,
-    carbs: number,
-    protein: number,
-    price: number,
-) {
-    return {
-        name,
-        calories,
-        fat,
-        carbs,
-        protein,
-        price,
-        history: [
-            {
-                date: '2020-01-05',
-                customerId: '11091700',
-                amount: 3,
-            },
-            {
-                date: '2020-01-02',
-                customerId: 'Anonymous',
-                amount: 1,
-            },
-        ],
-    };
-}
 
-function Row(props: { store: Store, bag: Bag , removeProduct: (productId : number) => void}) {
-    const { store, bag, removeProduct } = props;
+function Row(props: { store: Store, bag: Bag, removeProduct: (productId: number) => void, editProductAmount: (productId: number, amount: number) => void }) {
+    const { store, bag, removeProduct, editProductAmount } = props;
     const [open, setOpen] = React.useState(false);
 
     return (
@@ -121,7 +93,19 @@ function Row(props: { store: Store, bag: Bag , removeProduct: (productId : numbe
                                             <TableCell component="th" scope="row">
                                                 {product.name}
                                             </TableCell>
-                                            <TableCell >{product.quantity}</TableCell>
+                                            <TableCell >
+                                                <TextField
+                                                value={product.quantity}
+                                                autoFocus
+                                                margin="dense"
+                                                id="quantity"
+                                                label="quantity"
+                                                type="number"
+                                                fullWidth
+                                                variant="standard"
+                                                    onChange={(e) => editProductAmount(product.id,Number(e.target.value))}
+                                                />
+                                            </TableCell>
                                             <TableCell >
                                                 {product.quantity * product.basePrice}
                                             </TableCell>
@@ -155,6 +139,10 @@ export default function CartDialog(
     };
     const handleRemoveProduct = (productId: number) => {
         editCart(productId, 0);
+        setOpen(true);
+    }
+    const handleEditProductAmount = (productId: number, amount: number) => {
+        editCart(productId, amount);
         setOpen(true);
     }
     return (
@@ -198,7 +186,7 @@ export default function CartDialog(
                 </TableHead>
                 <TableBody>
                             {getBagToStore(cart, stores).map(([bag, store]: [Bag, Store]) => (
-                                <Row key={store.storeId} store={store} bag={bag} removeProduct={handleRemoveProduct}/>
+                                <Row key={store.storeId} store={store} bag={bag} removeProduct={handleRemoveProduct} editProductAmount={handleEditProductAmount} />
                     ))}
                 </TableBody>
             </Table>

@@ -17,7 +17,7 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
             shoppingBags = new Dictionary<int,ShoppingBag>();
         }
 
-        public virtual  ShoppingBagProduct addToCart(ShoppingBagProduct product, int storeId)
+        public virtual ShoppingBagProduct AddToCart(ShoppingBagProduct product, int storeId)
         {
             if(!checkIfStoreHasBag(storeId))
             {
@@ -55,6 +55,12 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
         }
 
         internal virtual void Clear()
+        internal int GetQuantityInCart(int productId, int bagNum)
+        {
+            return shoppingBags[bagNum].GetQuantity(productId);
+        }
+
+        internal void Clear()
         {
             shoppingBags.Clear();
         }

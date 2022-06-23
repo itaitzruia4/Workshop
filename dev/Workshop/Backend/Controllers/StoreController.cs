@@ -1,6 +1,7 @@
 ﻿using API.Requests;
 using API.Responses;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 using Workshop.ServiceLayer;
 using Workshop.ServiceLayer.ServiceObjects;
 
@@ -19,7 +20,7 @@ namespace API.Controllers
         [HttpPost("newstore")]
         public ActionResult<FrontResponse<Store>> CreateNewStore([FromBody] StoreCreationRequest request)
         {
-            Response<Store> response = Service.CreateNewStore(request.UserId, request.Membername, request.StoreName);
+            Response<Store> response = Service.CreateNewStore(request.UserId, request.Membername, request.StoreName, DateTime.Now.Date);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<Store>(response.ErrorMessage));
@@ -52,7 +53,7 @@ namespace API.Controllers
         [HttpPost("nominatemanager")]
         public ActionResult<FrontResponse<StoreManager>> NominateStoreManager([FromBody] NominationRequest request)
         {
-            Response<StoreManager> response = Service.NominateStoreManager(request.UserId, request.Membername, request.Nominee, request.StoreId);
+            Response<StoreManager> response = Service.NominateStoreManager(request.UserId, request.Membername, request.Nominee, request.StoreId, DateTime.Now.Date);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<StoreManager>(response.ErrorMessage));
@@ -63,12 +64,23 @@ namespace API.Controllers
         [HttpPost("nominateowner")]
         public ActionResult<FrontResponse<StoreOwner>> NominateStoreOwner([FromBody] NominationRequest request)
         {
-            Response<StoreOwner> response = Service.NominateStoreOwner(request.UserId, request.Membername, request.Nominee, request.StoreId);
+            Response<StoreOwner> response = Service.NominateStoreOwner(request.UserId, request.Membername, request.Nominee, request.StoreId, DateTime.Now.Date);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<StoreOwner>(response.ErrorMessage));
             }
             return Ok(new FrontResponse<StoreOwner>(response.Value));
+        }
+
+        [HttpPost("rejectownernomination")]
+        public ActionResult<FrontResponse<int>> RejectStoreOwnerNomination([FromBody] NominationRequest request)
+        {
+            Response response = Service.RejectStoreOwnerNomination(request.UserId, request.Membername, request.Nominee, request.StoreId);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<int>(response.ErrorMessage));
+            }
+            return Ok(new FrontResponse<int>(response.UserId));
         }
 
         [HttpPost("removeownernomination")]
@@ -183,6 +195,28 @@ namespace API.Controllers
             }
             return Ok(new FrontResponse<int>(request.StoreId));
 
+        }
+
+        [HttpPost("getdailyincomestore")]
+        public ActionResult<FrontResponse<double>> GetDailyIncomeStore([FromBody] StoreRequest request)
+        {
+            Response<double> response = Service.GetDailyIncomeStore(request.UserId, request.Membername, request.StoreId);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<double>(response.ErrorMessage));
+            }
+            return Ok(new FrontResponse<double>(response.Value));
+        }
+
+        [HttpPost("getstorepurchasehistory")]
+        public ActionResult<FrontResponse<List<Order>>> GetStorePurchaseHistory([FromBody] StoreRequest request)
+        {
+            Response<List<Order>> response = Service.GetStorePurchaseHistory(request.UserId, request.Membername, request.StoreId);
+            if (response.ErrorOccured)
+            {
+                return BadRequest(new FrontResponse<List<Order>>(response.ErrorMessage));
+            }
+            return Ok(new FrontResponse<List<Order>>(response.Value));
         }
     }
 }

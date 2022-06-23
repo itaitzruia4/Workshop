@@ -53,6 +53,7 @@
     <Reference Include="log4net, Version=2.0.14.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.14\lib\net45\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.1.1.1\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
@@ -252,6 +253,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AcceptanceTests\AcceptanceTests.cs" />
+    <Compile Include="IntegrationTests\DomainLayer\MarketPackage\TestBid.cs" />
     <Compile Include="IntegrationTests\DomainLayer\MarketPackage\TestDiscountPolicy.cs" />
     <Compile Include="IntegrationTests\DomainLayer\MarketPackage\TestMarketController.cs" />
     <Compile Include="IntegrationTests\DomainLayer\MarketPackage\TestPurchasePolicy.cs" />

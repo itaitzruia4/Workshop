@@ -26,11 +26,11 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
 
             userController = new UserController(security, review, new List<SystemAdminDTO>());
 
-            userController.EnterMarket(1);
+            userController.EnterMarket(1, DateTime.Now);
 
             userController.Register(1, "member1", "pass1", DateTime.Parse("Aug 22, 1972"));
-            userController.Login(1, "member1", "pass1");
-            userController.addToCart(1, new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1, "cat1", 1), 1);
+            userController.Login(1, "member1", "pass1", DateTime.Now);
+            userController.AddToCart(1, new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1, "cat1", 1), 1);
 
             List<ShoppingBagProduct> member1prods = new List<ShoppingBagProduct>();
             member1prods.Add(new ShoppingBagProduct(1, "prod1", "desc1", 11.90, 3, "cat1", 1));
@@ -39,17 +39,17 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             {
                 pdtos1.Add(sbp.GetProductDTO());
             }
-            userController.AddOrder(1, new OrderDTO(1, "member1", address, "blasToysRus", pdtos1), "member1");
+            userController.AddOrder(1, new OrderDTO(1, "member1", address, "blasToysRus", pdtos1, DateTime.Now,1.0), "member1");
             userController.Logout(1, "member1");
 
             userController.Register(1, "member3", "pass3", DateTime.Parse("Aug 22, 1972"));
             userController.Register(1, "member4", "pass4", DateTime.Parse("Aug 22, 1972"));
 
             userController.Register(1, "member2", "pass2", DateTime.Parse("Aug 22, 1972"));
-            userController.Login(1, "member2", "pass2");
-            userController.AddStoreFounder("member2", member2StoreId);
+            userController.Login(1, "member2", "pass2", DateTime.Now);
+            userController.AddStoreFounder("member2", member2StoreId, DateTime.Now);
 
-            userController.NominateStoreManager(1, "member2", "member3", member2StoreId);
+            userController.NominateStoreManager(1, "member2", "member3", member2StoreId, DateTime.Now);
             userController.AddPermissionToStoreManager(1, "member2", "member3", 1, Action.NominateStoreOwner);
             userController.AddPermissionToStoreManager(1, "member2", "member3", 1, Action.NominateStoreManager);
 
@@ -70,7 +70,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         {
             // Arrange
             string username = "test1", password = "pass1";
-            userController.EnterMarket(1);
+            userController.EnterMarket(1, DateTime.Now);
 
             // Act
             userController.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
@@ -107,7 +107,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         {
             string username = "user4", password = "pass4";
             Assert.IsFalse(userController.IsMember(username));
-            userController.EnterMarket(1);
+            userController.EnterMarket(1, DateTime.Now);
 
             userController.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
             Assert.IsTrue(userController.IsMember(username));
@@ -121,7 +121,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             string username = "member1", password = "pass12";
             Assert.IsTrue(userController.IsMember(username));
 
-            userController.EnterMarket(1);
+            userController.EnterMarket(1, DateTime.Now);
             userController.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
         }
 
@@ -131,14 +131,14 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [TestMethod]
         public void TestEnterMarket_Success()
         {
-            userController.EnterMarket(1);
+            userController.EnterMarket(1, DateTime.Now);
         }
 
         [TestMethod]
         public void TestEnterMarket_Failure_AlreadyEntered()
         {
-            userController.EnterMarket(1);
-            Assert.ThrowsException<InvalidOperationException>(() => userController.EnterMarket(1));
+            userController.EnterMarket(1, DateTime.Now);
+            Assert.ThrowsException<InvalidOperationException>(() => userController.EnterMarket(1, DateTime.Now));
         }
 
         /// Tests for UserController.Login method
@@ -151,10 +151,10 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         public void TestLogin_Success(string username, string password)
         {
             // Arrange
-            userController.EnterMarket(1);
+            userController.EnterMarket(1, DateTime.Now);
 
             // Act
-            userController.Login(1, username, password);
+            userController.Login(1, username, password, DateTime.Now);
         }
 
         [TestMethod]
@@ -163,10 +163,10 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         {
             // Arrange
             string username = "user0", password = "password0";
-            userController.EnterMarket(1);
+            userController.EnterMarket(1, DateTime.Now);
 
             // Act
-            userController.Login(1, username, password);
+            userController.Login(1, username, password, DateTime.Now);
         }
 
         [TestMethod]
@@ -176,8 +176,8 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [ExpectedException(typeof(ArgumentException), "Username or password cannot be empty")]
         public void TestLogin_Failure_EmptyDetails(string username, string password)
         {
-            userController.EnterMarket(1);
-            userController.Login(1, username, password);
+            userController.EnterMarket(1, DateTime.Now);
+            userController.Login(1, username, password, DateTime.Now);
         }
 
         [TestMethod]
@@ -187,8 +187,8 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [ExpectedException(typeof(ArgumentException), "Username or password cannot be null")]
         public void TestLogin_Failure_NullDetails(string username, string password)
         {
-            userController.EnterMarket(1);
-            userController.Login(1, username, password);
+            userController.EnterMarket(1, DateTime.Now);
+            userController.Login(1, username, password, DateTime.Now);
         }
 
         [TestMethod]
@@ -198,10 +198,10 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         public void TestLogin_Failure_WrongPassword(string username, string password)
         {
             // Arrange
-            userController.EnterMarket(1);
+            userController.EnterMarket(1, DateTime.Now);
 
             // Act
-            userController.Login(1, username, password);
+            userController.Login(1, username, password, DateTime.Now);
         }
 
         [TestMethod]
@@ -209,10 +209,10 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         public void TestLogin_Failure_ThisUserAlreadyLoggedIn()
         {
             string username = "member1", password = "pass1";
-            userController.EnterMarket(1);
+            userController.EnterMarket(1, DateTime.Now);
 
-            userController.Login(1, username, password);
-            userController.Login(1, username, password);
+            userController.Login(1, username, password, DateTime.Now);
+            userController.Login(1, username, password, DateTime.Now);
         }
 
         [TestMethod]
@@ -220,10 +220,10 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         public void TestLogin_Failure_OtherUserAlreadyLoggedIn()
         {
             string username1 = "member1", password1 = "pass1", username2 = "member2", password2 = "pass2";
-            userController.EnterMarket(1);
+            userController.EnterMarket(1, DateTime.Now);
 
-            userController.Login(1, username1, password1);
-            userController.Login(1, username2, password2);
+            userController.Login(1, username1, password1, DateTime.Now);
+            userController.Login(1, username2, password2, DateTime.Now);
         }
 
         /// Tests for UserController.Logout method
@@ -233,8 +233,8 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         public void TestLogout_Success()
         {
             string username = "member1", password = "pass1";
-            userController.EnterMarket(1);
-            userController.Login(1, username, password);
+            userController.EnterMarket(1, DateTime.Now);
+            userController.Login(1, username, password, DateTime.Now);
 
             userController.Logout(1, username);
         }
@@ -251,7 +251,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         public void TestLogout_Failure_NoUserLoggedIn()
         {
             string username = "member1";
-            userController.EnterMarket(1);
+            userController.EnterMarket(1, DateTime.Now);
 
             userController.Logout(1, username);
         }
@@ -261,8 +261,8 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         public void TestLogout_Failure_OtherUserLoggedIn()
         {
             string username1 = "member1", password1 = "pass1", username2 = "member2";
-            userController.EnterMarket(1);
-            userController.Login(1, username1, password1);
+            userController.EnterMarket(1, DateTime.Now);
+            userController.Login(1, username1, password1, DateTime.Now);
 
             userController.Logout(1, username2);
         }
@@ -275,8 +275,8 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [DataRow("member4")]
         public void TestNominateStoreManager_Failure_NominatorNotLoggedIn(string nominator)
         {
-            userController.EnterMarket(1);
-            Assert.ThrowsException<ArgumentException>(() => userController.NominateStoreManager(1, nominator, "member1", member2StoreId));
+            userController.EnterMarket(1, DateTime.Now);
+            Assert.ThrowsException<ArgumentException>(() => userController.NominateStoreManager(1, nominator, "member1", member2StoreId, DateTime.Now));
         }
 
         [TestMethod]
@@ -285,18 +285,18 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [DataRow("member4", "pass4")]
         public void TestNominateStoreManager_Failure_NoSuchNominated(string nominator, string nominatorPassword)
         {
-            userController.EnterMarket(1);
-            userController.Login(1, nominator, nominatorPassword);
-            Assert.ThrowsException<ArgumentException>(() => userController.NominateStoreManager(1, nominator, "arya stark", member2StoreId));
+            userController.EnterMarket(1, DateTime.Now);
+            userController.Login(1, nominator, nominatorPassword, DateTime.Now);
+            Assert.ThrowsException<ArgumentException>(() => userController.NominateStoreManager(1, nominator, "arya stark", member2StoreId, DateTime.Now));
         }
 
         [TestMethod]
         public void TestNominateStoreManager_Failure_NoPermission()
         {
-            userController.EnterMarket(1);
+            userController.EnterMarket(1, DateTime.Now);
             string nominator = "member1";
-            userController.Login(1, nominator, "pass1");
-            Assert.ThrowsException<MemberAccessException>(() => userController.NominateStoreManager(1, nominator, "member5", member2StoreId));
+            userController.Login(1, nominator, "pass1", DateTime.Now);
+            Assert.ThrowsException<MemberAccessException>(() => userController.NominateStoreManager(1, nominator, "member5", member2StoreId, DateTime.Now));
         }
 
         /// Tests for UserController.ReviewProduct method
@@ -305,11 +305,11 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [TestMethod]
         public void TestReviewProduct_Success()
         {
-            userController.EnterMarket(1);
+            userController.EnterMarket(1, DateTime.Now);
             string username = "member1";
             int id = 1;
             string review = "Honest review123";
-            userController.Login(1, username, "pass1");
+            userController.Login(1, username, "pass1", DateTime.Now);
             ReviewDTO dto = userController.ReviewProduct(1, username, id, review, 4);
             Assert.AreEqual(review, dto.Review);
             Assert.AreEqual(dto.Reviewer, username);
@@ -321,8 +321,8 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [DataRow(null)]
         public void TestReviewProduct_Failure_EmptyOrNullReview(string review)
         {
-            userController.EnterMarket(1);
-            userController.Login(1, "member1", "pass1");
+            userController.EnterMarket(1, DateTime.Now);
+            userController.Login(1, "member1", "pass1", DateTime.Now);
             Assert.ThrowsException<ArgumentException>(() => userController.ReviewProduct(1, "member1", 1, review, 4));
         }
 
@@ -331,8 +331,8 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
         [DataRow(11)]
         public void TestReviewProduct_Failure_OutOfRangeRating(int rating)
         {
-            userController.EnterMarket(1);
-            userController.Login(1, "member1", "pass1");
+            userController.EnterMarket(1, DateTime.Now);
+            userController.Login(1, "member1", "pass1", DateTime.Now);
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => userController.ReviewProduct(1, "member1", 1, "TestReview", rating));
         }
     }

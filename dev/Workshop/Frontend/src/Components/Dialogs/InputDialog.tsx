@@ -24,7 +24,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 
 
-export default function InputDialog<T extends string | number>(label: string, hook: T, setHook: React.Dispatch<React.SetStateAction<T>>) {
+export default function InputDialog<T extends string | number>(label: string, hook: T, setHook: React.Dispatch<React.SetStateAction<T>>, disable: boolean) {
     const [open, setOpen] = React.useState(false);
     const [input, setInput] = React.useState(hook);
     const handleClose = () => {
@@ -37,7 +37,7 @@ export default function InputDialog<T extends string | number>(label: string, ho
     }
     return (
         <div>
-            <ListItem button onClick={() => setOpen(true)}>
+            <ListItem button onClick={() => setOpen(true)} disabled={disable}>
                 <ListItemText
                     primary={"Product " + label}
                     secondary={hook} />

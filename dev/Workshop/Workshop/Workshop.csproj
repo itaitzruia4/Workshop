@@ -303,6 +303,7 @@
     <Compile Include="DataLayer\DataObjects\Members\NameToRole.cs" />
     <Compile Include="DataLayer\Test.cs" />
     <Compile Include="DomainLayer\IPersistentObject.cs" />
+    <Compile Include="DomainLayer\MarketPackage\Biding\Bid.cs" />
     <Compile Include="DomainLayer\MarketPackage\CreditCard.cs" />
     <Compile Include="DomainLayer\MarketPackage\SupplyAddress.cs" />
     <Compile Include="DomainLayer\UserPackage\Shopping\MemberShoppingBag.cs" />
@@ -312,6 +313,7 @@
       <DependentUpon>20220620223441_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\ContextModelSnapshot.cs" />
+    <Compile Include="DomainLayer\UserPackage\UserCountInDate.cs" />
     <Compile Include="ServiceLayer\ExternalSystem.cs" />
     <Compile Include="DomainLayer\UserPackage\ILoginChecker.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\AndDiscount.cs" />
@@ -377,12 +379,16 @@
     <Compile Include="ServiceLayer\IExternalSystem.cs" />
     <Compile Include="ServiceLayer\Response.cs" />
     <Compile Include="ServiceLayer\ResponseT.cs" />
+    <Compile Include="ServiceLayer\ServiceObjects\Bid.cs" />
+    <Compile Include="ServiceLayer\ServiceObjects\Order.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\PermissionInformation.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\MarketManager.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Member.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Notification.cs" />
+    <Compile Include="ServiceLayer\ServiceObjects\PermissionInformation.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Product.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\Role.cs" />
+    <Compile Include="ServiceLayer\ServiceObjects\StatisticsInformation.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\StoreRole.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\ShoppingBag.cs" />
     <Compile Include="ServiceLayer\ServiceObjects\ShoppingCart.cs" />

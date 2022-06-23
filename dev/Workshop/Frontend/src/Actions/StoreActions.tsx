@@ -84,6 +84,7 @@ export function handleCloseStore(token: memberToken, storeId: number) {
         if (!response.ok) {
             return Promise.reject(data.error);
         }
+        alert(`Store closed successfully`);
         return Promise.resolve(data.value)
     })
 }
@@ -105,6 +106,7 @@ export function handleOpenStore(token: memberToken, storeId: number) {
         if (!response.ok) {
             return Promise.reject(data.error);
         }
+        alert(`Store opened successfully`);
         return Promise.resolve(data.value)
     })
 }
@@ -170,14 +172,14 @@ export function handleAddProductDiscount(token: memberToken, storeId: number, pr
             JsonDiscount: discountJson,
             productId: productId
         })
-    }).then(async response => {
-        const data = await response.json();
-        if (!response.ok) {
-            return Promise.reject(data.error);
-        }
-        alert(`Product discount for product ${productId} in store ${storeId} has been added successfully`);
-        return Promise.resolve(data.value)
-    })
+    }).then(response => response.json()
+        .then(data => {
+            if(!response.ok) {
+                return Promise.reject(data.error);
+            }
+            alert(`Product discount for product ${productId} in store ${storeId} has been added successfully`);
+            return Promise.resolve(data.value)
+        }))
 }
 
 export function handleAddCategoryDiscount(token: memberToken, storeId: number, category: string, discountJson: string) {
@@ -363,6 +365,30 @@ export function handleAddUserPurchasePolicy(token: memberToken, storeId: number,
             return Promise.reject(data.error);
         }
         alert(`User Purchase Policy in store ${storeId} has been added successfully`);
+        return Promise.resolve(data.value)
+    })
+}
+
+export function handleAddActionToManager(token: memberToken, nominee: string ,storeId: number, action: string) {
+    const url = "http://localhost:5165/api/store/addactiontomanager";
+
+    return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            userId: token.userId,
+            membername: token.membername,
+            nominee: nominee,
+            storeId: storeId,
+            action: action
+        })
+    }).then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            return Promise.reject(data.error);
+        }
+        alert(`${nominee} now has the permission of ${action} at store ${storeId}`);
         return Promise.resolve(data.value)
     })
 }

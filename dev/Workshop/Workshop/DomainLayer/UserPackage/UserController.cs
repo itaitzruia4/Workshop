@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.UserPackage.Permissions;
@@ -17,6 +15,7 @@ using UserControllerDAL = Workshop.DataLayer.DataObjects.Controllers.UserControl
 using MemberDAL = Workshop.DataLayer.DataObjects.Members.Member;
 using DataHandler = Workshop.DataLayer.DataHandler;
 using SystemAdminDTO = Workshop.ServiceLayer.ServiceObjects.SystemAdminDTO;
+using System.Collections;
 
 namespace Workshop.DomainLayer.UserPackage
 {
@@ -31,6 +30,7 @@ namespace Workshop.DomainLayer.UserPackage
 
         public UserControllerDAL userControllerDAL { get; set; }
         //public UserController(ISecurityHandler securityHandler, IReviewHandler reviewHandler)
+        public SortedList userCountOnDatePerType;
         public UserController(ISecurityHandler securityHandler, IReviewHandler reviewHandler, List<SystemAdminDTO> systemAdmins)
         {
             this.securityHandler = securityHandler;
@@ -43,6 +43,7 @@ namespace Workshop.DomainLayer.UserPackage
             userControllerDAL = new UserControllerDAL(reviewHandler.ToDAL(), notificationHandler.ToDAL(), orderHandler.ToDAL(), new List<MemberDAL>());
             DataHandler.getDBHandler().save(userControllerDAL);
             //InitializeSystem();
+            userCountOnDatePerType = SortedList.Synchronized(new SortedList());
             InitializeAdmins(systemAdmins);
         }
 
@@ -91,12 +92,17 @@ namespace Workshop.DomainLayer.UserPackage
         /// <returns>
         /// A <c>User</c> instance representing the guest who entered the market
         /// </returns>
-        public User EnterMarket(int userId)
+        public User EnterMarket(int userId, DateTime date)
         {
             Logger.Instance.LogEvent($"User {userId} is trying to enter the market");
+            if (date > DateTime.Now)
+            {
+                throw new ArgumentException($"{date} is not a valid date: you are not from the future!");
+            }
             User user = new User();
             if (currentUsers.TryAdd(userId, user))
             {
+                UpdateUserStatistics(user, date);
                 Logger.Instance.LogEvent($"User {userId} has entered the market successfuly");
                 return user;
             }
@@ -143,6 +149,23 @@ namespace Workshop.DomainLayer.UserPackage
 
         }
 
+        public void UpdateUserStatistics(User u, DateTime date)
+        {
+            lock (userCountOnDatePerType.SyncRoot)
+            {
+                if (userCountOnDatePerType.Contains(date.Date))
+                {
+                    ((UserCountInDate)userCountOnDatePerType[date.Date]).IncreaseCount(u);
+                }
+                else
+                {
+                    UserCountInDate userCount = new UserCountInDate(date.Date);
+                    userCount.IncreaseCount(u);
+                    userCountOnDatePerType.Add(date.Date, userCount);
+                }
+            }
+        }
+
         /// <summary>
         /// Perform a login attempt. If successfull, the current visitor becomes a Member.
         /// </summary>
@@ -155,12 +178,15 @@ namespace Workshop.DomainLayer.UserPackage
         /// <returns>
         /// The logged in member
         /// </returns>
-        public KeyValuePair<Member, List<Notification>> Login(int userId, string username, string password)
+        public KeyValuePair<Member, List<Notification>> Login(int userId, string username, string password, DateTime date)
         {
             Logger.Instance.LogEvent($"User {userId} is trying to login member {username}");
+            if (date > DateTime.Now)
+            {
+                throw new ArgumentException($"{date} is not a valid date: you are not from the future!");
+            }
             EnsureNonEmptyUserDetails(username, password);
             EnsureEnteredMarket(userId);
-
 
             if (currentUsers[userId] is Member)
                 throw new InvalidOperationException($"User {userId} is already logged in");
@@ -180,9 +206,12 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new ArgumentException($"User {userId} has entered wrong password for member {username}");
 
             currentUsers[userId] = member;
-            Logger.Instance.LogEvent($"Successfuly logged in user {userId} as member {username}");
             List<Notification> userNotifications = notificationHandler.GetNotifications(member.Username);
             notificationHandler.RemoveNotifications(member.Username);
+
+            UpdateUserStatistics(member, date);
+
+            Logger.Instance.LogEvent($"Successfuly logged in user {userId} as member {username}");
             return new KeyValuePair<Member, List<Notification>>(member, userNotifications);
         }
 
@@ -224,67 +253,21 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new ArgumentException("Username or password cannot be empty");
         }
 
-        public void AddStoreFounder(string username, int storeId)
+        public void AddStoreFounder(string username, int storeId, DateTime date)
         {
             Member member = GetMember(username);
             member.AddRole(new StoreFounder(storeId));
+            UpdateUserStatistics(member, date);
         }
 
-        /*// Being called only from MarketController
-        public StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId)
-        {
-            // Check that nominator is the logged in member
-            AssertCurrentUser(userId, nominatorUsername);
-
-            // Check that the nominated member is indeed a member
-            EnsureMemberExists(nominatedUsername);
-
-            Member nominator = members[nominatorUsername], nominated = members[nominatedUsername];
-
-            // Check that the nominator is authorized to nominate a store owner
-            if (!nominator.IsAuthorized(storeId, Action.NominateStoreOwner))
-                throw new MemberAccessException($"Member {nominatorUsername} is not allowed to nominate owners in store #{storeId}.");
-
-            if (nominatorUsername.Equals(nominatedUsername))
-            {
-                throw new InvalidOperationException($"Member {nominatorUsername} cannot nominate itself to be a store owner.");
-            }
-
-            // Check that nominator is not a store owner and that there is no circular nomination
-            List<StoreRole> nominatedStoreRoles = nominated.GetStoreRoles(storeId), nominatorStoreRoles = nominator.GetStoreRoles(storeId);
-
-            foreach (StoreRole nominatedStoreRole in nominatedStoreRoles)
-            {
-                if (nominatedStoreRole is StoreOwner)
-                    throw new InvalidOperationException($"Member {nominatedUsername} is already a store owner of store #{storeId}");
-
-                foreach (StoreRole nominatorStoreRole in nominatorStoreRoles)
-                {
-                    if (nominatedStoreRole.ContainsNominee(nominatorStoreRole))
-                        throw new InvalidOperationException($"Member {nominatedUsername} was already nominated by {nominatorUsername} or one of its nominators");
-                }
-            }
-
-            // Finally, add the new role
-            StoreOwner newRole = new StoreOwner(storeId);
-            nominated.AddRole(newRole);
-
-            // Add the new manager to the nominator's nominees list
-            StoreRole nominatorStoreOwner = nominatorStoreRoles.Last();
-            nominatorStoreOwner.AddNominee(nominatedUsername, newRole);
-
-            RegisterToEvent(nominated.Username, new Event("RemoveStoreOwnerNominationFrom" + nominatedUsername, "", "MarketController"));
-            RegisterToEvent(nominated.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
-            RegisterToEvent(nominated.Username, new Event("OpenStore" + storeId, "", "MarketController"));
-            RegisterToEvent(nominated.Username, new Event("CloseStore" + storeId, "", "MarketController"));
-            Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} successfuly nominated member {nominatedUsername} as a store owner of store {storeId}");
-            return newRole;
-        }*/
-
         // Being called only from MarketController
-        public StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId)
+        public StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId, DateTime date)
         {
             Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} is trying to nominate {nominatedUsername} as a store manager of store {storeId}");
+            if (date > DateTime.Now)
+            {
+                throw new ArgumentException($"{date} is not a valid date: you are not from the future!");
+            }
             // Check that nominator is the logged in member
             AssertCurrentUser(userId, nominatorUsername);
 
@@ -319,6 +302,8 @@ namespace Workshop.DomainLayer.UserPackage
             RegisterToEvent(nominated.Username, new Event("RemoveStoreOwnerNominationFrom" + nominatedUsername, "", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("OpenStore" + storeId, "", "MarketController"));
             RegisterToEvent(nominated.Username, new Event("CloseStore" + storeId, "", "MarketController"));
+            RegisterToEvent(nominated.Username, new Event("BidOfferInStore" + storeId, "", "MarketController"));
+            UpdateUserStatistics(nominated, date);
             Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} successfuly nominated member {nominatedUsername} as a store manager of store {storeId}");
             return newRole;
         }
@@ -471,7 +456,7 @@ namespace Workshop.DomainLayer.UserPackage
 
         public ReviewDTO ReviewProduct(int userId, string user, int productId, string review, int rating)
         {
-            Logger.Instance.LogEvent("User " + user + " is trying to review product " + productId);
+            Logger.Instance.LogEvent("User " + user + " is trying to review Product " + productId);
             AssertCurrentUser(userId, user);
             List<OrderDTO> orders = orderHandler.GetOrders(user);
             bool purchasedProduct = false;
@@ -485,27 +470,26 @@ namespace Workshop.DomainLayer.UserPackage
             }
             if (!purchasedProduct)
             {
-                Logger.Instance.LogEvent("User " + user + " FAILED to review product " + productId);
-                throw new ArgumentException($"Username {user} did not purchase product {productId}");
+                Logger.Instance.LogEvent("User " + user + " FAILED to review Product " + productId);
+                throw new ArgumentException($"Username {user} did not purchase Product {productId}");
             }
-            Logger.Instance.LogEvent("User " + user + " successfuly reviewed product " + productId);
+            Logger.Instance.LogEvent("User " + user + " successfuly reviewed Product " + productId);
             return reviewHandler.AddReview(user, productId, review, rating);
         }
 
 
-        public ShoppingBagProduct addToCart(int userId, ShoppingBagProduct product, int storeId)
+        public ShoppingBagProduct AddToCart(int userId, ShoppingBagProduct product, int storeId)
         {
             //ShoppingBagProduct 
-            Logger.Instance.LogEvent("User " + userId + " is trying to add a product to his cart from store " + storeId);
-            AssertUserEnteredMarket(userId);
-            return this.currentUsers[userId].addToCart(product, storeId);
+            Logger.Instance.LogEvent("User " + userId + " is trying to add a Product to his cart from store " + storeId);
+            return this.currentUsers[userId].AddToCart(product, storeId);
         }
 
         public ShoppingCartDTO viewCart(int userId)
         {
             Logger.Instance.LogEvent($"User {userId} is trying to view his cart");
             AssertUserEnteredMarket(userId);
-            return currentUsers[userId].viewShopingCart();
+            return currentUsers[userId].ViewShoppingCart();
         }
 
         public void AssertUserEnteredMarket(int userId)
@@ -514,27 +498,6 @@ namespace Workshop.DomainLayer.UserPackage
             {
                 throw new ArgumentException($"User {userId} has not entered market");
             }
-        }
-
-        public ShoppingCartDTO editCart(int userId, int productId, int newQuantity)
-        {
-            Logger.Instance.LogEvent("User " + userId + " is trying to edit the quantity of " + productId + " in his cart");
-            AssertUserEnteredMarket(userId);
-            if (newQuantity < 0)
-            {
-                Logger.Instance.LogEvent("User " + userId + " failed to edit the quantity of " + productId + " in his cart");
-                throw new ArgumentException($"Quantity {newQuantity} can not be a negtive number");
-            }
-            if (newQuantity == 0)
-            {
-                currentUsers[userId].deleteFromCart(productId);
-            }
-            else
-            {
-                currentUsers[userId].changeQuantityInCart(productId, newQuantity);
-            }
-            Logger.Instance.LogEvent("User " + userId + " successfuly edited the quantity of " + productId + " in his cart");
-            return currentUsers[userId].viewShopingCart();
         }
 
         public void ClearUserCart(int userId)
@@ -612,7 +575,7 @@ namespace Workshop.DomainLayer.UserPackage
             return reviewHandler.GetProductRating(productId);
         }
 
-        bool IUserController.IsConnected(int userId)
+        public bool IsConnected(int userId)
         {
             return currentUsers.ContainsKey(userId);
         }
@@ -662,11 +625,75 @@ namespace Workshop.DomainLayer.UserPackage
             {
                 member = (Member)GetUser(userId);
             }
-            catch (Exception ex)
+            catch
             {
                 throw new ArgumentException("SANITY CHECK: GETMEMBERPERMISSIONS");
             }
             return member.GetAllRoles().Select(r => new ServiceLayer.ServiceObjects.PermissionInformation(userId, membername, (r is StoreRole ? ((StoreRole)r).StoreId : -1), r.GetAllActions())).ToList();
+        }
+
+        private int bisect_left(DateTime[] l, DateTime val)
+        {
+            int low = 0, high = l.Length;
+            while (low < high)
+            {
+                int mid = low + (high - low) / 2;
+                if (l[mid] < val)
+                {
+                    low = mid + 1;
+                }
+                else
+                {
+                    high = mid;
+                }
+            }
+            return low;
+        }
+
+        private int bisect_right(DateTime[] l, DateTime val)
+        {
+            int low = 0, high = l.Length;
+            while (low < high)
+            {
+                int mid = low + (high - low) / 2;
+                if (l[mid] > val)
+                {
+                    high = mid;
+                }
+                else
+                {
+                    low = mid + 1;
+                }
+            }
+            return low;
+        }
+
+        public List<UserCountInDate> MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end)
+        {
+            beginning = beginning.Date;
+            end = end.Date;
+            AssertCurrentUser(userId, membername);
+            Member m = GetMember(membername);
+            List<UserCountInDate> returnVal = new List<UserCountInDate>();
+            if (!m.GetAllRoles().Any(x => x is MarketManager))
+            {
+                throw new ArgumentException($"{membername} is not a market manager and can not request to view this information.");
+            }
+            if (beginning == null || end == null || beginning > DateTime.Now || end > DateTime.Now || beginning > end)
+            {
+                throw new ArgumentException($"Given dates are not correct: {beginning}, {end}");
+            }
+            lock (userCountOnDatePerType.SyncRoot)
+            {
+                DateTime[] dates = userCountOnDatePerType.Keys.Cast<DateTime>().ToArray();
+                int STARTING_INDEX = bisect_left(dates, beginning);
+                int ENDING_INDEX = bisect_right(dates, end);
+                for (int i = STARTING_INDEX; i < ENDING_INDEX; i++)
+                {
+                    returnVal.Add((UserCountInDate)userCountOnDatePerType.GetByIndex(i));
+                }
+            }
+            return returnVal;
         }
     }
 }

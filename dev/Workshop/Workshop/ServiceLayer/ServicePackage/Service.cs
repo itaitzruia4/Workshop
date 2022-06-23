@@ -27,7 +27,7 @@ namespace Workshop.ServiceLayer
     {
         private Facade facade;
         public readonly bool WasInitializedWithFile;
-
+        private readonly int Port;
         public Service(IExternalSystem externalSystem, string conf)
         {
             string starting_state_file = null;
@@ -63,8 +63,8 @@ namespace Workshop.ServiceLayer
                             switch (splits[0])
                             {
                                 case "enter-market":
-                                    if (actualParams.Length != 1) { throw new ArgumentException(); }
-                                    facade.EnterMarket(int.Parse(actualParams[0]));
+                                    if (actualParams.Length != 2) { throw new ArgumentException(); }
+                                    facade.EnterMarket(int.Parse(actualParams[0]), DateTime.ParseExact(actualParams[1], "dd/MM/yyyy", CultureInfo.InvariantCulture));
                                     break;
                                 case "exit-market":
                                     if (actualParams.Length != 1) { throw new ArgumentException(); }
@@ -75,24 +75,24 @@ namespace Workshop.ServiceLayer
                                     facade.Register(int.Parse(actualParams[0]), actualParams[1], actualParams[2], DateTime.ParseExact(actualParams[3], "dd/MM/yyyy", CultureInfo.InvariantCulture));
                                     break;
                                 case "login":
-                                    if (actualParams.Length != 3) { throw new ArgumentException(); }
-                                    facade.Login(int.Parse(actualParams[0]), actualParams[1], actualParams[2]);
+                                    if (actualParams.Length != 4) { throw new ArgumentException(); }
+                                    facade.Login(int.Parse(actualParams[0]), actualParams[1], actualParams[2], DateTime.ParseExact(actualParams[3], "dd/MM/yyyy", CultureInfo.InvariantCulture));
                                     break;
                                 case "logout":
                                     if (actualParams.Length != 2) { throw new ArgumentException(); }
                                     facade.Logout(int.Parse(actualParams[0]), actualParams[1]);
                                     break;
-                                case "add-product":
+                                case "add-Product":
                                     if (actualParams.Length != 8) { throw new ArgumentException(); }
                                     facade.AddProduct(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), actualParams[3], actualParams[4], double.Parse(actualParams[5]), int.Parse(actualParams[6]), actualParams[7]);
                                     break;
                                 case "nominate-store-manager":
-                                    if (actualParams.Length != 4) { throw new ArgumentException(); }
-                                    facade.NominateStoreManager(int.Parse(actualParams[0]), actualParams[1], actualParams[2], int.Parse(actualParams[3]));
+                                    if (actualParams.Length != 5) { throw new ArgumentException(); }
+                                    facade.NominateStoreManager(int.Parse(actualParams[0]), actualParams[1], actualParams[2], int.Parse(actualParams[3]), DateTime.ParseExact(actualParams[4], "dd/MM/yyyy", CultureInfo.InvariantCulture));
                                     break;
                                 case "nominate-store-owner":
-                                    if (actualParams.Length != 4) { throw new ArgumentException(); }
-                                    facade.NominateStoreOwner(int.Parse(actualParams[0]), actualParams[1], actualParams[2], int.Parse(actualParams[3]));
+                                    if (actualParams.Length != 5) { throw new ArgumentException(); }
+                                    facade.NominateStoreOwner(int.Parse(actualParams[0]), actualParams[1], actualParams[2], int.Parse(actualParams[3]), DateTime.ParseExact(actualParams[4], "dd/MM/yyyy", CultureInfo.InvariantCulture));
                                     break;
                                 case "remove-store-owner-nomination":
                                     if (actualParams.Length != 4) { throw new ArgumentException(); }
@@ -111,14 +111,14 @@ namespace Workshop.ServiceLayer
                                     facade.OpenStore(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]));
                                     break;
                                 case "create-new-store":
-                                    if (actualParams.Length != 3) { throw new ArgumentException(); }
-                                    facade.CreateNewStore(int.Parse(actualParams[0]), actualParams[1], actualParams[2]);
+                                    if (actualParams.Length != 4) { throw new ArgumentException(); }
+                                    facade.CreateNewStore(int.Parse(actualParams[0]), actualParams[1], actualParams[2], DateTime.ParseExact(actualParams[3], "dd/MM/yyyy", CultureInfo.InvariantCulture));
                                     break;
-                                case "review-product":
+                                case "review-Product":
                                     if (actualParams.Length != 5) { throw new ArgumentException(); }
                                     facade.ReviewProduct(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), actualParams[3], int.Parse(actualParams[4]));
                                     break;
-                                case "search-product":
+                                case "search-Product":
                                     if (actualParams.Length != 6) { throw new ArgumentException(); }
                                     facade.SearchProduct(int.Parse(actualParams[0]), actualParams[1], actualParams[2], double.Parse(actualParams[3]), double.Parse(actualParams[4]), double.Parse(actualParams[5]));
                                     break;
@@ -139,12 +139,12 @@ namespace Workshop.ServiceLayer
                                     facade.EditCart(int.Parse(actualParams[0]), int.Parse(actualParams[1]), int.Parse(actualParams[2]));
                                     break;
                                 case "buy-cart":
-                                    if (actualParams.Length != 12) { throw new ArgumentException(); }
+                                    if (actualParams.Length != 13) { throw new ArgumentException(); }
                                     CreditCard cc = new CreditCard(actualParams[1], actualParams[2], actualParams[3], actualParams[4], actualParams[5], actualParams[6]);
                                     SupplyAddress address = new SupplyAddress(actualParams[7], actualParams[8], actualParams[9], actualParams[10], actualParams[11]);
-                                    facade.BuyCart(int.Parse(actualParams[0]), cc, address);
+                                    facade.BuyCart(int.Parse(actualParams[0]), cc, address, DateTime.ParseExact(actualParams[12], "dd/MM/yyyy", CultureInfo.InvariantCulture));
                                     break;
-                                case "add-product-discount":
+                                case "add-Product-discount":
                                     if (actualParams.Length != 5) { throw new ArgumentException(); }
                                     facade.AddProductDiscount(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), actualParams[3], int.Parse(actualParams[4]));
                                     break;
@@ -156,27 +156,27 @@ namespace Workshop.ServiceLayer
                                     if (actualParams.Length != 4) { throw new ArgumentException(); }
                                     facade.AddStoreDiscount(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), actualParams[3]);
                                     break;
-                                case "remove-product-from-store":
+                                case "remove-Product-from-store":
                                     if (actualParams.Length != 4) { throw new ArgumentException(); }
                                     facade.RemoveProductFromStore(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]));
                                     break;
-                                case "change-product-name":
+                                case "change-Product-name":
                                     if (actualParams.Length != 5) { throw new ArgumentException(); }
                                     facade.ChangeProductName(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]), actualParams[4]);
                                     break;
-                                case "change-product-price":
+                                case "change-Product-OfferedPrice":
                                     if (actualParams.Length != 5) { throw new ArgumentException(); }
                                     facade.ChangeProductPrice(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]), double.Parse(actualParams[4]));
                                     break;
-                                case "change-product-quantity":
+                                case "change-Product-quantity":
                                     if (actualParams.Length != 5) { throw new ArgumentException(); }
                                     facade.ChangeProductQuantity(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]), int.Parse(actualParams[4]));
                                     break;
-                                case "change-product-category":
+                                case "change-Product-category":
                                     if (actualParams.Length != 5) { throw new ArgumentException(); }
                                     facade.ChangeProductCategory(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]), actualParams[4]);
                                     break;
-                                case "add-product-purchase-term":
+                                case "add-Product-purchase-term":
                                     if (actualParams.Length != 5) { throw new ArgumentException(); }
                                     facade.AddProducPurchaseTerm(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), actualParams[3], int.Parse(actualParams[4]));
                                     break;
@@ -212,6 +212,32 @@ namespace Workshop.ServiceLayer
                                     if (actualParams.Length != 2) { throw new ArgumentException(); }
                                     facade.GetMemberPermissions(int.Parse(actualParams[0]), actualParams[1]);
                                     break;
+                                case "reject-store-owner-nomination":
+                                    if (actualParams.Length != 4) { throw new ArgumentException(); }
+                                    facade.RejectStoreOwnerNomination(int.Parse(actualParams[0]), actualParams[1], actualParams[2], int.Parse(actualParams[3]));
+                                    break;
+                                case "offer-bid":
+                                    if (actualParams.Length != 5) { throw new ArgumentException(); }
+                                    facade.OfferBid(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]), double.Parse(actualParams[4]));
+                                    break;
+                                case "counter-bid":
+                                    if (actualParams.Length != 5) { throw new ArgumentException(); }
+                                    facade.CounterBid(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]), double.Parse(actualParams[4]));
+                                    break;
+                                case "vote-for-bid":
+                                    if (actualParams.Length != 5) { throw new ArgumentException(); }
+                                    facade.VoteForBid(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]), bool.Parse(actualParams[4]));
+                                    break;
+                                case "buy-bid-product":
+                                    if (actualParams.Length != 16) { throw new ArgumentException(); }
+                                    CreditCard cc1 = new CreditCard(actualParams[1], actualParams[2], actualParams[3], actualParams[4], actualParams[5], actualParams[6]);
+                                    SupplyAddress address1 = new SupplyAddress(actualParams[7], actualParams[8], actualParams[9], actualParams[10], actualParams[11]);
+                                    facade.BuyBidProduct(int.Parse(actualParams[0]), actualParams[12], int.Parse(actualParams[13]), int.Parse(actualParams[14]), cc1, address1, DateTime.ParseExact(actualParams[15], "dd/MM/yyyy", CultureInfo.InvariantCulture));
+                                    break;
+                                case "get-bids-status":
+                                    if (actualParams.Length != 3) { throw new ArgumentException(); }
+                                    facade.GetBidsStatus(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]));
+                                    break;
                                 default:
                                     throw new ArgumentException();
                             }
@@ -240,7 +266,7 @@ namespace Workshop.ServiceLayer
                     case "admin":
                         if (parts.Length != 4) throw new ArgumentException($"admin is not in the correct format: {entry}");
                         try { systemManagers.Add(new SystemAdminDTO(parts[1], parts[2], parts[3])); }
-                        catch (Exception _)
+                        catch
                         {
                             throw new ArgumentException($"admin is not in the correct format: {entry}");
                         }
@@ -248,6 +274,10 @@ namespace Workshop.ServiceLayer
                     case "ss":
                         if (parts.Length != 2) throw new ArgumentException($"starting state is not in the correct format: {entry}");
                         starting_state_file = parts[1];
+                        break;
+                    case "port":
+                        if (parts.Length != 2) throw new ArgumentException($"port is not in the correct format: {entry}");
+                        if (!int.TryParse(parts[1], out Port)) throw new ArgumentException($"port is not in the correct format: {entry}");
                         break;
                     default:
                         throw new ArgumentException("Unidentified command in config file");
@@ -261,11 +291,16 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<User> EnterMarket(int userId)
+        public int GetPort()
+        {
+            return Port;
+        }
+
+        public Response<User> EnterMarket(int userId, DateTime date)
         {
             try
             {
-                DomainUser domainUser = facade.EnterMarket(userId);
+                DomainUser domainUser = facade.EnterMarket(userId, date);
                 User serviceUser = new User(domainUser);
                 return new Response<User>(serviceUser, userId);
             }
@@ -301,11 +336,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<KeyValuePair<Member, List<Notification>>> Login(int userId, string username, string password)
+        public Response<KeyValuePair<Member, List<Notification>>> Login(int userId, string username, string password, DateTime date)
         {
             try
             {
-                KeyValuePair<DomainMember, List<DomainNotification>> domainAnswer = facade.Login(userId, username, password);
+                KeyValuePair<DomainMember, List<DomainNotification>> domainAnswer = facade.Login(userId, username, password, date);
                 Member serviceMember = new Member(domainAnswer.Key);
                 List<Notification> notificationList = domainAnswer.Value.Select(n => new Notification(n)).ToList();
                 return new Response<KeyValuePair<Member, List<Notification>>>(new KeyValuePair<Member, List<Notification>>(serviceMember, notificationList), userId);
@@ -343,11 +378,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<StoreOwner> NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId)
+        public Response<StoreOwner> NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId, DateTime date)
         {
             try
             {
-                DomainStoreOwner domainOwner = facade.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId);
+                DomainStoreOwner domainOwner = facade.NominateStoreOwner(userId, nominatorUsername, nominatedUsername, storeId, date);
                 StoreOwner serviceOwner = domainOwner == null ? null : new StoreOwner(domainOwner);
                 return new Response<StoreOwner>(serviceOwner, userId);
             }
@@ -357,11 +392,24 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<StoreManager> NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId)
+        public Response RejectStoreOwnerNomination(int userId, string nominatorUsername, string nominatedUsername, int storeId)
         {
             try
             {
-                DomainStoreManager domainManager = facade.NominateStoreManager(userId, nominatorUsername, nominatedUsername, storeId);
+                facade.RejectStoreOwnerNomination(userId, nominatorUsername, nominatedUsername, storeId);
+                return new Response(userId);
+            }
+            catch (Exception e)
+            {
+                return new Response<StoreOwner>(e.Message, userId);
+            }
+        }
+
+        public Response<StoreManager> NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId, DateTime date)
+        {
+            try
+            {
+                DomainStoreManager domainManager = facade.NominateStoreManager(userId, nominatorUsername, nominatedUsername, storeId, date);
                 StoreManager serviceManager = new StoreManager(domainManager);
                 return new Response<StoreManager>(serviceManager, userId);
             }
@@ -437,11 +485,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<Store> CreateNewStore(int userId, string creator, string storeName)
+        public Response<Store> CreateNewStore(int userId, string creator, string storeName, DateTime date)
         {
             try
             {
-                DomainStore domainStore = facade.CreateNewStore(userId, creator, storeName);
+                DomainStore domainStore = facade.CreateNewStore(userId, creator, storeName, date);
                 Store store = new Store(domainStore);
                 return new Response<Store>(store, userId);
             }
@@ -521,11 +569,11 @@ namespace Workshop.ServiceLayer
             }
         }
 
-        public Response<double> BuyCart(int userId, CreditCard cc, SupplyAddress address)
+        public Response<double> BuyCart(int userId, CreditCard cc, SupplyAddress address, DateTime buyTime)
         {
             try
             {
-                return new Response<double>(facade.BuyCart(userId, cc, address), userId);
+                return new Response<double>(facade.BuyCart(userId, cc, address, buyTime), userId);
             }
             catch (Exception e)
             {
@@ -746,6 +794,32 @@ namespace Workshop.ServiceLayer
             }
         }
 
+        public Response<double> GetDailyIncomeMarketManager(int userId, string username)
+        {
+            try
+            {
+                double res = facade.GetDailyIncomeMarketManager(userId, username);
+                return new Response<double>(res,userId);
+            }
+            catch (Exception e)
+            {
+                return new Response<double>(e.Message, userId);
+            }
+        }
+
+        public Response<double> GetDailyIncomeStore(int userId, string username, int storeId)
+        {
+            try
+            {
+                double res = facade.GetDailyIncomeStoreOwner(userId, username, storeId);
+                return new Response<double>(res, userId);
+            }
+            catch (Exception e)
+            {
+                return new Response<double>(e.Message, userId);
+            }
+        }
+
         public Response<List<PermissionInformation>> GetMemberPermissions(int userId, string membername)
         {
             try
@@ -755,6 +829,90 @@ namespace Workshop.ServiceLayer
             catch (Exception e)
             {
                 return new Response<List<PermissionInformation>>(e.Message, userId);
+            }
+        }
+
+        public Response<List<StatisticsInformation>> MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end)
+        {
+            try
+            {
+                return new Response<List<StatisticsInformation>>(facade.MarketManagerDailyRangeInformation(userId, membername, beginning, end).Select(ucd => new StatisticsInformation(ucd)).ToList(), userId);
+            }
+            catch (Exception e)
+            {
+                return new Response<List<StatisticsInformation>>(e.Message, userId);
+            }
+        }
+
+        public Response<List<Order>> GetStorePurchaseHistory(int userId, string membername, int storeId)
+        {
+            try
+            {
+                return new Response<List<Order>>(facade.GetStorePurchaseHistory(userId, membername, storeId).Select(dor => new Order(dor)).ToList(), userId);
+            }
+            catch (Exception ex)
+            {
+                return new Response<List<Order>>(ex.Message, userId);
+            }
+        }
+
+        public Response<Bid> OfferBid(int userId, string username, int storeId, int productId, double price)
+        {
+            try
+            {
+                return new Response<Bid>(new Bid(facade.OfferBid(userId, username, storeId, productId, price)), userId);
+            }
+            catch (Exception ex)
+            {
+                return new Response<Bid>(ex.Message, userId);
+            }
+        }
+
+        public Response<Bid> CounterBid(int userId, string membername, int storeId, int bidId, double newPrice)
+        {
+            try
+            {
+                return new Response<Bid>(new Bid(facade.CounterBid(userId, membername, storeId, bidId, newPrice)), userId);
+            }
+            catch (Exception ex)
+            {
+                return new Response<Bid>(ex.Message, userId);
+            }
+        }
+
+        public Response<Bid> VoteForBid(int userId, string username, int storeId, int bidId, bool vote)
+        {
+            try
+            {
+                return new Response<Bid>(new Bid(facade.VoteForBid(userId, username, storeId, bidId, vote)), userId);
+            }
+            catch (Exception ex)
+            {
+                return new Response<Bid>(ex.Message, userId);
+            }        
+        }
+
+        public Response<double> BuyBidProduct(int userId, string username, int storeId, int bidId, CreditCard cc, SupplyAddress address, DateTime buyTime)
+        {
+            try
+            {
+                return new Response<double>(facade.BuyBidProduct(userId, username, storeId, bidId, cc, address, buyTime), userId);
+            }
+            catch (Exception ex)
+            {
+                return new Response<double>(ex.Message, userId);
+            }
+        }
+
+        public Response<List<Bid>> GetBidsStatus(int userId, string username, int storeId)
+        {
+            try
+            {
+                return new Response<List<Bid>>(facade.GetBidsStatus(userId, username, storeId).Select(db => new Bid(db)).ToList(), userId);
+            }
+            catch (Exception ex)
+            {
+                return new Response<List<Bid>>(ex.Message, userId);
             }
         }
     }

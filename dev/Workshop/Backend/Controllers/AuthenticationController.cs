@@ -2,9 +2,9 @@
 using API.Requests;
 using API.Responses;
 using Microsoft.AspNetCore.Mvc;
-using System.Globalization;
 using Workshop.ServiceLayer;
 using Workshop.ServiceLayer.ServiceObjects;
+using WebSocketSharp.Server;
 
 namespace API.Controllers
 {
@@ -13,21 +13,28 @@ namespace API.Controllers
     public class AuthenticationController : ControllerBase
     {
         IService Service;
-        static int userId = 0;
-        public AuthenticationController(IService service)
+        StaisticsViewingServer StatsServer;
+        static volatile int userId = 0;
+        public AuthenticationController(IService service, StaisticsViewingServer statsServer)
         {
             Service = service;
+            this.StatsServer = statsServer;
         }
 
         [HttpGet("entermarket")]
         public ActionResult<FrontResponse<int>> EnterMarket()
         {
-            Response<User> response = Service.EnterMarket(userId);
+            Response<User> response = Service.EnterMarket(userId, DateTime.Now.Date);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<int>(response.ErrorMessage));
             }
-            return Ok(new FrontResponse<int>(userId++));
+            int CURR_ID = userId++;
+            /*foreach (string path in StatsServer.WebSocketServices.Paths)
+            {
+                StatsServer.WebSocketServices[path].Sessions.Broadcast(BitConverter.GetBytes(CURR_ID).Reverse().ToArray());
+            }*/
+            return Ok(new FrontResponse<int>(CURR_ID));
         }
 
         [HttpPost("exitmarket")]
@@ -44,13 +51,11 @@ namespace API.Controllers
         [HttpPost("login")]
         public ActionResult<LoginResponse> Login([FromBody] AuthenticationRequest request)
         {
-            Response<KeyValuePair<Member, List<Notification>>> response = Service.Login(request.UserId, request.Membername, request.Password);
+            Response<KeyValuePair<Member, List<Notification>>> response = Service.Login(request.UserId, request.Membername, request.Password, DateTime.Now.Date);
             if (response.ErrorOccured)
             {
                 return BadRequest(new LoginResponse(response.ErrorMessage));
             }
-
-            List<Notification> nots = new List<Notification>();
             return Ok(new LoginResponse(response.Value.Key, response.Value.Value));
         }
 

@@ -20,6 +20,7 @@ export function handleChangeProductName(token: memberToken, storeId: number, pro
         if (!response.ok) {
             return Promise.reject(data.error);
         }
+        alert(`Changed product name to ${name}`);
         return Promise.resolve(data.value)
     })
 }
@@ -43,6 +44,7 @@ export function handleChangeProductPrice(token: memberToken, storeId: number, pr
         if (!response.ok) {
             return Promise.reject(data.error);
         }
+        alert(`Changed product price to ${price}`);
         return Promise.resolve(data.value)
     })
 }
@@ -66,6 +68,7 @@ export function handleChangeProductQuantity(token: memberToken, storeId: number,
         if (!response.ok) {
             return Promise.reject(data.error);
         }
+        alert(`Changed product quantity to ${quantity}`);
         return Promise.resolve(data.value)
     })
 }
@@ -89,6 +92,7 @@ export function handleChangeProductCategory(token: memberToken, storeId: number,
         if (!response.ok) {
             return Promise.reject(data.error);
         }
+        alert(`Changed product category to ${category}`);
         return Promise.resolve(data.value)
     })
 }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Workshop.DomainLayer.MarketPackage.Biding;
+using Workshop.DomainLayer.Orders;
 using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Shopping;
 
@@ -11,9 +13,9 @@ namespace Workshop.DomainLayer.MarketPackage
     public interface IMarketController
     {
         void InitializeSystem();
-        StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId);
+        StoreOwner NominateStoreOwner(int userId, string nominatorUsername, string nominatedUsername, int storeId, DateTime date);
         
-        StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId);
+        StoreManager NominateStoreManager(int userId, string nominatorUsername, string nominatedUsername, int storeId, DateTime date);
 
         Member RemoveStoreOwnerNomination(int userId, string nominatorMembername, string nominatedMembername, int storeId);
 
@@ -37,7 +39,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
         void OpenStore(int userId, string username, int storeId);
         
-        Store CreateNewStore(int userId, string creator, string storeName);
+        Store CreateNewStore(int userId, string creator, string storeName, DateTime date);
 
         bool IsStoreOpen(int userId, string username, int storeId);
 
@@ -49,11 +51,10 @@ namespace Workshop.DomainLayer.MarketPackage
 
         List<ProductDTO> SearchProduct(int userId, string keyWords, string catagory, double minPrice, double maxPrice, double productReview);
 
-        double BuyCart(int userId, CreditCard cc, SupplyAddress address);
+        double BuyCart(int userId, CreditCard cc, SupplyAddress address, DateTime buyTime);
+        ShoppingCartDTO EditCart(int userId, int productId, int newQuantity);
 
-        ShoppingBagProduct getProductForSale(int productId, int storeId, int quantity);
-
-        ShoppingBagProduct addToBag(int userId, int productId, int storeId, int quantity);
+        ShoppingBagProduct AddToCart(int userId, int productId, int storeId, int quantity);
 
         void AddProductDiscount(int userId, string user, int storeId ,string jsonDiscount, int productId);
 
@@ -70,6 +71,15 @@ namespace Workshop.DomainLayer.MarketPackage
         void AddUserPurchaseTerm(int userId, string user, int storeId, string json_term);
 
         List<Store> GetAllStores(int userId);
+        double GetDailyIncomeStoreOwner(int userId, string username, int storeId);
+        double GetDailyIncomeMarketManager(int userId, string username);
         double GetCartPrice(ShoppingCartDTO shoppingCart);
+        void RejectStoreOwnerNomination(int userId, string nominatorUsername, string nominatedUsername, int storeId);
+        List<OrderDTO> GetStorePurchaseHistory(int userId, string membername, int storeId);
+        Bid OfferBid(int userId, string username, int storeId, int productId, double price);
+        Bid CounterBid(int userId, string membername, int storeId, int bidId, double newPrice);
+        Bid VoteForBid(int userId, string username, int storeId, int bidId, bool vote);
+        double BuyBidProduct(int userId, string username, int storeId, int bidId, CreditCard cc, SupplyAddress address, DateTime buyTime);
+        List<Bid> GetBidsStatus(int userId, string username, int storeId);
     }
 }

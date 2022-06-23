@@ -20,6 +20,8 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             actions.Add(Action.CancelMember);
             actions.Add(Action.GetMarketStatistics);
             actions.Add(Action.GetMembersOnlineStats);
+            actions.Add(Action.GetMembersOnlineStats);
+            actions.Add(Action.ViewStorePurchaseHistory);
 
             roleDAL.RoleType = "MarketManager";
             foreach (var action in actions)
@@ -42,6 +44,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             if (obj == null)
                 return false;
             return obj.GetType() != typeof(MarketManager);
+            
         }
     }
 }

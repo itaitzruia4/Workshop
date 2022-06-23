@@ -257,7 +257,7 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 return ParseProductDateTerm(action, value, productId);
             }
-            throw new Exception("Unknown product term type: " + type);
+            throw new Exception("Unknown Product term type: " + type);
         }
 
         private Term ParseProductPriceTerm(string action, string value, string productId)
@@ -268,7 +268,7 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 price = double.Parse(value);
                 if (price < 0)
-                    throw new Exception("Term price value cannot be negtive number.");
+                    throw new Exception("Term OfferedPrice value cannot be negtive number.");
                 try
                 {
 
@@ -276,11 +276,11 @@ namespace Workshop.DomainLayer.MarketPackage
                     
                 }catch (Exception)
                 {
-                    throw new Exception("Invalid product ID term value: " + productId);
+                    throw new Exception("Invalid Product ID term value: " + productId);
                 }
             }catch (Exception)
             {
-                throw new Exception("Invalid price term value: " + value);
+                throw new Exception("Invalid OfferedPrice term value: " + value);
             }
             if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
                 throw new Exception("Unknown term operand: " + action);
@@ -323,12 +323,12 @@ namespace Workshop.DomainLayer.MarketPackage
                 }
                 catch (Exception)
                 {
-                    throw new Exception("Invalid product ID term value: " + productId);
+                    throw new Exception("Invalid Product ID term value: " + productId);
                 }
             }
             catch (Exception)
             {
-                throw new Exception("Invalid price term value: " + value);
+                throw new Exception("Invalid OfferedPrice term value: " + value);
             }
             if (quantity < 0)
                 throw new Exception("Term quantity value cannot be negtive number.");
@@ -372,7 +372,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 }
                 catch (Exception)
                 {
-                    throw new Exception("Invalid product ID term value: " + productId);
+                    throw new Exception("Invalid Product ID term value: " + productId);
                 }
             }
             catch (Exception)
@@ -424,7 +424,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 }
                 catch (Exception)
                 {
-                    throw new Exception("Invalid product ID term value: " + productId);
+                    throw new Exception("Invalid Product ID term value: " + productId);
                 }
             }
             catch (Exception)
@@ -486,7 +486,7 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 return ParseCategoryDateTerm(action, value, category);
             }
-            throw new Exception("Unknown product term type: " + type);
+            throw new Exception("Unknown Product term type: " + type);
         }
 
         private Term ParseCategoryPriceTerm(string action, string value, string category)
@@ -498,10 +498,10 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             catch (Exception)
             {
-                throw new Exception("Invalid price term value: " + value);
+                throw new Exception("Invalid OfferedPrice term value: " + value);
             }
             if (price < 0)
-                throw new Exception("Term price value cannot be negtive number.");
+                throw new Exception("Term OfferedPrice value cannot be negtive number.");
             if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
                 throw new Exception("Unknown term operand: " + action);
             SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
@@ -536,7 +536,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             catch (Exception)
             {
-                throw new Exception("Invalid price term value: " + value);
+                throw new Exception("Invalid OfferedPrice term value: " + value);
             }
             if (quantity < 0)
                 throw new Exception("Term quantity value cannot be negtive number.");
@@ -673,7 +673,7 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 return ParseBagDateTerm(action, value);
             }
-            throw new Exception("Unknown product term type: " + type);
+            throw new Exception("Unknown Product term type: " + type);
         }
 
         private Term ParseBagPriceTerm(string action, string value)
@@ -685,10 +685,10 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             catch (Exception)
             {
-                throw new Exception("Invalid price term value: " + value);
+                throw new Exception("Invalid OfferedPrice term value: " + value);
             }
             if (price < 0)
-                throw new Exception("Term price value cannot be negtive number.");
+                throw new Exception("Term OfferedPrice value cannot be negtive number.");
             if (!action.Equals("<") && !action.Equals("<=") && !action.Equals(">") && !action.Equals(">=") && !action.Equals("=") && !action.Equals("!="))
                 throw new Exception("Unknown term operand: " + action);
             SimpleTerm.TermSimple term = (ShoppingBagDTO shoppingBag, int age) =>
@@ -722,7 +722,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             catch (Exception)
             {
-                throw new Exception("Invalid price term value: " + value);
+                throw new Exception("Invalid OfferedPrice term value: " + value);
             }
             if (quantity < 0)
                 throw new Exception("Term quantity value cannot be negtive number.");

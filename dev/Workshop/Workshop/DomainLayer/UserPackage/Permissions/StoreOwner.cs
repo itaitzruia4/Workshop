@@ -32,6 +32,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             actions.Add(Action.NominateStoreManager);
             actions.Add(Action.AddDiscount);
             actions.Add(Action.AddPurchaseTerm);
+            actions.Add(Action.ViewStorePurchaseHistory);
 
             roleDAL.RoleType = "StoreOwner";
             foreach(var action in actions)
