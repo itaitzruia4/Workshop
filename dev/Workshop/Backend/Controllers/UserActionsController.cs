@@ -164,32 +164,6 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
             return Ok(new FrontResponse<List<StatisticsInformation>>(resp.Value));
-
-            /*Func<string[], bool> notifier = (msgs) =>
-            {
-                string username = request.Membername;
-
-                // Try send, if not - add to unsent messages
-                if (adminDailyService.WebSocketServices[relativeServicePath] == null || adminDailyService.WebSocketServices[relativeServicePath].Sessions.Count < 1)
-                {
-                    IList<string> unsentMsgs = new List<string>();
-                    if (buyerUnsentMessages.ContainsKey(username))
-                        unsentMsgs = buyerUnsentMessages[username];
-
-                    // Adding new unsent messages
-                    foreach (string msg in msgs)
-                        unsentMsgs.Add(msg);
-
-                    //this.buyerUnsentMessages[username] = unsentMsgs;
-                    AddUnsentMessage(username, unsentMsgs);
-                    return true; // So msgs delete on member msgs queue
-                }
-
-                foreach (string msg in msgs)
-                    notificationServer.WebSocketServices[relativeServicePath].Sessions.Broadcast(msg);
-                return true;
-            };*/
-
         }
     }
 }

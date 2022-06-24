@@ -1,7 +1,6 @@
 ﻿using API.Requests;
 using API.Responses;
 using Microsoft.AspNetCore.Mvc;
-using System.Globalization;
 using Workshop.ServiceLayer;
 using Workshop.ServiceLayer.ServiceObjects;
 
@@ -12,9 +11,11 @@ namespace API.Controllers
     public class StoreController : ControllerBase
     {
         IService Service;
-        public StoreController(IService service)
+        StaisticsViewingServer StatsServer;
+        public StoreController(IService service, StaisticsViewingServer statsServer)
         {
             Service = service;
+            StatsServer = statsServer;
         }
 
         [HttpPost("newstore")]
@@ -25,6 +26,7 @@ namespace API.Controllers
             {
                 return BadRequest(new FrontResponse<Store>(response.ErrorMessage));
             }
+            StatsServer.SendMessageToAllAdmins("STOREOWNER");
             return Ok(new FrontResponse<Store>(response.Value));
         }
 
@@ -58,6 +60,7 @@ namespace API.Controllers
             {
                 return BadRequest(new FrontResponse<StoreManager>(response.ErrorMessage));
             }
+            StatsServer.SendMessageToAllAdmins("STOREMANAGER");
             return Ok(new FrontResponse<StoreManager>(response.Value));
         }
 
@@ -68,6 +71,10 @@ namespace API.Controllers
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<StoreOwner>(response.ErrorMessage));
+            }
+            if (response.Value != null)
+            {
+                StatsServer.SendMessageToAllAdmins("STOREOWNER");
             }
             return Ok(new FrontResponse<StoreOwner>(response.Value));
         }
