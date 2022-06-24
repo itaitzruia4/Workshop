@@ -24,6 +24,7 @@ namespace Workshop.DataLayer.DataObjects.Controllers
 
         public UserController()
         {
+            members = new List<Member>();
         }
 
         public UserController(ReviewHandler reviewHandler, NotificationHandler notificationHandler, OrderHandler<string> orderHandler, List<Member> members)

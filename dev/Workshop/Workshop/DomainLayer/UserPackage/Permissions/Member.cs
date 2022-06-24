@@ -34,7 +34,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             Birthdate = birthdate;
             roles = new List<Role>();
             this.rwl = new ReaderWriterLock();
-            shoppingCart = new MemberShoppingCart(shoppingCart);
+            shoppingCart = new MemberShoppingCart();
 
             memberDAL = new MemberDAL(password, username, birthdate, new List<RoleDAL>(), ((MemberShoppingCart)shoppingCart).ToDAL());
             DataHandler.getDBHandler().save(memberDAL);

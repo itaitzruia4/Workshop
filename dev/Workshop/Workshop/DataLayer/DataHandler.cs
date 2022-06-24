@@ -68,15 +68,23 @@ namespace Workshop.DataLayer
             return null;
         }
 
-        public MarketController SearchMarket(int key)
+        public MarketController loadMarket(int key)
         {
+            //Add for each member instance it's roles
+
             return cache.marketController.Where(s => s.Id == key)
-                    .Include(mc => mc.userController.members)
-                    .Include(mc => mc.userController.reviewHandler.productReviews)
-                    .Include(mc => mc.userController.reviewHandler.userReviews)
-                    .Include(mc => mc.userController.notificationHandler.Notifications)
-                    .Include(mc => mc.userController.notificationHandler.observers)
-                    .Include(mc => mc.userController.orderHandler.MemberToOrders)
+                    .Include(mc => mc.userController.members).ThenInclude(m => m.ShoppingCart)
+                    .Include(mc => mc.userController.reviewHandler.productReviews).ThenInclude(pr => pr.userToReviewDTOs).ThenInclude(utr => utr.Review)
+                    .Include(mc => mc.userController.reviewHandler.userReviews).ThenInclude(ur => ur.productToReviewDTOs).ThenInclude(ptr => ptr.Review)
+                    .Include(mc => mc.userController.notificationHandler.Notifications).ThenInclude(mn => mn.Notifications)
+                    .Include(mc => mc.userController.notificationHandler.observers).ThenInclude(eo => eo.Event)
+                    .Include(mc => mc.userController.notificationHandler.observers).ThenInclude(eo => eo.Observers).ThenInclude(m => m.ShoppingCart)
+                    .Include(mc => mc.userController.orderHandler.MemberToOrders).ThenInclude(mto => mto.orders).ThenInclude(o => o.address)
+                    .Include(mc => mc.userController.orderHandler.MemberToOrders).ThenInclude(mto => mto.orders).ThenInclude(o => o.items)
+                    .Include(mc => mc.stores)
+                    .Include(mc => mc.stores).ThenInclude(s => s.DiscountPolicy)
+                    .Include(mc => mc.stores).ThenInclude(s => s.PurchasePolicy)
+                    .Include(mc => mc.stores).ThenInclude(s => s.Products)
                     .FirstOrDefault();
         }
 

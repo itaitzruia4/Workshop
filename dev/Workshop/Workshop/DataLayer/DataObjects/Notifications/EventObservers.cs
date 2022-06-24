@@ -23,6 +23,7 @@ namespace Workshop.DataLayer.DataObjects.Notifications
         {
             this.Id = nextId;
             nextId++;
+            Observers = new List<Member>();
         }
 
         public EventObservers(Event Event, List<Member> observers)

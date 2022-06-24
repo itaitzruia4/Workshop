@@ -39,13 +39,14 @@ namespace Workshop.DomainLayer.MarketPackage
             STORE_COUNT = 0;
             PRODUCT_COUNT = 1;
             this.dalMarketController = new DALMarketController(userController.ToDAL(), orderHandler.ToDAL(), new List<DALStore>(), STORE_COUNT, PRODUCT_COUNT);
+            dalMarketController.userController = userController.ToDAL();
             DataHandler.getDBHandler().save(dalMarketController);
         }
 
         public MarketController(DALMarketController DALMarketController, IUserController userController, IExternalSystem externalSystem)
         {
             this.userController = userController;
-            this.ExternalSystem= externalSystem;
+            this.ExternalSystem = externalSystem;
             this.orderHandler = new OrderHandler<int>(DALMarketController.orderHandler);
             this.stores = new ConcurrentDictionary<int, Store>();
             this.storesLocks = new ConcurrentDictionary<int, ReaderWriterLock>();

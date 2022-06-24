@@ -25,6 +25,7 @@ namespace Workshop.DataLayer.DataObjects.Orders
         {
             this.id = nextId;
             nextId++;
+            items = new List<ProductDTO>();
         }
 
         public OrderDTO(int id, string clientName, SupplyAddress address, string storeName, List<ProductDTO> items)

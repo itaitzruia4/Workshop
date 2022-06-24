@@ -22,7 +22,6 @@ namespace Workshop.DataLayer.DataObjects.Members
         public Member()
         { 
             Roles = new List<Role>();
-            ShoppingCart = new ShoppingCart();
         }
         public Member(string password, string memberName, DateTime birthdate, List<Role> roles, ShoppingCart shoppingCart)
         {

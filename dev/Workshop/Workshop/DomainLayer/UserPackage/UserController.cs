@@ -47,6 +47,20 @@ namespace Workshop.DomainLayer.UserPackage
             InitializeAdmins(systemAdmins);
         }
 
+        public UserController(UserControllerDAL userControllerDAL, List<SystemAdminDTO> systemAdmins)
+        {
+            this.userControllerDAL = userControllerDAL;
+            this.securityHandler = new HashSecurityHandler();
+            currentUsers = new ConcurrentDictionary<int, User>();
+            this.reviewHandler = new ReviewHandler(userControllerDAL.reviewHandler);
+            members = new ConcurrentDictionary<string, Member>();
+            foreach (MemberDAL memberDAL in userControllerDAL.members)
+                members[memberDAL.MemberName] = new Member(memberDAL);
+            orderHandler = new OrderHandler<string>(userControllerDAL.orderHandler);
+            notificationHandler = new NotificationHandler(userControllerDAL.notificationHandler, this);
+            userCountOnDatePerType = SortedList.Synchronized(new SortedList());
+        }
+
         public UserControllerDAL ToDAL()
         {
             return userControllerDAL;

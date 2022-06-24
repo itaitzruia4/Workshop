@@ -22,6 +22,7 @@ namespace Workshop.DataLayer.DataObjects.Orders
         {
             this.Id = nextId;
             nextId++;
+            orders = new List<OrderDTO>();
         }
 
     }

@@ -33,12 +33,6 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
             this.shoppingCartDAL = shoppingCartDAL;
         }
 
-        public MemberShoppingCart(ShoppingCart other)
-        {
-            shoppingBags = new Dictionary<int, ShoppingBag>();
-            shoppingCartDAL = new ShoppingCartDAL(new List<ShoppingBagDAL>());
-            DataHandler.getDBHandler().save(shoppingCartDAL);
-        }
 
         public override ShoppingBagProduct AddToCart(ShoppingBagProduct product, int storeId)
         {

@@ -25,8 +25,6 @@ namespace Workshop.DataLayer.DataObjects.Market
         public Store()
         {
             Products = new List<Product>();
-            DiscountPolicy = null;
-            PurchasePolicy = null;
         }
         public Store(int id, bool open, string storeName, DiscountPolicy discountPolicy, PurchasePolicy purchasePolicy, List<Product> products)
         {

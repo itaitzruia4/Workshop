@@ -24,6 +24,8 @@ namespace Workshop.DataLayer.DataObjects.Members
         {
             this.Id = nextId;
             nextId++;
+            Actions = new List<Action>();
+            nominees = new List<NameToRole>();
         }
 
         // Consructor for non-store role

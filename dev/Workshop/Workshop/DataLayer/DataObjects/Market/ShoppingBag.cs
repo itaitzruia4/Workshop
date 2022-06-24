@@ -19,7 +19,9 @@ namespace Workshop.DataLayer.DataObjects.Market
         public List<ShoppingBagProduct> Products { get; set; }
 
         public ShoppingBag()
-        {}
+        {
+            Products = new List<ShoppingBagProduct>();
+        }
 
         public ShoppingBag(int storeId, List<ShoppingBagProduct> products)
         {

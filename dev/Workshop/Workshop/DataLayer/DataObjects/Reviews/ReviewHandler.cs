@@ -22,6 +22,8 @@ namespace Workshop.DataLayer.DataObjects.Reviews
         {
             this.Id = nextId;
             nextId++;
+            productReviews = new List<ProductReviews>();
+            userReviews = new List<UserReviews>();
         }
 
         public ReviewHandler(List<ProductReviews> productReviews, List<UserReviews> userReviews)

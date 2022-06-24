@@ -23,6 +23,7 @@ namespace Workshop.DataLayer.DataObjects.Notifications
         {
             this.Id = nextId;
             nextId++;
+            Notifications = new List<Notification>();
         }
 
         public MemberNotifications(Member member, List<Notification> notifications)

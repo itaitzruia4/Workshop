@@ -22,6 +22,7 @@ namespace Workshop.DataLayer.DataObjects.Reviews
         {
             this.Id = nextId;
             nextId++;
+            productToReviewDTOs = new List<ProductToReviewDTO>();
         }
 
         public UserReviews(string username, List<ProductToReviewDTO> productToReviewDTOs)
