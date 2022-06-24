@@ -210,6 +210,52 @@ namespace Workshop.Migrations
                     b.ToTable("ProductDTO");
                 });
 
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Purchases.CategoryTerm", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PurchasePolicyId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TermId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PurchasePolicyId");
+
+                    b.HasIndex("TermId");
+
+                    b.ToTable("CategoryTerm");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Purchases.ProductTerm", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PurchasePolicyId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TermId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PurchasePolicyId");
+
+                    b.HasIndex("TermId");
+
+                    b.ToTable("ProductTerm");
+                });
+
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Purchases.PurchasePolicy", b =>
                 {
                     b.Property<int>("Id")
@@ -235,20 +281,10 @@ namespace Workshop.Migrations
                     b.Property<int>("Id")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PurchasePolicyId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PurchasePolicyId1")
-                        .HasColumnType("int");
-
                     b.Property<string>("TermJson")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PurchasePolicyId");
-
-                    b.HasIndex("PurchasePolicyId1");
 
                     b.ToTable("Term");
                 });
@@ -837,6 +873,28 @@ namespace Workshop.Migrations
                         .HasForeignKey("OrderDTOid");
                 });
 
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Purchases.CategoryTerm", b =>
+                {
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.PurchasePolicy", null)
+                        .WithMany("category_terms")
+                        .HasForeignKey("PurchasePolicyId");
+
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.Term", "Term")
+                        .WithMany()
+                        .HasForeignKey("TermId");
+                });
+
+            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Purchases.ProductTerm", b =>
+                {
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.PurchasePolicy", null)
+                        .WithMany("products_terms")
+                        .HasForeignKey("PurchasePolicyId");
+
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.Term", "Term")
+                        .WithMany()
+                        .HasForeignKey("TermId");
+                });
+
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Purchases.PurchasePolicy", b =>
                 {
                     b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.Term", "store_terms")
@@ -846,17 +904,6 @@ namespace Workshop.Migrations
                     b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.Term", "user_terms")
                         .WithMany()
                         .HasForeignKey("user_termsId");
-                });
-
-            modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.Purchases.Term", b =>
-                {
-                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.PurchasePolicy", null)
-                        .WithMany("category_terms")
-                        .HasForeignKey("PurchasePolicyId");
-
-                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Purchases.PurchasePolicy", null)
-                        .WithMany("products_terms")
-                        .HasForeignKey("PurchasePolicyId1");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Market.ShoppingBag", b =>

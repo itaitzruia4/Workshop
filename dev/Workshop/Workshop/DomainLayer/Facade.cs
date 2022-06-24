@@ -11,6 +11,8 @@ using Workshop.DomainLayer.UserPackage.Shopping;
 using Workshop.ServiceLayer;
 using Notification = Workshop.DomainLayer.UserPackage.Notifications.Notification;
 using SystemAdminDTO = Workshop.ServiceLayer.ServiceObjects.SystemAdminDTO;
+using DataHandler = Workshop.DataLayer.DataHandler;
+using DALMarketController = Workshop.DataLayer.DataObjects.Controllers.MarketController;
 
 namespace Workshop.DomainLayer
 {
@@ -21,6 +23,7 @@ namespace Workshop.DomainLayer
 
         internal Facade(IExternalSystem externalSystem, List<SystemAdminDTO> systemAdmins)
         {
+            DALMarketController market = DataHandler.getDBHandler().find<DALMarketController>(typeof(DALMarketController), 0);
             UserController = new UserController(new HashSecurityHandler(), new ReviewHandler(), systemAdmins);
             MarketController = new MarketController(UserController, externalSystem);
         }

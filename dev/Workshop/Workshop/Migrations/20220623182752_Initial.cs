@@ -134,6 +134,18 @@ namespace Workshop.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Term",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false),
+                    TermJson = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Term", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DiscountPolicy",
                 columns: table => new
                 {
@@ -299,6 +311,31 @@ namespace Workshop.Migrations
                         name: "FK_ShoppingBag_ShoppingCart_ShoppingCartId",
                         column: x => x.ShoppingCartId,
                         principalTable: "ShoppingCart",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PurchasePolicy",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false),
+                    user_termsId = table.Column<int>(nullable: true),
+                    store_termsId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PurchasePolicy", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PurchasePolicy_Term_store_termsId",
+                        column: x => x.store_termsId,
+                        principalTable: "Term",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_PurchasePolicy_Term_user_termsId",
+                        column: x => x.user_termsId,
+                        principalTable: "Term",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -526,6 +563,58 @@ namespace Workshop.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CategoryTerm",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false),
+                    CategoryName = table.Column<string>(nullable: true),
+                    TermId = table.Column<int>(nullable: true),
+                    PurchasePolicyId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CategoryTerm", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CategoryTerm_PurchasePolicy_PurchasePolicyId",
+                        column: x => x.PurchasePolicyId,
+                        principalTable: "PurchasePolicy",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CategoryTerm_Term_TermId",
+                        column: x => x.TermId,
+                        principalTable: "Term",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductTerm",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false),
+                    ProductId = table.Column<int>(nullable: false),
+                    TermId = table.Column<int>(nullable: true),
+                    PurchasePolicyId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductTerm", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProductTerm_PurchasePolicy_PurchasePolicyId",
+                        column: x => x.PurchasePolicyId,
+                        principalTable: "PurchasePolicy",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ProductTerm_Term_TermId",
+                        column: x => x.TermId,
+                        principalTable: "Term",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProductDTO",
                 columns: table => new
                 {
@@ -546,6 +635,40 @@ namespace Workshop.Migrations
                         column: x => x.OrderDTOid,
                         principalTable: "OrderDTO",
                         principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Store",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false),
+                    Open = table.Column<bool>(nullable: false),
+                    StoreName = table.Column<string>(nullable: true),
+                    DiscountPolicyId = table.Column<int>(nullable: true),
+                    PurchasePolicyId = table.Column<int>(nullable: true),
+                    MarketControllerId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Store", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Store_DiscountPolicy_DiscountPolicyId",
+                        column: x => x.DiscountPolicyId,
+                        principalTable: "DiscountPolicy",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Store_marketController_MarketControllerId",
+                        column: x => x.MarketControllerId,
+                        principalTable: "marketController",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Store_PurchasePolicy_PurchasePolicyId",
+                        column: x => x.PurchasePolicyId,
+                        principalTable: "PurchasePolicy",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -591,6 +714,30 @@ namespace Workshop.Migrations
                         column: x => x.MemberName,
                         principalTable: "Member",
                         principalColumn: "MemberName",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Product",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false),
+                    Store = table.Column<int>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true),
+                    Price = table.Column<double>(nullable: false),
+                    Quantity = table.Column<int>(nullable: false),
+                    Category = table.Column<string>(nullable: true),
+                    StoreId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Product", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Product_Store_StoreId",
+                        column: x => x.StoreId,
+                        principalTable: "Store",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -653,97 +800,6 @@ namespace Workshop.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Store",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false),
-                    Open = table.Column<bool>(nullable: false),
-                    StoreName = table.Column<string>(nullable: true),
-                    DiscountPolicyId = table.Column<int>(nullable: true),
-                    PurchasePolicyId = table.Column<int>(nullable: true),
-                    MarketControllerId = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Store", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Store_DiscountPolicy_DiscountPolicyId",
-                        column: x => x.DiscountPolicyId,
-                        principalTable: "DiscountPolicy",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Store_marketController_MarketControllerId",
-                        column: x => x.MarketControllerId,
-                        principalTable: "marketController",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Product",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false),
-                    Store = table.Column<int>(nullable: false),
-                    Name = table.Column<string>(nullable: true),
-                    Description = table.Column<string>(nullable: true),
-                    Price = table.Column<double>(nullable: false),
-                    Quantity = table.Column<int>(nullable: false),
-                    Category = table.Column<string>(nullable: true),
-                    StoreId = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Product", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Product_Store_StoreId",
-                        column: x => x.StoreId,
-                        principalTable: "Store",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Term",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false),
-                    TermJson = table.Column<string>(nullable: true),
-                    PurchasePolicyId = table.Column<int>(nullable: true),
-                    PurchasePolicyId1 = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Term", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PurchasePolicy",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false),
-                    user_termsId = table.Column<int>(nullable: true),
-                    store_termsId = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PurchasePolicy", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PurchasePolicy_Term_store_termsId",
-                        column: x => x.store_termsId,
-                        principalTable: "Term",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_PurchasePolicy_Term_user_termsId",
-                        column: x => x.user_termsId,
-                        principalTable: "Term",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Action_RoleId",
                 table: "Action",
@@ -758,6 +814,16 @@ namespace Workshop.Migrations
                 name: "IX_CategoryDiscount_DiscountPolicyId",
                 table: "CategoryDiscount",
                 column: "DiscountPolicyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CategoryTerm_PurchasePolicyId",
+                table: "CategoryTerm",
+                column: "PurchasePolicyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CategoryTerm_TermId",
+                table: "CategoryTerm",
+                column: "TermId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DiscountPolicy_store_discountId",
@@ -870,6 +936,16 @@ namespace Workshop.Migrations
                 column: "ReviewHandlerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProductTerm_PurchasePolicyId",
+                table: "ProductTerm",
+                column: "PurchasePolicyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductTerm_TermId",
+                table: "ProductTerm",
+                column: "TermId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProductToReviewDTO_ReviewId",
                 table: "ProductToReviewDTO",
                 column: "ReviewId");
@@ -920,16 +996,6 @@ namespace Workshop.Migrations
                 column: "PurchasePolicyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Term_PurchasePolicyId",
-                table: "Term",
-                column: "PurchasePolicyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Term_PurchasePolicyId1",
-                table: "Term",
-                column: "PurchasePolicyId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_userController_notificationHandlerId",
                 table: "userController",
                 column: "notificationHandlerId");
@@ -958,47 +1024,18 @@ namespace Workshop.Migrations
                 name: "IX_UserToReviewDTO_ReviewId",
                 table: "UserToReviewDTO",
                 column: "ReviewId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Store_PurchasePolicy_PurchasePolicyId",
-                table: "Store",
-                column: "PurchasePolicyId",
-                principalTable: "PurchasePolicy",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Term_PurchasePolicy_PurchasePolicyId",
-                table: "Term",
-                column: "PurchasePolicyId",
-                principalTable: "PurchasePolicy",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Term_PurchasePolicy_PurchasePolicyId1",
-                table: "Term",
-                column: "PurchasePolicyId1",
-                principalTable: "PurchasePolicy",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_PurchasePolicy_Term_store_termsId",
-                table: "PurchasePolicy");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_PurchasePolicy_Term_user_termsId",
-                table: "PurchasePolicy");
-
             migrationBuilder.DropTable(
                 name: "Action");
 
             migrationBuilder.DropTable(
                 name: "CategoryDiscount");
+
+            migrationBuilder.DropTable(
+                name: "CategoryTerm");
 
             migrationBuilder.DropTable(
                 name: "NameToRole");
@@ -1014,6 +1051,9 @@ namespace Workshop.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProductDTO");
+
+            migrationBuilder.DropTable(
+                name: "ProductTerm");
 
             migrationBuilder.DropTable(
                 name: "ProductToReviewDTO");
@@ -1061,6 +1101,9 @@ namespace Workshop.Migrations
                 name: "marketController");
 
             migrationBuilder.DropTable(
+                name: "PurchasePolicy");
+
+            migrationBuilder.DropTable(
                 name: "MemberToOrdersI");
 
             migrationBuilder.DropTable(
@@ -1082,6 +1125,9 @@ namespace Workshop.Migrations
                 name: "userController");
 
             migrationBuilder.DropTable(
+                name: "Term");
+
+            migrationBuilder.DropTable(
                 name: "OrderHandlerI");
 
             migrationBuilder.DropTable(
@@ -1095,12 +1141,6 @@ namespace Workshop.Migrations
 
             migrationBuilder.DropTable(
                 name: "ReviewHandler");
-
-            migrationBuilder.DropTable(
-                name: "Term");
-
-            migrationBuilder.DropTable(
-                name: "PurchasePolicy");
         }
     }
 }
