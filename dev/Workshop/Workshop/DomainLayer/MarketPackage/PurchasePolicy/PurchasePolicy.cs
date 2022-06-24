@@ -58,8 +58,10 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 AddCategoryTerm(category_term.Term.TermJson, category_term.CategoryName, null);
             }
-            AddUserTerm(purchasePolicyDAL.user_terms.TermJson);
-            AddStoreTerm(purchasePolicyDAL.store_terms.TermJson);
+            if(purchasePolicyDAL.user_terms != null)
+                AddUserTerm(purchasePolicyDAL.user_terms.TermJson);
+            if(purchasePolicyDAL.store_terms != null)
+                AddStoreTerm(purchasePolicyDAL.store_terms.TermJson);
             this.purchasePolicyDAL = purchasePolicyDAL;
         }
 

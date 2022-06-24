@@ -25,8 +25,17 @@ namespace Workshop.DomainLayer
         {
             //DALMarketController market = DataHandler.getDBHandler().find<DALMarketController>(0);
             DALMarketController market = DataHandler.getDBHandler().loadMarket(0);
-            UserController = new UserController(market.userController, systemAdmins);
-            MarketController = new MarketController(market, UserController, externalSystem);
+            if (market == null)
+            {
+                UserController = new UserController(new HashSecurityHandler(), new ReviewHandler(), systemAdmins);
+                MarketController = new MarketController(UserController, externalSystem);
+            }
+            else
+            {
+                UserController = new UserController(market.userController, systemAdmins);
+                MarketController = new MarketController(market, UserController, externalSystem);
+            }
+            
         }
 
         public User EnterMarket(int userId, DateTime date)

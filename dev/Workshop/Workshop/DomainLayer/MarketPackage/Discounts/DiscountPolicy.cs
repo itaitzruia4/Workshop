@@ -61,7 +61,8 @@ namespace Workshop.DomainLayer.MarketPackage
                 AddProductDiscount(productDiscount.Discount.discountJson, productDiscount.ProductId, productDiscount.Discount);
             foreach(CategoryDiscountDAL categoryDiscount in discountPolicyDAL.category_discounts)
                 AddCategoryDiscount(categoryDiscount.Discount.discountJson, categoryDiscount.Name, categoryDiscount.Discount);
-            AddStoreDiscount(discountPolicyDAL.store_discount.discountJson);
+            if(discountPolicyDAL.store_discount != null)
+                AddStoreDiscount(discountPolicyDAL.store_discount.discountJson);
             this.discountPolicyDAL = discountPolicyDAL;
         }
 

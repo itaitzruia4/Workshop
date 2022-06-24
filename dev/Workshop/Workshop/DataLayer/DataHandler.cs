@@ -74,6 +74,7 @@ namespace Workshop.DataLayer
 
             return cache.marketController.Where(s => s.Id == key)
                     .Include(mc => mc.userController.members).ThenInclude(m => m.ShoppingCart)
+                    .Include(mc => mc.userController.members).ThenInclude(m => m.Roles).ThenInclude(r => r.nominees).ThenInclude(n => n.role)
                     .Include(mc => mc.userController.reviewHandler.productReviews).ThenInclude(pr => pr.userToReviewDTOs).ThenInclude(utr => utr.Review)
                     .Include(mc => mc.userController.reviewHandler.userReviews).ThenInclude(ur => ur.productToReviewDTOs).ThenInclude(ptr => ptr.Review)
                     .Include(mc => mc.userController.notificationHandler.Notifications).ThenInclude(mn => mn.Notifications)
@@ -83,7 +84,14 @@ namespace Workshop.DataLayer
                     .Include(mc => mc.userController.orderHandler.MemberToOrders).ThenInclude(mto => mto.orders).ThenInclude(o => o.items)
                     .Include(mc => mc.stores)
                     .Include(mc => mc.stores).ThenInclude(s => s.DiscountPolicy)
+                    .Include(mc => mc.stores).ThenInclude(s => s.DiscountPolicy).ThenInclude(dp => dp.products_discounts).ThenInclude(pd => pd.Discount)
+                    .Include(mc => mc.stores).ThenInclude(s => s.DiscountPolicy).ThenInclude(dp => dp.category_discounts).ThenInclude(pd => pd.Discount)
+                    .Include(mc => mc.stores).ThenInclude(s => s.DiscountPolicy).ThenInclude(dp => dp.store_discount)
                     .Include(mc => mc.stores).ThenInclude(s => s.PurchasePolicy)
+                    .Include(mc => mc.stores).ThenInclude(s => s.PurchasePolicy).ThenInclude(pp => pp.products_terms).ThenInclude(pt => pt.Term)
+                    .Include(mc => mc.stores).ThenInclude(s => s.PurchasePolicy).ThenInclude(pp => pp.category_terms).ThenInclude(pt => pt.Term)
+                    .Include(mc => mc.stores).ThenInclude(s => s.PurchasePolicy).ThenInclude(pp => pp.user_terms)
+                    .Include(mc => mc.stores).ThenInclude(s => s.PurchasePolicy).ThenInclude(pp => pp.store_terms)
                     .Include(mc => mc.stores).ThenInclude(s => s.Products)
                     .FirstOrDefault();
         }

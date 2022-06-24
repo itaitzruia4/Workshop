@@ -36,6 +36,9 @@ namespace Workshop.DomainLayer.MarketPackage
         public ConcurrentDictionary<int,Bid> biding_votes { get; set; }
         private volatile int bid_id_count;
         public ConcurrentDictionary<Member, KeyValuePair<Member, HashSet<Member>>> owner_voting { get; }
+
+
+
         public Store(int id, string name, Member founder)
         {
             if (name == null || name.Equals(""))
@@ -71,9 +74,9 @@ namespace Workshop.DomainLayer.MarketPackage
         public Store(StoreDAL storeDAL)
         {
             this.id = storeDAL.Id;
-            this.name = name;
+            this.name = storeDAL.StoreName;
             this.products = new Dictionary<int, Product>();
-            this.open = true; //TODO: check if on init store supposed to be open or closed.
+            this.open = storeDAL.Open;
             this.rwl = new ReaderWriterLock();
             this.discountPolicy = new DiscountPolicy(storeDAL.DiscountPolicy, this);
             this.purchasePolicy = new PurchasePolicy(storeDAL.PurchasePolicy, this);
