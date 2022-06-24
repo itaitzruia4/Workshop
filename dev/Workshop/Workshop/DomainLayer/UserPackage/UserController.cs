@@ -146,7 +146,8 @@ namespace Workshop.DomainLayer.UserPackage
             }
             else
                 throw new ArgumentException($"Username {username} already exists");
-
+            userControllerDAL.members.Add(newMember.ToDAL());
+            DataHandler.getDBHandler().update(userControllerDAL);
         }
 
         public void UpdateUserStatistics(User u, DateTime date)

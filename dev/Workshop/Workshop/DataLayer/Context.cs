@@ -75,16 +75,10 @@ namespace Workshop.DataLayer
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<UserController>().HasMany(uc => uc.members);
+            //marketController.Include("userController, OrderHandlerI, Store");
+            //userController.Include("ReviewHandler, NotificationHandler, OrderHandlerS, Member");
 
-            /*foreach (var item in modelBuilder.Model.GetEntityTypes())
-            {
-                var p = item.FindPrimaryKey().Properties.FirstOrDefault(i => i.ValueGenerated != Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.Never);
-                if (p != null)
-                {
-                    p.ValueGenerated = Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.Never;
-                }
-
-            }*/
         }
 
         public override EntityEntry<TEntity> Update<TEntity>(TEntity entity)

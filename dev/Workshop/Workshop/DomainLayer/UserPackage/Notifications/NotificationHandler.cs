@@ -82,7 +82,7 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
             observers.TryAdd(eventt.Name, new HashSet<string>());
             this.observers[eventt.Name].Add(observer_name);
 
-            MemberDAL memberDAL = DataHandler.getDBHandler().find<MemberDAL>(typeof(MemberDAL), observer_name);
+            MemberDAL memberDAL = DataHandler.getDBHandler().find<MemberDAL>(observer_name);
             foreach(EventObservers eventObservers1 in NotificationHandlerDAL.observers)
             {
                 if(eventObservers1.Event.Name.Equals(eventt.Name))
@@ -104,7 +104,7 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
                 {
                     if(eventObservers.Event.Name.Equals(eventt.Name))
                     {
-                        MemberDAL memberDAL = DataHandler.getDBHandler().find<MemberDAL>(typeof(MemberDAL), observer_name);
+                        MemberDAL memberDAL = DataHandler.getDBHandler().find<MemberDAL>(observer_name);
                         eventObservers.Observers.Remove(memberDAL);
                         DataHandler.getDBHandler().update(eventObservers);
                         break;
@@ -130,7 +130,7 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
                     List<NotificationDAL> notificationsDAL = new List<NotificationDAL>();
                     if(this.Notifications.TryAdd(observer, new List<Notification>()))
                     {
-                        MemberDAL memberDAL = DataHandler.getDBHandler().find<MemberDAL>(typeof(MemberDAL), observer);
+                        MemberDAL memberDAL = DataHandler.getDBHandler().find<MemberDAL>(observer);
                         MemberNotifications memberNotifications = new MemberNotifications(memberDAL, notificationsDAL);
                         DataHandler.getDBHandler().save(memberNotifications);
                         NotificationHandlerDAL.Notifications.Add(memberNotifications);

@@ -61,11 +61,23 @@ namespace Workshop.DataLayer
             }
         }
 
-        public T find<T>(Type entityType, object key) where T : class, DALObject
+        public T find<T>(object key) where T : class, DALObject
         {
             if (Context.USE_DB)
-                return (T)cache.Find(entityType, key);
+                return (T)cache.Find(typeof(T), key);
             return null;
+        }
+
+        public MarketController SearchMarket(int key)
+        {
+            return cache.marketController.Where(s => s.Id == key)
+                    .Include(mc => mc.userController.members)
+                    .Include(mc => mc.userController.reviewHandler.productReviews)
+                    .Include(mc => mc.userController.reviewHandler.userReviews)
+                    .Include(mc => mc.userController.notificationHandler.Notifications)
+                    .Include(mc => mc.userController.notificationHandler.observers)
+                    .Include(mc => mc.userController.orderHandler.MemberToOrders)
+                    .FirstOrDefault();
         }
 
         public void clear()
