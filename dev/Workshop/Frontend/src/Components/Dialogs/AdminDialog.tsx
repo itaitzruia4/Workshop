@@ -15,8 +15,11 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
 
-import { handleGetMemberInformation, getStorePurchaseHistory, removeMember, viewStatistics, getDailyIncome } from '../../Actions/AdminActions';
+import { handleGetMemberInformation, getStorePurchaseHistory, removeMember, getDailyIncome, handleViewStatistics } from '../../Actions/AdminActions';
 import { memberToken } from '../../Types/roles';
+
+interface Statistics { admins: string[], guests: string[], members: string[], owners: string[], managers: string[] }
+const makeEmptyStatistics = (): Statistics => ({ admins: [], guests: [], members: [], owners: [], managers: [] });
 
 export default function AdminDialog(isOpen: boolean, token: memberToken) {
 
@@ -24,13 +27,69 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
     const [removeMemberOpen, setRemoveMemberOpen] = React.useState(false);
     const [historyOpen, setHistoryOpen] = React.useState(false);
     const [memberInfoOpen, setMemberInfoOpen] = React.useState(false);
-    const [incomeOpen, setIncomeOpen] = React.useState(false);
     const [statsOpen, setStatsOpen] = React.useState(false);
 
     const [storeId, setStoreId] = React.useState(0);
     const [membername, setMembername] = React.useState("");
     const [fromDate, setFromDate] = React.useState("");
     const [toDate, setToDate] = React.useState("");
+
+    const [statistics, setStatistics] = React.useState<Statistics>(makeEmptyStatistics());
+    React.useEffect(() => {
+        viewStatistics(null);
+    }, []);
+
+    const updateStats = (params: string[]): void => {
+        const role: string = params[0];
+        const name: string = params[1];
+        
+        switch (role) {
+            case "GUEST":
+                setStatistics({
+                    admins: statistics.admins,
+                    guests: statistics.guests.concat([name]),
+                    members: statistics.members,
+                    owners: statistics.owners,
+                    managers: statistics.managers
+                });
+                break;
+            case "MEMBER":
+                setStatistics({
+                    admins: statistics.admins,
+                    guests: statistics.guests,
+                    members: statistics.members.concat([name]),
+                    owners: statistics.owners,
+                    managers: statistics.managers
+                });
+                break;
+            case "STOREMANAGER":
+                setStatistics({
+                    admins: statistics.admins,
+                    guests: statistics.guests,
+                    members: statistics.members,
+                    owners: statistics.owners,
+                    managers: statistics.managers.concat([name])
+                });
+                break;
+            case "STOREOWNER":
+                setStatistics({
+                    admins: statistics.admins,
+                    guests: statistics.guests,
+                    members: statistics.members,
+                    owners: statistics.owners.concat([name]),
+                    managers: statistics.managers
+                });
+                break;
+            case "MARKETMANAGER":
+                setStatistics({
+                    admins: statistics.admins.concat([name]),
+                    guests: statistics.guests,
+                    members: statistics.members,
+                    owners: statistics.owners,
+                    managers: statistics.managers
+                });
+        }
+    }
 
     const [onlineMembers, setOnlineMembers] = React.useState([]);
     const [offlineMembers, setOfflineMembers] = React.useState([]);
@@ -72,16 +131,6 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
 
     const handleCloseMemberInfo = () => {
         setMemberInfoOpen(false);
-        setOpen(true);
-    };
-
-    const handleOpenIncome = () => {
-        setOpen(false);
-        setIncomeOpen(true);
-    };
-
-    const handleCloseIncome = () => {
-        setIncomeOpen(false);
         setOpen(true);
     };
 
@@ -133,9 +182,22 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
             });
     };
 
-    const handleViewStats = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        viewStatistics(token, fromDate, toDate);
+    const viewStatistics = (e: React.FormEvent<HTMLFormElement>|null) => {
+        if (e) {
+            e.preventDefault();
+        }
+        else {
+            handleViewStatistics(token, fromDate, toDate)
+                .then(response => setStatistics(response))
+                .catch(error => {
+                    alert(error)
+                });
+        }
+
+        const url = "http://localhost:5165/api/useractions/marketmanagerdaily";
+        const conn = new WebSocket(url);
+        conn.addEventListener("message", (ev: MessageEvent<string[]>) => updateStats(ev.data))
+        
         setFromDate("");
         setToDate("");
         handleCloseStats();
@@ -267,7 +329,7 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
                     <DialogContentText>
                         Please insert start and end date
                     </DialogContentText>
-                    <form onSubmit={handleViewStats} id="statsForm" >
+                    <form onSubmit={viewStatistics} id="statsForm" >
                         <TextField
                             value={fromDate}
                             autoFocus

@@ -116,14 +116,15 @@ export function getDailyIncome(token: memberToken): Promise<any> {
     })
 }
 
-function handleViewStatistics(token: memberToken, fromDate: string, toDate: string): Promise<any> {
-    // TODO add daily statistics API request
-    return Promise.reject("Not yet implemented");
-}
+export function handleViewStatistics(token: memberToken, fromDate: string, toDate: string): Promise<any> {
+    if (fromDate === "" || toDate === "") {
+        return Promise.reject('User details must not be empty');
+    }
 
-export const viewStatistics = (token: memberToken, fromDate: string, toDate: string): void => {
-    handleViewStatistics(token, fromDate, toDate)
-        .catch(error => {
-            alert(error)
-        });
+    var date_regex = /\d{1,2}\/\d{1,2}\/\d{4}/;
+    if (!(date_regex.test(fromDate)) || !(date_regex.test(toDate))) {
+        return Promise.reject("Invalid date format");
+    }
+
+    const url = "http://localhost:5165/api/useractions/marketmanagerdaily";
 }
