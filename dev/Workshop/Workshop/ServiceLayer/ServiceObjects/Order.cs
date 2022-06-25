@@ -10,7 +10,7 @@ namespace Workshop.ServiceLayer.ServiceObjects
         public int Id { get; set; }
         public string BuyerName { get; set; }
         public SupplyAddress Address { get; set; }
-        public string StoreName { get; set; }
+        public int StoreId { get; set; }
         public List<Product> Products { get; set; }
         public string Date { get; set; }
         public double Price { get; set; }
@@ -20,7 +20,7 @@ namespace Workshop.ServiceLayer.ServiceObjects
             Id = dor.id;
             BuyerName = dor.clientName;
             Address = dor.address;
-            StoreName = dor.storeName;
+            StoreId = dor.storeId;
             Products = dor.items.Select(pdto => new Product(pdto)).ToList();
             Date = dor.date.ToShortDateString();
             Price = dor.price;

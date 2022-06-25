@@ -2676,7 +2676,7 @@ namespace Tests.AcceptanceTests
             Assert.IsNotNull(orderHistory);
             Assert.AreEqual(1, orderHistory.Count);
             Assert.AreEqual(PURCHASE_DATE.ToShortDateString(), orderHistory[0].Date);
-            Assert.AreEqual("Store1", orderHistory[0].StoreName);
+            Assert.AreEqual(store.StoreId, orderHistory[0].StoreId);
             Assert.AreEqual("member1", orderHistory[0].BuyerName);
             Assert.AreEqual(address, orderHistory[0].Address);
             Assert.AreEqual(expected_price, orderHistory[0].Price);
@@ -2690,7 +2690,7 @@ namespace Tests.AcceptanceTests
             Assert.IsNotNull(orderHistory1);
             Assert.AreEqual(1, orderHistory1.Count);
             Assert.AreEqual(PURCHASE_DATE.ToShortDateString(), orderHistory1[0].Date);
-            Assert.AreEqual("Store1", orderHistory1[0].StoreName);
+            Assert.AreEqual(store.StoreId, orderHistory1[0].StoreId);
             Assert.AreEqual("member1", orderHistory1[0].BuyerName);
             Assert.AreEqual(address, orderHistory1[0].Address);
             Assert.AreEqual(expected_price, orderHistory1[0].Price);
