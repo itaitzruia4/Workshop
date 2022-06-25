@@ -9,7 +9,7 @@ import Switch from '@mui/material/Switch';
 import Stack from '@mui/material/Stack';
 
 
-import { memberToken, Actions, StorePermission } from '../Types/roles';
+import { memberToken, Actions, StorePermission, hasPermission } from '../Types/roles';
 import { Store } from "../Types/store"
 import { Product } from "../Types/product"
 import { Cart, Bag } from '../Types/shopping';
@@ -68,6 +68,7 @@ export default function StoreCard(
                     <Switch
                         checked={checked}
                         onChange={handleChange}
+                        disabled={checked ? !hasPermission(Actions.CloseStore, permissions) : !hasPermission(Actions.OpenStore, permissions) }
                     />
                     <Typography>Open</Typography>
                 </Stack>

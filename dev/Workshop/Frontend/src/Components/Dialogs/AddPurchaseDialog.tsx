@@ -7,16 +7,18 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { BagPurchaseSimpleTerm, CategoryPurchaseSimpleTerm, makeBagPurchaseSimpleTerm, makeCategoryPurchaseSimpleTerm, makeProductPurchaseSimpleTerm, ProductPurchaseSimpleTerm, UserPurchaseSimpleTerm, makeUserPurchaseSimpleTerm } from '../../Types/purchase';
+import { memberToken, Actions, StorePermission, actionNames, hasPermission } from '../../Types/roles';
 
 export default function AddPurchaseDialog(
     props: {
         storeId: number,
+        permissions: Actions[]
         addProductPurchase: (storeId: number, productId: number, purchaseJson: string) => void,
         addCategoryPurchase: (storeId: number, category: string, purchaseJson: string) => void,
         addBagPurchase: (storeId: number, purchaseJson: string) => void,
         addUserPurchase: (storeId: number, purchaseJson: string) => void
     }) {
-    const { storeId, addProductPurchase, addCategoryPurchase, addBagPurchase, addUserPurchase } = props;
+    const { storeId, permissions ,addProductPurchase, addCategoryPurchase, addBagPurchase, addUserPurchase } = props;
     const PURCHASE_TYPES = ["p", "q", "h", "d"]
     const NON_USER_PURCHASE_ACTIONS = ["<", ">", "=", "!=", ">=", "<="]
     const USER_PURCHASE_ACTIONS = [">", "!=", ">="]
@@ -184,7 +186,7 @@ export default function AddPurchaseDialog(
 
     return (
         <div>
-            <Button onClick={handleOpenPurchase}>
+            <Button disabled={!hasPermission(Actions.AddPurchaseTerm, permissions) } onClick={handleOpenPurchase}>
                 Add Purchase Policy
             </Button>
             <Dialog open={open} onClose={handleClosePurchase}>
