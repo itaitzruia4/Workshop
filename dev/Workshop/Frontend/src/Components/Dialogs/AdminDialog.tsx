@@ -18,8 +18,8 @@ import Paper from '@mui/material/Paper';
 import { handleGetMemberInformation, getStorePurchaseHistory, removeMember, getDailyIncome, handleViewStatistics } from '../../Actions/AdminActions';
 import { memberToken } from '../../Types/roles';
 
-interface Statistics { admins: string[], guests: string[], members: string[], owners: string[], managers: string[] }
-const makeEmptyStatistics = (): Statistics => ({ admins: [], guests: [], members: [], owners: [], managers: [] });
+interface Statistics { admins: number, guests: number, members: number, owners: number, managers: number }
+const makeEmptyStatistics = (): Statistics => ({ admins: 0, guests: 0, members: 0, owners: 0, managers: 0 });
 
 export default function AdminDialog(isOpen: boolean, token: memberToken) {
 
@@ -39,15 +39,13 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
         viewStatistics(null);
     }, []);
 
-    const updateStats = (params: string[]): void => {
-        const role: string = params[0];
-        const name: string = params[1];
+    const updateStats = (role: string): void => {
         
         switch (role) {
             case "GUEST":
                 setStatistics({
                     admins: statistics.admins,
-                    guests: statistics.guests.concat([name]),
+                    guests: statistics.guests + 1,
                     members: statistics.members,
                     owners: statistics.owners,
                     managers: statistics.managers
@@ -57,7 +55,7 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
                 setStatistics({
                     admins: statistics.admins,
                     guests: statistics.guests,
-                    members: statistics.members.concat([name]),
+                    members: statistics.members + 1,
                     owners: statistics.owners,
                     managers: statistics.managers
                 });
@@ -68,7 +66,7 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
                     guests: statistics.guests,
                     members: statistics.members,
                     owners: statistics.owners,
-                    managers: statistics.managers.concat([name])
+                    managers: statistics.managers + 1
                 });
                 break;
             case "STOREOWNER":
@@ -76,13 +74,13 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
                     admins: statistics.admins,
                     guests: statistics.guests,
                     members: statistics.members,
-                    owners: statistics.owners.concat([name]),
+                    owners: statistics.owners + 1,
                     managers: statistics.managers
                 });
                 break;
             case "MARKETMANAGER":
                 setStatistics({
-                    admins: statistics.admins.concat([name]),
+                    admins: statistics.admins + 1,
                     guests: statistics.guests,
                     members: statistics.members,
                     owners: statistics.owners,
@@ -196,7 +194,7 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
 
         const url = "http://localhost:5165/api/useractions/marketmanagerdaily";
         const conn = new WebSocket(url);
-        conn.addEventListener("message", (ev: MessageEvent<string[]>) => updateStats(ev.data))
+        conn.addEventListener("message", (ev: MessageEvent<string>) => updateStats(ev.data))
         
         setFromDate("");
         setToDate("");
