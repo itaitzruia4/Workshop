@@ -13,12 +13,14 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import {DataGrid, GridColDef} from "@mui/x-data-grid"; 
 
 
 import { handleGetMemberInformation, getStorePurchaseHistory, removeMember, getDailyIncome, handleViewStatistics } from '../../Actions/AdminActions';
 import { memberToken } from '../../Types/roles';
 
-interface Statistics { date: string, admins: number, guests: number, members: number, owners: number, managers: number }
+interface Statistics { id: number, date: string, marketManagers: number, guests: number, members: number, storeOwners: number, storeManagers: number }
+interface APIStatistics { date: string, marketManagers: number, guests: number, members: number, storeOwners: number, storeManagers: number }
 
 export default function AdminDialog(isOpen: boolean, token: memberToken) {
 
@@ -41,57 +43,71 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
         }
     }, []);
 
+    const columns: GridColDef[] = [
+        { field: "date", headerName: "Date", flex: 2 },
+        { field: "marketManagers", headerName: "Market Managers", flex: 1 },
+        { field: "storeOwners", headerName: "Store Owners", flex: 1 },
+        { field: "storeManagers", headerName: "Store Managers", flex: 1 },
+        { field: "members", headerName: "Members", flex: 1 },
+        { field: "guests", headerName: "Guests", flex: 1 }
+    ];
+
     const updateStats = (role: string): void => {
         const todayIdx = statistics.length - 1;
         switch (role) {
             case "GUEST":
                 setStatistics(statistics.slice(0, todayIdx).concat([{
+                    id: statistics[todayIdx].id,
                     date: statistics[todayIdx].date,
-                    admins: statistics[todayIdx].admins,
+                    marketManagers: statistics[todayIdx].marketManagers,
                     guests: statistics[todayIdx].guests + 1,
                     members: statistics[todayIdx].members,
-                    owners: statistics[todayIdx].owners,
-                    managers: statistics[todayIdx].managers
+                    storeOwners: statistics[todayIdx].storeOwners,
+                    storeManagers: statistics[todayIdx].storeManagers
                 }]));
                 break;
             case "MEMBER":
                 setStatistics(statistics.slice(0, todayIdx).concat([{
+                    id: statistics[todayIdx].id,
                     date: statistics[todayIdx].date,
-                    admins: statistics[todayIdx].admins,
-                    guests: statistics[todayIdx].guests,
+                    marketManagers: statistics[todayIdx].marketManagers,
+                    guests: statistics[todayIdx].guests - 1,
                     members: statistics[todayIdx].members + 1,
-                    owners: statistics[todayIdx].owners,
-                    managers: statistics[todayIdx].managers
+                    storeOwners: statistics[todayIdx].storeOwners,
+                    storeManagers: statistics[todayIdx].storeManagers
                 }]));
                 break;
             case "STOREMANAGER":
                 setStatistics(statistics.slice(0, todayIdx).concat([{
+                    id: statistics[todayIdx].id,
                     date: statistics[todayIdx].date,
-                    admins: statistics[todayIdx].admins,
-                    guests: statistics[todayIdx].guests,
+                    marketManagers: statistics[todayIdx].marketManagers,
+                    guests: statistics[todayIdx].guests - 1,
                     members: statistics[todayIdx].members,
-                    owners: statistics[todayIdx].owners,
-                    managers: statistics[todayIdx].managers + 1
+                    storeOwners: statistics[todayIdx].storeOwners,
+                    storeManagers: statistics[todayIdx].storeManagers + 1
                 }]));
                 break;
             case "STOREOWNER":
                 setStatistics(statistics.slice(0, todayIdx).concat([{
+                    id: statistics[todayIdx].id,
                     date: statistics[todayIdx].date,
-                    admins: statistics[todayIdx].admins,
-                    guests: statistics[todayIdx].guests,
+                    marketManagers: statistics[todayIdx].marketManagers,
+                    guests: statistics[todayIdx].guests - 1,
                     members: statistics[todayIdx].members,
-                    owners: statistics[todayIdx].owners + 1,
-                    managers: statistics[todayIdx].managers
+                    storeOwners: statistics[todayIdx].storeOwners + 1,
+                    storeManagers: statistics[todayIdx].storeManagers
                 }]));
                 break;
             case "MARKETMANAGER":
                 setStatistics(statistics.slice(0, todayIdx).concat([{
+                    id: statistics[todayIdx].id,
                     date: statistics[todayIdx].date,
-                    admins: statistics[todayIdx].admins + 1,
+                    marketManagers: statistics[todayIdx].marketManagers + 1,
                     guests: statistics[todayIdx].guests,
                     members: statistics[todayIdx].members,
-                    owners: statistics[todayIdx].owners,
-                    managers: statistics[todayIdx].managers
+                    storeOwners: statistics[todayIdx].storeOwners,
+                    storeManagers: statistics[todayIdx].storeManagers
                 }]));
         }
     }
@@ -149,8 +165,9 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
         setOpen(true);
     };
 
-    const handleOpenStats = () => {
-        setOpen(false);
+    const handleOpenStats = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setStatsInputOpen(false);
         viewStatistics();
         setStatsOpen(true);
     };
@@ -198,10 +215,15 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
             });
     };
 
+    const addStatsIds = (stats: APIStatistics[]): Statistics[] =>
+        stats.map(
+            (stat, idx) => ({ id: idx, date: stat.date, marketManagers: stat.marketManagers, storeOwners: stat.storeOwners, storeManagers: stat.storeManagers, members: stat.members, guests: stat.guests})
+        )
+
     const viewStatistics = () => {
         handleViewStatistics(token, fromDate, toDate)
             .then(stats => {
-                setStatistics(stats);
+                setStatistics(addStatsIds(stats));
                 setFromDate("");
                 setToDate("");
 
@@ -370,6 +392,51 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
                     <Button variant="contained" type="submit" form="statsForm">OK</Button>
                 </DialogActions>
             </Dialog>
+
+            <Dialog open={statsOpen} onClose={handleCloseStats} fullScreen>
+                <DialogTitle>Market Statistics</DialogTitle>
+                <DialogContent>
+                    {/*<TableContainer component={Paper}>*/}
+                    {/*    <Table sx={{ minWidth: 250 }} aria-label="simple table">*/}
+                    {/*        <TableHead>*/}
+                    {/*            <TableRow>*/}
+                    {/*                <TableCell>Date</TableCell>*/}
+                    {/*                <TableCell align="center">Market Managers</TableCell>*/}
+                    {/*                <TableCell align="center">Store Owners</TableCell>*/}
+                    {/*                <TableCell align="center">Store Managers</TableCell>*/}
+                    {/*                <TableCell align="center">Members</TableCell>*/}
+                    {/*                <TableCell align="center">Guests</TableCell>*/}
+                    {/*            </TableRow>*/}
+                    {/*        </TableHead>*/}
+                    {/*        <TableBody>*/}
+                    {/*            {statistics.map((row) => (*/}
+                    {/*                <TableRow*/}
+                    {/*                    key={row.date}*/}
+                    {/*                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}*/}
+                    {/*                >*/}
+                    {/*                    <TableCell component="th" scope="row">*/}
+                    {/*                        {row.date}*/}
+                    {/*                    </TableCell>*/}
+                    {/*                    <TableCell align="center">{row.marketManagers}</TableCell>*/}
+                    {/*                    <TableCell align="center">{row.storeOwners}</TableCell>*/}
+                    {/*                    <TableCell align="center">{row.storeManagers}</TableCell>*/}
+                    {/*                    <TableCell align="center">{row.members}</TableCell>*/}
+                    {/*                    <TableCell align="center">{row.guests}</TableCell>*/}
+                    {/*                </TableRow>*/}
+                    {/*            ))}*/}
+                    {/*        </TableBody>*/}
+                    {/*    </Table>*/}
+                    {/*</TableContainer>*/}
+                    <DataGrid 
+                        rows={statistics}
+                        columns={columns}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseStats}>Back</Button>
+                </DialogActions>
+            </Dialog>
+
         </div>
     );
 }
