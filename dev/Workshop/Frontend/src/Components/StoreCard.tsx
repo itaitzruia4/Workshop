@@ -37,11 +37,12 @@ export default function StoreCard(
         nominateStoreOwner: (storeId: number, nominee: string) => void,
         nominateStoreManager: (storeId: number, nominee: string) => void,
         removeStoreOwnerNomination: (storeId: number, nominee: string) => void,
-        addActionToManager:(nominee: string, storeId: number, action: string) => void
+        addActionToManager: (nominee: string, storeId: number, action: string) => void,
+        getStorePurchaseHistory: (storeId: number) => void
     }) {
     const { store, permissions, closeStore, openStore, addProduct, removeProduct, updateProduct, reviewProduct,
         addDiscount, addProductDiscount, addCategoryDiscount, addProductPurchasePolicy, addCategoryPurchasePolicy,
-        addBagPurchasePolicy, addUserPurchasePolicy, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination, addActionToManager } = props
+        addBagPurchasePolicy, addUserPurchasePolicy, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination, addActionToManager, getStorePurchaseHistory } = props
     const [checked, setChecked] = React.useState(store.open);
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         console.log(checked)
@@ -80,7 +81,7 @@ export default function StoreCard(
                     addProductPurchasePolicy={addProductPurchasePolicy} addCategoryPurchasePolicy={addCategoryPurchasePolicy}
                     addBagPurchasePolicy={addBagPurchasePolicy} addUserPurchasePolicy={addUserPurchasePolicy}
                     nominateStoreOwner={nominateStoreOwner} nominateStoreManager={nominateStoreManager}
-                    removeStoreOwnerNomination={removeStoreOwnerNomination} addActionToManager={addActionToManager}
+                    removeStoreOwnerNomination={removeStoreOwnerNomination} addActionToManager={addActionToManager} getStorePurchaseHistory={getStorePurchaseHistory }
                     />
             </CardActions>
         </Card>
