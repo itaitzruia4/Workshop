@@ -161,14 +161,14 @@ export default function StoreAdjust(
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         <ButtonGroup variant="outlined" aria-label="outlined button group">
-                            <StoreRolesDialog storeId={store.storeId} nominateStoreOwner={nominateStoreOwner}
+                            <StoreRolesDialog storeId={store.storeId} permissions={permissions } nominateStoreOwner={nominateStoreOwner}
                                 nominateStoreManager={nominateStoreManager} removeStoreOwnerNomination={removeStoreOwnerNomination} addActionToManager={addActionToManager} />
                         </ButtonGroup>
                     </TabPanel>
                     <TabPanel value={value} index={2}>
                         <ButtonGroup variant="outlined" aria-label="outlined button group">
-                            <AddDiscountDialog storeId={store.storeId} addDiscount={addDiscount} addProductDiscount={addProductDiscount} addCategoryDiscount={addCategoryDiscount } />
-                            <AddPurchaseDialog storeId={store.storeId} addProductPurchase={addProductPurchasePolicy} addCategoryPurchase={addCategoryPurchasePolicy}
+                            <AddDiscountDialog storeId={store.storeId} permissions={permissions} addDiscount={addDiscount} addProductDiscount={addProductDiscount} addCategoryDiscount={addCategoryDiscount} />
+                            <AddPurchaseDialog storeId={store.storeId} permissions={permissions} addProductPurchase={addProductPurchasePolicy} addCategoryPurchase={addCategoryPurchasePolicy}
                                 addBagPurchase={addBagPurchasePolicy} addUserPurchase={addUserPurchasePolicy } />
                         </ButtonGroup>
                     </TabPanel>

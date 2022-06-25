@@ -116,6 +116,7 @@ export function getDailyIncome(token: memberToken): Promise<any> {
     })
 }
 
+
 export function handleViewStatistics(token: memberToken, fromDate: string, toDate: string): Promise<any> {
     if (fromDate === "" || toDate === "") {
         return Promise.reject('User details must not be empty');

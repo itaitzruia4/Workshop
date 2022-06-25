@@ -39,7 +39,7 @@ function Admin() {
             navigate(path, { state: token });
 
     const [stores, setStores] = useState<Store[]>([])
-    const [cart, setCart] = useState<Cart>({ shoppingBags: [] })
+    const [cart, setCart] = useState<Cart>({ shoppingBags: [] , price: 0})
     const [notifications, setNotifications] = useState<MarketNotification[]>(token.notifications);
 
     const [adminOpen, setAdminOpen] = useState<boolean>(false);
