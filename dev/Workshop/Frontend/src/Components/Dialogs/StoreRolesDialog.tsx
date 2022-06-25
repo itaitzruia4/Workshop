@@ -12,19 +12,20 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import { makeCategoryPriceActionSimple, makeProductPriceActionSimple, makeSimpleDiscount, makeStorePriceActionSimple, SimpleDiscount } from '../../Types/discount';
-import { memberToken, Actions, StorePermission, actionNames } from '../../Types/roles';
+import { memberToken, Actions, StorePermission, actionNames, hasPermission } from '../../Types/roles';
 
 
 
 export default function StoreRolesDialog(
     props: {
         storeId: number,
+        permissions: Actions[],
         nominateStoreOwner: (storeId: number, nominee: string) => void,
         nominateStoreManager: (storeId: number, nominee: string) => void,
         removeStoreOwnerNomination: (storeId: number, nominee: string) => void
         addActionToManager: (nominee: string, storeId: number, action: string) => void
     }){
-    const { storeId, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination, addActionToManager } = props
+    const { storeId, permissions, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination, addActionToManager } = props
     const [open, setOpen] = React.useState(false);
     const [nominateStoreOwnerOpen, setNominateStoreOwnerOpen] = React.useState(false);
     const [nominateStoreManagerOpen, setNominateStoreManagerOpen] = React.useState(false);
@@ -129,10 +130,10 @@ export default function StoreRolesDialog(
             <Dialog open={open} onClose={handleCloseStoreRoles}>
                 <DialogTitle>Manage Store Roles</DialogTitle>
                 <DialogContent>
-                    <Button onClick={handleOpenNominateStoreOwner}>Nominate Store Owner</Button>
-                    <Button onClick={handleOpenNominateStoreManager}>Nominate Store Manager</Button>
+                    <Button disabled={!hasPermission(Actions.NominateStoreOwner,permissions)} onClick={handleOpenNominateStoreOwner}>Nominate Store Owner</Button>
+                    <Button disabled={!hasPermission(Actions.NominateStoreManager, permissions)} onClick={handleOpenNominateStoreManager}>Nominate Store Manager</Button>
                     <Button onClick={handleOpenRemoveStoreOwnerNomination}>Remove Store Owner Nomination</Button>
-                    <Button onClick={handleOpenAddActionToManager}>Add action to Manager</Button>
+                    <Button disabled={!hasPermission(Actions.AddPermissionToStoreManager, permissions)} onClick={handleOpenAddActionToManager}>Add action to Manager</Button>         
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseStoreRoles}>Close</Button>

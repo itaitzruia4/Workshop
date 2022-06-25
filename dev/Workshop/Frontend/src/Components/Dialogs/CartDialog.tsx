@@ -169,7 +169,7 @@ export default function CartDialog(
                             <CloseIcon />
                         </IconButton>
                         <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-                            Your shopping cart
+                            {"Toal price after discounts: " +  cart.price}
                         </Typography>
                         {BuyCartDialog(buyCart)}
                     </Toolbar>
@@ -181,7 +181,7 @@ export default function CartDialog(
                         <TableCell />
                         <TableCell>Store</TableCell>
                         <TableCell >Total products</TableCell>
-                                <TableCell >Total price($)</TableCell>
+                        <TableCell >Total price($)</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
