@@ -10,43 +10,43 @@ namespace Workshop.DomainLayer.UserPackage
 {
     public class UserCountInDate
     {
-        private int Guests;
-        private int Members;
-        private int StoreManagers;
-        private int StoreOwners;
-        private int MarketManagers;
+        private HashSet<User> Guests;
+        private HashSet<Member> Members;
+        private HashSet<Member> StoreManagers;
+        private HashSet<Member> StoreOwners;
+        private HashSet<Member> MarketManagers;
         private string Date;
 
         public UserCountInDate(DateTime date)
         {
             Date = date.ToShortDateString();
-            Guests = 0;
-            Members = 0;
-            StoreManagers = 0;
-            StoreOwners = 0;
-            MarketManagers = 0;
+            Guests = new HashSet<User>();
+            Members = new HashSet<Member>();
+            StoreManagers = new HashSet<Member>();
+            StoreOwners = new HashSet<Member>();
+            MarketManagers = new HashSet<Member>();
         }
 
         public int GetGuests()
         {
-            return Guests;
+            return Guests.Count;
         }
 
         public int GetMembers()
         {
-            return Members;
+            return Members.Count;
         }
         public int GetStoreManagers()
         {
-            return StoreManagers;
+            return StoreManagers.Count;
         }
         public int GetStoreOwners()
         {
-            return StoreOwners;
+            return StoreOwners.Count;
         }
         public int GetMarketManagers()
         {
-            return MarketManagers;
+            return MarketManagers.Count;
         }
         public string GetDate()
         {
@@ -55,7 +55,68 @@ namespace Workshop.DomainLayer.UserPackage
 
         public void IncreaseCount(User u)
         {
-            IncreaseCount(HighestRank(u));
+            string hrank = HighestRank(u);
+            if (hrank.Equals("guest"))
+            {
+                Guests.Add(u);
+                return;
+            }
+            Member m = (Member)u;
+            switch (hrank)
+            {
+                case "member":
+                    Members.Add(m);
+                    if (Guests.Contains(m))
+                    {
+                        Guests.Remove(m);
+                    }
+                    break;
+                case "manager":
+                    StoreManagers.Add(m);
+                    if (Members.Contains(m))
+                    {
+                        Members.Remove(m);
+                    }
+                    if (Guests.Contains(m))
+                    {
+                        Guests.Remove(m);
+                    }
+                    break;
+                case "owner":
+                    StoreOwners.Add(m);
+                    if (StoreManagers.Contains(m))
+                    {
+                        StoreManagers.Remove(m);
+                    }
+                    if (Members.Contains(m))
+                    {
+                        Members.Remove(m);
+                    }
+                    if (Guests.Contains(m))
+                    {
+                        Guests.Remove(m);
+                    }
+                    break;
+                case "market":
+                    MarketManagers.Add(m);
+                    if (StoreOwners.Contains(m))
+                    {
+                        StoreOwners.Remove(m);
+                    }
+                    if (StoreManagers.Contains(m))
+                    {
+                        StoreManagers.Remove(m);
+                    }
+                    if (Members.Contains(m))
+                    {
+                        Members.Remove(m);
+                    }
+                    if (Guests.Contains(m))
+                    {
+                        Guests.Remove(m);
+                    }
+                    break;
+            }
         }
 
         private string HighestRank(User u)
@@ -86,30 +147,6 @@ namespace Workshop.DomainLayer.UserPackage
             if (OWNER) return "owner";
             if (MANAGER) return "manager";
             return "member";
-        }
-
-        private void IncreaseCount(string type)
-        {
-            switch (type)
-            {
-                case "guest":
-                    Interlocked.Increment(ref Guests);
-                    break;
-                case "member":
-                    Interlocked.Increment(ref Members);
-                    break;
-                case "manager":
-                    Interlocked.Increment(ref StoreManagers);
-                    break;
-                case "owner":
-                    Interlocked.Increment(ref StoreOwners);
-                    break;
-                case "market":
-                    Interlocked.Increment(ref MarketManagers);
-                    break;
-                default:
-                    throw new ArgumentException($"A user type {type} is not recognized!");
-            }
         }
     }
 }

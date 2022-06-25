@@ -2528,15 +2528,15 @@ namespace Tests.AcceptanceTests
         }
 
         [DataTestMethod]
-        [DataRow("Aug 21, 1980", "Aug 21, 1990", 1, 0, 0, 0, 0)]
-        [DataRow("Aug 21, 1980", "Aug 22, 1990", 2, 0, 0, 0, 0)]
-        [DataRow("Aug 21, 1980", "May 22, 2022", 3, 0, 0, 0, 0)]
+        [DataRow("Aug 22, 1980", "Aug 21, 1990", 1, 0, 0, 0, 0)]
+        [DataRow("Aug 22, 1980", "Aug 22, 1990", 2, 0, 0, 0, 0)]
+        [DataRow("Aug 22, 1980", "May 22, 2022", 3, 0, 0, 0, 0)]
         [DataRow("Aug 22, 1980", "Jun 14, 2022", 3, 1, 0, 1, 0)]
         [DataRow("Aug 22, 1980", "Jun 15, 2022", 3, 2, 1, 1, 0)]
         [DataRow("Aug 22, 1980", "Jun 16, 2022", 3, 2, 1, 1, 1)]
 
-        [DataRow("Aug 21, 1990", "Aug 22, 1990", 1, 0, 0, 0, 0)]
-        [DataRow("Aug 21, 1990", "May 22, 2022", 2, 0, 0, 0, 0)]
+        [DataRow("Aug 22, 1990", "Aug 22, 1990", 1, 0, 0, 0, 0)]
+        [DataRow("Aug 22, 1990", "May 22, 2022", 2, 0, 0, 0, 0)]
         [DataRow("Aug 22, 1990", "Jun 14, 2022", 2, 1, 0, 1, 0)]
         [DataRow("Aug 22, 1990", "Jun 15, 2022", 2, 2, 1, 1, 0)]
         [DataRow("Aug 22, 1990", "Jun 16, 2022", 2, 2, 1, 1, 1)]
