@@ -30,7 +30,7 @@ namespace API.Controllers
             {
                 return BadRequest(new FrontResponse<int>(response.ErrorMessage));
             }
-            int CURR_ID = userId++;
+            int CURR_ID = Interlocked.Increment(ref userId);
             StatsServer.SendMessageToAllAdmins("GUEST");
             return Ok(new FrontResponse<int>(CURR_ID));
         }
