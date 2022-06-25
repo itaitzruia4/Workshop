@@ -1,4 +1,5 @@
-﻿using WebSocketSharp.Server;
+﻿using System.Text;
+using WebSocketSharp.Server;
 
 namespace API
 {
@@ -24,6 +25,14 @@ namespace API
             catch
             {
                 throw new Exception("Sorry, but it seems that we cant connect you");
+            }
+        }
+
+        public void SendMessageToAllAdmins(string message)
+        {
+            foreach (string path in WebSocketServices.Paths)
+            {
+                WebSocketServices[path].Sessions.Broadcast(Encoding.ASCII.GetBytes(message));
             }
         }
     }
