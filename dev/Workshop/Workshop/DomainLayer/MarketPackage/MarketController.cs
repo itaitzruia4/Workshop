@@ -740,7 +740,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
                     events.Add(new Event("SaleInStore" + storeId, $"Prouducts with the name {String.Join(" ", bag.products.Select(p => p.Name).ToArray())} were bought from store {storeId} by {username}", "marketController"));
                     productsSoFar.Add(storeId, bag.products);
-                    OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetStoreName(), bag.products, buyTime, stores[storeId].CalaculatePrice(bag));
+                    OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetId(), bag.products, buyTime, stores[storeId].CalaculatePrice(bag));
                     if (storeOrdersSoFar.ContainsKey(storeId))
                     {
                         storeOrdersSoFar[storeId].Add(order);
@@ -1068,7 +1068,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 string username = currentUser is Member ? ((Member)currentUser).Username : "A guest";
 
                 events.Add(new Event("SaleInStore" + storeId, $"Prouduct with the name {product.Name} were bought from store {storeId} by {username}", "marketController"));
-                OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetStoreName(), Products, buyTime, price);
+                OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetId(), Products, buyTime, price);
                 if (storeOrdersSoFar.ContainsKey(storeId))
                 {
                     storeOrdersSoFar[storeId].Add(order);
