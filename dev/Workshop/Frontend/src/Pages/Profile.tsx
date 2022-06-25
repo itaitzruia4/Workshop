@@ -18,7 +18,7 @@ import AddStoreDialog from '../Components/Dialogs/addStoreDialog';
 import StoreCard from '../Components/StoreCard';
 
 import { memberToken, Actions, StorePermission, permissionsById, isManager } from '../Types/roles';
-import { Store, storeById } from "../Types/store"
+import { Store, storeById, Order } from "../Types/store"
 import { Product } from "../Types/product"
 import { Cart, Bag } from '../Types/shopping';
 import { MarketNotification } from '../Types/Notification';
@@ -27,7 +27,8 @@ import { MarketNotification } from '../Types/Notification';
 import {
     handleGetStores, handleNewStore, handleAddProduct, handleCloseStore, handleOpenStore, handleRemoveProduct, handleAddDiscount,
     handleAddProductDiscount, handleAddCategoryDiscount, handleNominateStoreOwner, handleNominateStoreManager, handleRemoveStoreOwnerNomination,
-    handleAddProductPurchasePolicy, handleAddCategoryPurchasePolicy, handleAddStorePurchasePolicy, handleAddUserPurchasePolicy, handleAddActionToManager
+    handleAddProductPurchasePolicy, handleAddCategoryPurchasePolicy, handleAddStorePurchasePolicy, handleAddUserPurchasePolicy, handleAddActionToManager,
+    handleGetStorePurchaseHistory
 } from '../Actions/StoreActions';
 import { handleAddToCart, handleViewCart, handleBuyCart, handleReviewProduct, handleUpdateNotifications, handleEditCart, handleGetMemberPermissions } from '../Actions/UserActions';
 import { handleChangeProductCategory, handleChangeProductName, handleChangeProductPrice, handleChangeProductQuantity } from '../Actions/ProductActions';
@@ -37,6 +38,7 @@ function Profile() {
 
     const [stores, setStores] = useState<Store[]>([])
     const [permissionsInfo, setPermissionsInfo] = useState<StorePermission[]>([])
+    const [orders, setOrders] = useState<Order[]>([])
 
     const location = useLocation();
     const token = location.state as memberToken;
@@ -159,6 +161,13 @@ function Profile() {
             });
     }
 
+    const getStorePurchaseHistory = (storeId: number) => {
+        handleGetStorePurchaseHistory(token, storeId)
+            .catch(error => {
+                alert(error)
+            });
+    }
+
     useEffect(() => {
         refresh();
     }, [refreshKey])
@@ -202,7 +211,7 @@ function Profile() {
                                     addProductPurchasePolicy={addProductPurchasePolicy} addCategoryPurchasePolicy={addCategoryPurchasePolicy}
                                     addBagPurchasePolicy={addBagPurchasePolicy} addUserPurchasePolicy={addUserPurchasePolicy}
                                     nominateStoreOwner={nominateStoreOwner} nominateStoreManager={nominateStoreManager}
-                                    removeStoreOwnerNomination={removeStoreOwnerNomination} addActionToManager={addActionToManager }
+                                    removeStoreOwnerNomination={removeStoreOwnerNomination} addActionToManager={addActionToManager} getStorePurchaseHistory={getStorePurchaseHistory } 
                                 />
                         </Grid> : null)})}
             </Grid>
