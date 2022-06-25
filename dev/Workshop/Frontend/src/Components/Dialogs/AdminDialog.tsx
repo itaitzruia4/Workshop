@@ -18,8 +18,7 @@ import Paper from '@mui/material/Paper';
 import { handleGetMemberInformation, getStorePurchaseHistory, removeMember, getDailyIncome, handleViewStatistics } from '../../Actions/AdminActions';
 import { memberToken } from '../../Types/roles';
 
-interface Statistics { admins: number, guests: number, members: number, owners: number, managers: number }
-const makeEmptyStatistics = (): Statistics => ({ admins: 0, guests: 0, members: 0, owners: 0, managers: 0 });
+interface Statistics { date: string, admins: number, guests: number, members: number, owners: number, managers: number }
 
 export default function AdminDialog(isOpen: boolean, token: memberToken) {
 
@@ -27,6 +26,7 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
     const [removeMemberOpen, setRemoveMemberOpen] = React.useState(false);
     const [historyOpen, setHistoryOpen] = React.useState(false);
     const [memberInfoOpen, setMemberInfoOpen] = React.useState(false);
+    const [statsInputOpen, setStatsInputOpen] = React.useState(false);
     const [statsOpen, setStatsOpen] = React.useState(false);
 
     const [storeId, setStoreId] = React.useState(0);
@@ -34,58 +34,65 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
     const [fromDate, setFromDate] = React.useState("");
     const [toDate, setToDate] = React.useState("");
 
-    const [statistics, setStatistics] = React.useState<Statistics>(makeEmptyStatistics());
+    const [statistics, setStatistics] = React.useState<Statistics[]>([]);
     React.useEffect(() => {
-        viewStatistics(null);
+        if (fromDate && toDate) {
+            viewStatistics();
+        }
     }, []);
 
     const updateStats = (role: string): void => {
-        
+        const todayIdx = statistics.length - 1;
         switch (role) {
             case "GUEST":
-                setStatistics({
-                    admins: statistics.admins,
-                    guests: statistics.guests + 1,
-                    members: statistics.members,
-                    owners: statistics.owners,
-                    managers: statistics.managers
-                });
+                setStatistics(statistics.slice(0, todayIdx).concat([{
+                    date: statistics[todayIdx].date,
+                    admins: statistics[todayIdx].admins,
+                    guests: statistics[todayIdx].guests + 1,
+                    members: statistics[todayIdx].members,
+                    owners: statistics[todayIdx].owners,
+                    managers: statistics[todayIdx].managers
+                }]));
                 break;
             case "MEMBER":
-                setStatistics({
-                    admins: statistics.admins,
-                    guests: statistics.guests,
-                    members: statistics.members + 1,
-                    owners: statistics.owners,
-                    managers: statistics.managers
-                });
+                setStatistics(statistics.slice(0, todayIdx).concat([{
+                    date: statistics[todayIdx].date,
+                    admins: statistics[todayIdx].admins,
+                    guests: statistics[todayIdx].guests,
+                    members: statistics[todayIdx].members + 1,
+                    owners: statistics[todayIdx].owners,
+                    managers: statistics[todayIdx].managers
+                }]));
                 break;
             case "STOREMANAGER":
-                setStatistics({
-                    admins: statistics.admins,
-                    guests: statistics.guests,
-                    members: statistics.members,
-                    owners: statistics.owners,
-                    managers: statistics.managers + 1
-                });
+                setStatistics(statistics.slice(0, todayIdx).concat([{
+                    date: statistics[todayIdx].date,
+                    admins: statistics[todayIdx].admins,
+                    guests: statistics[todayIdx].guests,
+                    members: statistics[todayIdx].members,
+                    owners: statistics[todayIdx].owners,
+                    managers: statistics[todayIdx].managers + 1
+                }]));
                 break;
             case "STOREOWNER":
-                setStatistics({
-                    admins: statistics.admins,
-                    guests: statistics.guests,
-                    members: statistics.members,
-                    owners: statistics.owners + 1,
-                    managers: statistics.managers
-                });
+                setStatistics(statistics.slice(0, todayIdx).concat([{
+                    date: statistics[todayIdx].date,
+                    admins: statistics[todayIdx].admins,
+                    guests: statistics[todayIdx].guests,
+                    members: statistics[todayIdx].members,
+                    owners: statistics[todayIdx].owners + 1,
+                    managers: statistics[todayIdx].managers
+                }]));
                 break;
             case "MARKETMANAGER":
-                setStatistics({
-                    admins: statistics.admins + 1,
-                    guests: statistics.guests,
-                    members: statistics.members,
-                    owners: statistics.owners,
-                    managers: statistics.managers
-                });
+                setStatistics(statistics.slice(0, todayIdx).concat([{
+                    date: statistics[todayIdx].date,
+                    admins: statistics[todayIdx].admins + 1,
+                    guests: statistics[todayIdx].guests,
+                    members: statistics[todayIdx].members,
+                    owners: statistics[todayIdx].owners,
+                    managers: statistics[todayIdx].managers
+                }]));
         }
     }
 
@@ -132,8 +139,19 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
         setOpen(true);
     };
 
+    const handleOpenStatsInput = () => {
+        setOpen(false);
+        setStatsInputOpen(true);
+    };
+
+    const handleCloseStatsInput = () => {
+        setStatsInputOpen(false);
+        setOpen(true);
+    };
+
     const handleOpenStats = () => {
         setOpen(false);
+        viewStatistics();
         setStatsOpen(true);
     };
 
@@ -180,25 +198,20 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
             });
     };
 
-    const viewStatistics = (e: React.FormEvent<HTMLFormElement>|null) => {
-        if (e) {
-            e.preventDefault();
-        }
-        else {
-            handleViewStatistics(token, fromDate, toDate)
-                .then(response => setStatistics(response))
-                .catch(error => {
-                    alert(error)
-                });
-        }
+    const viewStatistics = () => {
+        handleViewStatistics(token, fromDate, toDate)
+            .then(stats => {
+                setStatistics(stats);
+                setFromDate("");
+                setToDate("");
 
-        const url = "http://localhost:5165/api/useractions/marketmanagerdaily";
-        const conn = new WebSocket(url);
-        conn.addEventListener("message", (ev: MessageEvent<string>) => updateStats(ev.data))
-        
-        setFromDate("");
-        setToDate("");
-        handleCloseStats();
+                //const url = "http://localhost:5165/api/useractions/marketmanagerdaily";
+                //const conn = new WebSocket(url);
+                //conn.addEventListener("message", (ev: MessageEvent<string>) => updateStats(ev.data))
+            })
+            .catch(error => {
+                alert(error)
+            });
     };
 
     return (
@@ -213,7 +226,7 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
                     <Button onClick={handleOpenHistory}>View Store Purchase History</Button>
                     <Button onClick={handleOpenMemberInfo}>Members Information</Button>
                     <Button onClick={handleGetDailyIncome}>Daily Market Income</Button>
-                    <Button onClick={handleOpenStats}>Market Statistics</Button>
+                    <Button onClick={handleOpenStatsInput}>Market Statistics</Button>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseManager}>Close</Button>
@@ -294,7 +307,9 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
                                 ))}
                             </TableBody>
                         </Table>
-                        <br/>
+                    </TableContainer>
+                    <br/>
+                    <TableContainer component={Paper}>
                         <Table sx={{ minWidth: 100 }} aria-label="offline table">
                             <TableHead>
                                 <TableRow>
@@ -321,13 +336,13 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={statsOpen} onClose={handleCloseStats}>
+            <Dialog open={statsInputOpen} onClose={handleCloseStatsInput}>
                 <DialogTitle>Daily Statistics</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
                         Please insert start and end date
                     </DialogContentText>
-                    <form onSubmit={viewStatistics} id="statsForm" >
+                    <form onSubmit={handleOpenStats} id="statsForm" >
                         <TextField
                             value={fromDate}
                             autoFocus
@@ -351,7 +366,7 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
                     </form>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseStats}>Back</Button>
+                    <Button onClick={handleCloseStatsInput}>Back</Button>
                     <Button variant="contained" type="submit" form="statsForm">OK</Button>
                 </DialogActions>
             </Dialog>

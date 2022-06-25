@@ -127,4 +127,21 @@ export function handleViewStatistics(token: memberToken, fromDate: string, toDat
     }
 
     const url = "http://localhost:5165/api/useractions/marketmanagerdaily";
+    return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            userId: token.userId,
+            membername: token.membername,
+            StartDate: fromDate,
+            EndDate: toDate
+        })
+    }).then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            return Promise.reject(data.error);
+        }
+        return Promise.resolve(data.value);
+    })
 }
