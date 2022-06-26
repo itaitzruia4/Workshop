@@ -57,7 +57,11 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         public void AddNominee(string membername, StoreRole nominee)
         {
             nominees.Add(membername, nominee);
-            roleDAL.nominees.Add(new NameToRole(nominee.ToDAL(), membername));
+            Console.WriteLine("AddNominee %s %s", membername, nominee.ToDAL().RoleType);
+            NameToRole ntr = new NameToRole(nominee.ToDAL(), membername);
+            DataHandler.getDBHandler().save(ntr);
+            roleDAL.nominees.Add(ntr);
+            DataHandler.getDBHandler().update(roleDAL);
         }
 
         public void RemoveNominee(StoreRole nominee)
@@ -74,7 +78,12 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             if (key_to_remove != null)
             {
                 nominees.Remove(key_to_remove);
-                
+                NameToRole to_remove = null;
+                foreach(NameToRole nameToRole in roleDAL.nominees)
+                    if(nameToRole.role.Equals(nominee.ToDAL()))
+                        to_remove = nameToRole;
+                roleDAL.nominees.Remove(to_remove);
+                DataHandler.getDBHandler().update(roleDAL);
             }
         }
 

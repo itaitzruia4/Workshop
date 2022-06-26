@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Workshop.Migrations
 {
-    public partial class rf1 : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -793,15 +793,15 @@ namespace Workshop.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false),
-                    roleId = table.Column<int>(nullable: true),
+                    Role = table.Column<int>(nullable: true),
                     memberName = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_NameToRole", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_NameToRole_Role_roleId",
-                        column: x => x.roleId,
+                        name: "FK_NameToRole_Role_Role",
+                        column: x => x.Role,
                         principalTable: "Role",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -898,9 +898,9 @@ namespace Workshop.Migrations
                 column: "OrderHandler<string>Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_NameToRole_roleId",
+                name: "IX_NameToRole_Role",
                 table: "NameToRole",
-                column: "roleId");
+                column: "Role");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Notification_MemberNotificationsId",

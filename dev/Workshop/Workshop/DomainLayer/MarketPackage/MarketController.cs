@@ -817,11 +817,11 @@ namespace Workshop.DomainLayer.MarketPackage
                     {
                         double cartPrice = GetCartPrice(shoppingCart);
                         events.ForEach(e => userController.notify(e));
-
                         foreach (int storeId in storeOrdersSoFar.Keys)
                         {
                             foreach (OrderDTO order in storeOrdersSoFar[storeId])
                             {
+                                DataHandler.getDBHandler().save(order.ToDAL());
                                 orderHandler.addOrder(order, storeId);
                             }
                         }

@@ -10,8 +10,8 @@ using Workshop.DataLayer;
 namespace Workshop.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20220626121414_rf1")]
-    partial class rf1
+    [Migration("20220626205654_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -464,15 +464,15 @@ namespace Workshop.Migrations
                     b.Property<int>("Id")
                         .HasColumnType("int");
 
+                    b.Property<int?>("Role")
+                        .HasColumnType("int");
+
                     b.Property<string>("memberName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("roleId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("roleId");
+                    b.HasIndex("Role");
 
                     b.ToTable("NameToRole");
                 });
@@ -972,7 +972,7 @@ namespace Workshop.Migrations
                 {
                     b.HasOne("Workshop.DataLayer.DataObjects.Members.Role", "role")
                         .WithMany("nominees")
-                        .HasForeignKey("roleId");
+                        .HasForeignKey("Role");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Members.Role", b =>

@@ -36,7 +36,7 @@ namespace Workshop.DomainLayer.Orders
                 products.Add(product.ToDAL());
             }
             this.OrderDTODAL = new OrderDTODAL(id, clientName, address.ToDAL(), storeName, products);
-            DataHandler.getDBHandler().save(OrderDTODAL);
+            //DataHandler.getDBHandler().save(OrderDTODAL);
         }
 
         public OrderDTO(OrderDTODAL orderDTODAL)

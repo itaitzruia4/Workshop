@@ -10,7 +10,7 @@ namespace Workshop.DataLayer.DataObjects.Orders
 {
     public class MemberToOrders<T> : DALObject
     {
-        private static int nextId = 0;
+        public static int nextId = 0;
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -23,6 +23,14 @@ namespace Workshop.DataLayer.DataObjects.Orders
             this.Id = nextId;
             nextId++;
             orders = new List<OrderDTO>();
+        }
+
+        public MemberToOrders(T key, List<OrderDTO> orders)
+        {
+            this.Id = nextId;
+            nextId++;
+            this.orders = orders;
+            this.key = key;
         }
 
     }

@@ -10,7 +10,7 @@ namespace Workshop.DataLayer.DataObjects.Members
 {
     public class Action : DALObject
     {
-        private static int nextId = 0;
+        public static int nextId = 0;
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]

@@ -9,6 +9,12 @@ using System.Threading;
 using Workshop.DomainLayer.Loggers;
 using Microsoft.EntityFrameworkCore;
 using Workshop.DataLayer.DataObjects.Controllers;
+using Workshop.DataLayer.DataObjects.Market.Discounts;
+using Workshop.DataLayer.DataObjects.Market.Purchases;
+using Workshop.DataLayer.DataObjects.Members;
+using Workshop.DataLayer.DataObjects.Notifications;
+using Workshop.DataLayer.DataObjects.Orders;
+using Workshop.DataLayer.DataObjects.Reviews;
 
 namespace Workshop.DataLayer
 {
@@ -82,14 +88,14 @@ namespace Workshop.DataLayer
         {
             //Add for each member instance it's roles
 
-            return cache.marketController.Where(s => s.Id == key)
-                    .Include(mc => mc.userController.members).ThenInclude(m => m.ShoppingCart)
+            MarketController market = cache.marketController.Where(s => s.Id == key)
+                    .Include(mc => mc.userController.members).ThenInclude(m => m.ShoppingCart).ThenInclude(s => s.ShoppingBags).ThenInclude(sb => sb.Products)
                     .Include(mc => mc.userController.members).ThenInclude(m => m.Roles).ThenInclude(r => r.nominees).ThenInclude(n => n.role)
                     .Include(mc => mc.userController.reviewHandler.productReviews).ThenInclude(pr => pr.userToReviewDTOs).ThenInclude(utr => utr.Review)
                     .Include(mc => mc.userController.reviewHandler.userReviews).ThenInclude(ur => ur.productToReviewDTOs).ThenInclude(ptr => ptr.Review)
                     .Include(mc => mc.userController.notificationHandler.Notifications).ThenInclude(mn => mn.Notifications)
                     .Include(mc => mc.userController.notificationHandler.observers).ThenInclude(eo => eo.Event)
-                    .Include(mc => mc.userController.notificationHandler.observers).ThenInclude(eo => eo.Observers).ThenInclude(m => m.ShoppingCart)
+                    .Include(mc => mc.userController.notificationHandler.observers).ThenInclude(eo => eo.Observers).ThenInclude(m => m.ShoppingCart).ThenInclude(s => s.ShoppingBags).ThenInclude(sb => sb.Products)
                     .Include(mc => mc.userController.orderHandler.MemberToOrders).ThenInclude(mto => mto.orders).ThenInclude(o => o.address)
                     .Include(mc => mc.userController.orderHandler.MemberToOrders).ThenInclude(mto => mto.orders).ThenInclude(o => o.items)
                     .Include(mc => mc.stores)
@@ -105,6 +111,133 @@ namespace Workshop.DataLayer
                     .Include(mc => mc.stores).ThenInclude(s => s.Products)
                     .Include(mc => mc.stores).ThenInclude(s => s.Owners)
                     .FirstOrDefault();
+
+
+            int nextId = 0;
+            cache.marketController.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            MarketController.nextId = nextId;
+
+            nextId = 0;
+            cache.Discount.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            Discount.nextId = nextId;
+
+            nextId = 0;
+            cache.DiscountPolicy.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            DiscountPolicy.nextId = nextId;
+
+            nextId = 0;
+            cache.PurchasePolicy.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            PurchasePolicy.nextId = nextId;
+
+            nextId = 0;
+            cache.Term.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            Term.nextId = nextId;
+
+            nextId = 0;
+            cache.Product.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            Product.nextId = nextId;
+
+            nextId = 0;
+            cache.ProductDTO.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            ProductDTO.nextId = nextId;
+
+            nextId = 0;
+            cache.ShoppingBag.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            ShoppingBag.nextId = nextId;
+
+            nextId = 0;
+            cache.ShoppingBagProduct.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            ShoppingBagProduct.nextId = nextId;
+
+            nextId = 0;
+            cache.ShoppingCart.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            ShoppingCart.nextId = nextId;
+
+            nextId = 0;
+            cache.SupplyAddress.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            SupplyAddress.nextId = nextId;
+
+            nextId = 0;
+            cache.Action.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            DataObjects.Members.Action.nextId = nextId;
+
+            nextId = 0;
+            cache.NameToRole.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            NameToRole.nextId = nextId;
+
+            nextId = 0;
+            cache.Role.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            Role.nextId = nextId;
+
+            nextId = 0;
+            cache.Event.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            Event.nextId = nextId;
+
+            nextId = 0;
+            cache.EventObservers.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            EventObservers.nextId = nextId;
+
+            nextId = 0;
+            cache.MemberNotifications.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            MemberNotifications.nextId = nextId;
+
+            nextId = 0;
+            cache.Notification.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            Notification.nextId = nextId;
+
+            nextId = 0;
+            cache.NotificationHandler.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            NotificationHandler.nextId = nextId;
+
+            nextId = 0;
+            cache.MemberToOrdersI.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            MemberToOrders<int>.nextId = nextId;
+
+            nextId = 0;
+            cache.MemberToOrdersS.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            MemberToOrders<string>.nextId = nextId;
+
+            nextId = 0;
+            cache.OrderDTO.ToList().ForEach(item => nextId = Math.Max(nextId, item.id + 1));
+            OrderDTO.nextId = nextId;
+
+            nextId = 0;
+            cache.OrderHandlerI.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            OrderHandler<int>.nextId = nextId;
+
+            nextId = 0;
+            cache.OrderHandlerS.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            OrderHandler<string>.nextId = nextId;
+
+            nextId = 0;
+            cache.ProductReviews.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            ProductReviews.nextId = nextId;
+
+            nextId = 0;
+            cache.ProductToReviewDTO.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            ProductToReviewDTO.nextId = nextId;
+
+            nextId = 0;
+            cache.Review.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            Review.nextId = nextId;
+
+            nextId = 0;
+            cache.ReviewDTO.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            ReviewDTO.nextId = nextId;
+
+            nextId = 0;
+            cache.ReviewHandler.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            ReviewHandler.nextId = nextId;
+
+            nextId = 0;
+            cache.UserReviews.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            UserReviews.nextId = nextId;
+
+            nextId = 0;
+            cache.UserToReviewDTO.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            UserToReviewDTO.nextId = nextId;
+
+            return market;
         }
 
         public void clear()

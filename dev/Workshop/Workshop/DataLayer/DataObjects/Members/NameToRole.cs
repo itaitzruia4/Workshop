@@ -8,15 +8,17 @@ using System.Threading.Tasks;
 
 namespace Workshop.DataLayer.DataObjects.Members
 {
-    public class NameToRole
+    public class NameToRole: DALObject
     {
 
 
-        private static int nextId = 0;
+        public static int nextId = 0;
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
+
+        [ForeignKey("Role")]
         public Role role { get; set; }
         public string memberName { get; set; }
         public NameToRole()

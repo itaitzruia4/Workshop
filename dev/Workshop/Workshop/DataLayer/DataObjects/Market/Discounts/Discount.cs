@@ -10,7 +10,7 @@ namespace Workshop.DataLayer.DataObjects.Market.Discounts
 {
     public class Discount : DALObject
     {
-        private static int nextId = 0;
+        public static int nextId = 0;
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }

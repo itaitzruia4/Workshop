@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.MarketPackage;
 using DataHandler = Workshop.DataLayer.DataHandler;
+using OrderDTODAL = Workshop.DataLayer.DataObjects.Orders.OrderDTO;
+using Workshop.DataLayer.DataObjects.Orders;
 
 namespace Workshop.DomainLayer.Orders
 {
@@ -34,6 +36,7 @@ namespace Workshop.DomainLayer.Orders
                 this.orders.Add(memberToOrders.key, orders);
             }
             this.OrderHandlerDAL = orderHandlerDAL;
+            CURR_ID = OrderDTODAL.nextId;
         }
 
         public DataLayer.DataObjects.Orders.OrderHandler<T> ToDAL()
@@ -46,15 +49,28 @@ namespace Workshop.DomainLayer.Orders
             if (!this.orders.ContainsKey(key))
             {
                 orders.Add(key, new List<OrderDTO>());
+                MemberToOrders<T> memberToOrders = new MemberToOrders<T>(key, new List<DataLayer.DataObjects.Orders.OrderDTO>());
+                OrderHandlerDAL.MemberToOrders.Add(memberToOrders);
+                DataHandler.getDBHandler().save(memberToOrders);
             }
 
             orders[key].Add(order);
+            foreach (MemberToOrders<T> mto in OrderHandlerDAL.MemberToOrders)
+            {
+                if (mto.key.Equals(key) && !mto.orders.Contains(order.ToDAL()))
+                {
+                    mto.orders.Add(order.ToDAL());
+                    DataHandler.getDBHandler().update(mto);
+                }
+            }
+            DataHandler.getDBHandler().update(OrderHandlerDAL);
         }
 
         public OrderDTO CreateOrder(string membername, SupplyAddress address, string storeName, List<ProductDTO> items, DateTime date, double price)
         {
             OrderDTO temp = new OrderDTO(CURR_ID, membername, address, storeName, items,date,price);
             CURR_ID++;
+            DataHandler.getDBHandler().update(OrderHandlerDAL);
             return temp;
         }
 
