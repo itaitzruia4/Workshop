@@ -75,8 +75,7 @@ namespace Workshop.DataLayer
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            //marketController.Include("userController, OrderHandlerI, Store");
-            //userController.Include("ReviewHandler, NotificationHandler, OrderHandlerS, Member");
+
 
         }
 

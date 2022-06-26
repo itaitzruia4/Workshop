@@ -10,6 +10,7 @@ using DALObject = Workshop.DataLayer.DALObject;
 using ProductDAL = Workshop.DataLayer.DataObjects.Market.Product;
 using DiscountPolicyDAL = Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy;
 using PurchasePolicyDAL = Workshop.DataLayer.DataObjects.Market.Purchases.PurchasePolicy;
+using memberDAL = Workshop.DataLayer.DataObjects.Members.Member;
 using DataHandler = Workshop.DataLayer.DataHandler;
 
 using Member = Workshop.DomainLayer.UserPackage.Permissions.Member;
@@ -50,24 +51,25 @@ namespace Workshop.DomainLayer.MarketPackage
             this.rwl = new ReaderWriterLock();
             this.discountPolicy = new DiscountPolicy(this);
             this.purchasePolicy = new PurchasePolicy(this);
-
+            owners = new HashSet<Member>();
+            owner_voting = new ConcurrentDictionary<Member, KeyValuePair<Member, HashSet<Member>>>();
+            biding_votes = new ConcurrentDictionary<int, Bid>();
+            List<memberDAL> ownersDAL = new List<memberDAL>();
             List<ProductDAL> productsDAL = new List<ProductDAL>();
             DiscountPolicyDAL dpDAL = (DiscountPolicyDAL)discountPolicy.ToDAL();
             PurchasePolicyDAL ppDAL = (PurchasePolicyDAL)purchasePolicy.ToDAL();
-            storeDAL = new StoreDAL(id, open, name, dpDAL, ppDAL, productsDAL);
+
+            storeDAL = new StoreDAL(id, open, name, dpDAL, ppDAL, productsDAL, ownersDAL);
             DataHandler.getDBHandler().save(storeDAL);
             open = true; //TODO: check if on init store supposed to be open or closed.
-            discountPolicy = new DiscountPolicy(this);
-            purchasePolicy = new PurchasePolicy(this);
-            owners = new HashSet<Member>();
             owners.Add(founder);
             bid_id_count = 0;
-            owner_voting = new ConcurrentDictionary<Member, KeyValuePair<Member, HashSet<Member>>>();
-            biding_votes = new ConcurrentDictionary<int,Bid>();
         }
 
         public bool AddOwner(Member owner)
         {
+            storeDAL.Owners.Add(owner.ToDAL());
+            DataHandler.getDBHandler().update(storeDAL);
             return owners.Add(owner);
         }
 

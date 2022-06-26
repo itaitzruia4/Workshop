@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Workshop.DataLayer.DataObjects.Market.Discounts;
 using Workshop.DataLayer.DataObjects.Market.Purchases;
-
+using Workshop.DataLayer.DataObjects.Members;
 
 namespace Workshop.DataLayer.DataObjects.Market
 {
@@ -21,12 +21,14 @@ namespace Workshop.DataLayer.DataObjects.Market
         public DiscountPolicy DiscountPolicy { get; set; }
         public PurchasePolicy PurchasePolicy { get; set; }
         public List<Product> Products { get; set; }
+        public List<Member> Owners { get; set; }
 
         public Store()
         {
             Products = new List<Product>();
+            Owners = new List<Member>();
         }
-        public Store(int id, bool open, string storeName, DiscountPolicy discountPolicy, PurchasePolicy purchasePolicy, List<Product> products)
+        public Store(int id, bool open, string storeName, DiscountPolicy discountPolicy, PurchasePolicy purchasePolicy, List<Product> products, List<Member> owners)
         {
             Id = id;
             Open = open;
@@ -34,6 +36,7 @@ namespace Workshop.DataLayer.DataObjects.Market
             DiscountPolicy = discountPolicy;
             PurchasePolicy = purchasePolicy;
             Products = products;
+            Owners = owners;
         }
     }
 }

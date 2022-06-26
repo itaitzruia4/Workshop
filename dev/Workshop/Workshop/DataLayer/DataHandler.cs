@@ -61,6 +61,16 @@ namespace Workshop.DataLayer
             }
         }
 
+        public void remove<T>(List<T> toRemove) where T : class, DALObject
+        {
+            if (Context.USE_DB)
+            {   
+                foreach (T to in toRemove)
+                    cache.Remove(to);
+                cache.SaveChanges();
+            }
+        }
+
         public T find<T>(object key) where T : class, DALObject
         {
             if (Context.USE_DB)
@@ -93,6 +103,7 @@ namespace Workshop.DataLayer
                     .Include(mc => mc.stores).ThenInclude(s => s.PurchasePolicy).ThenInclude(pp => pp.user_terms)
                     .Include(mc => mc.stores).ThenInclude(s => s.PurchasePolicy).ThenInclude(pp => pp.store_terms)
                     .Include(mc => mc.stores).ThenInclude(s => s.Products)
+                    .Include(mc => mc.stores).ThenInclude(s => s.Owners)
                     .FirstOrDefault();
         }
 

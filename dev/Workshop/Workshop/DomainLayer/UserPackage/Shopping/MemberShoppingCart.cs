@@ -50,14 +50,22 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
         internal override void Clear()
         {
             base.Clear();
+            List<ShoppingBagProductDAL> trsbp =  new List<ShoppingBagProductDAL>();
+            List<ShoppingBagDAL> trsb = new List<ShoppingBagDAL>();
             foreach (ShoppingBagDAL sbDAL in shoppingCartDAL.ShoppingBags)
             {
                 foreach (ShoppingBagProductDAL sbpDAL in sbDAL.Products)
                 {
-                    DataHandler.getDBHandler().remove(sbpDAL);
+                    trsbp.Add(sbpDAL);
+                    //DataHandler.getDBHandler().remove(sbpDAL);
                 }
-                DataHandler.getDBHandler().remove(sbDAL);
+                trsb.Add(sbDAL);
+                //DataHandler.getDBHandler().remove(sbDAL);
             }
+
+            DataHandler.getDBHandler().remove(trsbp);
+            DataHandler.getDBHandler().remove(trsb);
+
             shoppingCartDAL.ShoppingBags = new List<ShoppingBagDAL>();
         }
 

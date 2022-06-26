@@ -116,12 +116,25 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         public void RemoveRole(Role role)
         {
             rwl.AcquireReaderLock(Timeout.Infinite);
+
+            if(roles.Contains(role))
+            {
+                LockCookie lc = rwl.UpgradeToWriterLock(Timeout.Infinite);
+                roles.Remove(role);
+                memberDAL.Roles.Remove(role.ToDAL());
+                DataHandler.getDBHandler().update(memberDAL);
+                rwl.DowngradeFromWriterLock(ref lc);
+                rwl.ReleaseReaderLock();
+                return;
+            }
+                
+            /*
             foreach (Role role2 in roles)
             {
                 if (role.Equals(role2))
                 {
                     LockCookie lc = rwl.UpgradeToWriterLock(Timeout.Infinite);
-                    roles.Remove(role2);
+                    roles.Remove(role2); //TODO fix deleting from collection while iteration over it
                     memberDAL.Roles.Remove(role2.ToDAL());
                     DataHandler.getDBHandler().update(memberDAL);
                     rwl.DowngradeFromWriterLock(ref lc);
@@ -129,6 +142,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
                     return;
                 }
             }
+            */
             
             rwl.ReleaseReaderLock();
             throw new InvalidOperationException($"Member {this.Username} does not have the requested role.");

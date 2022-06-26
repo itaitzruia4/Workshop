@@ -10,8 +10,8 @@ using Workshop.DataLayer;
 namespace Workshop.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20220623182752_Initial")]
-    partial class Initial
+    [Migration("20220626121414_rf1")]
+    partial class rf1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -440,6 +440,9 @@ namespace Workshop.Migrations
                     b.Property<int?>("ShoppingCartId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("StoreId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("UserControllerId")
                         .HasColumnType("int");
 
@@ -448,6 +451,8 @@ namespace Workshop.Migrations
                     b.HasIndex("EventObserversId");
 
                     b.HasIndex("ShoppingCartId");
+
+                    b.HasIndex("StoreId");
 
                     b.HasIndex("UserControllerId");
 
@@ -953,6 +958,10 @@ namespace Workshop.Migrations
                     b.HasOne("Workshop.DataLayer.DataObjects.Market.ShoppingCart", "ShoppingCart")
                         .WithMany()
                         .HasForeignKey("ShoppingCartId");
+
+                    b.HasOne("Workshop.DataLayer.DataObjects.Market.Store", null)
+                        .WithMany("Owners")
+                        .HasForeignKey("StoreId");
 
                     b.HasOne("Workshop.DataLayer.DataObjects.Controllers.UserController", null)
                         .WithMany("members")
