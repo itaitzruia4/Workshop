@@ -28,22 +28,21 @@ namespace Tests.AcceptanceTests
         [TestInitialize]
         public void InitSystem()
         {
-            string config = "admin~admin~admin~22/08/1972";
             externalSystem.Setup(x => x.Supply(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(new Random().Next(10000, 100000));
             externalSystem.Setup(x => x.Cancel_Supply(It.IsAny<int>())).Returns(1);
             externalSystem.Setup(x => x.Pay(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(new Random().Next(10000, 100000));
             externalSystem.Setup(x => x.Cancel_Pay(It.IsAny<int>())).Returns(1);
             externalSystem.Setup(x => x.IsExternalSystemOnline()).Returns(true);
-            Workshop.DataLayer.DataHandler.getDBHandler().clear();
+            Workshop.DataLayer.DataHandler.Instance.Value.clear();
             address = new SupplyAddress("Ronmi", "Mayor 1", "Ashkelon", "Israel", "784112");
             cc = new CreditCard("001122334455667788", "11", "26", "LeBron Michal", "555", "208143751");
-            service = new Service(externalSystem.Object, config);
+            service = new Service(externalSystem.Object);
         }
 
         [TestCleanup]
         public void TestCleanup() 
         {
-            Workshop.DataLayer.DataHandler.getDBHandler().clear();
+            Workshop.DataLayer.DataHandler.Instance.Value.clear();
         }
 
         [TestMethod]
@@ -1858,7 +1857,7 @@ namespace Tests.AcceptanceTests
                 "create-new-store(1,user1,store1,16/06/2022)");
             file.Flush();
             file.Close();
-            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
+            Service service = new Service($"admin~admin~admin~22/08/1972\nss~{FileName}");
             Assert.IsTrue(service.WasInitializedWithFile);
             Assert.IsTrue(service.EnterMarket(1, DateTime.Now).ErrorOccured);
             Assert.IsTrue(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1877,7 +1876,7 @@ namespace Tests.AcceptanceTests
                 "create-new-store(1,user1,store1)");
             file.Flush();
             file.Close();
-            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
+            Service service = new Service($"admin~admin~admin~22/08/1972\nss~{FileName}");
             // Expecting error: need to register before logging in
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1, DateTime.Now).ErrorOccured); // Make sure nothing happend after it failed
@@ -1898,7 +1897,7 @@ namespace Tests.AcceptanceTests
                 "blah-blah(1,user1,pass1,store1)");
             file.Flush();
             file.Close();
-            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
+            Service service = new Service($"admin~admin~admin~22/08/1972\nss~{FileName}");
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1, DateTime.Now).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1917,7 +1916,7 @@ namespace Tests.AcceptanceTests
                 "create-new-store(1,user1,store1,failureInLife1)");
             file.Flush();
             file.Close();
-            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
+            Service service = new Service($"admin~admin~admin~22/08/1972\nss~{FileName}");
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1, DateTime.Now).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1936,7 +1935,7 @@ namespace Tests.AcceptanceTests
                 "create-new-store(1,user1)");
             file.Flush();
             file.Close();
-            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
+            Service service = new Service($"admin~admin~admin~22/08/1972\nss~{FileName}");
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1, DateTime.Now).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1955,7 +1954,7 @@ namespace Tests.AcceptanceTests
                 "create-new-store(FAILME,user1,store1)");
             file.Flush();
             file.Close();
-            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
+            Service service = new Service($"admin~admin~admin~22/08/1972\nss~{FileName}");
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1, DateTime.Now).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -2032,7 +2031,7 @@ namespace Tests.AcceptanceTests
             externalSystem.Setup(x => x.Pay(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Callback((string s1, string s2, string s3, string s4, string s5, string s6) => PAY_FLAG = true).Returns(150000);
             externalSystem.Setup(x => x.Cancel_Pay(It.IsAny<int>())).Callback((int n1) => CANCEL_PAY_FLAG = true).Returns(1);
             externalSystem.Setup(x => x.IsExternalSystemOnline()).Returns(true);
-            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
+            service = new Service(externalSystem.Object);
 
             Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore", DateTime.Now).Value.StoreId;
@@ -2057,7 +2056,7 @@ namespace Tests.AcceptanceTests
             externalSystem.Setup(x => x.Pay(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Callback((string s1, string s2, string s3, string s4, string s5, string s6) => PAY_FLAG = true).Returns(-1);
             externalSystem.Setup(x => x.Cancel_Pay(It.IsAny<int>())).Callback((int n1) => CANCEL_PAY_FLAG = true).Returns(1);
             externalSystem.Setup(x => x.IsExternalSystemOnline()).Returns(true);
-            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
+            service = new Service(externalSystem.Object);
 
             Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore", DateTime.Now).Value.StoreId;
@@ -2073,7 +2072,7 @@ namespace Tests.AcceptanceTests
         public void Test_ExternalSystem_Real_BuyCart()
         {
             IExternalSystem externalSystem = new ExternalSystem();
-            service = new Service(externalSystem, "admin~admin~admin~22/08/1972");
+            service = new Service(externalSystem);
             Test_Login_Good(1, username, password);
             int storeId = service.CreateNewStore(1, username, "RandomStore", DateTime.Now).Value.StoreId;
             Product prod = service.AddProduct(1, username, storeId, product, "Good", 1.0, 2, "cat1").Value;
@@ -2094,7 +2093,7 @@ namespace Tests.AcceptanceTests
             externalSystem.Setup(x => x.Pay(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Callback((string s1, string s2, string s3, string s4, string s5, string s6) => PAY_FLAG = true).Returns(8688);
             externalSystem.Setup(x => x.Cancel_Pay(It.IsAny<int>())).Callback((int n1) => CANCEL_PAY_FLAG = true).Returns(1);
             externalSystem.Setup(x => x.IsExternalSystemOnline()).Returns(true);
-            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
+            service = new Service(externalSystem.Object);
 
             Test_Login_Good(1, username, password);
             Store store = service.CreateNewStore(1, username, "RandomStore", DateTime.Now).Value;
@@ -2123,7 +2122,7 @@ namespace Tests.AcceptanceTests
             externalSystem.Setup(x => x.Pay(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Callback((string s1, string s2, string s3, string s4, string s5, string s6) => { PAY_FLAG = true; throw new Exception(); }).Returns(8688);
             externalSystem.Setup(x => x.Cancel_Pay(It.IsAny<int>())).Callback((int n1) => { CANCEL_PAY_FLAG = true; throw new Exception(); }).Returns(1);
             externalSystem.Setup(x => x.IsExternalSystemOnline()).Callback(() => { IS_ONLINE_FLAG = true; throw new Exception(); }).Returns(true);
-            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
+            service = new Service(externalSystem.Object);
 
             Test_Login_Good(1, username, password);
             Store store = service.CreateNewStore(1, username, "RandomStore", DateTime.Now).Value;
@@ -2315,7 +2314,7 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_DailyIncomeMarketManager_Success()
         {
-            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
+            service = new Service(externalSystem.Object);
             Test_Login_Good(1, "mem1", "pass1");
             service.EnterMarket(2, DateTime.Now);
             service.Login(2, "admin", "admin", DateTime.Now);
@@ -2331,7 +2330,7 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_DailyIncomeMarketManager_MultipleStores()
         {
-            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
+            service = new Service(externalSystem.Object);
             Test_Login_Good(1, "mem1", "pass1");
             service.EnterMarket(2, DateTime.Now);
             service.Login(2, "admin", "admin", DateTime.Now);
@@ -2357,7 +2356,7 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_DailyIncomeMarketManager_Failure_NoPermission()
         {
-            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
+            service = new Service(externalSystem.Object);
             Test_Login_Good(1, "mem1", "pass1");
             Test_Login_Good(2, "Ron", "Ron");
             Store st = service.CreateNewStore(1, "mem1", "s1", DateTime.Now).Value;
@@ -2372,7 +2371,7 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_DailyIncomeMarketManager_SuccessWithDiscounts()
         {
-            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
+            service = new Service(externalSystem.Object);
             string member = "member1";
             Test_Login_Good(1, member, "password1");
             service.EnterMarket(2, DateTime.Now);
@@ -2593,9 +2592,6 @@ namespace Tests.AcceptanceTests
             // 15/06/22 - Member
             // 15/06/22 - Store manager
             // 16/06/22 - Market manager
-
-            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
-
             service.EnterMarket(1, DateTime.Parse("May 22, 2022"));
             service.EnterMarket(2, DateTime.Parse("Aug 22, 1980"));
             service.EnterMarket(3, DateTime.Parse("Aug 22, 1990"));
@@ -2618,7 +2614,7 @@ namespace Tests.AcceptanceTests
 
         public void Test_MarketManagerDailyInformation_Failure_NotMarketManager()
         {
-            service = new Service(externalSystem.Object, "admin~NOTYOU~admin~22/08/1972");
+            service = new Service("admin~NOTYOU~admin~22/08/1972");
 
             service.EnterMarket(1, DateTime.Parse("May 22, 2022"));
             service.EnterMarket(2, DateTime.Parse("Aug 22, 1980"));
@@ -2655,7 +2651,6 @@ namespace Tests.AcceptanceTests
             // 15/06/22 - Store manager
             // 16/06/22 - Market manager
 
-            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
             service.EnterMarket(1, DateTime.Parse("May 22, 2022"));
             service.EnterMarket(2, DateTime.Parse("Aug 22, 1980"));
             service.EnterMarket(3, DateTime.Parse("Aug 22, 1990"));
@@ -2679,7 +2674,6 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_GetStorePurhcaseHistory_Success()
         {
-            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
             string member1 = "member1";
             Test_Login_Good(1, member1, "password1");
             DateTime PURCHASE_DATE = DateTime.Now;
@@ -2731,7 +2725,6 @@ namespace Tests.AcceptanceTests
         [TestMethod]
         public void Test_GetStorePurhcaseHistory_Success_MultipleOrders_MultipleStores()
         {
-            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972");
             string member1 = "member1";
             Test_Login_Good(1, member1, "password1");
             DateTime PURCHASE_DATE = DateTime.Now;

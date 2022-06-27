@@ -31,7 +31,7 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
             eventsnames = new ConcurrentDictionary<string, Event>();
             this.LoginChecker = loginChecker;
             this.NotificationHandlerDAL = new NotificationHandlerDAL(new List<MemberNotifications>(), new List<EventObservers>());
-            DataHandler.getDBHandler().save(NotificationHandlerDAL);
+            DataHandler.Instance.Value.save(NotificationHandlerDAL);
         }
 
         public NotificationHandler(NotificationHandlerDAL notificationHandlerDAL, ILoginChecker loginChecker)
@@ -75,30 +75,31 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
             if(eventsnames.TryAdd(eventt.Name, eventt))
             {
                 EventObservers eventObservers = new EventObservers(eventt.ToDAL(), new List<EventObserversToMembers>());
-                DataHandler.getDBHandler().save(eventObservers);
+                DataHandler.Instance.Value.save(eventObservers);
                 NotificationHandlerDAL.observers.Add(eventObservers);
-                DataHandler.getDBHandler().update(NotificationHandlerDAL);
+                DataHandler.Instance.Value.update(NotificationHandlerDAL);
             }
 
             observers.TryAdd(eventt.Name, new HashSet<string>());
             this.observers[eventt.Name].Add(observer_name);
 
-            MemberDAL memberDAL = DataHandler.getDBHandler().find<MemberDAL>(observer_name);
-            foreach(EventObservers eventObservers1 in NotificationHandlerDAL.observers)
+            MemberDAL memberDAL = DataHandler.Instance.Value.find<MemberDAL>(observer_name);
+            if (memberDAL != null)
             {
-                if(eventObservers1.Event.Name.Equals(eventt.Name))
+                foreach (EventObservers eventObservers1 in NotificationHandlerDAL.observers)
                 {
-                    EventObserversToMembers eotm = new EventObserversToMembers(memberDAL, eventObservers1);
-                    DataHandler.getDBHandler().save(eotm);
-                    eventObservers1.Observers.Add(eotm);
-                    DataHandler.getDBHandler().update(eventObservers1);
-                    memberDAL.EventObservers.Add(eotm);
-                    DataHandler.getDBHandler().update(memberDAL);
-                    break;
+                    if (eventObservers1.Event.Name.Equals(eventt.Name))
+                    {
+                        EventObserversToMembers eotm = new EventObserversToMembers(memberDAL, eventObservers1);
+                        DataHandler.Instance.Value.save(eotm);
+                        eventObservers1.Observers.Add(eotm);
+                        DataHandler.Instance.Value.update(eventObservers1);
+                        memberDAL.EventObservers.Add(eotm);
+                        DataHandler.Instance.Value.update(memberDAL);
+                        break;
+                    }
                 }
             }
-
-            
         }
 
         public void Detach(string observer_name, Event eventt)
@@ -111,23 +112,26 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
                 {
                     if(eventObservers.Event.Name.Equals(eventt.Name))
                     {
-                        MemberDAL memberDAL = DataHandler.getDBHandler().find<MemberDAL>(observer_name);
-                        List<EventObserversToMembers> leotm = new List<EventObserversToMembers>();
-                        foreach (EventObserversToMembers eotm in memberDAL.EventObservers)
-                            if(eotm.EventObserver.Event.Name.Equals(eventt.Name))
-                            {
-                                leotm.Add(eotm);
-                            }
-
-                        foreach(EventObserversToMembers eotm in leotm)
+                        MemberDAL memberDAL = DataHandler.Instance.Value.find<MemberDAL>(observer_name);
+                        if (memberDAL != null)
                         {
-                            eventObservers.Observers.Remove(eotm);
-                            memberDAL.EventObservers.Remove(eotm);
-                            DataHandler.getDBHandler().remove(eotm);
+                            List<EventObserversToMembers> leotm = new List<EventObserversToMembers>();
+                            foreach (EventObserversToMembers eotm in memberDAL.EventObservers)
+                                if (eotm.EventObserver.Event.Name.Equals(eventt.Name))
+                                {
+                                    leotm.Add(eotm);
+                                }
+
+                            foreach (EventObserversToMembers eotm in leotm)
+                            {
+                                eventObservers.Observers.Remove(eotm);
+                                memberDAL.EventObservers.Remove(eotm);
+                                DataHandler.Instance.Value.remove(eotm);
+                            }
+                            DataHandler.Instance.Value.update(eventObservers);
+                            DataHandler.Instance.Value.update(memberDAL);
+                            break;
                         }
-                        DataHandler.getDBHandler().update(eventObservers);
-                        DataHandler.getDBHandler().update(memberDAL);
-                        break;
                     }
                 }
             }
@@ -150,11 +154,14 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
                     List<NotificationDAL> notificationsDAL = new List<NotificationDAL>();
                     if(this.Notifications.TryAdd(observer, new List<Notification>()))
                     {
-                        MemberDAL memberDAL = DataHandler.getDBHandler().find<MemberDAL>(observer);
-                        MemberNotifications memberNotifications = new MemberNotifications(memberDAL, notificationsDAL);
-                        DataHandler.getDBHandler().save(memberNotifications);
-                        NotificationHandlerDAL.Notifications.Add(memberNotifications);
-                        DataHandler.getDBHandler().update(NotificationHandlerDAL);
+                        MemberDAL memberDAL = DataHandler.Instance.Value.find<MemberDAL>(observer);
+                        if (memberDAL != null)
+                        {
+                            MemberNotifications memberNotifications = new MemberNotifications(memberDAL, notificationsDAL);
+                            DataHandler.Instance.Value.save(memberNotifications);
+                            NotificationHandlerDAL.Notifications.Add(memberNotifications);
+                            DataHandler.Instance.Value.update(NotificationHandlerDAL);
+                        }
                     }
                     List<Notification> notis;
                     if (this.Notifications.TryGetValue(observer, out notis))
@@ -187,10 +194,10 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
                 {
                     foreach(NotificationDAL notification in memberNotifications.Notifications)
                     {
-                        DataHandler.getDBHandler().remove(notification);
+                        DataHandler.Instance.Value.remove(notification);
                     }
                     memberNotifications.Notifications.Clear();
-                    DataHandler.getDBHandler().update(memberNotifications);
+                    DataHandler.Instance.Value.update(memberNotifications);
                 }
             }
         }

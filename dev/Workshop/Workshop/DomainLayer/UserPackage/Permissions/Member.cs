@@ -37,7 +37,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             shoppingCart = new MemberShoppingCart();
 
             memberDAL = new MemberDAL(password, username, birthdate, new List<RoleDAL>(), ((MemberShoppingCart)shoppingCart).ToDAL());
-            DataHandler.getDBHandler().save(memberDAL);
+            DataHandler.Instance.Value.save(memberDAL);
         }
 
         public Member(MemberDAL memberDAL)
@@ -108,7 +108,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             LockCookie lc = rwl.UpgradeToWriterLock(Timeout.Infinite);
             roles.Add(role);
             memberDAL.Roles.Add(role.ToDAL());
-            DataHandler.getDBHandler().update(memberDAL);
+            DataHandler.Instance.Value.update(memberDAL);
             rwl.DowngradeFromWriterLock(ref lc);
             rwl.ReleaseReaderLock();
         }
@@ -122,7 +122,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
                 LockCookie lc = rwl.UpgradeToWriterLock(Timeout.Infinite);
                 roles.Remove(role);
                 memberDAL.Roles.Remove(role.ToDAL());
-                DataHandler.getDBHandler().update(memberDAL);
+                DataHandler.Instance.Value.update(memberDAL);
                 rwl.DowngradeFromWriterLock(ref lc);
                 rwl.ReleaseReaderLock();
                 return;
@@ -136,7 +136,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
                     LockCookie lc = rwl.UpgradeToWriterLock(Timeout.Infinite);
                     roles.Remove(role2); //TODO fix deleting from collection while iteration over it
                     memberDAL.Roles.Remove(role2.ToDAL());
-                    DataHandler.getDBHandler().update(memberDAL);
+                    DataHandler.Instance.Value.update(memberDAL);
                     rwl.DowngradeFromWriterLock(ref lc);
                     rwl.ReleaseReaderLock();
                     return;

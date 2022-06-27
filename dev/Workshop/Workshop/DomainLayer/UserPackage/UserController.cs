@@ -41,7 +41,7 @@ namespace Workshop.DomainLayer.UserPackage
             // TODO Find out how to actually implement IMessageSender, Look at Github Issues!
             notificationHandler = new NotificationHandler(this);
             userControllerDAL = new UserControllerDAL(reviewHandler.ToDAL(), notificationHandler.ToDAL(), orderHandler.ToDAL(), new List<MemberDAL>());
-            DataHandler.getDBHandler().save(userControllerDAL);
+            DataHandler.Instance.Value.save(userControllerDAL);
             //InitializeSystem();
             userCountOnDatePerType = SortedList.Synchronized(new SortedList());
             InitializeAdmins(systemAdmins);
@@ -155,13 +155,13 @@ namespace Workshop.DomainLayer.UserPackage
             Member newMember = new Member(username, encryptedPassword, birthdate);
             if (members.TryAdd(username, newMember))
             {
-                //DataHandler.getDBHandler().update(userControllerDAL);
+                //DataHandler.Instance.Value.update(userControllerDAL);
                 Logger.Instance.LogEvent($"User {userId} has successfuly registered user {username}");
             }
             else
                 throw new ArgumentException($"Username {username} already exists");
             userControllerDAL.members.Add(newMember.ToDAL());
-            DataHandler.getDBHandler().update(userControllerDAL);
+            DataHandler.Instance.Value.update(userControllerDAL);
         }
 
         public void UpdateUserStatistics(User u, DateTime date)
@@ -557,10 +557,9 @@ namespace Workshop.DomainLayer.UserPackage
             if(members.TryRemove(canceledUsername,out canceled))
             {
                 userControllerDAL.members.Remove(canceled.ToDAL());
-                DataHandler.getDBHandler().save(userControllerDAL);
+                DataHandler.Instance.Value.save(userControllerDAL);
             }
-            if (!members.TryRemove(canceledUsername,out canceled))
-            if (!members.TryRemove(canceledUsername, out canceled))
+            else
             {
                 throw new ArgumentException($"Could not cancel member {canceledUsername}");
             }

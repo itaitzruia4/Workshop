@@ -39,7 +39,7 @@ namespace Workshop.DomainLayer.MarketPackage
             this.user_terms = null;
             this.store_terms = null;
             this.purchasePolicyDAL = new PurchasePolicyDAL(new List<DALProductTerm>(), new List<DALCategoryTerm>(), null, null);
-            DataHandler.getDBHandler().save(purchasePolicyDAL);
+            DataHandler.Instance.Value.save(purchasePolicyDAL);
         }
 
         public PurchasePolicy(PurchasePolicyDAL purchasePolicyDAL, Store store)
@@ -107,9 +107,9 @@ namespace Workshop.DomainLayer.MarketPackage
                 if (this.purchasePolicyDAL != null)
                 {
                     products_terms[product_id].DALTerm = new DALTerm(json_term);
-                    DataHandler.getDBHandler().save(products_terms[product_id].DALTerm);
+                    DataHandler.Instance.Value.save(products_terms[product_id].DALTerm);
                     this.purchasePolicyDAL.products_terms.Add(new DALProductTerm(product_id, term.ToDAL()));
-                    DataHandler.getDBHandler().update(purchasePolicyDAL);
+                    DataHandler.Instance.Value.update(purchasePolicyDAL);
                 }
             }
             else
@@ -118,10 +118,10 @@ namespace Workshop.DomainLayer.MarketPackage
                 if (this.purchasePolicyDAL != null)
                 {
                     products_terms[product_id].DALTerm = new DALTerm(json_term);
-                    DataHandler.getDBHandler().save(products_terms[product_id].DALTerm);
+                    DataHandler.Instance.Value.save(products_terms[product_id].DALTerm);
                     DALProductTerm dal_term = this.purchasePolicyDAL.products_terms.Find(d => d.ProductId == product_id);
                     dal_term.Term = products_terms[product_id].ToDAL();
-                    DataHandler.getDBHandler().update(dal_term);
+                    DataHandler.Instance.Value.update(dal_term);
                 }
             }
         }
@@ -141,9 +141,9 @@ namespace Workshop.DomainLayer.MarketPackage
                 if (this.purchasePolicyDAL != null)
                 {
                     category_terms[category_name].DALTerm = new DALTerm(json_term);
-                    DataHandler.getDBHandler().save(category_terms[category_name].DALTerm);
+                    DataHandler.Instance.Value.save(category_terms[category_name].DALTerm);
                     this.purchasePolicyDAL.category_terms.Add(new DALCategoryTerm(category_name, term.ToDAL()));
-                    DataHandler.getDBHandler().update(purchasePolicyDAL);
+                    DataHandler.Instance.Value.update(purchasePolicyDAL);
                 }
             }
             else
@@ -152,10 +152,10 @@ namespace Workshop.DomainLayer.MarketPackage
                 if (this.purchasePolicyDAL != null)
                 {
                     category_terms[category_name].DALTerm = new DALTerm(json_term);
-                    DataHandler.getDBHandler().save(category_terms[category_name].DALTerm);
+                    DataHandler.Instance.Value.save(category_terms[category_name].DALTerm);
                     DALCategoryTerm dal_term = this.purchasePolicyDAL.category_terms.Find(d => d.CategoryName == category_name);
                     dal_term.Term = category_terms[category_name].ToDAL();
-                    DataHandler.getDBHandler().update(dal_term);
+                    DataHandler.Instance.Value.update(dal_term);
                 }
             }
         }
@@ -176,9 +176,9 @@ namespace Workshop.DomainLayer.MarketPackage
             if (this.purchasePolicyDAL != null)
             {
                 store_terms.DALTerm = new DALTerm(json_term);
-                DataHandler.getDBHandler().save(store_terms.DALTerm);
+                DataHandler.Instance.Value.save(store_terms.DALTerm);
                 this.purchasePolicyDAL.store_terms = store_terms.ToDAL();
-                DataHandler.getDBHandler().update(purchasePolicyDAL);
+                DataHandler.Instance.Value.update(purchasePolicyDAL);
             }
         }
 
@@ -198,9 +198,9 @@ namespace Workshop.DomainLayer.MarketPackage
             if (this.purchasePolicyDAL != null)
             {
                 user_terms.DALTerm = new DALTerm(json_term);
-                DataHandler.getDBHandler().save(user_terms.DALTerm);
+                DataHandler.Instance.Value.save(user_terms.DALTerm);
                 this.purchasePolicyDAL.user_terms = user_terms.ToDAL();
-                DataHandler.getDBHandler().update(purchasePolicyDAL);
+                DataHandler.Instance.Value.update(purchasePolicyDAL);
             }
         }
 

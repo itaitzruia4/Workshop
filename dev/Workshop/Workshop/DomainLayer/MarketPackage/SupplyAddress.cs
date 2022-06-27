@@ -20,7 +20,7 @@ namespace Workshop.DomainLayer.MarketPackage
             Country = country;
             Zip = zip;
             this.SupplyAddressDAL = new SupplyAddressDAL(name, address, city, country, zip);
-            DataHandler.getDBHandler().save(SupplyAddressDAL);
+            DataHandler.Instance.Value.save(SupplyAddressDAL);
         }
 
         public SupplyAddress(SupplyAddressDAL supplyAddressDAL)

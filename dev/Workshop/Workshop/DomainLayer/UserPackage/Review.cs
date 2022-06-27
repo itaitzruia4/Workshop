@@ -28,7 +28,7 @@ namespace Workshop.DomainLayer.UserPackage
             this.review = review;
             this.productId = productId;
             reviewDAL = new ReviewDAL(review, reviewer, productId);
-            DataHandler.getDBHandler().save(reviewDAL);
+            DataHandler.Instance.Value.save(reviewDAL);
         }
 
         public Review(ReviewDAL reviewDAL)

@@ -26,7 +26,7 @@ namespace Workshop.DomainLayer.MarketPackage
             this.Category = category;
             this.StoreId = StoreId;
             this.ProductDTODAL = new ProductDTODAL(name, description, price, quantity, category, StoreId);
-            DataHandler.getDBHandler().save(ProductDTODAL);
+            DataHandler.Instance.Value.save(ProductDTODAL);
         }
 
         public ProductDTO(ProductDTODAL productDTODAL)

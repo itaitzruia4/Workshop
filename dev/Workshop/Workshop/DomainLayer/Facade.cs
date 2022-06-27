@@ -23,8 +23,8 @@ namespace Workshop.DomainLayer
 
         internal Facade(IExternalSystem externalSystem, List<SystemAdminDTO> systemAdmins)
         {
-            //DALMarketController market = DataHandler.getDBHandler().find<DALMarketController>(0);
-            DALMarketController market = DataHandler.getDBHandler().loadMarket(0);
+            //DALMarketController market = DataHandler.Instance.Value.find<DALMarketController>(0);
+            DALMarketController market = DataHandler.Instance.Value.loadMarket(0);
             if (market == null)
             {
                 UserController = new UserController(new HashSecurityHandler(), new ReviewHandler(), systemAdmins);
@@ -35,7 +35,6 @@ namespace Workshop.DomainLayer
                 UserController = new UserController(market.userController, systemAdmins);
                 MarketController = new MarketController(market, UserController, externalSystem);
             }
-            
         }
 
         public User EnterMarket(int userId, DateTime date)

@@ -33,7 +33,11 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             foreach(NameToRole ntr in storeRoleDAL.nominees)
             {
                 //nominees[ntr.memberName] = (StoreRole)createRole(ntr.data);
-                nominees[ntr.memberName] = (StoreRole)createRole(DataHandler.getDBHandler().find<StoreRoleDAL>(ntr.data_key));
+                StoreRoleDAL temp = DataHandler.Instance.Value.find<StoreRoleDAL>(ntr.data_key);
+                if (temp != null)
+                {
+                    nominees[ntr.memberName] = (StoreRole)createRole(temp);
+                }
             }
         }
 
@@ -60,9 +64,9 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             nominees.Add(membername, nominee);
             Console.WriteLine("AddNominee %s %s", membername, nominee.ToDAL().RoleType);
             NameToRole ntr = new NameToRole(nominee.ToDAL().Id, membername);
-            DataHandler.getDBHandler().save(ntr);
+            DataHandler.Instance.Value.save(ntr);
             roleDAL.nominees.Add(ntr);
-            DataHandler.getDBHandler().update(roleDAL);
+            DataHandler.Instance.Value.update(roleDAL);
         }
 
         public void RemoveNominee(StoreRole nominee)
@@ -82,13 +86,13 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
                 NameToRole to_remove = null;
                 foreach (NameToRole nameToRole in roleDAL.nominees)
                 {
-                    StoreRoleDAL role = DataHandler.getDBHandler().find<StoreRoleDAL>(nameToRole.data_key);
+                    StoreRoleDAL role = DataHandler.Instance.Value.find<StoreRoleDAL>(nameToRole.data_key);
                     if (role != null && role.Equals(nominee.ToDAL()))
                         to_remove = nameToRole;
                 }
                 roleDAL.nominees.Remove(to_remove);
-                DataHandler.getDBHandler().update(roleDAL);
-                DataHandler.getDBHandler().remove(to_remove);
+                DataHandler.Instance.Value.update(roleDAL);
+                DataHandler.Instance.Value.remove(to_remove);
             }
         }
 

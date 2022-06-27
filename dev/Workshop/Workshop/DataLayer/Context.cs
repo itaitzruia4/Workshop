@@ -21,7 +21,7 @@ namespace Workshop.DataLayer
 {
     public class Context: DbContext
     {
-        public static bool USE_DB = true;
+        public static bool USE_DB = false;
         public List<DbSet<DALObject>> DbSetList;
         public DbSet<MarketController> marketController { get; set; }
         public DbSet<UserController> userController { get; set; }
@@ -59,13 +59,9 @@ namespace Workshop.DataLayer
         public DbSet<UserToReviewDTO> UserToReviewDTO { get; set; }
         public DbSet<EventObserversToMembers> EventObserversToMembers { get; set; }
 
-
-
-        
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if(USE_DB)
+            if (USE_DB)
             {
                 optionsBuilder.UseSqlServer("Data Source = 34.107.89.228;Initial Catalog=WorkshopDB; Integrated Security = False; User Id = sqlserver; Password = workshop; Encrypt = True; TrustServerCertificate = True; MultipleActiveResultSets = True");
                 optionsBuilder.EnableSensitiveDataLogging();
@@ -92,14 +88,22 @@ namespace Workshop.DataLayer
 
         public override EntityEntry<TEntity> Update<TEntity>(TEntity entity)
         {
-            Logger.Instance.LogEvent($"Updating {entity} in the cache");
-            return base.Update(entity);
+            if (USE_DB)
+            {
+                Logger.Instance.LogEvent($"Updating {entity} in the cache");
+                return base.Update(entity);
+            }
+            return null;
         }
 
         public override EntityEntry<TEntity> Add<TEntity>(TEntity entity)
         {
-            Logger.Instance.LogEvent($"Adding {entity} to the cache");
-            return base.Add(entity);
+            if (USE_DB)
+            {
+                Logger.Instance.LogEvent($"Adding {entity} to the cache");
+                return base.Add(entity);
+            }
+            return null;
         }
 
     }

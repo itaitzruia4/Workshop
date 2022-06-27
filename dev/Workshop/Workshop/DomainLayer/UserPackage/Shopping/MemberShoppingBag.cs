@@ -19,7 +19,7 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
         public MemberShoppingBag(int storeId) : base(storeId)
         {
             shoppingBagDAL = new ShoppingBagDAL(storeId, new List<ShoppingBagProductDAL>());
-            DataHandler.getDBHandler().save(shoppingBagDAL);
+            DataHandler.Instance.Value.save(shoppingBagDAL);
         }
 
         public MemberShoppingBag(ShoppingBagDAL shoppingBagDAL)
@@ -35,7 +35,7 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
             {
                 products.Add(product.Id, product);
                 shoppingBagDAL.Products.Add(product.ToDAL());
-                DataHandler.getDBHandler().update(shoppingBagDAL);
+                DataHandler.Instance.Value.update(shoppingBagDAL);
             }
             else
                 changeQuantity(product.Id, products[product.Id].Quantity + product.Quantity);
@@ -46,9 +46,9 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
         internal override void deleteProduct(int productId)
         {
             shoppingBagDAL.Products.Remove(products[productId].ToDAL());
-            DataHandler.getDBHandler().remove(products[productId].ToDAL());
+            DataHandler.Instance.Value.remove(products[productId].ToDAL());
             products.Remove(productId);
-            DataHandler.getDBHandler().update(shoppingBagDAL);
+            DataHandler.Instance.Value.update(shoppingBagDAL);
         }
 
         internal override void changeQuantity(int productId, int newQuantity)
@@ -57,7 +57,7 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
             foreach(ShoppingBagProductDAL productDAL in shoppingBagDAL.Products)
                 if(productDAL.Id == productId)
                     productDAL.Quantity = newQuantity;
-            DataHandler.getDBHandler().update(shoppingBagDAL);
+            DataHandler.Instance.Value.update(shoppingBagDAL);
         }
 
         public ShoppingBagDAL ToDAL()

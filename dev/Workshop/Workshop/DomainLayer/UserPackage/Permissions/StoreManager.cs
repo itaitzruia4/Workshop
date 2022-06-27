@@ -14,7 +14,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         {
             roleDAL.RoleType = "StoreManager";
 
-            DataHandler.getDBHandler().save(roleDAL);
+            DataHandler.Instance.Value.save(roleDAL);
         }
 
         public StoreManager(RoleDAL roleDAL) : base(roleDAL)
