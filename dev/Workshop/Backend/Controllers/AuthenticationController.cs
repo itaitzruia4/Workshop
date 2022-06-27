@@ -15,7 +15,7 @@ namespace API.Controllers
     {
         IService Service;
         StaisticsViewingServer StatsServer;
-        static Lazy<int> userId = new Lazy<int>(() => 0);
+        static int userId = 0;
         public AuthenticationController(IService service, StaisticsViewingServer statsServer)
         {
             Service = service;
@@ -25,12 +25,12 @@ namespace API.Controllers
         [HttpGet("entermarket")]
         public ActionResult<FrontResponse<int>> EnterMarket()
         {
-            Response<User> response = Service.EnterMarket(userId, DateTime.Now.Date);
+            int CURR_ID = Interlocked.Increment(ref userId);
+            Response<User> response = Service.EnterMarket(CURR_ID, DateTime.Now.Date);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<int>(response.ErrorMessage));
             }
-            int CURR_ID = Interlocked.Increment(ref userId);
             StatsServer.SendMessageToAllAdmins("GUEST");
             return Ok(new FrontResponse<int>(CURR_ID));
         }
