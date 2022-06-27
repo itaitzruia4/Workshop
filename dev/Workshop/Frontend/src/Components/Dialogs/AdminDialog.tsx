@@ -53,6 +53,7 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
     ];
 
     const updateStats = (role: string): void => {
+        console.log("role=", role);
         const todayIdx = statistics.length - 1;
         switch (role) {
             case "GUEST":
@@ -227,9 +228,9 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
                 setFromDate("");
                 setToDate("");
 
-                //const url = "http://localhost:5165/api/useractions/marketmanagerdaily";
-                //const conn = new WebSocket(url);
-                //conn.addEventListener("message", (ev: MessageEvent<string>) => updateStats(ev.data))
+                const url = "ws://127.0.0.1:5165/api/useractions/marketmanagerdaily";
+                const conn = new WebSocket(url);
+                conn.addEventListener("message", (ev: MessageEvent<string>) => updateStats(ev.data))
             })
             .catch(error => {
                 alert(error)
@@ -396,37 +397,6 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
             <Dialog open={statsOpen} onClose={handleCloseStats} fullScreen>
                 <DialogTitle>Market Statistics</DialogTitle>
                 <DialogContent>
-                    {/*<TableContainer component={Paper}>*/}
-                    {/*    <Table sx={{ minWidth: 250 }} aria-label="simple table">*/}
-                    {/*        <TableHead>*/}
-                    {/*            <TableRow>*/}
-                    {/*                <TableCell>Date</TableCell>*/}
-                    {/*                <TableCell align="center">Market Managers</TableCell>*/}
-                    {/*                <TableCell align="center">Store Owners</TableCell>*/}
-                    {/*                <TableCell align="center">Store Managers</TableCell>*/}
-                    {/*                <TableCell align="center">Members</TableCell>*/}
-                    {/*                <TableCell align="center">Guests</TableCell>*/}
-                    {/*            </TableRow>*/}
-                    {/*        </TableHead>*/}
-                    {/*        <TableBody>*/}
-                    {/*            {statistics.map((row) => (*/}
-                    {/*                <TableRow*/}
-                    {/*                    key={row.date}*/}
-                    {/*                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}*/}
-                    {/*                >*/}
-                    {/*                    <TableCell component="th" scope="row">*/}
-                    {/*                        {row.date}*/}
-                    {/*                    </TableCell>*/}
-                    {/*                    <TableCell align="center">{row.marketManagers}</TableCell>*/}
-                    {/*                    <TableCell align="center">{row.storeOwners}</TableCell>*/}
-                    {/*                    <TableCell align="center">{row.storeManagers}</TableCell>*/}
-                    {/*                    <TableCell align="center">{row.members}</TableCell>*/}
-                    {/*                    <TableCell align="center">{row.guests}</TableCell>*/}
-                    {/*                </TableRow>*/}
-                    {/*            ))}*/}
-                    {/*        </TableBody>*/}
-                    {/*    </Table>*/}
-                    {/*</TableContainer>*/}
                     <DataGrid 
                         rows={statistics}
                         columns={columns}
