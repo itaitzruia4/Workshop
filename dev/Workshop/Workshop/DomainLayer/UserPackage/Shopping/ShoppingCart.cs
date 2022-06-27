@@ -10,21 +10,24 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
 {
     public class ShoppingCart
     {
-        private Dictionary<int,ShoppingBag> shoppingBags { get; set; }
+        protected Dictionary<int,ShoppingBag> shoppingBags { get; set; }
 
         public ShoppingCart()
         {
             shoppingBags = new Dictionary<int,ShoppingBag>();
         }
 
-        public ShoppingBagProduct AddToCart(ShoppingBagProduct product, int storeId)
+        public virtual ShoppingBagProduct AddToCart(ShoppingBagProduct product, int storeId)
         {
             if(!checkIfStoreHasBag(storeId))
             {
                 shoppingBags.Add(storeId,new ShoppingBag(storeId));
             }
-            return shoppingBags[storeId].addToBag(product);
+
+            ShoppingBagProduct productRet = shoppingBags[storeId].addToBag(product);
+            return productRet;
         }
+
         public ShoppingCartDTO getShoppingCartDTO()
         {
             Dictionary<int,ShoppingBagDTO> shoppingBagsDTOs = new Dictionary<int, ShoppingBagDTO>();
@@ -56,7 +59,7 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
             return shoppingBags[bagNum].GetQuantity(productId);
         }
 
-        internal void Clear()
+        internal virtual void Clear()
         {
             shoppingBags.Clear();
         }
@@ -67,7 +70,7 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
         }
         internal void changeQuantity(int productId,int newQuantity, int bagNum)
         {
-            shoppingBags[bagNum].changeQuantity(productId,newQuantity);
+            shoppingBags[bagNum].changeQuantity(productId, newQuantity);
         }
     }
 }

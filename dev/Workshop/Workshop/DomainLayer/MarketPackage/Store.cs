@@ -3,12 +3,22 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Workshop.DomainLayer.UserPackage.Shopping;
+using Workshop.DomainLayer.MarketPackage;
+using System.Threading;
+using StoreDAL = Workshop.DataLayer.DataObjects.Market.Store;
+using DALObject = Workshop.DataLayer.DALObject;
+using ProductDAL = Workshop.DataLayer.DataObjects.Market.Product;
+using DiscountPolicyDAL = Workshop.DataLayer.DataObjects.Market.Discounts.DiscountPolicy;
+using PurchasePolicyDAL = Workshop.DataLayer.DataObjects.Market.Purchases.PurchasePolicy;
+using memberDAL = Workshop.DataLayer.DataObjects.Members.Member;
+using DataHandler = Workshop.DataLayer.DataHandler;
+
 using Member = Workshop.DomainLayer.UserPackage.Permissions.Member;
 using Bid = Workshop.DomainLayer.MarketPackage.Biding.Bid;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
-    public class Store
+    public class Store : IPersistentObject<StoreDAL>
     {
         private bool open { get; set; }
         public readonly int id;
@@ -16,10 +26,20 @@ namespace Workshop.DomainLayer.MarketPackage
         private Dictionary<int, Product> products { get; set; }
         private DiscountPolicy discountPolicy { get; set; }
         private PurchasePolicy purchasePolicy { get; set; }
+
+        private ReaderWriterLock rwl;
+
+        private StoreDAL storeDAL;
+
+
+        //public Store(int id, string name)
         public HashSet<Member> owners { get; }
         public ConcurrentDictionary<int,Bid> biding_votes { get; set; }
         private volatile int bid_id_count;
         public ConcurrentDictionary<Member, KeyValuePair<Member, HashSet<Member>>> owner_voting { get; }
+
+
+
         public Store(int id, string name, Member founder)
         {
             if (name == null || name.Equals(""))
@@ -27,19 +47,59 @@ namespace Workshop.DomainLayer.MarketPackage
             this.id = id;
             this.name = name;
             products = new Dictionary<int, Product>();
-            open = true; //TODO: check if on init store supposed to be open or closed.
-            discountPolicy = new DiscountPolicy(this);
-            purchasePolicy = new PurchasePolicy(this);
+            this.open = true; //TODO: check if on init store supposed to be open or closed.
+            this.rwl = new ReaderWriterLock();
+            this.discountPolicy = new DiscountPolicy(this);
+            this.purchasePolicy = new PurchasePolicy(this);
             owners = new HashSet<Member>();
+            owner_voting = new ConcurrentDictionary<Member, KeyValuePair<Member, HashSet<Member>>>();
+            biding_votes = new ConcurrentDictionary<int, Bid>();
+            List<memberDAL> ownersDAL = new List<memberDAL>();
+            List<ProductDAL> productsDAL = new List<ProductDAL>();
+            DiscountPolicyDAL dpDAL = (DiscountPolicyDAL)discountPolicy.ToDAL();
+            PurchasePolicyDAL ppDAL = (PurchasePolicyDAL)purchasePolicy.ToDAL();
+
+            ownersDAL.Add(founder.ToDAL());
+            storeDAL = new StoreDAL(id, open, name, dpDAL, ppDAL, productsDAL, ownersDAL);
+            open = true; //TODO: check if on init store supposed to be open or closed.
             owners.Add(founder);
             bid_id_count = 0;
-            owner_voting = new ConcurrentDictionary<Member, KeyValuePair<Member, HashSet<Member>>>();
-            biding_votes = new ConcurrentDictionary<int,Bid>();
+            DataHandler.getDBHandler().save(storeDAL);
         }
 
         public bool AddOwner(Member owner)
         {
+            storeDAL.Owners.Add(owner.ToDAL());
+            DataHandler.getDBHandler().update(storeDAL);
             return owners.Add(owner);
+        }
+
+        public Store(StoreDAL storeDAL, HashSet<Member> owners)
+        {
+            this.id = storeDAL.Id;
+            this.name = storeDAL.StoreName;
+            this.products = new Dictionary<int, Product>();
+            this.open = storeDAL.Open;
+            this.rwl = new ReaderWriterLock();
+            this.discountPolicy = new DiscountPolicy(storeDAL.DiscountPolicy, this);
+            this.purchasePolicy = new PurchasePolicy(storeDAL.PurchasePolicy, this);
+            this.owners = owners;
+
+            foreach(ProductDAL product in storeDAL.Products)
+            {
+                products.Add(product.Id, new Product(product));
+            }
+            this.storeDAL = storeDAL;
+        }
+
+        public StoreDAL ToDAL()
+        {
+            return storeDAL;
+        }
+
+        public ReaderWriterLock getLock()
+        {
+            return this.rwl;
         }
 
         public Member VoteForStoreOwnerNominee(Member voter, Member nominee)
@@ -58,6 +118,7 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 if (nominator_voter_pair.Value.Add(voter))
                 {
+                    Console.WriteLine("VoteForStoreOwnerNominee1: %s", nominator_voter_pair.Key.Username);
                     return nominator_voter_pair.Value.Count == owners.Count ? nominator_voter_pair.Key : null;
                 }
                 else
@@ -70,6 +131,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 HashSet<Member> temp = new HashSet<Member>();
                 temp.Add(voter);
                 owner_voting.TryAdd(nominee, new KeyValuePair<Member, HashSet<Member>>(voter, temp));
+                Console.WriteLine("VoteForStoreOwnerNominee2: %s", voter.Username);
                 return 1 == owners.Count ? voter : null;
             }
         }
@@ -109,11 +171,15 @@ namespace Workshop.DomainLayer.MarketPackage
         public void OpenStore()
         {
             this.open = true;
+            storeDAL.Open = true;
+            DataHandler.getDBHandler().update(storeDAL);
         }
 
         public void CloseStore()
         {
             this.open = false;
+            storeDAL.Open = false;
+            DataHandler.getDBHandler().update(storeDAL);
         }
 
         public Product AddProduct(string name, int productId, string description, double price, int quantity, string category)
@@ -124,6 +190,8 @@ namespace Workshop.DomainLayer.MarketPackage
             ValidateCategory(category);
             Product newProd = new Product(productId, name, description, price, quantity, category, id);
             products.Add(productId, newProd);
+            storeDAL.Products.Add(newProd.ToDAL());
+            DataHandler.getDBHandler().update(storeDAL);
             return newProd;
         }
 
@@ -137,6 +205,10 @@ namespace Workshop.DomainLayer.MarketPackage
             ValidateID(productID);
             ValidateProductExist(productID);
             products.Remove(productID);
+            ProductDAL pDAL = storeDAL.Products.Find(x => x.Id == productID);
+            storeDAL.Products.Remove(pDAL);
+            DataHandler.getDBHandler().update(storeDAL);
+            DataHandler.getDBHandler().remove(pDAL);
         }
 
         public void ChangeProductName(int productID, string name)
@@ -145,6 +217,10 @@ namespace Workshop.DomainLayer.MarketPackage
             ValidateProductExist(productID);
             ValidateName(name);
             products[productID].Name = name;
+
+            ProductDAL pDAL = storeDAL.Products.Find(x => x.Id == productID);
+            pDAL.Name = name;
+            DataHandler.getDBHandler().update(pDAL);
         }
 
         public void ChangeProductDescription(int productID, string description)
@@ -152,6 +228,10 @@ namespace Workshop.DomainLayer.MarketPackage
             ValidateID(productID);
             ValidateProductExist(productID);
             products[productID].Description = description;
+
+            ProductDAL pDAL = storeDAL.Products.Find(x => x.Id == productID);
+            pDAL.Description = description;
+            DataHandler.getDBHandler().update(pDAL);
         }
 
         public void ChangeProductPrice(int productID, double price)
@@ -160,6 +240,10 @@ namespace Workshop.DomainLayer.MarketPackage
             ValidateProductExist(productID);
             ValidatePrice(price);
             products[productID].Price = price;
+
+            ProductDAL pDAL = storeDAL.Products.Find(x => x.Id == productID);
+            pDAL.Price = price;
+            DataHandler.getDBHandler().update(pDAL);
         }
         public void ChangeProductQuantity(int productID, int quantity)
         {
@@ -167,6 +251,10 @@ namespace Workshop.DomainLayer.MarketPackage
             ValidateProductExist(productID);
             ValidateQuantity(quantity);
             products[productID].Quantity = quantity;
+
+            ProductDAL pDAL = storeDAL.Products.Find(x => x.Id == productID);
+            pDAL.Quantity = quantity;
+            DataHandler.getDBHandler().update(pDAL);
         }
 
         public void ChangeProductCategory(int productID, string category)
@@ -175,6 +263,10 @@ namespace Workshop.DomainLayer.MarketPackage
             ValidateProductExist(productID);
             ValidateCategory(category);
             products[productID].Category = category;
+
+            ProductDAL pDAL = storeDAL.Products.Find(x => x.Id == productID);
+            pDAL.Category = category;
+            DataHandler.getDBHandler().update(pDAL);
         }
 
         public void AddProductDiscount(string json_discount, int product_id)
@@ -273,6 +365,8 @@ namespace Workshop.DomainLayer.MarketPackage
         internal void RemoveOwner(Member nominatedMember)
         {
             owners.Remove(nominatedMember);
+            storeDAL.Owners.Remove(nominatedMember.ToDAL());
+            DataHandler.getDBHandler().update(storeDAL);
         }
 
         internal void restoreProduct(ProductDTO product)
@@ -308,6 +402,25 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             else throw new ArgumentException($"Store {id} does not have Product {productId}");
         }
+
+        internal ShoppingBagDTO validateBagInStockAndGet(ShoppingBagDTO shoppingBag)
+        {
+            
+            foreach (ProductDTO product in shoppingBag.products)
+            {
+                if(products.ContainsKey(product.Id) && products[product.Id].Quantity >= product.Quantity)
+                {
+                    //products[product.Id].Quantity -= product.Quantity;
+                    //todo does it impact thred
+                }
+                else {
+                    throw new ArgumentException($"store {id} doesn't has enough {product.Name} in stock");
+                }
+                        
+            }  
+            return shoppingBag;     
+        }
+        
 
         internal StoreDTO GetStoreDTO()
         {

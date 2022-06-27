@@ -11,12 +11,15 @@ using Workshop.DomainLayer.UserPackage.Shopping;
 using Workshop.DomainLayer.Loggers;
 using System.Collections.Concurrent;
 using Workshop.DomainLayer.UserPackage.Notifications;
+using UserControllerDAL = Workshop.DataLayer.DataObjects.Controllers.UserController;
+using MemberDAL = Workshop.DataLayer.DataObjects.Members.Member;
+using DataHandler = Workshop.DataLayer.DataHandler;
 using SystemAdminDTO = Workshop.ServiceLayer.ServiceObjects.SystemAdminDTO;
 using System.Collections;
 
 namespace Workshop.DomainLayer.UserPackage
 {
-    public class UserController : IUserController, ILoginChecker
+    public class UserController : IUserController, ILoginChecker, IPersistentObject<UserControllerDAL>
     {
         private ISecurityHandler securityHandler;
         private IReviewHandler reviewHandler;
@@ -24,6 +27,9 @@ namespace Workshop.DomainLayer.UserPackage
         private OrderHandler<string> orderHandler;
         private ConcurrentDictionary<string, Member> members;
         private ConcurrentDictionary<int, User> currentUsers;
+
+        public UserControllerDAL userControllerDAL { get; set; }
+        //public UserController(ISecurityHandler securityHandler, IReviewHandler reviewHandler)
         public SortedList userCountOnDatePerType;
         public UserController(ISecurityHandler securityHandler, IReviewHandler reviewHandler, List<SystemAdminDTO> systemAdmins)
         {
@@ -32,9 +38,32 @@ namespace Workshop.DomainLayer.UserPackage
             this.reviewHandler = reviewHandler;
             members = new ConcurrentDictionary<string, Member>();
             this.orderHandler = new OrderHandler<string>();
+            // TODO Find out how to actually implement IMessageSender, Look at Github Issues!
             notificationHandler = new NotificationHandler(this);
+            userControllerDAL = new UserControllerDAL(reviewHandler.ToDAL(), notificationHandler.ToDAL(), orderHandler.ToDAL(), new List<MemberDAL>());
+            DataHandler.getDBHandler().save(userControllerDAL);
+            //InitializeSystem();
             userCountOnDatePerType = SortedList.Synchronized(new SortedList());
             InitializeAdmins(systemAdmins);
+        }
+
+        public UserController(UserControllerDAL userControllerDAL, List<SystemAdminDTO> systemAdmins)
+        {
+            this.userControllerDAL = userControllerDAL;
+            this.securityHandler = new HashSecurityHandler();
+            currentUsers = new ConcurrentDictionary<int, User>();
+            this.reviewHandler = new ReviewHandler(userControllerDAL.reviewHandler);
+            members = new ConcurrentDictionary<string, Member>();
+            foreach (MemberDAL memberDAL in userControllerDAL.members)
+                members[memberDAL.MemberName] = new Member(memberDAL);
+            orderHandler = new OrderHandler<string>(userControllerDAL.orderHandler);
+            notificationHandler = new NotificationHandler(userControllerDAL.notificationHandler, this);
+            userCountOnDatePerType = SortedList.Synchronized(new SortedList());
+        }
+
+        public UserControllerDAL ToDAL()
+        {
+            return userControllerDAL;
         }
 
         private void InitializeAdmins(List<SystemAdminDTO> admins)
@@ -125,10 +154,14 @@ namespace Workshop.DomainLayer.UserPackage
             string encryptedPassword = securityHandler.Encrypt(password);
             Member newMember = new Member(username, encryptedPassword, birthdate);
             if (members.TryAdd(username, newMember))
+            {
+                //DataHandler.getDBHandler().update(userControllerDAL);
                 Logger.Instance.LogEvent($"User {userId} has successfuly registered user {username}");
+            }
             else
                 throw new ArgumentException($"Username {username} already exists");
-
+            userControllerDAL.members.Add(newMember.ToDAL());
+            DataHandler.getDBHandler().update(userControllerDAL);
         }
 
         public void UpdateUserStatistics(User u, DateTime date)
@@ -521,6 +554,12 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new MemberAccessException($"User {actingUsername} is not allowed to cancel members.");
 
             //cancel member
+            if(members.TryRemove(canceledUsername,out canceled))
+            {
+                userControllerDAL.members.Remove(canceled.ToDAL());
+                DataHandler.getDBHandler().save(userControllerDAL);
+            }
+            if (!members.TryRemove(canceledUsername,out canceled))
             if (!members.TryRemove(canceledUsername, out canceled))
             {
                 throw new ArgumentException($"Could not cancel member {canceledUsername}");
@@ -589,6 +628,8 @@ namespace Workshop.DomainLayer.UserPackage
             notificationHandler.RemoveNotifications(membername);
             return retme;
         }
+
+        
 
         public List<ServiceLayer.ServiceObjects.PermissionInformation> GetMemberPermissions(int userId, string membername)
         {

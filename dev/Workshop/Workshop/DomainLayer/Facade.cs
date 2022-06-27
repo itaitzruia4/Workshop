@@ -11,6 +11,8 @@ using Workshop.DomainLayer.UserPackage.Shopping;
 using Workshop.ServiceLayer;
 using Notification = Workshop.DomainLayer.UserPackage.Notifications.Notification;
 using SystemAdminDTO = Workshop.ServiceLayer.ServiceObjects.SystemAdminDTO;
+using DataHandler = Workshop.DataLayer.DataHandler;
+using DALMarketController = Workshop.DataLayer.DataObjects.Controllers.MarketController;
 
 namespace Workshop.DomainLayer
 {
@@ -21,8 +23,19 @@ namespace Workshop.DomainLayer
 
         internal Facade(IExternalSystem externalSystem, List<SystemAdminDTO> systemAdmins)
         {
-            UserController = new UserController(new HashSecurityHandler(), new ReviewHandler(), systemAdmins);
-            MarketController = new MarketController(UserController, externalSystem);
+            //DALMarketController market = DataHandler.getDBHandler().find<DALMarketController>(0);
+            DALMarketController market = DataHandler.getDBHandler().loadMarket(0);
+            if (market == null)
+            {
+                UserController = new UserController(new HashSecurityHandler(), new ReviewHandler(), systemAdmins);
+                MarketController = new MarketController(UserController, externalSystem);
+            }
+            else
+            {
+                UserController = new UserController(market.userController, systemAdmins);
+                MarketController = new MarketController(market, UserController, externalSystem);
+            }
+            
         }
 
         public User EnterMarket(int userId, DateTime date)

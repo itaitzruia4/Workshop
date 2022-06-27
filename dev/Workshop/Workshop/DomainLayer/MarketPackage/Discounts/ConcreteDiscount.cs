@@ -16,8 +16,9 @@ namespace Workshop.DomainLayer.MarketPackage.Discounts
             this.priceAction = priceAction;
         }
 
-        public abstract double CalculateDiscountValue(ShoppingBagDTO shoppingBag);
+        public abstract override double CalculateDiscountValue(ShoppingBagDTO shoppingBag);
 
-        public abstract bool IsEligible(ShoppingBagDTO shoppingBag);
+        public abstract override bool IsEligible(ShoppingBagDTO shoppingBag);
+        
     }
 }

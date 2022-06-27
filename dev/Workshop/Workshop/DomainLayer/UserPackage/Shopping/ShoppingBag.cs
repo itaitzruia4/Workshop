@@ -10,8 +10,10 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
 {
     public class ShoppingBag
     {
-        private int storeId;
-        private Dictionary<int, ShoppingBagProduct> products;
+        protected int storeId;
+        protected Dictionary<int, ShoppingBagProduct> products;
+
+        protected ShoppingBag(){}
 
         public ShoppingBag(int storeId)
         {
@@ -23,13 +25,16 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
 
         public ShoppingBagProduct addToBag(ShoppingBagProduct product)
         {
-            if(!products.ContainsKey(product.Id))
+            if (!products.ContainsKey(product.Id))
             {
-                products.Add(product.Id,product);
+                products.Add(product.Id, product);
             }
-            else products[product.Id].Quantity +=product.Quantity;
+            else 
+                changeQuantity(product.Id, products[product.Id].Quantity + product.Quantity);
+            
             return product;
         }
+
         internal ShoppingBagDTO GetShoppingBagDTO()
         {
             List<ProductDTO> productsDTOs = new List<ProductDTO>();
@@ -43,11 +48,12 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
         {
             return products.ContainsKey(ProductId);
         }
-        internal void deleteProduct(int productId)
+        internal virtual void deleteProduct(int productId)
         {
+            //DataHandler.getDBHandler().remove(products[productId].ToDAL());
             products.Remove(productId);
         }
-        internal void changeQuantity(int productId,int newQuantity)
+        internal virtual void changeQuantity(int productId,int newQuantity)
         {
             products[productId].Quantity = newQuantity;
         }

@@ -4,12 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer.UserPackage.Shopping;
+using DALTerm = Workshop.DataLayer.DataObjects.Market.Purchases.Term;
 
 namespace Workshop.DomainLayer.MarketPackage.Terms
 {
-    public interface Term
+    public abstract class Term : IPersistentObject<DALTerm>
     {
-        bool IsEligible(ShoppingBagDTO shoppingBag);
-        bool IsEligible(ShoppingBagDTO shoppingBag, int age);
+        public string json_discount { get; set; }
+        public abstract bool IsEligible(ShoppingBagDTO shoppingBag);
+        public abstract bool IsEligible(ShoppingBagDTO shoppingBag, int age);
+
+        public DALTerm DALTerm { get; set; }
+        public DALTerm ToDAL()
+        {
+            return this.DALTerm;
+        }
     }
 }

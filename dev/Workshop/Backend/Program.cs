@@ -1,7 +1,7 @@
 ﻿using Workshop.ServiceLayer;
 using WebSocketSharp.Server;
 
-namespace API.Controllers
+namespace API
 {
     public class Program
     {

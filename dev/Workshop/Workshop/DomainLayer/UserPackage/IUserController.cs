@@ -10,10 +10,11 @@ using Workshop.DomainLayer.UserPackage.Permissions;
 using Workshop.DomainLayer.UserPackage.Shopping;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 using Notification = Workshop.DomainLayer.UserPackage.Notifications.Notification;
+using UserControllerDAL = Workshop.DataLayer.DataObjects.Controllers.UserController;
 
 namespace Workshop.DomainLayer.UserPackage
 {
-    public interface IUserController
+    public interface IUserController: IPersistentObject<UserControllerDAL>
     {
         void AssertUserEnteredMarket(int userId);
         bool IsConnected(int userId);
