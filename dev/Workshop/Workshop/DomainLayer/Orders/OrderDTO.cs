@@ -35,7 +35,7 @@ namespace Workshop.DomainLayer.Orders
             {
                 products.Add(product.ToDAL());
             }
-            this.OrderDTODAL = new OrderDTODAL(id, clientName, address.ToDAL(), storeName, products);
+            this.OrderDTODAL = new OrderDTODAL(id, clientName, address.ToDAL(), storeId, products);
             //DataHandler.getDBHandler().save(OrderDTODAL);
         }
 
@@ -44,7 +44,7 @@ namespace Workshop.DomainLayer.Orders
             this.id = orderDTODAL.id;
             this.clientName = orderDTODAL.clientName;
             this.address = new SupplyAddress(orderDTODAL.address);
-            this.storeName = orderDTODAL.storeName;
+            this.storeId = orderDTODAL.storeId;
             this.items = new List<ProductDTO>();
             foreach (ProductDTODAL product in orderDTODAL.items)
             {

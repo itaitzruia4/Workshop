@@ -18,7 +18,7 @@ namespace Workshop.DataLayer.DataObjects.Orders
         public int id { get; set; }
         public string clientName { get; set; }
         public SupplyAddress address { get; set; }
-        public string storeName { get; set; }
+        public int storeId { get; set; }
         public List<ProductDTO> items { get; set; }
 
         public OrderDTO()
@@ -28,12 +28,12 @@ namespace Workshop.DataLayer.DataObjects.Orders
             items = new List<ProductDTO>();
         }
 
-        public OrderDTO(int id, string clientName, SupplyAddress address, string storeName, List<ProductDTO> items)
+        public OrderDTO(int id, string clientName, SupplyAddress address, int storeId, List<ProductDTO> items)
         {
             this.id = id;
             this.clientName = clientName;
             this.address = address;
-            this.storeName = storeName;
+            this.storeId = storeId;
             this.items = items;
         }
     }

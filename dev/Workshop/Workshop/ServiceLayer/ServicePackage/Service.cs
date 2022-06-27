@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Workshop.DomainLayer;
+using Context = Workshop.DataLayer.Context;
 using Workshop.ServiceLayer.ServiceObjects;
 using DomainUser = Workshop.DomainLayer.UserPackage.User;
 using DomainMember = Workshop.DomainLayer.UserPackage.Permissions.Member;
@@ -31,6 +32,7 @@ namespace Workshop.ServiceLayer
         public Service(IExternalSystem externalSystem, string conf)
         {
             string starting_state_file = null;
+            Context.USE_DB = false;
             List<SystemAdminDTO> systemManagers = new List<SystemAdminDTO>();
             Func<string, bool> parse_ss = (ssfile) =>
             {
@@ -278,6 +280,10 @@ namespace Workshop.ServiceLayer
                     case "port":
                         if (parts.Length != 2) throw new ArgumentException($"port is not in the correct format: {entry}");
                         if (!int.TryParse(parts[1], out Port)) throw new ArgumentException($"port is not in the correct format: {entry}");
+                        break;
+                    case "db":
+                        if (parts.Length != 1) throw new ArgumentException();
+                        Context.USE_DB = true;
                         break;
                     default:
                         throw new ArgumentException("Unidentified command in config file");
