@@ -57,6 +57,7 @@ namespace Workshop.DataLayer
         public DbSet<ReviewHandler> ReviewHandler { get; set; }
         public DbSet<UserReviews> UserReviews { get; set; }
         public DbSet<UserToReviewDTO> UserToReviewDTO { get; set; }
+        public DbSet<EventObserversToMembers> EventObserversToMembers { get; set; }
 
 
 
@@ -74,14 +75,18 @@ namespace Workshop.DataLayer
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
-            
-
             modelBuilder.Entity<NameToRole>()
                 .HasOne(ntr => ntr.father)
                 .WithMany(r => r.nominees);
 
-            
+            modelBuilder.Entity<EventObserversToMembers>()
+                .HasOne(eotm => eotm.EventObserver)
+                .WithMany(eo => eo.Observers);
+
+            modelBuilder.Entity<EventObserversToMembers>()
+                .HasOne(eotm => eotm.member)
+                .WithMany(eo => eo.EventObservers);
+
             base.OnModelCreating(modelBuilder);
         }
 

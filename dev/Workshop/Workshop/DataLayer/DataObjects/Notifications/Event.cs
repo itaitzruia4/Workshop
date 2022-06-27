@@ -25,7 +25,7 @@ namespace Workshop.DataLayer.DataObjects.Notifications
             nextId++;
         }
 
-        public Event(string message, string name, string sender)
+        public Event(string name, string message, string sender)
         {
             Message = message;
             Name = name;

@@ -12,6 +12,7 @@ using EventDAL = Workshop.DataLayer.DataObjects.Notifications.Event;
 using EventObservers = Workshop.DataLayer.DataObjects.Notifications.EventObservers;
 using MemberDAL = Workshop.DataLayer.DataObjects.Members.Member;
 using DataHandler = Workshop.DataLayer.DataHandler;
+using EventObserversToMembers = Workshop.DataLayer.DataObjects.Notifications.EventObserversToMembers;
 
 namespace Workshop.DomainLayer.UserPackage.Notifications
 {
@@ -52,9 +53,9 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
             foreach(EventObservers eventObservers in notificationHandlerDAL.observers)
             {
                 HashSet<string> newObservers = new HashSet<string>();
-                foreach(MemberDAL memberDAL in eventObservers.Observers)
+                foreach(EventObserversToMembers eventObserversToMembers in eventObservers.Observers)
                 {
-                    newObservers.Add(memberDAL.MemberName);
+                    newObservers.Add(eventObserversToMembers.member.MemberName);
                 }
                 observers.TryAdd(eventObservers.Event.Name, newObservers);
                 eventsnames.TryAdd(eventObservers.Event.Name, new Event(eventObservers.Event));
@@ -73,7 +74,7 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
         {
             if(eventsnames.TryAdd(eventt.Name, eventt))
             {
-                EventObservers eventObservers = new EventObservers(eventt.ToDAL(), new List<MemberDAL>());
+                EventObservers eventObservers = new EventObservers(eventt.ToDAL(), new List<EventObserversToMembers>());
                 DataHandler.getDBHandler().save(eventObservers);
                 NotificationHandlerDAL.observers.Add(eventObservers);
                 DataHandler.getDBHandler().update(NotificationHandlerDAL);
@@ -87,12 +88,17 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
             {
                 if(eventObservers1.Event.Name.Equals(eventt.Name))
                 {
-                    eventObservers1.Observers.Add(memberDAL);
+                    EventObserversToMembers eotm = new EventObserversToMembers(memberDAL, eventObservers1);
+                    DataHandler.getDBHandler().save(eotm);
+                    eventObservers1.Observers.Add(eotm);
                     DataHandler.getDBHandler().update(eventObservers1);
+                    memberDAL.EventObservers.Add(eotm);
+                    DataHandler.getDBHandler().update(memberDAL);
                     break;
                 }
             }
-            DataHandler.getDBHandler().update(memberDAL);
+
+            
         }
 
         public void Detach(string observer_name, Event eventt)
@@ -106,8 +112,21 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
                     if(eventObservers.Event.Name.Equals(eventt.Name))
                     {
                         MemberDAL memberDAL = DataHandler.getDBHandler().find<MemberDAL>(observer_name);
-                        eventObservers.Observers.Remove(memberDAL);
+                        List<EventObserversToMembers> leotm = new List<EventObserversToMembers>();
+                        foreach (EventObserversToMembers eotm in memberDAL.EventObservers)
+                            if(eotm.EventObserver.Event.Name.Equals(eventt.Name))
+                            {
+                                leotm.Add(eotm);
+                            }
+
+                        foreach(EventObserversToMembers eotm in leotm)
+                        {
+                            eventObservers.Observers.Remove(eotm);
+                            memberDAL.EventObservers.Remove(eotm);
+                            DataHandler.getDBHandler().remove(eotm);
+                        }
                         DataHandler.getDBHandler().update(eventObservers);
+                        DataHandler.getDBHandler().update(memberDAL);
                         break;
                     }
                 }

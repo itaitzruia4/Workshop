@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Workshop.DataLayer.DataObjects.Market;
+using Workshop.DataLayer.DataObjects.Notifications;
 
 namespace Workshop.DataLayer.DataObjects.Members
 {
@@ -18,10 +19,12 @@ namespace Workshop.DataLayer.DataObjects.Members
         public DateTime Birthdate { get; set; }
         public List<Role> Roles { get; set; }
         public ShoppingCart ShoppingCart { get; set; }
+        public List<EventObserversToMembers> EventObservers { get; set; }
 
         public Member()
         { 
             Roles = new List<Role>();
+            EventObservers = new List<EventObserversToMembers>();
         }
         public Member(string password, string memberName, DateTime birthdate, List<Role> roles, ShoppingCart shoppingCart)
         {
@@ -30,6 +33,7 @@ namespace Workshop.DataLayer.DataObjects.Members
             Birthdate = birthdate;
             Roles = roles;
             ShoppingCart = shoppingCart;
+            EventObservers = new List<EventObserversToMembers>();
         }
     }
 }

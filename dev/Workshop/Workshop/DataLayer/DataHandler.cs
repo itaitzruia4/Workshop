@@ -95,7 +95,7 @@ namespace Workshop.DataLayer
                     .Include(mc => mc.userController.reviewHandler.userReviews).ThenInclude(ur => ur.productToReviewDTOs).ThenInclude(ptr => ptr.Review)
                     .Include(mc => mc.userController.notificationHandler.Notifications).ThenInclude(mn => mn.Notifications)
                     .Include(mc => mc.userController.notificationHandler.observers).ThenInclude(eo => eo.Event)
-                    .Include(mc => mc.userController.notificationHandler.observers).ThenInclude(eo => eo.Observers).ThenInclude(m => m.ShoppingCart).ThenInclude(s => s.ShoppingBags).ThenInclude(sb => sb.Products)
+                    .Include(mc => mc.userController.notificationHandler.observers).ThenInclude(eo => eo.Observers).ThenInclude(eotm => eotm.member).ThenInclude(m => m.ShoppingCart).ThenInclude(s => s.ShoppingBags).ThenInclude(sb => sb.Products)
                     .Include(mc => mc.userController.orderHandler.MemberToOrders).ThenInclude(mto => mto.orders).ThenInclude(o => o.address)
                     .Include(mc => mc.userController.orderHandler.MemberToOrders).ThenInclude(mto => mto.orders).ThenInclude(o => o.items)
                     .Include(mc => mc.stores)
@@ -110,6 +110,8 @@ namespace Workshop.DataLayer
                     .Include(mc => mc.stores).ThenInclude(s => s.PurchasePolicy).ThenInclude(pp => pp.store_terms)
                     .Include(mc => mc.stores).ThenInclude(s => s.Products)
                     .Include(mc => mc.stores).ThenInclude(s => s.Owners)
+                    .Include(mc => mc.userController).ThenInclude(uc => uc.notificationHandler).ThenInclude(nh => nh.observers).ThenInclude(eo => eo.Observers).ThenInclude(eotm => eotm.member)
+                    .Include(mc => mc.userController.members).ThenInclude(eotm => eotm.EventObservers)
                     .FirstOrDefault();
 
 
@@ -236,6 +238,11 @@ namespace Workshop.DataLayer
             nextId = 0;
             cache.UserToReviewDTO.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
             UserToReviewDTO.nextId = nextId;
+
+            nextId = 0;
+            cache.EventObserversToMembers.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            EventObserversToMembers.nextId = nextId;
+            
 
             return market;
         }

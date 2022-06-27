@@ -303,6 +303,7 @@
     <Compile Include="DataLayer\DataObjects\Members\Role.cs" />
     <Compile Include="DataLayer\DataObjects\Notifications\Event.cs" />
     <Compile Include="DataLayer\DataObjects\Notifications\EventObservers.cs" />
+    <Compile Include="DataLayer\DataObjects\Notifications\EventObserversToMembers.cs" />
     <Compile Include="DataLayer\DataObjects\Notifications\MemberNotifications.cs" />
     <Compile Include="DataLayer\DataObjects\Notifications\Notification.cs" />
     <Compile Include="DataLayer\DataObjects\Notifications\NotificationHandler.cs" />
@@ -325,9 +326,9 @@
     <Compile Include="DomainLayer\UserPackage\Shopping\MemberShoppingBag.cs" />
     <Compile Include="DomainLayer\UserPackage\Shopping\MemberShoppingCart.cs" />
     <Compile Include="DomainLayer\UserPackage\UserCountInDate.cs" />
-    <Compile Include="Migrations\20220627144750_Initial.cs" />
-    <Compile Include="Migrations\20220627144750_Initial.designer.cs">
-      <DependentUpon>20220627144750_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\20220627182001_rrrr7.cs" />
+    <Compile Include="Migrations\20220627182001_rrrr7.designer.cs">
+      <DependentUpon>20220627182001_rrrr7.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\ContextModelSnapshot.cs" />
     <Compile Include="ServiceLayer\ExternalSystem.cs" />

@@ -9,29 +9,30 @@ using Workshop.DataLayer.DataObjects.Members;
 
 namespace Workshop.DataLayer.DataObjects.Notifications
 {
-    public class EventObservers: DALObject
+    public class EventObserversToMembers : DALObject
     {
         public static int nextId = 0;
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
-        public Event Event { get; set; }
-        public List<EventObserversToMembers> Observers { get; set; }
+        public Member member { get; set; }
+        public EventObservers EventObserver { get; set; }
 
-        public EventObservers()
+        public EventObserversToMembers()
         {
             this.Id = nextId;
             nextId++;
-            Observers = new List<EventObserversToMembers>();
         }
 
-        public EventObservers(Event Event, List<EventObserversToMembers> observers)
+        public EventObserversToMembers(Member member, EventObservers EventObserver)
         {
-            this.Event = Event;
-            this.Observers = observers;
             this.Id = nextId;
             nextId++;
+            this.member = member;
+            this.EventObserver = EventObserver;
         }
+       
+
     }
 }

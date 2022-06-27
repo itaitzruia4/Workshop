@@ -59,11 +59,12 @@ namespace Workshop.DomainLayer.MarketPackage
             DiscountPolicyDAL dpDAL = (DiscountPolicyDAL)discountPolicy.ToDAL();
             PurchasePolicyDAL ppDAL = (PurchasePolicyDAL)purchasePolicy.ToDAL();
 
+            ownersDAL.Add(founder.ToDAL());
             storeDAL = new StoreDAL(id, open, name, dpDAL, ppDAL, productsDAL, ownersDAL);
-            DataHandler.getDBHandler().save(storeDAL);
             open = true; //TODO: check if on init store supposed to be open or closed.
             owners.Add(founder);
             bid_id_count = 0;
+            DataHandler.getDBHandler().save(storeDAL);
         }
 
         public bool AddOwner(Member owner)
