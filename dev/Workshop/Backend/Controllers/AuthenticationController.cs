@@ -15,7 +15,7 @@ namespace API.Controllers
     {
         IService Service;
         StaisticsViewingServer StatsServer;
-        static volatile int userId = 0;
+        static int userId = 0;
         public AuthenticationController(IService service, StaisticsViewingServer statsServer)
         {
             Service = service;
