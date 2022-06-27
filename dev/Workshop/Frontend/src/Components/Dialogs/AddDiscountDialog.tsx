@@ -7,16 +7,18 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { makeCategoryPriceActionSimple, makeProductPriceActionSimple, makeSimpleDiscount, makeStorePriceActionSimple, SimpleDiscount } from '../../Types/discount';
+import { memberToken, Actions, StorePermission, actionNames, hasPermission } from '../../Types/roles';
 
 export default function AddDiscountDialog(
     props: {
         storeId: number,
+        permissions: Actions[],
         addDiscount: (storeId: number, discountJson: string) => void,
         addProductDiscount: (storeId: number, productId: number, discountJson: string) => void,
         addCategoryDiscount: (storeId: number, category: string, discountJson: string) => void
     }) {
 
-    const { storeId, addDiscount, addProductDiscount, addCategoryDiscount } = props;
+    const { storeId, permissions ,addDiscount, addProductDiscount, addCategoryDiscount } = props;
     const [open, setOpen] = React.useState(false);
     const [productOpen, setProductOpen] = React.useState(false);
     const [categoryOpen, setCategoryOpen] = React.useState(false);
@@ -106,7 +108,7 @@ export default function AddDiscountDialog(
 
     return (
         <div>
-            <Button onClick={handleOpenDiscount}>
+            <Button disabled={!hasPermission(Actions.AddDiscount, permissions) } onClick={handleOpenDiscount}>
                 Add discount
             </Button>
             <Dialog open={open} onClose={handleCloseDiscount}>

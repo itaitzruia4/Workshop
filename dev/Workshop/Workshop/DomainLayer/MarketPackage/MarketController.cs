@@ -30,6 +30,7 @@ namespace Workshop.DomainLayer.MarketPackage
         private int STORE_COUNT = 0;
         private int PRODUCT_COUNT = 1;
         private DALMarketController dalMarketController;
+
         public MarketController(IUserController userController, IExternalSystem externalSystem)
         {
             this.userController = userController;
@@ -131,6 +132,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 userController.RegisterToEvent(nominated.Username, new Event("OpenStore" + storeId, "", "MarketController"));
                 userController.RegisterToEvent(nominated.Username, new Event("CloseStore" + storeId, "", "MarketController"));
                 userController.RegisterToEvent(nominated.Username, new Event("BidOfferInStore" + storeId, "", "MarketController"));
+                userController.RegisterToEvent(nominated.Username, new Event("ReviewInStore" + storeId, "", "MarketController"));
 
                 userController.UpdateUserStatistics(nominated, date);
 
@@ -230,6 +232,7 @@ namespace Workshop.DomainLayer.MarketPackage
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("OpenStore" + storeId, "", "MarketController"));
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("CloseStore" + storeId, "", "MarketController"));
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("BidOfferInStore" + storeId, "", "MarketController"));
+            userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("ReviewInStore" + storeId, "", "MarketController"));
             userController.notify(new Event("RemoveStoreOwnerNominationFrom" + nominated, "Removed store owner nomination from member " + nominated, "MarketController"));
             Logger.Instance.LogEvent($"Member {nominator} successfuly removed store owner nomination from {nominated} in store {storeId}.");
             return nominatedMember;
@@ -345,9 +348,11 @@ namespace Workshop.DomainLayer.MarketPackage
             ViewStorePermission(userId, username, storeId);
             if (!IsAuthorized(userId, username, storeId, Action.AddProduct))
                 throw new MemberAccessException("This user is not authorized for adding products to the specified store.");
-            product = stores[storeId].AddProduct(name, PRODUCT_COUNT++, description, price, quantity, category);
+
+            product = stores[storeId].AddProduct(name, Interlocked.Increment(ref PRODUCT_COUNT), description, price, quantity, category);
             this.dalMarketController.PRODUCT_COUNT = PRODUCT_COUNT;
             DataHandler.getDBHandler().update(this.dalMarketController);
+
             storesLocks[storeId].ReleaseWriterLock();
             Logger.Instance.LogEvent($"{username} successfuly added Product {name} to store {storeId}.");
             return product;
@@ -596,17 +601,19 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException($"Entered date is not valid: {date}");
             }
-            int storeId = STORE_COUNT;
+            int storeId = Interlocked.Increment(ref STORE_COUNT);
             ReaderWriterLock rwl = new ReaderWriterLock();
             storesLocks[storeId] = rwl;
             rwl.AcquireWriterLock(Timeout.Infinite);
             userController.AddStoreFounder(creator, storeId, date);
             Store store = new Store(storeId, storeName, userController.GetMember(creator));
             stores[storeId] = store;
+
             STORE_COUNT++;
             this.dalMarketController.STORE_COUNT = STORE_COUNT;
             this.dalMarketController.stores.Add(store.ToDAL());
             DataHandler.getDBHandler().update(this.dalMarketController);
+
             rwl.ReleaseWriterLock();
 
             userController.RegisterToEvent(creator, new Event("SaleInStore" + storeId, "", "MarketController"));
@@ -614,6 +621,7 @@ namespace Workshop.DomainLayer.MarketPackage
             userController.RegisterToEvent(creator, new Event("CloseStore" + storeId, "", "MarketController"));
             userController.RegisterToEvent(creator, new Event("BidOfferInStore" + storeId, "", "MarketController"));
             userController.RegisterToEvent(creator, new Event("StoreOwnerVoting" + storeId, "", "MarketController"));
+            userController.RegisterToEvent(creator, new Event("ReviewInStore" + storeId, "", "MarketController"));
             Logger.Instance.LogEvent($"{creator} successfuly created store \"{storeName}\", and received a new store ID: {storeId}.");
             return store;
         }
@@ -782,7 +790,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
                     events.Add(new Event("SaleInStore" + storeId, $"Prouducts with the name {String.Join(" ", bag.products.Select(p => p.Name).ToArray())} were bought from store {storeId} by {username}", "marketController"));
                     productsSoFar.Add(storeId, bag.products);
-                    OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetStoreName(), bag.products, buyTime, stores[storeId].CalaculatePrice(bag));
+                    OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetId(), bag.products, buyTime, stores[storeId].CalaculatePrice(bag));
                     if (storeOrdersSoFar.ContainsKey(storeId))
                     {
                         storeOrdersSoFar[storeId].Add(order);
@@ -1110,7 +1118,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 string username = currentUser is Member ? ((Member)currentUser).Username : "A guest";
 
                 events.Add(new Event("SaleInStore" + storeId, $"Prouduct with the name {product.Name} were bought from store {storeId} by {username}", "marketController"));
-                OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetStoreName(), Products, buyTime, price);
+                OrderDTO order = orderHandler.CreateOrder(username, address, stores[storeId].GetId(), Products, buyTime, price);
                 if (storeOrdersSoFar.ContainsKey(storeId))
                 {
                     storeOrdersSoFar[storeId].Add(order);

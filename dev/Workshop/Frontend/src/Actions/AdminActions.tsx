@@ -1,6 +1,6 @@
 import { memberToken } from "../Types/roles"
 
-function handleIsAdmin(token: memberToken): Promise<boolean> {
+export function handleIsAdmin(token: memberToken): Promise<any> {
     let url = "http://localhost:5165/api/useractions/GetMemberPermissions";
 
     return fetch(url, {
@@ -11,27 +11,13 @@ function handleIsAdmin(token: memberToken): Promise<boolean> {
             userId: token.userId,
             membername: token.membername
         })
-    }).then(async response => {
-        const data = await response.json();
-        if (!response.ok) {
-            return Promise.reject(data.error);
-        }
-        //if (data.filter(perm => perm.storeId === -1).length > 0) {
-        //    return Promise.resolve(true);
-        //}
-        return Promise.resolve(false);
-    })
-}
-
-export const isAdmin = (token: memberToken): boolean => {
-    return token.membername === "admin";
-
-    // TODO fix this
-    //return handleIsAdmin(token)
-    //    .then((b: boolean) => b)
-    //    .catch(error => {
-    //        return false;
-    //    });
+    }).then(response => response.json()
+        .then(data => {
+            if (!response.ok) {
+                return Promise.reject(data.error);
+            }
+            return Promise.resolve((data.value as Array<{storeId: number}>).filter(elem => elem.storeId === -1).length > 0);
+        }))
 }
 
 function handleRemoveMember(token: memberToken, memberToRemove: string): Promise<any> {
@@ -130,14 +116,33 @@ export function getDailyIncome(token: memberToken): Promise<any> {
     })
 }
 
-function handleViewStatistics(token: memberToken, fromDate: string, toDate: string): Promise<any> {
-    // TODO add daily statistics API request
-    return Promise.reject("Not yet implemented");
-}
 
-export const viewStatistics = (token: memberToken, fromDate: string, toDate: string): void => {
-    handleViewStatistics(token, fromDate, toDate)
-        .catch(error => {
-            alert(error)
-        });
+export function handleViewStatistics(token: memberToken, fromDate: string, toDate: string): Promise<any> {
+    if (fromDate === "" || toDate === "") {
+        return Promise.reject('User details must not be empty');
+    }
+
+    var date_regex = /\d{1,2}\/\d{1,2}\/\d{4}/;
+    if (!(date_regex.test(fromDate)) || !(date_regex.test(toDate))) {
+        return Promise.reject("Invalid date format");
+    }
+
+    const url = "http://localhost:5165/api/useractions/marketmanagerdaily";
+    return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            userId: token.userId,
+            membername: token.membername,
+            StartDate: fromDate,
+            EndDate: toDate
+        })
+    }).then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            return Promise.reject(data.error);
+        }
+        return Promise.resolve(data.value);
+    })
 }

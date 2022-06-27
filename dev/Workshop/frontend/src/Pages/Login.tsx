@@ -5,7 +5,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { userToken, token, makeMemberToken, makeUserToken } from '../Types/roles';
 import { handleLogin } from '../Actions/AuthenticationActions';
 import { MarketNotification } from '../Types/Notification';
-import { isAdmin } from '../Actions/AdminActions';
+import { handleIsAdmin } from '../Actions/AdminActions';
 
 const Login = () => {
 
@@ -37,9 +37,15 @@ const Login = () => {
                         handleLogin(token, membername, password)
                             .then((data) => {
                                 const memberTok = makeMemberToken(token.userId, membername, data.notifications);
-                                isAdmin(memberTok) ?
-                                    routeChange("/admin", memberTok)() :
-                                    routeChange("/member", memberTok)()
+                                handleIsAdmin(memberTok)
+                                    .then(isAdmin => 
+                                        isAdmin?
+                                            routeChange("/admin", memberTok)() :
+                                            routeChange("/member", memberTok)()
+                                        )
+                                    .catch(error => {
+                                        alert(error);
+                                    });
                             })
                     
                         .catch(error => {

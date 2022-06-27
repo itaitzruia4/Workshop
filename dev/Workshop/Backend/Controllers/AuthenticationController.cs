@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Workshop.ServiceLayer;
 using Workshop.ServiceLayer.ServiceObjects;
 using WebSocketSharp.Server;
+using System.Text;
 
 namespace API.Controllers
 {
@@ -14,26 +15,23 @@ namespace API.Controllers
     {
         IService Service;
         StaisticsViewingServer StatsServer;
-        static volatile int userId = 0;
+        static int userId = 0;
         public AuthenticationController(IService service, StaisticsViewingServer statsServer)
         {
             Service = service;
-            this.StatsServer = statsServer;
+            StatsServer = statsServer;
         }
 
         [HttpGet("entermarket")]
         public ActionResult<FrontResponse<int>> EnterMarket()
         {
-            Response<User> response = Service.EnterMarket(userId, DateTime.Now.Date);
+            int CURR_ID = Interlocked.Increment(ref userId);
+            Response<User> response = Service.EnterMarket(CURR_ID, DateTime.Now.Date);
             if (response.ErrorOccured)
             {
                 return BadRequest(new FrontResponse<int>(response.ErrorMessage));
             }
-            int CURR_ID = userId++;
-            /*foreach (string path in StatsServer.WebSocketServices.Paths)
-            {
-                StatsServer.WebSocketServices[path].Sessions.Broadcast(BitConverter.GetBytes(CURR_ID).Reverse().ToArray());
-            }*/
+            StatsServer.SendMessageToAllAdmins("GUEST");
             return Ok(new FrontResponse<int>(CURR_ID));
         }
 
@@ -56,7 +54,31 @@ namespace API.Controllers
             {
                 return BadRequest(new LoginResponse(response.ErrorMessage));
             }
-            return Ok(new LoginResponse(response.Value.Key, response.Value.Value));
+            LoginResponse res = new LoginResponse(response.Value.Key, response.Value.Value);
+            bool MANAGER = false;
+            bool OWNER = false;
+            bool MARKET = false;
+            string message = "member";
+            foreach (Role role in res.Value.Roles)
+            {
+                if (!MARKET && role is MarketManager)
+                {
+                    MARKET = true;
+                }
+                else if (!OWNER && (role is StoreOwner || role is StoreFounder))
+                {
+                    OWNER = true;
+                }
+                else if (!MANAGER && role is StoreManager)
+                {
+                    MANAGER = true;
+                }
+            }
+            if (MARKET) message = "market";
+            else if (OWNER) message = "owner";
+            else if (MANAGER) message = "manager";
+            StatsServer.SendMessageToAllAdmins(message);
+            return Ok(res);
         }
 
         [HttpPost("logout")]

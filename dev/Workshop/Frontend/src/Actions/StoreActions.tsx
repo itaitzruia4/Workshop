@@ -392,3 +392,24 @@ export function handleAddActionToManager(token: memberToken, nominee: string ,st
         return Promise.resolve(data.value)
     })
 }
+
+export function handleGetStorePurchaseHistory(token: memberToken, storeId: number) {
+    const url = "http://localhost:5165/api/store/getstorepurchasehistory";
+
+    return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            userId: token.userId,
+            membername: token.membername,
+            storeId: storeId,
+        })
+    }).then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            return Promise.reject(data.error);
+        }
+        return Promise.resolve(data.value)
+    })
+}

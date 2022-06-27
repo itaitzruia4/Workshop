@@ -82,7 +82,7 @@ namespace Workshop.ServiceLayer
                                     if (actualParams.Length != 2) { throw new ArgumentException(); }
                                     facade.Logout(int.Parse(actualParams[0]), actualParams[1]);
                                     break;
-                                case "add-Product":
+                                case "add-product":
                                     if (actualParams.Length != 8) { throw new ArgumentException(); }
                                     facade.AddProduct(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), actualParams[3], actualParams[4], double.Parse(actualParams[5]), int.Parse(actualParams[6]), actualParams[7]);
                                     break;
@@ -128,7 +128,7 @@ namespace Workshop.ServiceLayer
                                     break;
                                 case "add-to-cart":
                                     if (actualParams.Length != 4) { throw new ArgumentException(); }
-                                    facade.AddToCart(int.Parse(actualParams[0]), int.Parse(actualParams[2]), int.Parse(actualParams[3]), int.Parse(actualParams[4]));
+                                    facade.AddToCart(int.Parse(actualParams[0]), int.Parse(actualParams[1]), int.Parse(actualParams[2]), int.Parse(actualParams[3]));
                                     break;
                                 case "view-cart":
                                     if (actualParams.Length != 1) { throw new ArgumentException(); }
@@ -144,7 +144,7 @@ namespace Workshop.ServiceLayer
                                     SupplyAddress address = new SupplyAddress(actualParams[7], actualParams[8], actualParams[9], actualParams[10], actualParams[11]);
                                     facade.BuyCart(int.Parse(actualParams[0]), cc, address, DateTime.ParseExact(actualParams[12], "dd/MM/yyyy", CultureInfo.InvariantCulture));
                                     break;
-                                case "add-Product-discount":
+                                case "add-product-discount":
                                     if (actualParams.Length != 5) { throw new ArgumentException(); }
                                     facade.AddProductDiscount(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), actualParams[3], int.Parse(actualParams[4]));
                                     break;
@@ -156,27 +156,27 @@ namespace Workshop.ServiceLayer
                                     if (actualParams.Length != 4) { throw new ArgumentException(); }
                                     facade.AddStoreDiscount(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), actualParams[3]);
                                     break;
-                                case "remove-Product-from-store":
+                                case "remove-product-from-store":
                                     if (actualParams.Length != 4) { throw new ArgumentException(); }
                                     facade.RemoveProductFromStore(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]));
                                     break;
-                                case "change-Product-name":
+                                case "change-product-name":
                                     if (actualParams.Length != 5) { throw new ArgumentException(); }
                                     facade.ChangeProductName(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]), actualParams[4]);
                                     break;
-                                case "change-Product-OfferedPrice":
+                                case "change-product-OfferedPrice":
                                     if (actualParams.Length != 5) { throw new ArgumentException(); }
                                     facade.ChangeProductPrice(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]), double.Parse(actualParams[4]));
                                     break;
-                                case "change-Product-quantity":
+                                case "change-product-quantity":
                                     if (actualParams.Length != 5) { throw new ArgumentException(); }
                                     facade.ChangeProductQuantity(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]), int.Parse(actualParams[4]));
                                     break;
-                                case "change-Product-category":
+                                case "change-product-category":
                                     if (actualParams.Length != 5) { throw new ArgumentException(); }
                                     facade.ChangeProductCategory(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), int.Parse(actualParams[3]), actualParams[4]);
                                     break;
-                                case "add-Product-purchase-term":
+                                case "add-product-purchase-term":
                                     if (actualParams.Length != 5) { throw new ArgumentException(); }
                                     facade.AddProducPurchaseTerm(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), actualParams[3], int.Parse(actualParams[4]));
                                     break;

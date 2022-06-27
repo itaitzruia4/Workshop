@@ -92,11 +92,12 @@ export default function StoreAdjust(
         nominateStoreOwner: (storeId: number, nominee: string) => void,
         nominateStoreManager: (storeId: number, nominee: string) => void,
         removeStoreOwnerNomination: (storeId: number, nominee: string) => void,
-        addActionToManager: (nominee: string, storeId: number, action: string) => void
+        addActionToManager: (nominee: string, storeId: number, action: string) => void,
+        getStorePurchaseHistory: (storeId: number) => void
     }) {
     const { store, permissions, addProduct, removeProduct, updateProduct, reviewProduct,
         addDiscount, addProductDiscount, addCategoryDiscount, addProductPurchasePolicy, addCategoryPurchasePolicy,
-        addBagPurchasePolicy, addUserPurchasePolicy, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination, addActionToManager } = props
+        addBagPurchasePolicy, addUserPurchasePolicy, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination, addActionToManager, getStorePurchaseHistory } = props
     const [open, setOpen] = React.useState(false);
     const handleClose = () => {
         setOpen(false);
@@ -142,6 +143,7 @@ export default function StoreAdjust(
                             <Tab label="Products" {...a11yProps(0)} />
                             <Tab label="Members" {...a11yProps(1)} />
                             <Tab label="Discounts" {...a11yProps(2)} />
+                            <Tab label="Purchases" {...a11yProps(3)} />
                         </Tabs>
                     </Box>
                     <TabPanel value={value} index={0}>
@@ -161,16 +163,27 @@ export default function StoreAdjust(
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         <ButtonGroup variant="outlined" aria-label="outlined button group">
-                            <StoreRolesDialog storeId={store.storeId} nominateStoreOwner={nominateStoreOwner}
+                            <StoreRolesDialog storeId={store.storeId} permissions={permissions } nominateStoreOwner={nominateStoreOwner}
                                 nominateStoreManager={nominateStoreManager} removeStoreOwnerNomination={removeStoreOwnerNomination} addActionToManager={addActionToManager} />
                         </ButtonGroup>
                     </TabPanel>
                     <TabPanel value={value} index={2}>
                         <ButtonGroup variant="outlined" aria-label="outlined button group">
-                            <AddDiscountDialog storeId={store.storeId} addDiscount={addDiscount} addProductDiscount={addProductDiscount} addCategoryDiscount={addCategoryDiscount } />
-                            <AddPurchaseDialog storeId={store.storeId} addProductPurchase={addProductPurchasePolicy} addCategoryPurchase={addCategoryPurchasePolicy}
+                            <AddDiscountDialog storeId={store.storeId} permissions={permissions} addDiscount={addDiscount} addProductDiscount={addProductDiscount} addCategoryDiscount={addCategoryDiscount} />
+                            <AddPurchaseDialog storeId={store.storeId} permissions={permissions} addProductPurchase={addProductPurchasePolicy} addCategoryPurchase={addCategoryPurchasePolicy}
                                 addBagPurchase={addBagPurchasePolicy} addUserPurchase={addUserPurchasePolicy } />
                         </ButtonGroup>
+                    </TabPanel>
+                    <TabPanel value={value} index={3}>
+                    {hasPermission(Actions.ViewStorePurchaseHistory, permissions) ?           
+                            <ButtonGroup variant="outlined" aria-label="outlined button group">
+                                <AddDiscountDialog storeId={store.storeId} permissions={permissions} addDiscount={addDiscount} addProductDiscount={addProductDiscount} addCategoryDiscount={addCategoryDiscount} />
+                                <AddPurchaseDialog storeId={store.storeId} permissions={permissions} addProductPurchase={addProductPurchasePolicy} addCategoryPurchase={addCategoryPurchasePolicy}
+                                    addBagPurchase={addBagPurchasePolicy} addUserPurchase={addUserPurchasePolicy} />
+                            </ButtonGroup>
+                            : <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                You dont have permission to view this store's purchase history
+                            </Typography>}
                     </TabPanel>
                 </Box>
             </Dialog>

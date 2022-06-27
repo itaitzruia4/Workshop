@@ -25,7 +25,6 @@ import { Product } from "../Types/product"
 import { Cart, Bag } from '../Types/shopping';
 import { MarketNotification } from '../Types/Notification';
 import AdminDialog from '../Components/Dialogs/AdminDialog';
-import { isAdmin } from '../Actions/AdminActions';
 
 // Admin page
 function Admin() {
@@ -40,7 +39,7 @@ function Admin() {
             navigate(path, { state: token });
 
     const [stores, setStores] = useState<Store[]>([])
-    const [cart, setCart] = useState<Cart>({ shoppingBags: [] })
+    const [cart, setCart] = useState<Cart>({ shoppingBags: [] , price: 0})
     const [notifications, setNotifications] = useState<MarketNotification[]>(token.notifications);
 
     const [adminOpen, setAdminOpen] = useState<boolean>(false);

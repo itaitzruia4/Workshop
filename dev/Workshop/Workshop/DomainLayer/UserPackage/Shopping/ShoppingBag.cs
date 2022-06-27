@@ -21,7 +21,9 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
             products = new Dictionary<int,ShoppingBagProduct>();
         }
 
-        public virtual ShoppingBagProduct addToBag(ShoppingBagProduct product)
+        public int StoreId { get { return storeId; } }
+
+        public ShoppingBagProduct addToBag(ShoppingBagProduct product)
         {
             if (!products.ContainsKey(product.Id))
             {

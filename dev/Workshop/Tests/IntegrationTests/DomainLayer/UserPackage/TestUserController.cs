@@ -39,7 +39,7 @@ namespace Tests.IntegrationTests.DomainLayer.UserPackage
             {
                 pdtos1.Add(sbp.GetProductDTO());
             }
-            userController.AddOrder(1, new OrderDTO(1, "member1", address, "blasToysRus", pdtos1, DateTime.Now,1.0), "member1");
+            userController.AddOrder(1, new OrderDTO(1, "member1", address, 1, pdtos1, DateTime.Now,1.0), "member1");
             userController.Logout(1, "member1");
 
             userController.Register(1, "member3", "pass3", DateTime.Parse("Aug 22, 1972"));
