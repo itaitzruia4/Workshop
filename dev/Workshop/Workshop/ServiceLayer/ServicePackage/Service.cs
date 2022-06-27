@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Workshop.DomainLayer;
 using Context = Workshop.DataLayer.Context;
 using Workshop.ServiceLayer.ServiceObjects;
@@ -21,6 +19,8 @@ using Workshop.DomainLayer.Reviews;
 using Workshop.DomainLayer.Loggers;
 using System.Globalization;
 using System.IO;
+using Moq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Workshop.ServiceLayer
 {
@@ -29,11 +29,22 @@ namespace Workshop.ServiceLayer
         private Facade facade;
         public readonly bool WasInitializedWithFile;
         private readonly int Port;
-        public Service(IExternalSystem externalSystem, string conf)
+        public Service(string conf)
         {
             string starting_state_file = null;
-            Context.USE_DB = false;
+            bool USE_DB = false;
+            bool USE_EXTERNAL_SYSTEM = false;
+            Mock<DbContext> context = new Mock<DbContext>();
+            context.Setup(x => x.OnConfiguring(It.IsAny<DbContextOptionsBuilder>)).Callback();
+            Mock<IExternalSystem> externalSystem = new Mock<IExternalSystem>();
+            externalSystem.Setup(x => x.Supply(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(new Random().Next(10000, 100000));
+            externalSystem.Setup(x => x.Cancel_Supply(It.IsAny<int>())).Returns(1);
+            externalSystem.Setup(x => x.Pay(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(new Random().Next(10000, 100000));
+            externalSystem.Setup(x => x.Cancel_Pay(It.IsAny<int>())).Returns(1);
+            externalSystem.Setup(x => x.IsExternalSystemOnline()).Returns(true);
+
             List<SystemAdminDTO> systemManagers = new List<SystemAdminDTO>();
+
             Func<string, bool> parse_ss = (ssfile) =>
             {
                 string initializationState = "";
@@ -48,7 +59,7 @@ namespace Workshop.ServiceLayer
                 {
                     Logger.Instance.LogError("Starting state file does not exist");
                 }
-                facade = new Facade(externalSystem, systemManagers);
+                facade = new Facade(USE_EXTERNAL_SYSTEM ? new ExternalSystem() : externalSystem.Object, systemManagers, USE_DB ? new Context() : context.Object);
                 try
                 {
                     foreach (string command in initializationState.Split('\n'))
@@ -283,18 +294,32 @@ namespace Workshop.ServiceLayer
                         break;
                     case "db":
                         if (parts.Length != 1) throw new ArgumentException();
-                        Context.USE_DB = true;
+                        USE_DB = true;
+                        break;
+                    case "es":
+                        if (parts.Length != 1) throw new ArgumentException();
                         break;
                     default:
                         throw new ArgumentException("Unidentified command in config file");
                 }
             }
-
+            if (systemManagers.Count == 0)
+            {
+                throw new ArgumentException($"The system needs to have at least one admin! Incorrect config file!");
+            }
             WasInitializedWithFile = starting_state_file != null ? parse_ss(starting_state_file) : false;
             if (facade == null)
             {
-                facade = new Facade(externalSystem, systemManagers);
+                facade = new Facade(USE_EXTERNAL_SYSTEM ? new ExternalSystem() : externalSystem.Object, systemManagers, USE_DB ? new Context() : context.Object);
             }
+        }
+
+        public Service(IExternalSystem externalSystem)
+        {
+            List<SystemAdminDTO> systemManagers = new List<SystemAdminDTO>();
+            Mock<Context> context = new Mock<Context>();
+            systemManagers.Add(new SystemAdminDTO("admin", "admin", "22/08/1972"));
+            facade = new Facade(externalSystem, systemManagers, context.Object);
         }
 
         public int GetPort()
