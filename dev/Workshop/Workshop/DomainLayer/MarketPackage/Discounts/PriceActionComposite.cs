@@ -18,6 +18,6 @@ namespace Workshop.DomainLayer.MarketPackage.Discounts
             this.secondAction = secondAction;
         }
 
-        public abstract double CalculatePriceAction(ShoppingBagDTO shoppingBag);
+        public abstract override double CalculatePriceAction(ShoppingBagDTO shoppingBag);
     }
 }

@@ -21,8 +21,8 @@ namespace Tests.AcceptanceTests
         private const string username = "Goodun";
         private const string password = "Goodp";
         private const string product = "Product";
-        private SupplyAddress address = new SupplyAddress("Ronmi", "Mayor 1", "Ashkelon", "Israel", "784112");
-        private CreditCard cc = new CreditCard("001122334455667788", "11", "26", "LeBron Michal", "555", "208143751");
+        private SupplyAddress address;
+        private CreditCard cc;
         private Mock<IExternalSystem> externalSystem = new Mock<IExternalSystem>();
 
         [TestInitialize]
@@ -34,7 +34,16 @@ namespace Tests.AcceptanceTests
             externalSystem.Setup(x => x.Pay(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(new Random().Next(10000, 100000));
             externalSystem.Setup(x => x.Cancel_Pay(It.IsAny<int>())).Returns(1);
             externalSystem.Setup(x => x.IsExternalSystemOnline()).Returns(true);
+            Workshop.DataLayer.DataHandler.getDBHandler().clear();
+            address = new SupplyAddress("Ronmi", "Mayor 1", "Ashkelon", "Israel", "784112");
+            cc = new CreditCard("001122334455667788", "11", "26", "LeBron Michal", "555", "208143751");
             service = new Service(externalSystem.Object, config);
+        }
+
+        [TestCleanup]
+        public void TestCleanup() 
+        {
+            Workshop.DataLayer.DataHandler.getDBHandler().clear();
         }
 
         [TestMethod]
@@ -87,6 +96,7 @@ namespace Tests.AcceptanceTests
         {
             service.EnterMarket(userId, DateTime.Now);
             Assert.IsFalse(service.Register(userId, username, password, DateTime.Parse("Aug 22, 1972")).ErrorOccured);
+            //Thread.Sleep(60000);
         }
 
         [DataTestMethod]
@@ -153,12 +163,14 @@ namespace Tests.AcceptanceTests
             Assert.AreEqual("Member Member1 is already logged in from another user", service.Login(2, "Member1", "Pass1", DateTime.Now).ErrorMessage);
         }
 
-        public bool Login_Thread(int userId, string username, string password)
+        /*public bool Login_Thread(int userId, string username, string password)
         {
             return service.Login(userId, username, password, DateTime.Now).ErrorOccured;
         }
+            return service.Login(userId, username, password).ErrorOccured;
+        }*/
 
-        [TestMethod]
+        /*[TestMethod]
         public void Test_Login_Bad_LoginTwiceAtTheSameTime()
         {
             bool res1 = false;
@@ -175,7 +187,7 @@ namespace Tests.AcceptanceTests
             thr2.Join();
 
             Assert.AreNotEqual(res1, res2);
-        }
+        }*/
 
         [DataTestMethod]
         [DataRow(1, username, password)]
@@ -343,7 +355,7 @@ namespace Tests.AcceptanceTests
             Assert.IsTrue(service.NominateStoreManager(3, nominator, nominated, storeId, DateTime.Now).ErrorOccured);
         }
 
-        public bool NominateStoreManager_Thread(int userId, string nominator, string password, string nominated, int storeId)
+        /*public bool NominateStoreManager_Thread(int userId, string nominator, string password, string nominated, int storeId)
         {
             //Assert.IsFalse(service.EnterMarket(userId).ErrorOccured);
             Assert.IsFalse(service.Login(userId, nominator, password, DateTime.Now).ErrorOccured);
@@ -379,7 +391,7 @@ namespace Tests.AcceptanceTests
             thr2.Join();
 
             Assert.AreNotEqual(res1, res2);
-        }
+        }*/
 
 
         [DataTestMethod]
@@ -621,8 +633,8 @@ namespace Tests.AcceptanceTests
             Assert.IsFalse(resSC.ErrorOccured);
             Assert.AreEqual(10.0, resSC.Value.Price);
             Assert.AreEqual(1, resSC.Value.ShoppingBags.Count);
-            Assert.AreEqual(1, resSC.Value.ShoppingBags[storeId].Products.Count);
-            AssertProductsEqual(resSC.Value.ShoppingBags[storeId].Products.First(), prod);
+            Assert.AreEqual(1, resSC.Value.ShoppingBags.Where(sb => sb.StoreId == storeId).First().Products.First().Quantity);
+            AssertProductsEqual(resSC.Value.ShoppingBags.Where(sb => sb.StoreId == storeId).First().Products.First(), prod);
         }
 
         [DataTestMethod]
@@ -636,10 +648,10 @@ namespace Tests.AcceptanceTests
             Response<ShoppingCart> resSC = service.EditCart(1, prod.Id, 5);
             Assert.IsFalse(resSC.ErrorOccured);
             Assert.AreEqual(50.0, resSC.Value.Price);
-            Assert.AreEqual(5, resSC.Value.ShoppingBags[storeId].Products.First().Quantity);
+            Assert.AreEqual(5, resSC.Value.ShoppingBags.Where(sb => sb.StoreId == storeId).First().Products.First().Quantity);
             resSC = service.EditCart(1, prod.Id, 1);
             Assert.IsFalse(resSC.ErrorOccured);
-            Assert.AreEqual(1, resSC.Value.ShoppingBags[storeId].Products.First().Quantity);
+            Assert.AreEqual(1, resSC.Value.ShoppingBags.Where(sb => sb.StoreId == storeId).First().Products.First().Quantity);
         }
 
 
@@ -824,7 +836,7 @@ namespace Tests.AcceptanceTests
             Assert.IsTrue(service.ChangeProductCategory(1, username, storeId, prod.Id, cat).ErrorOccured);
         }
 
-        public bool BuyProduct_Thread(int userId, string user, string password, int productId, int storeId, int quantity)
+        /*public bool BuyProduct_Thread(int userId, string user, string password, int productId, int storeId, int quantity)
         {
             Assert.IsFalse(service.Login(userId, user, password, DateTime.Now).ErrorOccured);
             bool ret = service.AddToCart(userId, productId, storeId, quantity).ErrorOccured;
@@ -857,7 +869,7 @@ namespace Tests.AcceptanceTests
             thr2.Join();
 
             Assert.AreNotEqual(res1, res2);
-        }
+        }*/
 
         // PurchaseTerm tests
         private Func<int, string> makeSimpleProductPurchaseTerm(string type, string action, string value)
@@ -1566,14 +1578,14 @@ namespace Tests.AcceptanceTests
             service.Login(55, member2, "Password2", DateTime.Now);
             ShoppingCart cart = service.ViewCart(55).Value;
             Assert.AreEqual(1, cart.ShoppingBags.Count);
-            Assert.AreEqual(2, cart.ShoppingBags[store.StoreId].Products.Count);
-            Assert.AreEqual("Product1", cart.ShoppingBags[store.StoreId].Products[0].Name);
-            Assert.AreEqual(2, cart.ShoppingBags[store.StoreId].Products[0].Quantity);
-            Assert.AreEqual(p1.Id, cart.ShoppingBags[store.StoreId].Products[0].Id);
+            Assert.AreEqual(2, cart.ShoppingBags.Where(sb => sb.StoreId == store.StoreId).First().Products.Count);
+            Assert.AreEqual("Product1", cart.ShoppingBags.Where(sb => sb.StoreId == store.StoreId).First().Products.First().Name);
+            Assert.AreEqual(2, cart.ShoppingBags.Where(sb => sb.StoreId == store.StoreId).First().Products.First().Quantity);
+            Assert.AreEqual(p1.Id, cart.ShoppingBags.Where(sb => sb.StoreId == store.StoreId).First().Products.First().Id);
 
-            Assert.AreEqual("Product2", cart.ShoppingBags[store.StoreId].Products[1].Name);
-            Assert.AreEqual(3, cart.ShoppingBags[store.StoreId].Products[1].Quantity);
-            Assert.AreEqual(p2.Id, cart.ShoppingBags[store.StoreId].Products[1].Id);
+            Assert.AreEqual("Product2", cart.ShoppingBags.Where(sb => sb.StoreId == store.StoreId).First().Products.Last().Name);
+            Assert.AreEqual(3, cart.ShoppingBags.Where(sb => sb.StoreId == store.StoreId).First().Products.Last().Quantity);
+            Assert.AreEqual(p2.Id, cart.ShoppingBags.Where(sb => sb.StoreId == store.StoreId).First().Products.Last().Id);
 
             Assert.IsFalse(service.BuyCart(55, cc, address, DateTime.Now).ErrorOccured);
         }

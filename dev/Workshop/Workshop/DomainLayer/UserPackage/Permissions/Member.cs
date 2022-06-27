@@ -4,10 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using MemberDAL = Workshop.DataLayer.DataObjects.Members.Member;
+using DALObject = Workshop.DataLayer.DALObject;
+using RoleDAL = Workshop.DataLayer.DataObjects.Members.Role;
+using ShoppingCartDAL = Workshop.DataLayer.DataObjects.Market.ShoppingCart;
+using DataHandler = Workshop.DataLayer.DataHandler;
+using Workshop.DomainLayer.UserPackage.Shopping;
 
 namespace Workshop.DomainLayer.UserPackage.Permissions
 {
-    public class Member : User
+    public class Member : User, IPersistentObject<MemberDAL>
     {
         public string Username { get; }
         internal string Password { get; }
@@ -16,6 +22,8 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         private List<Role> roles;
 
         private ReaderWriterLock rwl;
+
+        private MemberDAL memberDAL;
 
         public Member(string username, string password, DateTime birthdate)
         {
@@ -26,6 +34,29 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             Birthdate = birthdate;
             roles = new List<Role>();
             this.rwl = new ReaderWriterLock();
+            shoppingCart = new MemberShoppingCart();
+
+            memberDAL = new MemberDAL(password, username, birthdate, new List<RoleDAL>(), ((MemberShoppingCart)shoppingCart).ToDAL());
+            DataHandler.getDBHandler().save(memberDAL);
+        }
+
+        public Member(MemberDAL memberDAL)
+        {
+            this.memberDAL = memberDAL;
+            Username = memberDAL.MemberName;
+            Password = memberDAL.Password;
+            Birthdate = memberDAL.Birthdate;
+            roles = new List<Role>();
+            foreach (RoleDAL role in memberDAL.Roles)
+                roles.Add(Role.createRole(role));
+            this.rwl = new ReaderWriterLock();
+            shoppingCart = new MemberShoppingCart(memberDAL.ShoppingCart);
+        }
+
+
+        public MemberDAL ToDAL()
+        {
+            return memberDAL;
         }
 
         public IReadOnlyList<Role> GetAllRoles()
@@ -76,6 +107,8 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             }
             LockCookie lc = rwl.UpgradeToWriterLock(Timeout.Infinite);
             roles.Add(role);
+            memberDAL.Roles.Add(role.ToDAL());
+            DataHandler.getDBHandler().update(memberDAL);
             rwl.DowngradeFromWriterLock(ref lc);
             rwl.ReleaseReaderLock();
         }
@@ -83,17 +116,34 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         public void RemoveRole(Role role)
         {
             rwl.AcquireReaderLock(Timeout.Infinite);
+
+            if(roles.Contains(role))
+            {
+                LockCookie lc = rwl.UpgradeToWriterLock(Timeout.Infinite);
+                roles.Remove(role);
+                memberDAL.Roles.Remove(role.ToDAL());
+                DataHandler.getDBHandler().update(memberDAL);
+                rwl.DowngradeFromWriterLock(ref lc);
+                rwl.ReleaseReaderLock();
+                return;
+            }
+                
+            /*
             foreach (Role role2 in roles)
             {
                 if (role.Equals(role2))
                 {
                     LockCookie lc = rwl.UpgradeToWriterLock(Timeout.Infinite);
-                    roles.Remove(role2);
+                    roles.Remove(role2); //TODO fix deleting from collection while iteration over it
+                    memberDAL.Roles.Remove(role2.ToDAL());
+                    DataHandler.getDBHandler().update(memberDAL);
                     rwl.DowngradeFromWriterLock(ref lc);
                     rwl.ReleaseReaderLock();
                     return;
                 }
             }
+            */
+            
             rwl.ReleaseReaderLock();
             throw new InvalidOperationException($"Member {this.Username} does not have the requested role.");
         }
