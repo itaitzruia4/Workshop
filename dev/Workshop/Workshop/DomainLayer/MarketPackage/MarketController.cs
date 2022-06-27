@@ -95,6 +95,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 userController.RegisterToEvent(nominated.Username, new Event("OpenStore" + storeId, "", "MarketController"));
                 userController.RegisterToEvent(nominated.Username, new Event("CloseStore" + storeId, "", "MarketController"));
                 userController.RegisterToEvent(nominated.Username, new Event("BidOfferInStore" + storeId, "", "MarketController"));
+                userController.RegisterToEvent(nominated.Username, new Event("ReviewInStore" + storeId, "", "MarketController"));
 
                 userController.UpdateUserStatistics(nominated, date);
 
@@ -193,6 +194,7 @@ namespace Workshop.DomainLayer.MarketPackage
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("OpenStore" + storeId, "", "MarketController"));
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("CloseStore" + storeId, "", "MarketController"));
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("BidOfferInStore" + storeId, "", "MarketController"));
+            userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("ReviewInStore" + storeId, "", "MarketController"));
             userController.notify(new Event("RemoveStoreOwnerNominationFrom" + nominated, "Removed store owner nomination from member " + nominated, "MarketController"));
             Logger.Instance.LogEvent($"Member {nominator} successfuly removed store owner nomination from {nominated} in store {storeId}.");
             return nominatedMember;
@@ -572,6 +574,7 @@ namespace Workshop.DomainLayer.MarketPackage
             userController.RegisterToEvent(creator, new Event("CloseStore" + storeId, "", "MarketController"));
             userController.RegisterToEvent(creator, new Event("BidOfferInStore" + storeId, "", "MarketController"));
             userController.RegisterToEvent(creator, new Event("StoreOwnerVoting" + storeId, "", "MarketController"));
+            userController.RegisterToEvent(creator, new Event("ReviewInStore" + storeId, "", "MarketController"));
             Logger.Instance.LogEvent($"{creator} successfuly created store \"{storeName}\", and received a new store ID: {storeId}.");
             return store;
         }

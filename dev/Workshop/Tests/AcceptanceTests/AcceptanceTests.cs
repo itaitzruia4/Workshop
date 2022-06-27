@@ -456,6 +456,22 @@ namespace Tests.AcceptanceTests
             Assert.IsFalse(service.ReviewProduct(1, username, prodId, "Blank", 6).ErrorOccured);
         }
 
+        [TestMethod]
+        public void Test_ReviewProduct_SendsNotifications()
+        {
+            Test_Login_Good(1, "member1", "pass");
+            Test_Login_Good(2, "member2", "pass");
+            int storeId = service.CreateNewStore(1, "member1", "RandomStore", DateTime.Now).Value.StoreId;
+            int prodId = service.AddProduct(1, "member1", storeId, "TestReviewProduct", "Good", 1, 2, "cat1").Value.Id;
+            service.AddToCart(2, prodId, storeId, 1);
+            service.BuyCart(2, cc, address, DateTime.Now);
+            service.TakeNotifications(1, "member1");
+            service.TakeNotifications(2, "member2");
+            Assert.IsFalse(service.ReviewProduct(2, "member2", prodId, "Blank", 6).ErrorOccured);
+            Assert.AreEqual(1, service.TakeNotifications(1, "member1").Value.Count);
+            Assert.AreEqual(0, service.TakeNotifications(2, "member2").Value.Count);
+        }
+
         [DataTestMethod]
         [DataRow(username, password)]
         public void Test_ReviewProduct_Bad_userLoggeedOut(string username, string password)
@@ -2528,15 +2544,15 @@ namespace Tests.AcceptanceTests
         }
 
         [DataTestMethod]
-        [DataRow("Aug 21, 1980", "Aug 21, 1990", 1, 0, 0, 0, 0)]
-        [DataRow("Aug 21, 1980", "Aug 22, 1990", 2, 0, 0, 0, 0)]
-        [DataRow("Aug 21, 1980", "May 22, 2022", 3, 0, 0, 0, 0)]
+        [DataRow("Aug 22, 1980", "Aug 21, 1990", 1, 0, 0, 0, 0)]
+        [DataRow("Aug 22, 1980", "Aug 22, 1990", 2, 0, 0, 0, 0)]
+        [DataRow("Aug 22, 1980", "May 22, 2022", 3, 0, 0, 0, 0)]
         [DataRow("Aug 22, 1980", "Jun 14, 2022", 3, 1, 0, 1, 0)]
         [DataRow("Aug 22, 1980", "Jun 15, 2022", 3, 2, 1, 1, 0)]
         [DataRow("Aug 22, 1980", "Jun 16, 2022", 3, 2, 1, 1, 1)]
 
-        [DataRow("Aug 21, 1990", "Aug 22, 1990", 1, 0, 0, 0, 0)]
-        [DataRow("Aug 21, 1990", "May 22, 2022", 2, 0, 0, 0, 0)]
+        [DataRow("Aug 22, 1990", "Aug 22, 1990", 1, 0, 0, 0, 0)]
+        [DataRow("Aug 22, 1990", "May 22, 2022", 2, 0, 0, 0, 0)]
         [DataRow("Aug 22, 1990", "Jun 14, 2022", 2, 1, 0, 1, 0)]
         [DataRow("Aug 22, 1990", "Jun 15, 2022", 2, 2, 1, 1, 0)]
         [DataRow("Aug 22, 1990", "Jun 16, 2022", 2, 2, 1, 1, 1)]
