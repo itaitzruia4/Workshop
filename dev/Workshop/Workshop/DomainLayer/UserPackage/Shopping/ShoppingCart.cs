@@ -36,11 +36,11 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
         }
         public int checkIfHasBag(int ProductId)
         {
-            foreach (int key in shoppingBags.Keys)
+            foreach (ShoppingBag sb in shoppingBags.Values)
             {
-                if(shoppingBags[key].HasProduct(ProductId))
+                if(sb.HasProduct(ProductId))
                 {
-                    return key;
+                    return sb.StoreId;
                 }
             }
             return -1;

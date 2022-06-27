@@ -24,7 +24,7 @@ namespace Workshop.DomainLayer.MarketPackage
         private ConcurrentDictionary<int, ReaderWriterLock> storesLocks;
         private IExternalSystem ExternalSystem;
         private int STORE_COUNT = 0;
-        private int PRODUCT_COUNT = 1;
+        private int PRODUCT_COUNT = 0;
         public MarketController(IUserController userController, IExternalSystem externalSystem)
         {
             this.userController = userController;
@@ -33,7 +33,7 @@ namespace Workshop.DomainLayer.MarketPackage
             this.stores = new ConcurrentDictionary<int, Store>();
             this.storesLocks = new ConcurrentDictionary<int, ReaderWriterLock>();
             STORE_COUNT = 0;
-            PRODUCT_COUNT = 1;
+            PRODUCT_COUNT = 0;
         }
 
         public void InitializeSystem()
@@ -310,7 +310,7 @@ namespace Workshop.DomainLayer.MarketPackage
             ViewStorePermission(userId, username, storeId);
             if (!IsAuthorized(userId, username, storeId, Action.AddProduct))
                 throw new MemberAccessException("This user is not authorized for adding products to the specified store.");
-            product = stores[storeId].AddProduct(name, PRODUCT_COUNT++, description, price, quantity, category);
+            product = stores[storeId].AddProduct(name, Interlocked.Increment(ref PRODUCT_COUNT), description, price, quantity, category);
             storesLocks[storeId].ReleaseWriterLock();
             Logger.Instance.LogEvent($"{username} successfuly added Product {name} to store {storeId}.");
             return product;
@@ -559,14 +559,13 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 throw new ArgumentException($"Entered date is not valid: {date}");
             }
-            int storeId = STORE_COUNT;
+            int storeId = Interlocked.Increment(ref STORE_COUNT);
             ReaderWriterLock rwl = new ReaderWriterLock();
             storesLocks[storeId] = rwl;
             rwl.AcquireWriterLock(Timeout.Infinite);
             userController.AddStoreFounder(creator, storeId, date);
             Store store = new Store(storeId, storeName, userController.GetMember(creator));
             stores[storeId] = store;
-            STORE_COUNT++;
             rwl.ReleaseWriterLock();
 
             userController.RegisterToEvent(creator, new Event("SaleInStore" + storeId, "", "MarketController"));
