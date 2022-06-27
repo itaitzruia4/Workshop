@@ -10,7 +10,7 @@ import Stack from '@mui/material/Stack';
 
 
 import { memberToken, Actions, StorePermission, hasPermission } from '../Types/roles';
-import { Store } from "../Types/store"
+import { Store , Order} from "../Types/store"
 import { Product } from "../Types/product"
 import { Cart, Bag } from '../Types/shopping';
 import { MarketNotification } from '../Types/Notification';
@@ -21,6 +21,7 @@ export default function StoreCard(
     props: {
         store: Store,
         permissions: Actions[],
+        orders: Order[]
         closeStore: (storeId: number) => void,
         openStore: (storeId: number) => void,
         addProduct: (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => void,
@@ -40,7 +41,7 @@ export default function StoreCard(
         addActionToManager: (nominee: string, storeId: number, action: string) => void,
         getStorePurchaseHistory: (storeId: number) => void
     }) {
-    const { store, permissions, closeStore, openStore, addProduct, removeProduct, updateProduct, reviewProduct,
+    const { store, permissions, orders, closeStore, openStore, addProduct, removeProduct, updateProduct, reviewProduct,
         addDiscount, addProductDiscount, addCategoryDiscount, addProductPurchasePolicy, addCategoryPurchasePolicy,
         addBagPurchasePolicy, addUserPurchasePolicy, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination, addActionToManager, getStorePurchaseHistory } = props
     const [checked, setChecked] = React.useState(store.open);
@@ -61,9 +62,6 @@ export default function StoreCard(
                 <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                     {'store id: ' + store.storeId}
                 </Typography>
-                <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                    {permissions}
-                </Typography>
                 <Stack direction="row" spacing={1} alignItems="center">
                     <Typography>Close</Typography>
                     <Switch
@@ -75,7 +73,7 @@ export default function StoreCard(
                 </Stack>
             </CardContent>
             <CardActions>
-                <StoreAdjust store={store} permissions={permissions} addProduct={addProduct}
+                <StoreAdjust store={store} permissions={permissions} orders={orders } addProduct={addProduct}
                     removeProduct={removeProduct} updateProduct={updateProduct} reviewProduct={reviewProduct}
                     addDiscount={addDiscount} addProductDiscount={addProductDiscount} addCategoryDiscount={addCategoryDiscount}
                     addProductPurchasePolicy={addProductPurchasePolicy} addCategoryPurchasePolicy={addCategoryPurchasePolicy}
