@@ -177,11 +177,9 @@ export default function StoreAdjust(
                         </ButtonGroup>
                     </TabPanel>
                     <TabPanel value={value} index={3}>
-                    {hasPermission(Actions.ViewStorePurchaseHistory, permissions) ?           
-                            <StorePurchaseHistory store={store} orders={orders } />
-                            : <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                You dont have permission to view this store's purchase history
-                            </Typography>}
+                        
+                    
+                        <StorePurchaseHistory store={store} orders={orders} />
                     </TabPanel>
                 </Box>
             </Dialog>
