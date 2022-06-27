@@ -82,7 +82,7 @@ namespace Workshop.ServiceLayer
                                     if (actualParams.Length != 2) { throw new ArgumentException(); }
                                     facade.Logout(int.Parse(actualParams[0]), actualParams[1]);
                                     break;
-                                case "add-Product":
+                                case "add-product":
                                     if (actualParams.Length != 8) { throw new ArgumentException(); }
                                     facade.AddProduct(int.Parse(actualParams[0]), actualParams[1], int.Parse(actualParams[2]), actualParams[3], actualParams[4], double.Parse(actualParams[5]), int.Parse(actualParams[6]), actualParams[7]);
                                     break;
