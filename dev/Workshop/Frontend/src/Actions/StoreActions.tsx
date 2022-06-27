@@ -224,7 +224,7 @@ export function handleNominateStoreOwner(token: memberToken, storeId: number, no
         if (!response.ok) {
             return Promise.reject(data.error);
         }
-        alert(`${nominee} is now Store Owner of store ${storeId}`);
+        alert(`Voted for ${nominee} to be Store Owner of store ${storeId}`);
         return Promise.resolve(data.value)
     })
 }

@@ -48,8 +48,8 @@ export const removeMember = (token: memberToken, membername: string): void => {
         });
 }
 
-function handleGetStorePurchaseHistory(token: memberToken, storeId: number): Promise<any> {
-    let url = "http://localhost:5165/api/store/GetDailyIncomeStore";
+export function handleGetStorePurchaseHistory(token: memberToken, storeId: number): Promise<any> {
+    let url = "http://localhost:5165/api/store/getstorepurchasehistory";
 
     return fetch(url, {
         method: 'POST',
@@ -69,12 +69,7 @@ function handleGetStorePurchaseHistory(token: memberToken, storeId: number): Pro
     })
 }
 
-export const getStorePurchaseHistory = (token: memberToken, storeId: number): void => {
-    handleGetStorePurchaseHistory(token, storeId)
-        .catch(error => {
-            alert(error)
-        });
-}
+
 
 export function handleGetMemberInformation(token: memberToken): Promise<any> {
     let url = "http://localhost:5165/api/useractions/getmembersonlinestats";
