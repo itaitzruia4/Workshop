@@ -456,6 +456,22 @@ namespace Tests.AcceptanceTests
             Assert.IsFalse(service.ReviewProduct(1, username, prodId, "Blank", 6).ErrorOccured);
         }
 
+        [TestMethod]
+        public void Test_ReviewProduct_SendsNotifications()
+        {
+            Test_Login_Good(1, "member1", "pass");
+            Test_Login_Good(2, "member2", "pass");
+            int storeId = service.CreateNewStore(1, "member1", "RandomStore", DateTime.Now).Value.StoreId;
+            int prodId = service.AddProduct(1, "member1", storeId, "TestReviewProduct", "Good", 1, 2, "cat1").Value.Id;
+            service.AddToCart(2, prodId, storeId, 1);
+            service.BuyCart(2, cc, address, DateTime.Now);
+            service.TakeNotifications(1, "member1");
+            service.TakeNotifications(2, "member2");
+            Assert.IsFalse(service.ReviewProduct(2, "member2", prodId, "Blank", 6).ErrorOccured);
+            Assert.AreEqual(1, service.TakeNotifications(1, "member1").Value.Count);
+            Assert.AreEqual(0, service.TakeNotifications(2, "member2").Value.Count);
+        }
+
         [DataTestMethod]
         [DataRow(username, password)]
         public void Test_ReviewProduct_Bad_userLoggeedOut(string username, string password)

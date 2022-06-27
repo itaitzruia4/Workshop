@@ -442,11 +442,13 @@ namespace Workshop.DomainLayer.UserPackage
             AssertCurrentUser(userId, user);
             List<OrderDTO> orders = orderHandler.GetOrders(user);
             bool purchasedProduct = false;
+            int storeId = -1;
             foreach (OrderDTO order in orders)
             {
                 if (order.ContainsProduct(productId))
                 {
                     purchasedProduct = true;
+                    storeId = order.storeId;
                     break;
                 }
             }
@@ -456,6 +458,7 @@ namespace Workshop.DomainLayer.UserPackage
                 throw new ArgumentException($"Username {user} did not purchase Product {productId}");
             }
             Logger.Instance.LogEvent("User " + user + " successfuly reviewed Product " + productId);
+            notify(new Event("ReviewInStore" + storeId, $"Member {user} has reviewed product {productId} in store {storeId}", "UserController"));
             return reviewHandler.AddReview(user, productId, review, rating);
         }
 
