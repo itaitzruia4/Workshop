@@ -15,7 +15,7 @@ namespace API.Controllers
     {
         IService Service;
         StaisticsViewingServer StatsServer;
-        static int userId = 0;
+        static Lazy<int> userId = new Lazy<int>(() => 0);
         public AuthenticationController(IService service, StaisticsViewingServer statsServer)
         {
             Service = service;
