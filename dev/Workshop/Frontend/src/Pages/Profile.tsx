@@ -18,7 +18,7 @@ import AddStoreDialog from '../Components/Dialogs/addStoreDialog';
 import StoreCard from '../Components/StoreCard';
 
 import { memberToken, Actions, StorePermission, permissionsById, isManager } from '../Types/roles';
-import { Store, storeById, Order } from "../Types/store"
+import { Store, storeById, Order, getOrders } from "../Types/store"
 import { Product } from "../Types/product"
 import { Cart, Bag } from '../Types/shopping';
 import { MarketNotification } from '../Types/Notification';
@@ -38,7 +38,7 @@ function Profile() {
 
     const [stores, setStores] = useState<Store[]>([])
     const [permissionsInfo, setPermissionsInfo] = useState<StorePermission[]>([])
-    const [orders, setOrders] = useState<Order[]>([])
+    const [orders, setOrders] = useState < {id: number ,orders : Order[]}[] >([])
 
     const location = useLocation();
     const token = location.state as memberToken;
@@ -48,9 +48,16 @@ function Profile() {
         () =>
             navigate(path, { state: token });
 
+
     const refresh = () => {
         handleGetMemberPermissions(token).then(value => { setPermissionsInfo(value as StorePermission[])}).catch(error => alert(error));
-        handleGetStores(token).then(value => setStores(value as Store[])).catch(error => alert(error));
+        handleGetStores(token).then(value => {
+            setStores(value as Store[])
+            setOrders([]);
+            stores.map(store => {
+                handleGetStorePurchaseHistory(token, store.storeId).then(value => setOrders([{ id: store.storeId, orders: value as Order[] }, ...orders]))
+            })
+        }).catch(error => alert(error));      
     };
 
     const addStore = (storeName: string) => {
@@ -199,12 +206,12 @@ function Profile() {
             <Typography sx={{ ml: 2, flex: 1 }} variant="h3" component="div">Your stores</Typography>
            <Grid container item spacing={3}>
                 {stores.map(store => {
-                    console.log(permissionsInfo)
                     const permissions = permissionsById(store.storeId, permissionsInfo);
-                    return ( 
+                    return (
+                        
                         isManager(store.storeId, permissionsInfo) ?
                             <Grid item >
-                                <StoreCard store={store} permissions={permissions}
+                                <StoreCard store={store} permissions={permissions} orders={getOrders(orders, store.storeId ) }
                                     closeStore={closeStore} openStore={openStore} addProduct={addProduct}
                                     removeProduct={removeProduct} updateProduct={updateProduct} reviewProduct={reviewProduct}
                                     addDiscount={addDiscount} addProductDiscount={addProductDiscount} addCategoryDiscount={addCategoryDiscount}

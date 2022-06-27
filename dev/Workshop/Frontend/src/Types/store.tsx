@@ -19,6 +19,10 @@ export type SupplyAdress = {
     zip: string
 }
 
+export const getAddressString = (address: SupplyAdress): string => {
+    return address.country + " - " + address.city + " - " + address.address
+}
+
 export type Order = {
     id: number,
     buyerName: string,
@@ -28,7 +32,9 @@ export type Order = {
     date: string,
     price: number
 }
-
+export const getOrders = (orders: { id: number, orders: Order[] }[], id: number): Order[] => {
+    return orders.length > 0 ? orders.find(o => o.id === id)!.orders : [];
+}
 export const isStore = (x: any): x is Store => x.tag === "Store";
 export const makeStore = (products: Product[], name: string, storeId: number, open: boolean): Store =>
     ({ products: products, name: name, storeId: storeId, open: open });
