@@ -47,23 +47,22 @@ namespace Workshop.DomainLayer.MarketPackage
             store_discount = null;
             this.store = store;
             this.discountPolicyDAL = new DiscountPolicyDAL(new List<ProductDiscountDAL>(), new List<CategoryDiscountDAL>(), null);
-            DataHandler.getDBHandler().save(discountPolicyDAL);
+            DataHandler.Instance.Value.save(discountPolicyDAL);
         }
 
-        public DiscountPolicy(DiscountPolicyDAL discountPolicyDAL, Store store)
+        public DiscountPolicy(DiscountPolicyDAL discountPolicyDAL1, Store store)
         {
             this.products_discounts = new Dictionary<int, Discount>();
             this.category_discounts = new Dictionary<string, Discount>();
             this.store_discount = null;
             this.store = store;
-            this.discountPolicyDAL = null;
-            foreach(ProductDiscountDAL productDiscount in discountPolicyDAL.products_discounts)
+            foreach(ProductDiscountDAL productDiscount in discountPolicyDAL1.products_discounts)
                 AddProductDiscount(productDiscount.Discount.discountJson, productDiscount.ProductId, productDiscount.Discount);
-            foreach(CategoryDiscountDAL categoryDiscount in discountPolicyDAL.category_discounts)
+            foreach(CategoryDiscountDAL categoryDiscount in discountPolicyDAL1.category_discounts)
                 AddCategoryDiscount(categoryDiscount.Discount.discountJson, categoryDiscount.Name, categoryDiscount.Discount);
-            if(discountPolicyDAL.store_discount != null)
-                AddStoreDiscount(discountPolicyDAL.store_discount.discountJson);
-            this.discountPolicyDAL = discountPolicyDAL;
+            if(discountPolicyDAL1.store_discount != null)
+                AddStoreDiscount(discountPolicyDAL1.store_discount.discountJson);
+            this.discountPolicyDAL = discountPolicyDAL1;
         }
 
         public DiscountPolicyDAL ToDAL()
@@ -86,9 +85,9 @@ namespace Workshop.DomainLayer.MarketPackage
                 if (this.discountPolicyDAL != null)
                 {
                     products_discounts[product_id].DALDiscount = new DiscountDAL(json_discount);
-                    DataHandler.getDBHandler().save(products_discounts[product_id].DALDiscount);
+                    DataHandler.Instance.Value.save(products_discounts[product_id].DALDiscount);
                     this.discountPolicyDAL.products_discounts.Add(new ProductDiscountDAL(product_id, discount.ToDAL()));
-                    DataHandler.getDBHandler().update(discountPolicyDAL);
+                    DataHandler.Instance.Value.update(discountPolicyDAL);
                 }
             }
             else
@@ -97,10 +96,13 @@ namespace Workshop.DomainLayer.MarketPackage
                 if (this.discountPolicyDAL != null)
                 {
                     products_discounts[product_id].DALDiscount = new DiscountDAL(json_discount);
-                    DataHandler.getDBHandler().save(products_discounts[product_id].DALDiscount);
+                    DataHandler.Instance.Value.save(products_discounts[product_id].DALDiscount);
                     ProductDiscountDAL dal_discount = this.discountPolicyDAL.products_discounts.Find(d => d.ProductId == product_id);
-                    dal_discount.Discount = products_discounts[product_id].ToDAL();
-                    DataHandler.getDBHandler().update(dal_discount);
+                    if (dal_discount != null)
+                    {
+                        dal_discount.Discount = products_discounts[product_id].ToDAL();
+                        DataHandler.Instance.Value.update(dal_discount);
+                    }
                 }
             }
         }
@@ -120,9 +122,9 @@ namespace Workshop.DomainLayer.MarketPackage
                 if (this.discountPolicyDAL != null)
                 {
                     category_discounts[category_name].DALDiscount = new DiscountDAL(json_discount);
-                    DataHandler.getDBHandler().save(category_discounts[category_name].DALDiscount);
+                    DataHandler.Instance.Value.save(category_discounts[category_name].DALDiscount);
                     this.discountPolicyDAL.category_discounts.Add(new CategoryDiscountDAL(category_name, discount.ToDAL()));
-                    DataHandler.getDBHandler().update(discountPolicyDAL);
+                    DataHandler.Instance.Value.update(discountPolicyDAL);
                 }
             }
             else
@@ -131,10 +133,13 @@ namespace Workshop.DomainLayer.MarketPackage
                 if (this.discountPolicyDAL != null)
                 {
                     category_discounts[category_name].DALDiscount = new DiscountDAL(json_discount);
-                    DataHandler.getDBHandler().save(category_discounts[category_name].DALDiscount);
+                    DataHandler.Instance.Value.save(category_discounts[category_name].DALDiscount);
                     CategoryDiscountDAL dal_discount = this.discountPolicyDAL.category_discounts.Find(d => d.Name == category_name);
-                    dal_discount.Discount = category_discounts[category_name].ToDAL();
-                    DataHandler.getDBHandler().update(dal_discount);
+                    if (dal_discount != null)
+                    {
+                        dal_discount.Discount = category_discounts[category_name].ToDAL();
+                        DataHandler.Instance.Value.update(dal_discount);
+                    }
                 }
             }
         }
@@ -159,9 +164,9 @@ namespace Workshop.DomainLayer.MarketPackage
             if (this.discountPolicyDAL != null)
             {
                 store_discount.DALDiscount = new DiscountDAL(json_discount);
-                DataHandler.getDBHandler().save(store_discount.DALDiscount);
+                DataHandler.Instance.Value.save(store_discount.DALDiscount);
                 this.discountPolicyDAL.store_discount = store_discount.ToDAL();
-                DataHandler.getDBHandler().update(discountPolicyDAL);
+                DataHandler.Instance.Value.update(discountPolicyDAL);
             }
         }
 
@@ -169,11 +174,11 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             dynamic discount_data = JObject.Parse(json_discount);
             Discount discount = ParseDiscount(discount_data);
-            /*if (this.discountPolicyDAL != null)
+            if (this.discountPolicyDAL != null)
             {
                 discount.DALDiscount = new DiscountDAL(json_discount);
-                DataHandler.getDBHandler().save(discount.DALDiscount);
-            }*/
+                DataHandler.Instance.Value.save(discount.DALDiscount);
+            }
             return discount;
         }
 

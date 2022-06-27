@@ -64,14 +64,18 @@ namespace Workshop.DomainLayer.MarketPackage
             open = true; //TODO: check if on init store supposed to be open or closed.
             owners.Add(founder);
             bid_id_count = 0;
-            DataHandler.getDBHandler().save(storeDAL);
+            DataHandler.Instance.Value.save(storeDAL);
         }
 
         public bool AddOwner(Member owner)
         {
-            storeDAL.Owners.Add(owner.ToDAL());
-            DataHandler.getDBHandler().update(storeDAL);
-            return owners.Add(owner);
+            bool temp = owners.Add(owner);
+            if (temp)
+            {
+                storeDAL.Owners.Add(owner.ToDAL());
+                DataHandler.Instance.Value.update(storeDAL);
+            }
+            return temp;
         }
 
         public Store(StoreDAL storeDAL, HashSet<Member> owners)
@@ -172,14 +176,14 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             this.open = true;
             storeDAL.Open = true;
-            DataHandler.getDBHandler().update(storeDAL);
+            DataHandler.Instance.Value.update(storeDAL);
         }
 
         public void CloseStore()
         {
             this.open = false;
             storeDAL.Open = false;
-            DataHandler.getDBHandler().update(storeDAL);
+            DataHandler.Instance.Value.update(storeDAL);
         }
 
         public Product AddProduct(string name, int productId, string description, double price, int quantity, string category)
@@ -191,7 +195,7 @@ namespace Workshop.DomainLayer.MarketPackage
             Product newProd = new Product(productId, name, description, price, quantity, category, id);
             products.Add(productId, newProd);
             storeDAL.Products.Add(newProd.ToDAL());
-            DataHandler.getDBHandler().update(storeDAL);
+            DataHandler.Instance.Value.update(storeDAL);
             return newProd;
         }
 
@@ -207,8 +211,8 @@ namespace Workshop.DomainLayer.MarketPackage
             products.Remove(productID);
             ProductDAL pDAL = storeDAL.Products.Find(x => x.Id == productID);
             storeDAL.Products.Remove(pDAL);
-            DataHandler.getDBHandler().update(storeDAL);
-            DataHandler.getDBHandler().remove(pDAL);
+            DataHandler.Instance.Value.update(storeDAL);
+            DataHandler.Instance.Value.remove(pDAL);
         }
 
         public void ChangeProductName(int productID, string name)
@@ -219,8 +223,11 @@ namespace Workshop.DomainLayer.MarketPackage
             products[productID].Name = name;
 
             ProductDAL pDAL = storeDAL.Products.Find(x => x.Id == productID);
-            pDAL.Name = name;
-            DataHandler.getDBHandler().update(pDAL);
+            if (pDAL != null)
+            {
+                pDAL.Name = name;
+                DataHandler.Instance.Value.update(pDAL);
+            }
         }
 
         public void ChangeProductDescription(int productID, string description)
@@ -230,8 +237,11 @@ namespace Workshop.DomainLayer.MarketPackage
             products[productID].Description = description;
 
             ProductDAL pDAL = storeDAL.Products.Find(x => x.Id == productID);
-            pDAL.Description = description;
-            DataHandler.getDBHandler().update(pDAL);
+            if (pDAL != null)
+            {
+                pDAL.Description = description;
+                DataHandler.Instance.Value.update(pDAL);
+            }
         }
 
         public void ChangeProductPrice(int productID, double price)
@@ -242,8 +252,11 @@ namespace Workshop.DomainLayer.MarketPackage
             products[productID].Price = price;
 
             ProductDAL pDAL = storeDAL.Products.Find(x => x.Id == productID);
-            pDAL.Price = price;
-            DataHandler.getDBHandler().update(pDAL);
+            if (pDAL != null)
+            {
+                pDAL.Price = price;
+                DataHandler.Instance.Value.update(pDAL);
+            }
         }
         public void ChangeProductQuantity(int productID, int quantity)
         {
@@ -253,8 +266,11 @@ namespace Workshop.DomainLayer.MarketPackage
             products[productID].Quantity = quantity;
 
             ProductDAL pDAL = storeDAL.Products.Find(x => x.Id == productID);
-            pDAL.Quantity = quantity;
-            DataHandler.getDBHandler().update(pDAL);
+            if (pDAL != null)
+            {
+                pDAL.Quantity = quantity;
+                DataHandler.Instance.Value.update(pDAL);
+            }
         }
 
         public void ChangeProductCategory(int productID, string category)
@@ -265,8 +281,11 @@ namespace Workshop.DomainLayer.MarketPackage
             products[productID].Category = category;
 
             ProductDAL pDAL = storeDAL.Products.Find(x => x.Id == productID);
-            pDAL.Category = category;
-            DataHandler.getDBHandler().update(pDAL);
+            if (pDAL != null)
+            {
+                pDAL.Category = category;
+                DataHandler.Instance.Value.update(pDAL);
+            }
         }
 
         public void AddProductDiscount(string json_discount, int product_id)
@@ -366,7 +385,7 @@ namespace Workshop.DomainLayer.MarketPackage
         {
             owners.Remove(nominatedMember);
             storeDAL.Owners.Remove(nominatedMember.ToDAL());
-            DataHandler.getDBHandler().update(storeDAL);
+            DataHandler.Instance.Value.update(storeDAL);
         }
 
         internal void restoreProduct(ProductDTO product)

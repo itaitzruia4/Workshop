@@ -23,7 +23,7 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
             Message = message;
             Sender = sender;
             this.EventDAL = new EventDAL(name, message, sender);
-            DataHandler.getDBHandler().save(EventDAL);
+            DataHandler.Instance.Value.save(EventDAL);
         }
 
         public Event(EventDAL eventDAL)

@@ -34,8 +34,6 @@ namespace Workshop.ServiceLayer
             string starting_state_file = null;
             bool USE_DB = false;
             bool USE_EXTERNAL_SYSTEM = false;
-            Mock<DbContext> context = new Mock<DbContext>();
-            context.Setup(x => x.OnConfiguring(It.IsAny<DbContextOptionsBuilder>)).Callback();
             Mock<IExternalSystem> externalSystem = new Mock<IExternalSystem>();
             externalSystem.Setup(x => x.Supply(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(new Random().Next(10000, 100000));
             externalSystem.Setup(x => x.Cancel_Supply(It.IsAny<int>())).Returns(1);
@@ -59,7 +57,7 @@ namespace Workshop.ServiceLayer
                 {
                     Logger.Instance.LogError("Starting state file does not exist");
                 }
-                facade = new Facade(USE_EXTERNAL_SYSTEM ? new ExternalSystem() : externalSystem.Object, systemManagers, USE_DB ? new Context() : context.Object);
+                facade = new Facade(USE_EXTERNAL_SYSTEM ? new ExternalSystem() : externalSystem.Object, systemManagers);
                 try
                 {
                     foreach (string command in initializationState.Split('\n'))
@@ -310,16 +308,15 @@ namespace Workshop.ServiceLayer
             WasInitializedWithFile = starting_state_file != null ? parse_ss(starting_state_file) : false;
             if (facade == null)
             {
-                facade = new Facade(USE_EXTERNAL_SYSTEM ? new ExternalSystem() : externalSystem.Object, systemManagers, USE_DB ? new Context() : context.Object);
+                facade = new Facade(USE_EXTERNAL_SYSTEM ? new ExternalSystem() : externalSystem.Object, systemManagers);
             }
         }
 
         public Service(IExternalSystem externalSystem)
         {
             List<SystemAdminDTO> systemManagers = new List<SystemAdminDTO>();
-            Mock<Context> context = new Mock<Context>();
             systemManagers.Add(new SystemAdminDTO("admin", "admin", "22/08/1972"));
-            facade = new Facade(externalSystem, systemManagers, context.Object);
+            facade = new Facade(externalSystem, systemManagers);
         }
 
         public int GetPort()

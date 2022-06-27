@@ -20,7 +20,7 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
             this.Sender = sender;
             this.TimeOfEvent = dateTimeOfEvent;
             this.notificationDAL = new NotificationDAL(message, sender, dateTimeOfEvent);
-            DataHandler.getDBHandler().save(notificationDAL);
+            DataHandler.Instance.Value.save(notificationDAL);
         }
 
         public Notification(Event eventt, DateTime dateTimeOfEvent)
@@ -29,7 +29,7 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
             this.Sender = eventt.Sender;
             this.TimeOfEvent = dateTimeOfEvent;
             this.notificationDAL = new NotificationDAL(eventt.Message,eventt.Sender, TimeOfEvent);
-            DataHandler.getDBHandler().save(notificationDAL);
+            DataHandler.Instance.Value.save(notificationDAL);
         }
 
         public Notification(NotificationDAL notificationDAL)

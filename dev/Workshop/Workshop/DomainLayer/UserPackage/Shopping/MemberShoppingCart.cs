@@ -20,7 +20,7 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
         public MemberShoppingCart() : base()
         {
             shoppingCartDAL = new ShoppingCartDAL(new List<ShoppingBagDAL>());
-            DataHandler.getDBHandler().save(shoppingCartDAL);
+            DataHandler.Instance.Value.save(shoppingCartDAL);
         }
 
         public MemberShoppingCart(ShoppingCartDAL shoppingCartDAL)
@@ -43,7 +43,7 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
             }
 
             ShoppingBagProduct productRet = shoppingBags[storeId].addToBag(product);
-            DataHandler.getDBHandler().update(shoppingCartDAL);
+            DataHandler.Instance.Value.update(shoppingCartDAL);
             return productRet;
         }
 
@@ -57,14 +57,14 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
                 foreach (ShoppingBagProductDAL sbpDAL in sbDAL.Products)
                 {
                     trsbp.Add(sbpDAL);
-                    //DataHandler.getDBHandler().remove(sbpDAL);
+                    //DataHandler.Instance.Value.remove(sbpDAL);
                 }
                 trsb.Add(sbDAL);
-                //DataHandler.getDBHandler().remove(sbDAL);
+                //DataHandler.Instance.Value.remove(sbDAL);
             }
 
-            DataHandler.getDBHandler().remove(trsbp);
-            DataHandler.getDBHandler().remove(trsb);
+            DataHandler.Instance.Value.remove(trsbp);
+            DataHandler.Instance.Value.remove(trsb);
 
             shoppingCartDAL.ShoppingBags = new List<ShoppingBagDAL>();
         }

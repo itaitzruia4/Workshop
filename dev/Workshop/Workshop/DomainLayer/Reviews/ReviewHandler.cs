@@ -29,7 +29,7 @@ namespace Workshop.DomainLayer.Reviews
             productReviews = new ConcurrentDictionary<int, ConcurrentDictionary<string, ReviewDTO>>();
             userReviews = new ConcurrentDictionary<string, ConcurrentDictionary<int, ReviewDTO>>();
             reviewHandlerDAL = new ReviewHandlerDAL(new List<ProductReviewesDAL>(), new List<UserReviewesDAL>());
-            DataHandler.getDBHandler().save(reviewHandlerDAL);
+            DataHandler.Instance.Value.save(reviewHandlerDAL);
         }
 
         public ReviewHandler(ReviewHandlerDAL reviewHandlerDAL)
@@ -104,7 +104,7 @@ namespace Workshop.DomainLayer.Reviews
                 }
                 
             }
-            DataHandler.getDBHandler().update(reviewHandlerDAL);//TODO figure it out with Nirdan
+            DataHandler.Instance.Value.update(reviewHandlerDAL);//TODO figure it out with Nirdan
         }
         private void AddToUserReviews(string user, int productId, ReviewDTO review)
         {
@@ -140,7 +140,7 @@ namespace Workshop.DomainLayer.Reviews
                 }
 
             }
-            DataHandler.getDBHandler().update(reviewHandlerDAL);//TODO figure it out with Nirdan
+            DataHandler.Instance.Value.update(reviewHandlerDAL);//TODO figure it out with Nirdan
         }
 
         public double GetProductRating(int productId)

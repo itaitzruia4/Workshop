@@ -20,7 +20,7 @@ namespace Workshop.DomainLayer.Orders
         {
             this.orders = new Dictionary<T, List<OrderDTO>>();
             this.OrderHandlerDAL = new DataLayer.DataObjects.Orders.OrderHandler<T>(new List<DataLayer.DataObjects.Orders.MemberToOrders<T>>());
-            DataHandler.getDBHandler().save(OrderHandlerDAL);
+            DataHandler.Instance.Value.save(OrderHandlerDAL);
         }
 
         public OrderHandler(DataLayer.DataObjects.Orders.OrderHandler<T> orderHandlerDAL)
@@ -51,7 +51,7 @@ namespace Workshop.DomainLayer.Orders
                 orders.Add(key, new List<OrderDTO>());
                 MemberToOrders<T> memberToOrders = new MemberToOrders<T>(key, new List<DataLayer.DataObjects.Orders.OrderDTO>());
                 OrderHandlerDAL.MemberToOrders.Add(memberToOrders);
-                DataHandler.getDBHandler().save(memberToOrders);
+                DataHandler.Instance.Value.save(memberToOrders);
             }
 
             orders[key].Add(order);
@@ -60,17 +60,17 @@ namespace Workshop.DomainLayer.Orders
                 if (mto.key.Equals(key) && !mto.orders.Contains(order.ToDAL()))
                 {
                     mto.orders.Add(order.ToDAL());
-                    DataHandler.getDBHandler().update(mto);
+                    DataHandler.Instance.Value.update(mto);
                 }
             }
-            DataHandler.getDBHandler().update(OrderHandlerDAL);
+            DataHandler.Instance.Value.update(OrderHandlerDAL);
         }
 
         public OrderDTO CreateOrder(string membername, SupplyAddress address, int storeId, List<ProductDTO> items, DateTime date, double price)
         {
             OrderDTO temp = new OrderDTO(CURR_ID, membername, address, storeId, items,date,price);
             CURR_ID++;
-            DataHandler.getDBHandler().update(OrderHandlerDAL);
+            DataHandler.Instance.Value.update(OrderHandlerDAL);
             return temp;
         }
 

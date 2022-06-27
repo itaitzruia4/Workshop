@@ -76,7 +76,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
                 throw new ArgumentException("This member already have the requested permission.");
             actions.Add(action);
             roleDAL.Actions.Add(new ActionDAL(((int)action)));
-            DataHandler.getDBHandler().update(roleDAL);
+            DataHandler.Instance.Value.update(roleDAL);
         }
         public void RemoveAction(Action action)
         {
@@ -94,7 +94,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
                 }
             }
             roleDAL.Actions.Remove(toRemove);
-            DataHandler.getDBHandler().update(roleDAL);
+            DataHandler.Instance.Value.update(roleDAL);
         }
 
     }

@@ -13,35 +13,35 @@ namespace Workshop.DomainLayer.MarketPackage
         public string Name { get => _name; set {
                 this._name = value;
                 productDAL.Name = value;
-                DataHandler.getDBHandler().update(productDAL);
+                DataHandler.Instance.Value.update(productDAL);
             } }
 
         private double _price;
         public double Price { get => _price; set {
                 this._price = value;
                 productDAL.Price = value;
-                DataHandler.getDBHandler().update(productDAL);
+                DataHandler.Instance.Value.update(productDAL);
             } }
 
         private int _quantity;
         public int Quantity { get => _quantity; set {
                 this._quantity = value;
                 productDAL.Quantity = value;
-                DataHandler.getDBHandler().update(productDAL);
+                DataHandler.Instance.Value.update(productDAL);
             } }
 
         private string _description;
         public string Description { get => _description; set {
                 this._description = value;
                 productDAL.Description = value;
-                DataHandler.getDBHandler().update(productDAL);
+                DataHandler.Instance.Value.update(productDAL);
             } }
 
         private string _category;
         public string Category { get => _category; set {
                 this._category = value;
                 productDAL.Category = value;
-                DataHandler.getDBHandler().update(productDAL);
+                DataHandler.Instance.Value.update(productDAL);
             } }
         public int StoreId { get; set; }
 

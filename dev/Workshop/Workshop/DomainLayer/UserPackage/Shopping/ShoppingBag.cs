@@ -50,7 +50,7 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
         }
         internal virtual void deleteProduct(int productId)
         {
-            //DataHandler.getDBHandler().remove(products[productId].ToDAL());
+            //DataHandler.Instance.Value.remove(products[productId].ToDAL());
             products.Remove(productId);
         }
         internal virtual void changeQuantity(int productId,int newQuantity)

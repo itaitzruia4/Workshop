@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data.SqlClient;
 using Workshop.DataLayer.DataObjects.Market;
-using System.Threading;
-using Workshop.DomainLayer.Loggers;
 using Microsoft.EntityFrameworkCore;
 using Workshop.DataLayer.DataObjects.Controllers;
 using Workshop.DataLayer.DataObjects.Market.Discounts;
@@ -21,24 +16,13 @@ namespace Workshop.DataLayer
     public class DataHandler
     {
         private Context cache;
-        private static DataHandler Instance = null;
+        public static Lazy<DataHandler> Instance = new Lazy<DataHandler>(() => new DataHandler());
 
 
         private DataHandler()
         {
             cache = new Context();
-            //cache.ChangeTracker.AutoDetectChangesEnabled = false;
-            //new Thread(() => upload(2)).Start();
         }
-
-        public static DataHandler getDBHandler()
-        {
-            if (Instance == null)
-                Instance = new DataHandler();
-                
-            return Instance;
-        }
-
 
         public void save<T>(T toSave) where T : class, DALObject
         {
@@ -87,7 +71,10 @@ namespace Workshop.DataLayer
         public MarketController loadMarket(int key)
         {
             //Add for each member instance it's roles
-
+            if (!Context.USE_DB)
+            {
+                return null;
+            }
             MarketController market = cache.marketController.Where(s => s.Id == key)
                     .Include(mc => mc.userController.members).ThenInclude(m => m.ShoppingCart).ThenInclude(s => s.ShoppingBags).ThenInclude(sb => sb.Products)
                     .Include(mc => mc.userController.members).ThenInclude(m => m.Roles).ThenInclude(r => r.nominees).ThenInclude(n => n.father)
@@ -290,26 +277,5 @@ namespace Workshop.DataLayer
                 cache.SaveChanges();
             }
         }
-
-        private void upload(double timeOutInSeconds)
-        {
-            while (true)
-            {
-                Logger.Instance.LogEvent($"Saving in {timeOutInSeconds} secs to the DB");
-                Thread.Sleep((int)timeOutInSeconds * 1000);
-                Logger.Instance.LogEvent($"Trying to upload data to DB");
-                try
-                {
-                    cache.SaveChanges();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Instance.LogEvent($"Exception!!!!!!!!!!!!!!!! " + ex.Message + ex.InnerException);
-                }
-                Logger.Instance.LogEvent($"Upload succeded");
-
-            }
-        }
-
     }
 }

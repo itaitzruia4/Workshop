@@ -42,7 +42,7 @@ namespace Workshop.DomainLayer.MarketPackage
             PRODUCT_COUNT = 1;
             this.dalMarketController = new DALMarketController(userController.ToDAL(), orderHandler.ToDAL(), new List<DALStore>(), STORE_COUNT, PRODUCT_COUNT);
             dalMarketController.userController = userController.ToDAL();
-            DataHandler.getDBHandler().save(dalMarketController);
+            DataHandler.Instance.Value.save(dalMarketController);
         }
 
         public MarketController(DALMarketController DALMarketController, IUserController userController, IExternalSystem externalSystem)
@@ -225,7 +225,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             nominatedMember.RemoveRole(FOUND_NOMINATED_ROLE);
             FOUND_NOMINATOR_ROLE.RemoveNominee(FOUND_NOMINATED_ROLE);
-            DataHandler.getDBHandler().remove(FOUND_NOMINATED_ROLE.ToDAL());
+            DataHandler.Instance.Value.remove(FOUND_NOMINATED_ROLE.ToDAL());
             stores[storeId].RemoveOwner(nominatedMember);
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("StoreOwnerVoting" + storeId, "", "MarketController"));
@@ -351,7 +351,7 @@ namespace Workshop.DomainLayer.MarketPackage
 
             product = stores[storeId].AddProduct(name, Interlocked.Increment(ref PRODUCT_COUNT), description, price, quantity, category);
             this.dalMarketController.PRODUCT_COUNT = PRODUCT_COUNT;
-            DataHandler.getDBHandler().update(this.dalMarketController);
+            DataHandler.Instance.Value.update(this.dalMarketController);
 
             storesLocks[storeId].ReleaseWriterLock();
             Logger.Instance.LogEvent($"{username} successfuly added Product {name} to store {storeId}.");
@@ -612,7 +612,7 @@ namespace Workshop.DomainLayer.MarketPackage
             STORE_COUNT++;
             this.dalMarketController.STORE_COUNT = STORE_COUNT;
             this.dalMarketController.stores.Add(store.ToDAL());
-            DataHandler.getDBHandler().update(this.dalMarketController);
+            DataHandler.Instance.Value.update(this.dalMarketController);
 
             rwl.ReleaseWriterLock();
 
@@ -836,7 +836,7 @@ namespace Workshop.DomainLayer.MarketPackage
                         {
                             foreach (OrderDTO order in storeOrdersSoFar[storeId])
                             {
-                                DataHandler.getDBHandler().save(order.ToDAL());
+                                DataHandler.Instance.Value.save(order.ToDAL());
                                 orderHandler.addOrder(order, storeId);
                             }
                         }

@@ -29,7 +29,7 @@ namespace Workshop.DomainLayer.Reviews
             this.ProductId = productId;
             this.Rating = rating;
             this.reviewDTODAL = new ReviewDTODAL(review, user, productId, rating);
-            DataHandler.getDBHandler().save(reviewDTODAL);
+            DataHandler.Instance.Value.save(reviewDTODAL);
         }
 
         public ReviewDTO(ReviewDTODAL reviewDTODAL)

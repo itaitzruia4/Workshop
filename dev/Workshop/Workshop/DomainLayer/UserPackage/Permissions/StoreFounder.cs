@@ -22,7 +22,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             foreach (var action in actions)
                 roleDAL.Actions.Add(new ActionDAL((int)action));
 
-            DataHandler.getDBHandler().update(roleDAL);
+            DataHandler.Instance.Value.update(roleDAL);
         }
 
         public StoreFounder(RoleDAL roleDAL) : base(roleDAL)

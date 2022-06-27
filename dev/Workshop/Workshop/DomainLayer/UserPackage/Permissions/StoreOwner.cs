@@ -39,7 +39,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             foreach(var action in actions)
                 roleDAL.Actions.Add(new ActionDAL((int)action));
 
-            DataHandler.getDBHandler().save(roleDAL);
+            DataHandler.Instance.Value.save(roleDAL);
         }
 
         public StoreOwner(RoleDAL roleDAL) : base(roleDAL)

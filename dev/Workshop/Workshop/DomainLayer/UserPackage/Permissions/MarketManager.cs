@@ -27,7 +27,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             foreach (var action in actions)
                 roleDAL.Actions.Add(new ActionDAL((int)action));
 
-            DataHandler.getDBHandler().save(roleDAL);
+            DataHandler.Instance.Value.save(roleDAL);
         }
 
         public MarketManager(RoleDAL roleDAL) : base(roleDAL)
