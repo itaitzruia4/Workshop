@@ -32,7 +32,7 @@ namespace API
         {
             foreach (string path in WebSocketServices.Paths)
             {
-                WebSocketServices[path].Sessions.Broadcast(Encoding.ASCII.GetBytes(message));
+                WebSocketServices[path].Sessions.Broadcast(message);
             }
         }
     }
