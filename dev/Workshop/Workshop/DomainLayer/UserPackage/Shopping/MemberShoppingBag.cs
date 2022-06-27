@@ -29,7 +29,7 @@ namespace Workshop.DomainLayer.UserPackage.Shopping
             this.shoppingBagDAL = shoppingBagDAL;
         }
 
-        public override ShoppingBagProduct addToBag(ShoppingBagProduct product)
+        public virtual ShoppingBagProduct addToBag(ShoppingBagProduct product)
         {
             if (!products.ContainsKey(product.Id))
             {
