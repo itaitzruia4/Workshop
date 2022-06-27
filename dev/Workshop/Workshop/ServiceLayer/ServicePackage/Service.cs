@@ -20,7 +20,6 @@ using Workshop.DomainLayer.Loggers;
 using System.Globalization;
 using System.IO;
 using Moq;
-using Microsoft.EntityFrameworkCore;
 
 namespace Workshop.ServiceLayer
 {
@@ -296,6 +295,7 @@ namespace Workshop.ServiceLayer
                         break;
                     case "es":
                         if (parts.Length != 1) throw new ArgumentException();
+                        USE_EXTERNAL_SYSTEM = true;
                         break;
                     default:
                         throw new ArgumentException("Unidentified command in config file");
@@ -310,6 +310,7 @@ namespace Workshop.ServiceLayer
             {
                 facade = new Facade(USE_EXTERNAL_SYSTEM ? new ExternalSystem() : externalSystem.Object, systemManagers);
             }
+            Context.USE_DB = USE_DB;
         }
 
         public Service(IExternalSystem externalSystem)
@@ -317,6 +318,7 @@ namespace Workshop.ServiceLayer
             List<SystemAdminDTO> systemManagers = new List<SystemAdminDTO>();
             systemManagers.Add(new SystemAdminDTO("admin", "admin", "22/08/1972"));
             facade = new Facade(externalSystem, systemManagers);
+            Context.USE_DB = false;
         }
 
         public int GetPort()
