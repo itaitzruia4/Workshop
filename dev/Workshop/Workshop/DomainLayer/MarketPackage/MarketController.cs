@@ -609,7 +609,6 @@ namespace Workshop.DomainLayer.MarketPackage
             Store store = new Store(storeId, storeName, userController.GetMember(creator));
             stores[storeId] = store;
 
-            STORE_COUNT++;
             this.dalMarketController.STORE_COUNT = STORE_COUNT;
             this.dalMarketController.stores.Add(store.ToDAL());
             DataHandler.Instance.Value.update(this.dalMarketController);
