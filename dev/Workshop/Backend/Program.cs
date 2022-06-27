@@ -1,5 +1,5 @@
 ﻿using Workshop.ServiceLayer;
-using WebSocketSharp.Server;
+using Moq;
 
 namespace API
 {
@@ -11,16 +11,23 @@ namespace API
 
             // Add builder.Services to the container.
             IService service;
+            Mock<IExternalSystem> externalSystem = new Mock<IExternalSystem>();
+            externalSystem.Setup(x => x.Supply(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(new Random().Next(10000, 100000));
+            externalSystem.Setup(x => x.Cancel_Supply(It.IsAny<int>())).Returns(1);
+            externalSystem.Setup(x => x.Pay(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(new Random().Next(10000, 100000));
+            externalSystem.Setup(x => x.Cancel_Pay(It.IsAny<int>())).Returns(1);
+            externalSystem.Setup(x => x.IsExternalSystemOnline()).Returns(true);
+
             if (args.Length == 1)
             {
                 using (StreamReader streamReader = File.OpenText(args[0]))
                 {
-                    service = new Service(streamReader.ReadToEnd());
+                    service = new Service(externalSystem.Object, streamReader.ReadToEnd());
                 }
             }
             else if (args.Length == 0)
             {
-                service = new Service("admin~admin~admin~22/08/1972\nport~8800");
+                service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972\nport~8800");
             }
             else
             {
