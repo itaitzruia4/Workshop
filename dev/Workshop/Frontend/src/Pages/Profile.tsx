@@ -48,15 +48,22 @@ function Profile() {
         () =>
             navigate(path, { state: token });
 
-
+    async function waterfallWithRetry<T>(promises: Promise<T>[]): Promise<T[]> {
+        return promises.reduce(
+            async (promisesSum: Promise<T[]>, currVal: Promise<T>) => {
+                return (await promisesSum).concat([(await currVal)])
+            }
+            , Promise.resolve([])
+        )
+    }
     const refresh = () => {
         handleGetMemberPermissions(token).then(value => { setPermissionsInfo(value as StorePermission[])}).catch(error => alert(error));
-        handleGetStores(token).then(value => {
-            setStores(value as Store[])
-            setOrders([]);
-            stores.map(store => {
-                handleGetStorePurchaseHistory(token, store.storeId).then(value => setOrders([{ id: store.storeId, orders: value as Order[] }, ...orders]))
+        handleGetStores(token).then((values : Store[]) => {
+            const newOrders = values.map(store => {
+                return handleGetStorePurchaseHistory(token, store.storeId).then(value => { return { id: store.storeId, orders: value as Order[] } })
             })
+            waterfallWithRetry(newOrders).then(value => setOrders(value))         
+            setStores(values as Store[])
         }).catch(error => alert(error));      
     };
 
