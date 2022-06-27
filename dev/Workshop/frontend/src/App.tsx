@@ -5,11 +5,11 @@ import Welcome from './Pages/Welcome'
 import Member from './Pages/Member'
 import Guest from './Pages/Guest'
 import Profile from './Pages/Profile'
-import Admin from './Pages/Admin'
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Login from './Pages/Login'
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
+import Admin from './Pages/Admin';
 
 
 function App() {

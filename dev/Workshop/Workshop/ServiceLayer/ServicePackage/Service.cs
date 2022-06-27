@@ -56,7 +56,8 @@ namespace Workshop.ServiceLayer
                 {
                     Logger.Instance.LogError("Starting state file does not exist");
                 }
-                facade = new Facade(USE_EXTERNAL_SYSTEM ? new ExternalSystem() : externalSystem.Object, systemManagers);
+                IExternalSystem extSys = USE_EXTERNAL_SYSTEM ? new ExternalSystem() : externalSystem.Object;
+                facade = new Facade(extSys, systemManagers);
                 try
                 {
                     foreach (string command in initializationState.Split('\n'))

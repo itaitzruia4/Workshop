@@ -11,6 +11,7 @@
   "profiles": {
     "API": {
       "commandName": "Project",
+      "commandLineArgs": "C:\\Users\\merav\\University\\Workshop\\test-conf.txt",
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

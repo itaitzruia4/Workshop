@@ -15,12 +15,12 @@ namespace API
             {
                 using (StreamReader streamReader = File.OpenText(args[0]))
                 {
-                    service = new Service(new ExternalSystem(), streamReader.ReadToEnd());
+                    service = new Service(streamReader.ReadToEnd());
                 }
             }
             else if (args.Length == 0)
             {
-                service = new Service(new ExternalSystem(), "admin~admin~admin~22/08/1972\nport~8800");
+                service = new Service("admin~admin~admin~22/08/1972\nport~8800");
             }
             else
             {
