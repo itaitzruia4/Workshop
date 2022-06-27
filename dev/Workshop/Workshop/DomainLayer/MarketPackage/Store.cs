@@ -73,7 +73,7 @@ namespace Workshop.DomainLayer.MarketPackage
             return owners.Add(owner);
         }
 
-        public Store(StoreDAL storeDAL)
+        public Store(StoreDAL storeDAL, HashSet<Member> owners)
         {
             this.id = storeDAL.Id;
             this.name = storeDAL.StoreName;
@@ -82,11 +82,13 @@ namespace Workshop.DomainLayer.MarketPackage
             this.rwl = new ReaderWriterLock();
             this.discountPolicy = new DiscountPolicy(storeDAL.DiscountPolicy, this);
             this.purchasePolicy = new PurchasePolicy(storeDAL.PurchasePolicy, this);
+            this.owners = owners;
 
             foreach(ProductDAL product in storeDAL.Products)
             {
                 products.Add(product.Id, new Product(product));
             }
+            this.storeDAL = storeDAL;
         }
 
         public StoreDAL ToDAL()

@@ -74,14 +74,15 @@ namespace Workshop.DataLayer
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+            
+            
+
             modelBuilder.Entity<NameToRole>()
-                .HasOne(ntr => ntr.role)
+                .HasOne(ntr => ntr.father)
                 .WithMany(r => r.nominees);
 
-            modelBuilder.Entity<Role>()
-                .HasMany(r => r.nominees)
-                .WithOne(ntr => ntr.role);
+            
+            base.OnModelCreating(modelBuilder);
         }
 
         public override EntityEntry<TEntity> Update<TEntity>(TEntity entity)

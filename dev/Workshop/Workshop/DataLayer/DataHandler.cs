@@ -90,7 +90,7 @@ namespace Workshop.DataLayer
 
             MarketController market = cache.marketController.Where(s => s.Id == key)
                     .Include(mc => mc.userController.members).ThenInclude(m => m.ShoppingCart).ThenInclude(s => s.ShoppingBags).ThenInclude(sb => sb.Products)
-                    .Include(mc => mc.userController.members).ThenInclude(m => m.Roles).ThenInclude(r => r.nominees).ThenInclude(n => n.role)
+                    .Include(mc => mc.userController.members).ThenInclude(m => m.Roles).ThenInclude(r => r.nominees).ThenInclude(n => n.father)
                     .Include(mc => mc.userController.reviewHandler.productReviews).ThenInclude(pr => pr.userToReviewDTOs).ThenInclude(utr => utr.Review)
                     .Include(mc => mc.userController.reviewHandler.userReviews).ThenInclude(ur => ur.productToReviewDTOs).ThenInclude(ptr => ptr.Review)
                     .Include(mc => mc.userController.notificationHandler.Notifications).ThenInclude(mn => mn.Notifications)

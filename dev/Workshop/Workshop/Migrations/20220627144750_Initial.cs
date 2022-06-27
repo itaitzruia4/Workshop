@@ -793,15 +793,16 @@ namespace Workshop.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false),
-                    Role = table.Column<int>(nullable: true),
+                    fatherId = table.Column<int>(nullable: true),
+                    data_key = table.Column<int>(nullable: false),
                     memberName = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_NameToRole", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_NameToRole_Role_Role",
-                        column: x => x.Role,
+                        name: "FK_NameToRole_Role_fatherId",
+                        column: x => x.fatherId,
                         principalTable: "Role",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -898,9 +899,9 @@ namespace Workshop.Migrations
                 column: "OrderHandler<string>Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_NameToRole_Role",
+                name: "IX_NameToRole_fatherId",
                 table: "NameToRole",
-                column: "Role");
+                column: "fatherId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Notification_MemberNotificationsId",

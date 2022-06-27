@@ -16,6 +16,7 @@ using Workshop.DomainLayer.MarketPackage.Biding;
 using DALMarketController = Workshop.DataLayer.DataObjects.Controllers.MarketController;
 using DALStore = Workshop.DataLayer.DataObjects.Market.Store;
 using DataHandler = Workshop.DataLayer.DataHandler;
+using MemberDAL = Workshop.DataLayer.DataObjects.Members.Member;
 
 namespace Workshop.DomainLayer.MarketPackage
 {
@@ -54,7 +55,12 @@ namespace Workshop.DomainLayer.MarketPackage
             this.PRODUCT_COUNT = DALMarketController.PRODUCT_COUNT;
             foreach (DALStore dal_store in DALMarketController.stores)
             {
-                this.stores.TryAdd(dal_store.Id, new Store(dal_store));
+                HashSet<Member> owners = new HashSet<Member>();
+                foreach(MemberDAL owner in dal_store.Owners)
+                {
+                    owners.Add(userController.GetMember(owner.MemberName));
+                }
+                this.stores.TryAdd(dal_store.Id, new Store(dal_store, owners));
                 ReaderWriterLock rwl = new ReaderWriterLock();
                 this.storesLocks.TryAdd(dal_store.Id, rwl);
             }
@@ -217,6 +223,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             nominatedMember.RemoveRole(FOUND_NOMINATED_ROLE);
             FOUND_NOMINATOR_ROLE.RemoveNominee(FOUND_NOMINATED_ROLE);
+            DataHandler.getDBHandler().remove(FOUND_NOMINATED_ROLE.ToDAL());
             stores[storeId].RemoveOwner(nominatedMember);
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("SaleInStore" + storeId, "", "MarketController"));
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("StoreOwnerVoting" + storeId, "", "MarketController"));

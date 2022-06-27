@@ -91,7 +91,8 @@ namespace Workshop.DomainLayer.UserPackage.Notifications
                     DataHandler.getDBHandler().update(eventObservers1);
                     break;
                 }
-            } 
+            }
+            DataHandler.getDBHandler().update(memberDAL);
         }
 
         public void Detach(string observer_name, Event eventt)

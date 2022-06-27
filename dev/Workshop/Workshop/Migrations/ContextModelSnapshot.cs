@@ -462,7 +462,10 @@ namespace Workshop.Migrations
                     b.Property<int>("Id")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Role")
+                    b.Property<int>("data_key")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("fatherId")
                         .HasColumnType("int");
 
                     b.Property<string>("memberName")
@@ -470,7 +473,7 @@ namespace Workshop.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Role");
+                    b.HasIndex("fatherId");
 
                     b.ToTable("NameToRole");
                 });
@@ -968,9 +971,9 @@ namespace Workshop.Migrations
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Members.NameToRole", b =>
                 {
-                    b.HasOne("Workshop.DataLayer.DataObjects.Members.Role", "role")
+                    b.HasOne("Workshop.DataLayer.DataObjects.Members.Role", "father")
                         .WithMany("nominees")
-                        .HasForeignKey("Role");
+                        .HasForeignKey("fatherId");
                 });
 
             modelBuilder.Entity("Workshop.DataLayer.DataObjects.Members.Role", b =>

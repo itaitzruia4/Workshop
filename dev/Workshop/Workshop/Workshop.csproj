@@ -325,9 +325,9 @@
     <Compile Include="DomainLayer\UserPackage\Shopping\MemberShoppingBag.cs" />
     <Compile Include="DomainLayer\UserPackage\Shopping\MemberShoppingCart.cs" />
     <Compile Include="DomainLayer\UserPackage\UserCountInDate.cs" />
-    <Compile Include="Migrations\20220626205654_Initial.cs" />
-    <Compile Include="Migrations\20220626205654_Initial.designer.cs">
-      <DependentUpon>20220626205654_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\20220627144750_Initial.cs" />
+    <Compile Include="Migrations\20220627144750_Initial.designer.cs">
+      <DependentUpon>20220627144750_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\ContextModelSnapshot.cs" />
     <Compile Include="ServiceLayer\ExternalSystem.cs" />

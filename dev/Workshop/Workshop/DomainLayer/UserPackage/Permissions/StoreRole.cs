@@ -32,7 +32,8 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
 
             foreach(NameToRole ntr in storeRoleDAL.nominees)
             {
-                nominees[ntr.memberName] = (StoreRole)createRole(ntr.role);
+                //nominees[ntr.memberName] = (StoreRole)createRole(ntr.data);
+                nominees[ntr.memberName] = (StoreRole)createRole(DataHandler.getDBHandler().find<StoreRoleDAL>(ntr.data_key));
             }
         }
 
@@ -58,7 +59,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         {
             nominees.Add(membername, nominee);
             Console.WriteLine("AddNominee %s %s", membername, nominee.ToDAL().RoleType);
-            NameToRole ntr = new NameToRole(nominee.ToDAL(), membername);
+            NameToRole ntr = new NameToRole(nominee.ToDAL().Id, membername);
             DataHandler.getDBHandler().save(ntr);
             roleDAL.nominees.Add(ntr);
             DataHandler.getDBHandler().update(roleDAL);
@@ -79,11 +80,15 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             {
                 nominees.Remove(key_to_remove);
                 NameToRole to_remove = null;
-                foreach(NameToRole nameToRole in roleDAL.nominees)
-                    if(nameToRole.role.Equals(nominee.ToDAL()))
+                foreach (NameToRole nameToRole in roleDAL.nominees)
+                {
+                    StoreRoleDAL role = DataHandler.getDBHandler().find<StoreRoleDAL>(nameToRole.data_key);
+                    if (role != null && role.Equals(nominee.ToDAL()))
                         to_remove = nameToRole;
+                }
                 roleDAL.nominees.Remove(to_remove);
                 DataHandler.getDBHandler().update(roleDAL);
+                DataHandler.getDBHandler().remove(to_remove);
             }
         }
 

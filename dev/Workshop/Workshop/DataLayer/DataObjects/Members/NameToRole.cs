@@ -17,9 +17,8 @@ namespace Workshop.DataLayer.DataObjects.Members
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
-
-        [ForeignKey("Role")]
-        public Role role { get; set; }
+        public Role father { get; set; }
+        public int data_key { get; set; }
         public string memberName { get; set; }
         public NameToRole()
         {
@@ -27,9 +26,9 @@ namespace Workshop.DataLayer.DataObjects.Members
             nextId++;
         }
 
-        public NameToRole(Role role, string memberName)
+        public NameToRole(int roleId, string memberName)
         {
-            this.role = role;
+            this.data_key = roleId;
             this.memberName = memberName;
             this.Id = nextId;
             nextId++;
