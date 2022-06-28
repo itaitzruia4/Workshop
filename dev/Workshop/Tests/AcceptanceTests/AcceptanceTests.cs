@@ -3,14 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using Workshop.DomainLayer.Reviews;
 using Workshop.ServiceLayer;
 using Workshop.ServiceLayer.ServiceObjects;
-using Newtonsoft.Json;
 using SupplyAddress = Workshop.DomainLayer.MarketPackage.SupplyAddress;
 using CreditCard = Workshop.DomainLayer.MarketPackage.CreditCard;
 using Moq;
+using System.Threading;
 
 namespace Tests.AcceptanceTests
 {
@@ -354,7 +353,7 @@ namespace Tests.AcceptanceTests
             Assert.IsTrue(service.NominateStoreManager(3, nominator, nominated, storeId, DateTime.Now).ErrorOccured);
         }
 
-        /*public bool NominateStoreManager_Thread(int userId, string nominator, string password, string nominated, int storeId)
+        public bool NominateStoreManager_Thread(int userId, string nominator, string password, string nominated, int storeId)
         {
             //Assert.IsFalse(service.EnterMarket(userId).ErrorOccured);
             Assert.IsFalse(service.Login(userId, nominator, password, DateTime.Now).ErrorOccured);
@@ -390,7 +389,7 @@ namespace Tests.AcceptanceTests
             thr2.Join();
 
             Assert.AreNotEqual(res1, res2);
-        }*/
+        }
 
 
         [DataTestMethod]
@@ -835,7 +834,7 @@ namespace Tests.AcceptanceTests
             Assert.IsTrue(service.ChangeProductCategory(1, username, storeId, prod.Id, cat).ErrorOccured);
         }
 
-        /*public bool BuyProduct_Thread(int userId, string user, string password, int productId, int storeId, int quantity)
+        public bool BuyProduct_Thread(int userId, string user, string password, int productId, int storeId, int quantity)
         {
             Assert.IsFalse(service.Login(userId, user, password, DateTime.Now).ErrorOccured);
             bool ret = service.AddToCart(userId, productId, storeId, quantity).ErrorOccured;
@@ -868,7 +867,7 @@ namespace Tests.AcceptanceTests
             thr2.Join();
 
             Assert.AreNotEqual(res1, res2);
-        }*/
+        }
 
         // PurchaseTerm tests
         private Func<int, string> makeSimpleProductPurchaseTerm(string type, string action, string value)

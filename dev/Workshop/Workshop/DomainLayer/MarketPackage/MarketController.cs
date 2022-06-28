@@ -341,7 +341,7 @@ namespace Workshop.DomainLayer.MarketPackage
             Product product = null;
             try
             {
-                storesLocks[storeId].AcquireWriterLock(Timeout.Infinite);
+                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
             }
             catch
             {
@@ -355,7 +355,7 @@ namespace Workshop.DomainLayer.MarketPackage
             this.dalMarketController.PRODUCT_COUNT = PRODUCT_COUNT;
             DataHandler.Instance.Value.update(this.dalMarketController);
 
-            storesLocks[storeId].ReleaseWriterLock();
+            storesLocks[storeId].ReleaseReaderLock();
             Logger.Instance.LogEvent($"{username} successfuly added Product {name} to store {storeId}.");
             return product;
         }
@@ -715,7 +715,7 @@ namespace Workshop.DomainLayer.MarketPackage
             int storeId = user.GetStoreOfProduct(productId);
             try
             {
-                storesLocks[storeId].AcquireWriterLock(Timeout.Infinite);
+                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
             }
             catch
             {
@@ -744,7 +744,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             catch (Exception e)
             {
-                storesLocks[storeId].ReleaseWriterLock();
+                storesLocks[storeId].ReleaseReaderLock();
                 throw e;
             }
             Logger.Instance.LogEvent("User " + userId + " successfuly edited the quantity of " + productId + " in his cart");
@@ -774,7 +774,7 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 try
                 {
-                    storesLocks[storeId].AcquireWriterLock(Timeout.Infinite);
+                    storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
                 }
                 catch
                 {
@@ -809,16 +809,16 @@ namespace Workshop.DomainLayer.MarketPackage
                         userOrdersSoFar.Add(username, new List<OrderDTO>() { order });
                     }
 
-                    storesLocks[storeId].ReleaseWriterLock();
+                    storesLocks[storeId].ReleaseReaderLock();
                 }
                 catch (Exception e)
                 {
-                    storesLocks[storeId].ReleaseWriterLock();
+                    storesLocks[storeId].ReleaseReaderLock();
                     foreach (int sid in productsSoFar.Keys)
                     {
                         storesLocks[sid].AcquireWriterLock(Timeout.Infinite);
                         productsSoFar[sid].ForEach(p => stores[sid].restoreProduct(p));
-                        storesLocks[sid].ReleaseWriterLock();
+                        storesLocks[sid].ReleaseReaderLock();
                     }
                     throw e;
                 }
@@ -862,9 +862,9 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             foreach (int sid in productsSoFar.Keys)
             {
-                storesLocks[sid].AcquireWriterLock(Timeout.Infinite);
+                storesLocks[sid].AcquireReaderLock(Timeout.Infinite);
                 productsSoFar[sid].ForEach(p => stores[sid].restoreProduct(p));
-                storesLocks[sid].ReleaseWriterLock();
+                storesLocks[sid].ReleaseReaderLock();
             }
             throw new ArgumentException("Buying cart failed due to failures with the external system we're using!");
         }
@@ -889,7 +889,7 @@ namespace Workshop.DomainLayer.MarketPackage
             }
             try
             {
-                storesLocks[storeId].AcquireWriterLock(Timeout.Infinite);
+                storesLocks[storeId].AcquireReaderLock(Timeout.Infinite);
             }
             catch
             {
@@ -900,7 +900,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 User u = userController.GetUser(userId);
                 product = stores[storeId].GetProductForSale(productId, quantity);
                 u.AddToCart(product, storeId);
-                storesLocks[storeId].ReleaseWriterLock();
+                storesLocks[storeId].ReleaseReaderLock();
             }
             catch (Exception e)
             {
