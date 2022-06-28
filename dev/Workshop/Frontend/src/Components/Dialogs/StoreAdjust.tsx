@@ -176,10 +176,8 @@ export default function StoreAdjust(
                                 addBagPurchase={addBagPurchasePolicy} addUserPurchase={addUserPurchasePolicy } />
                         </ButtonGroup>
                     </TabPanel>
-                    <TabPanel value={value} index={3}>
-                        
-                    
-                        <StorePurchaseHistory store={store} orders={orders} />
+                    <TabPanel value={value} index={3}>     
+                        <StorePurchaseHistory store={store} orders={orders} hasPermission={!hasPermission(Actions.ViewStorePurchaseHistory, permissions)} />
                     </TabPanel>
                 </Box>
             </Dialog>

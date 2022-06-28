@@ -193,7 +193,7 @@ function Profile() {
                     <IconButton
                         edge="start"
                         color="inherit"
-                        onClick={routeChange('/member', token)}
+                        onClick={() => (permissionsInfo.length > 0 && permissionsInfo[0].storeId === -1) ? routeChange('/admin', token)  : routeChange('/member', token)}
                         aria-label="close"
                     >
                         <CloseIcon />
