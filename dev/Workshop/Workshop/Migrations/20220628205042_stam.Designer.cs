@@ -10,8 +10,8 @@ using Workshop.DataLayer;
 namespace Workshop.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20220628181026_Initial")]
-    partial class Initial
+    [Migration("20220628205042_stam")]
+    partial class stam
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
