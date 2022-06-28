@@ -62,7 +62,7 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
         { field: "id", headerName: "Order ID", flex: 2 },
         { field: "buyerName", headerName: "Buyer Name", flex: 1 },
         { field: "date", headerName: "Order Date", flex: 1 },
-        { field: "price", headerName: "Order Date", flex: 1 }
+        { field: "price", headerName: "Order Price", flex: 1 }
     ];
 
     const [orders, setOrders] = React.useState<Order[]>([]);
