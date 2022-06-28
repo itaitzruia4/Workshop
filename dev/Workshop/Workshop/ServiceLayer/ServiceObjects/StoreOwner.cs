@@ -7,13 +7,11 @@ using DomainStoreOwner = Workshop.DomainLayer.UserPackage.Permissions.StoreOwner
 
 namespace Workshop.ServiceLayer.ServiceObjects
 {
-    public class StoreOwner
+    public class StoreOwner : StoreRole
     {
-        public readonly int StoreId;
-
-        public StoreOwner(DomainStoreOwner domainOwner)
+        public List<StoreRole> Nominees { get; set; }
+        public StoreOwner(DomainStoreOwner domainOwner) : base(domainOwner)
         {
-            this.StoreId = domainOwner.StoreId;
         }
     }
 }

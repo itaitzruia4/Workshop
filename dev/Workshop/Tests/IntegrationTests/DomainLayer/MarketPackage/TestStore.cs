@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
+using System.Globalization;
 using Workshop.DomainLayer.MarketPackage;
 
 namespace Tests.IntegrationTests.DomainLayer.MarketPackage
@@ -13,15 +14,18 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         [TestInitialize]
         public void Setup()
         {
-            store = new Store(1, "Store1");
+            store = new Store(1, "Store1", new Workshop.DomainLayer.UserPackage.Permissions.Member("member", "pass", DateTime.ParseExact("22/08/1972", "dd/MM/yyyy", CultureInfo.InvariantCulture)));
             int id = 2;
             string name = "Product2";
             string description = "Product2Desc";
             double price = 102.5;
             int quantity = 5;
-            product = store.AddProduct(id, name, description, price, quantity);
+            string category = "cat1";
+            product = store.AddProduct(name, id, description, price, quantity, category);
         }
 
+        /// Tests for Store.AddProduct method
+        /// <see cref="Store.AddProduct"/>
         [TestMethod]
         public void AddProductSuccess()
         {
@@ -30,25 +34,14 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             string description = "Product1";
             double price = 9.99;
             int quantity = 10;
-            Product p = store.AddProduct(id, name, description, price, quantity);
+            string category = "cat1";
+            Product p = store.AddProduct(name, id, description, price, quantity, category);
             Assert.IsNotNull(p);
             Assert.AreEqual(p.Name, name);
             Assert.AreEqual(p.Description, description);
             Assert.AreEqual(p.Price, price);
             Assert.AreEqual(p.Quantity, quantity);
             store.GetProduct(id);
-        }
-
-        [TestMethod]
-        public void AddProductBadId()
-        {
-            int id = -1;
-            string name = "Product1";
-            string description = "Product1";
-            double price = 9.99;
-            int quantity = 10;
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => store.AddProduct(id, name, description, price, quantity));
-            Assert.ThrowsException<ArgumentException>(() => store.GetProduct(id));
         }
 
         [TestMethod]
@@ -59,7 +52,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             string description = "Product1";
             double price = 9.99;
             int quantity = 10;
-            Assert.ThrowsException<ArgumentException>(() => store.AddProduct(id, name, description, price, quantity));
+            string category = "cat1";
+            Assert.ThrowsException<ArgumentException>(() => store.AddProduct(name, id, description, price, quantity, category));
             Assert.ThrowsException<ArgumentException>(() => store.GetProduct(id));
         }
 
@@ -71,7 +65,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             string description = "Product1";
             double price = -0.9;
             int quantity = 10;
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => store.AddProduct(id, name, description, price, quantity));
+            string category = "cat1";
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => store.AddProduct(name, id, description, price, quantity, category));
             Assert.ThrowsException<ArgumentException>(() => store.GetProduct(id));
         }
 
@@ -83,10 +78,13 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             string description = "Product1";
             double price = 9.99;
             int quantity = -1;
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => store.AddProduct(id, name, description, price, quantity));
+            string category = "cat1";
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => store.AddProduct(name, id, description, price, quantity, category));
             Assert.ThrowsException<ArgumentException>(() => store.GetProduct(id));
         }
-        
+
+        /// Tests for Store.RemoveProduct method
+        /// <see cref="Store.RemoveProduct"/>
         [TestMethod]
         public void RemoveProductSuccess()
         {
@@ -95,19 +93,22 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             string description = "Product1";
             double price = 9.99;
             int quantity = 10;
-            Product p = store.AddProduct(id, name, description, price, quantity);
+            string category = "cat1";
+            Product p = store.AddProduct(name, id, description, price, quantity, category);
             store.GetProduct(id);
             store.RemoveProduct(id);
             Assert.ThrowsException<ArgumentException>(() => store.GetProduct(id));
         }
 
         [TestMethod]
-        public void RemoveProductFail()
+        public void RemoveProduct_Failure_NoSuchId()
         {
             int id = 1;
             Assert.ThrowsException<Exception>(() => store.RemoveProduct(id));
         }
 
+        /// Tests for Store.ChangeProductName method
+        /// <see cref="Store.ChangeProductName"/>
         [TestMethod]
         public void ChangeProductNameSuccess()
         {
@@ -117,7 +118,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         }
 
         [TestMethod]
-        public void ChangeProductNameFail()
+        public void ChangeProductNameFail_EmptyName()
         {
             string name = "";
             string previousName = this.product.Name;
@@ -125,6 +126,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             Assert.AreEqual(previousName, this.product.Name);
         }
 
+        /// Tests for Store.ChangeProductDescription method
+        /// <see cref="Store.ChangeProductDescription"/>
         [TestMethod]
         public void ChangeProductDescriptionSuccess()
         {
@@ -134,7 +137,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         }
 
         [TestMethod]
-        public void ChangeProductDescriptionFail()
+        public void ChangeProductDescriptionFail_BadId()
         {
             string description = "newDesc2";
             string previousDescription = this.product.Description;
@@ -142,6 +145,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             Assert.AreEqual(previousDescription, this.product.Description);
         }
 
+        /// Tests for Store.ChangeProductPrice method
+        /// <see cref="Store.ChangeProductPrice"/>
         [TestMethod]
         public void ChangeProductPriceSuccess()
         {
@@ -151,7 +156,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         }
 
         [TestMethod]
-        public void ChangeProductPriceFail()
+        public void ChangeProductPriceFail_NegativePrice()
         {
             double price = -3.0;
             double previousPrice = this.product.Price;
@@ -159,6 +164,8 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
             Assert.AreEqual(previousPrice, this.product.Price);
         }
 
+        /// Tests for Store.ChangeProductQuantity method
+        /// <see cref="Store.ChangeProductQuantity"/>
         [TestMethod]
         public void ChangeProductQuantitySuccess()
         {
@@ -168,7 +175,7 @@ namespace Tests.IntegrationTests.DomainLayer.MarketPackage
         }
 
         [TestMethod]
-        public void ChangeProductQuantityFail()
+        public void ChangeProductQuantityFail_NegativeQuantity()
         {
             int quantity = -5;
             double previousQuantity = this.product.Quantity;

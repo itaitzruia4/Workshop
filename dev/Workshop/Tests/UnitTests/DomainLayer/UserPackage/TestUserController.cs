@@ -9,6 +9,7 @@ using Workshop.DomainLayer.UserPackage;
 using Workshop.DomainLayer.UserPackage.Security;
 using Action = Workshop.DomainLayer.UserPackage.Permissions.Action;
 using ShoppingCartDTO = Workshop.DomainLayer.UserPackage.Shopping.ShoppingCartDTO;
+using SystemAdminDTO = Workshop.ServiceLayer.ServiceObjects.SystemAdminDTO;
 
 namespace Tests.UnitTests.DomainLayer.UserPackage
 {
@@ -17,6 +18,8 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
     {
         private UserController userController;
         private int member2StoreId = 1;
+        private SupplyAddress address = new SupplyAddress("Ronmi", "Mayor 1", "Ashkelon", "Israel", "784112");
+        private CreditCard cc = new CreditCard("001122334455667788", "11", "26", "LeBron Michal", "555", "208143751");
 
         [TestInitialize]
         public void Setup()
@@ -25,52 +28,58 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
             securityMock.Setup(x => x.Encrypt(It.IsAny<string>())).Returns((string s) => s);
 
             var reviewMock = new Mock<IReviewHandler>();
-            reviewMock.Setup(x => x.AddReview(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>()))
-                                   .Returns((string u, int pid, string r) => new ReviewDTO(u, pid, r));
+            reviewMock.Setup(x => x.AddReview(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>()))
+                                   .Returns((string u, int pid, string r, int i) => new ReviewDTO(u, pid, r, i));
 
-            userController = new UserController(securityMock.Object, reviewMock.Object);
-            userController.InitializeSystem();
+            userController = new UserController(securityMock.Object, reviewMock.Object, new List<SystemAdminDTO>(){ new SystemAdminDTO("admin", "admin", "22/08/1972")});
 
-            userController.EnterMarket();
+            userController.EnterMarket(1, DateTime.Now);
 
-            userController.Register("member1", "pass1");
-            userController.Login("member1", "pass1");
-            userController.addToCart("member1", new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1), 1);
+            userController.Register(1, "member1", "pass1", DateTime.Parse("Aug 22, 1972"));
+            userController.Login(1, "member1", "pass1", DateTime.Now);
+            userController.AddToCart(1, new ShoppingBagProduct(1, "product1", "nntdd", 12.0, 1, "cat1", 1), 1);
             
             List<ShoppingBagProduct> member1prods = new List<ShoppingBagProduct>();
-            member1prods.Add(new ShoppingBagProduct(1, "prod1", "desc1", 11.90, 3));
-            userController.AddOrder(new OrderDTO(1, "member1", "whatever", "blasToysRus", member1prods, 12.30), "member1");
-            userController.Logout("member1");
+            member1prods.Add(new ShoppingBagProduct(1, "prod1", "desc1", 11.90, 3, "cat1", 1));
+            List<ProductDTO> pdtos1 = new List<ProductDTO>();
+            foreach (ShoppingBagProduct sbp in member1prods)
+            {
+                pdtos1.Add(sbp.GetProductDTO());
+            }
+            userController.AddOrder(1, new OrderDTO(1, "member1", address, 1, pdtos1,DateTime.Now,5), "member1");
+            userController.Logout(1, "member1");
 
-            userController.Register("member3", "pass3");
-            userController.Register("member4", "pass4");
+            userController.Register(1, "member3", "pass3", DateTime.Parse("Aug 22, 1972"));
+            userController.Register(1, "member4", "pass4", DateTime.Parse("Aug 22, 1972"));
 
-            userController.Register("member2", "pass2");
-            userController.Login("member2", "pass2");
-            userController.AddStoreFounder("member2", member2StoreId);
+            userController.Register(1, "member2", "pass2", DateTime.Parse("Aug 22, 1972"));
+            userController.Login(1, "member2", "pass2", DateTime.Now);
+            userController.AddStoreFounder("member2", member2StoreId, DateTime.Now);
 
-            userController.NominateStoreManager("member2", "member3", member2StoreId);
-            userController.AddPermissionToStoreManager("member2", "member3", 1, Action.NominateStoreOwner);
-            userController.AddPermissionToStoreManager("member2", "member3", 1, Action.NominateStoreManager);
+            userController.NominateStoreManager(1, "member2", "member3", member2StoreId, DateTime.Now);
+            userController.AddPermissionToStoreManager(1, "member2", "member3", 1, Action.NominateStoreOwner);
+            userController.AddPermissionToStoreManager(1, "member2", "member3", 1, Action.NominateStoreManager);
 
-            userController.NominateStoreOwner("member2", "member4", member2StoreId);
+//            userController.NominateStoreOwner(1, "member2", "member4", member2StoreId);
 
-            userController.Logout("member2");
+            userController.Logout(1, "member2");
 
-            userController.Register("member5", "pass5");
+            userController.Register(1, "member5", "pass5", DateTime.Parse("Aug 22, 1972"));
 
-            userController.ExitMarket();
+            userController.ExitMarket(1);
         }
 
+        /// Tests for UserController.Register method
+        /// <see cref="UserController.Register"/>
         [TestMethod]
         public void TestRegister_Success()
         {
             // Arrange
             string username = "test1", password = "pass1";
-            userController.EnterMarket();
+            userController.EnterMarket(1, DateTime.Now);
 
             // Act
-            userController.Register(username, password);
+            userController.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
 
             // Assert
             Assert.IsTrue(userController.IsMember(username));
@@ -81,9 +90,9 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         [DataRow("", "pass")]
         [DataRow("", "")]
         [ExpectedException(typeof(ArgumentException), "Username or password cannot be empty")]
-        public void TestRegister_EmptyDetails(string username, string password)
+        public void TestRegister_Failure_EmptyDetails(string username, string password)
         {
-            userController.Register(username, password);
+            userController.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
             Assert.IsFalse(userController.IsMember(username));
         }
 
@@ -92,49 +101,53 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         [DataRow(null, "pass")]
         [DataRow(null, null)]
         [ExpectedException(typeof(ArgumentException), "Username or password cannot be empty")]
-        public void TestRegister_NullDetails(string username, string password)
+        public void TestRegister_Failure_NullDetails(string username, string password)
         {
-            userController.Register(username, password);
+            userController.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
             Assert.IsFalse(userController.IsMember(username));
         }
 
         [DataTestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void TestRegister_RegisterTwice()
+        public void TestRegister_Failure_RegisterTwice()
         {
             string username = "user4", password = "pass4";
             Assert.IsFalse(userController.IsMember(username));
-            userController.EnterMarket();
+            userController.EnterMarket(1, DateTime.Now);
 
-            userController.Register(username, password);
+            userController.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
             Assert.IsTrue(userController.IsMember(username));
-            userController.Register(username, password);
+            userController.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
         }
 
         [DataTestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void TestRegister_UserExists()
+        public void TestRegister_Failure_UserExists()
         {
             string username = "member1", password = "pass12";
             Assert.IsTrue(userController.IsMember(username));
 
-            userController.EnterMarket();
-            userController.Register(username, password);
+            userController.EnterMarket(1, DateTime.Now);
+            userController.Register(1, username, password, DateTime.Parse("Aug 22, 1972"));
         }
 
+        /// Tests for UserController.EnterMarket method
+        /// <see cref="UserController.EnterMarket"/>
         [TestMethod]
         public void TestEnterMarket_Success()
         {
-            userController.EnterMarket();
+            userController.EnterMarket(1, DateTime.Now);
         }
 
         [TestMethod]
-        public void TestEnterMarket_AlreadyEntered()
+        public void TestEnterMarket_Failure_AlreadyEntered()
         {
-            userController.EnterMarket();
-            Assert.ThrowsException<InvalidOperationException>(() => userController.EnterMarket());
+            userController.EnterMarket(1, DateTime.Now);
+            Assert.ThrowsException<InvalidOperationException>(() => userController.EnterMarket(1, DateTime.Now));
         }
 
+        /// Tests for UserController.Login method
+        /// <see cref="UserController.Login"/>
         [TestMethod]
         [DataRow("member1", "pass1")]
         [DataRow("member2", "pass2")]
@@ -142,22 +155,22 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         public void TestLogin_Success(string username, string password)
         {
             // Arrange
-            userController.EnterMarket();
+            userController.EnterMarket(1, DateTime.Now);
 
             // Act
-            userController.Login(username, password);
+            userController.Login(1, username, password, DateTime.Now);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException), "Username does not exist")]
-        public void TestLogin_NoSuchUser()
+        public void TestLogin_Failure_NoSuchUser()
         {
             // Arrange
             string username = "user0", password = "password0";
-            userController.EnterMarket();
+            userController.EnterMarket(1, DateTime.Now);
 
             // Act
-            userController.Login(username, password);
+            userController.Login(1, username, password, DateTime.Now);
         }
 
         [TestMethod]
@@ -165,10 +178,10 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         [DataRow("", "pass")]
         [DataRow("", "")]
         [ExpectedException(typeof(ArgumentException), "Username or password cannot be empty")]
-        public void TestLogin_EmptyDetails(string username, string password)
+        public void TestLogin_Failure_EmptyDetails(string username, string password)
         {
-            userController.EnterMarket();
-            userController.Login(username, password);
+            userController.EnterMarket(1, DateTime.Now);
+            userController.Login(1, username, password, DateTime.Now);
         }
 
         [TestMethod]
@@ -176,325 +189,215 @@ namespace Tests.UnitTests.DomainLayer.UserPackage
         [DataRow(null, "pass")]
         [DataRow(null, null)]
         [ExpectedException(typeof(ArgumentException), "Username or password cannot be null")]
-        public void TestLogin_NullDetails(string username, string password)
+        public void TestLogin_Failure_NullDetails(string username, string password)
         {
-            userController.EnterMarket();
-            userController.Login(username, password);
+            userController.EnterMarket(1, DateTime.Now);
+            userController.Login(1, username, password, DateTime.Now);
         }
 
         [TestMethod]
         [DataRow("member1", "PASS1")]
         [DataRow("member2", "PASS2")]
         [ExpectedException(typeof(ArgumentException), "Wrong password")]
-        public void TestLogin_WrongPassword(string username, string password)
+        public void TestLogin_Failure_WrongPassword(string username, string password)
         {
             // Arrange
-            userController.EnterMarket();
+            userController.EnterMarket(1, DateTime.Now);
 
             // Act
-            userController.Login(username, password);
+            userController.Login(1, username, password, DateTime.Now);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException), "Current user already logged in")]
-        public void TestLogin_ThisUserAlreadyLoggedIn()
+        public void TestLogin_Failure_ThisUserAlreadyLoggedIn()
         {
             string username = "member1", password = "pass1";
-            userController.EnterMarket();
+            userController.EnterMarket(1, DateTime.Now);
 
-            userController.Login(username, password);
-            userController.Login(username, password);
+            userController.Login(1, username, password, DateTime.Now);
+            userController.Login(1, username, password, DateTime.Now);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException), "Other user already logged in")]
-        public void TestLogin_OtherUserAlreadyLoggedIn()
+        public void TestLogin_Failure_OtherUserAlreadyLoggedIn()
         {
             string username1 = "member1", password1 = "pass1", username2 = "member2", password2 = "pass2";
-            userController.EnterMarket();
+            userController.EnterMarket(1, DateTime.Now);
 
-            userController.Login(username1, password1);
-            userController.Login(username2, password2);
+            userController.Login(1, username1, password1, DateTime.Now);
+            userController.Login(1, username2, password2, DateTime.Now);
         }
 
+        /// Tests for UserController.Logout method
+        /// <see cref="UserController.Logout"/>
         [TestMethod]
         public void TestLogout_Success()
         {
             string username = "member1", password = "pass1";
-            userController.EnterMarket();
-            userController.Login(username, password);
+            userController.EnterMarket(1, DateTime.Now);
+            userController.Login(1, username, password, DateTime.Now);
 
-            userController.Logout(username);
+            userController.Logout(1, username);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException), "No such user")]
-        public void TestLogout_NoSuchUser()
+        public void TestLogout_Failure_NoSuchUser()
         {
-            userController.Logout("imaginary_user");
+            userController.Logout(1, "imaginary_user");
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException), "No user logged in")]
-        public void TestLogout_NoUserLoggedIn()
+        public void TestLogout_Failure_NoUserLoggedIn()
         {
             string username = "member1";
-            userController.EnterMarket();
+            userController.EnterMarket(1, DateTime.Now);
 
-            userController.Logout(username);
+            userController.Logout(1, username);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException), "Username not equal to logged in user name")]
-        public void TestLogout_OtherUserLoggedIn()
+        public void TestLogout_Failure_OtherUserLoggedIn()
         {
             string username1 = "member1", password1 = "pass1", username2 = "member2";
-            userController.EnterMarket();
-            userController.Login(username1, password1);
+            userController.EnterMarket(1, DateTime.Now);
+            userController.Login(1, username1, password1, DateTime.Now);
 
-            userController.Logout(username2);
-        }
-
-        [TestMethod]
-        [DataRow("member2", "pass2")]
-        [DataRow("member3", "pass3")]
-        [DataRow("member4", "pass4")]
-        public void TestNominateStoreOwner_Success(string nominator, string nominatorPassword)
-        {
-            userController.EnterMarket();
-            userController.Login(nominator, nominatorPassword);
-            userController.NominateStoreOwner(nominator, "member1", member2StoreId);
+            userController.Logout(1, username2);
         }
 
         [TestMethod]
         [DataRow("member2")]
         [DataRow("member3")]
         [DataRow("member4")]
-        public void TestNominateStoreOwner_NominatorNotLoggedIn(string nominator)
+        public void TestNominateStoreManager_Failure_NominatorNotLoggedIn(string nominator)
         {
-            userController.EnterMarket();
-            Assert.ThrowsException<ArgumentException>(() => userController.NominateStoreOwner(nominator, "member1", member2StoreId));
+            userController.EnterMarket(1, DateTime.Now);
+            Assert.ThrowsException<ArgumentException>(() => userController.NominateStoreManager(1, nominator, "member1", member2StoreId, DateTime.Now));
         }
 
         [TestMethod]
         [DataRow("member2", "pass2")]
         [DataRow("member3", "pass3")]
         [DataRow("member4", "pass4")]
-        public void TestNominateStoreOwner_NoSuchNominated(string nominator, string nominatorPassword)
+        public void TestNominateStoreManager_Failure_NoSuchNominated(string nominator, string nominatorPassword)
         {
-            userController.EnterMarket();
-            userController.Login(nominator, nominatorPassword);
-            Assert.ThrowsException<ArgumentException>(() => userController.NominateStoreOwner(nominator, "arya stark", member2StoreId));
+            userController.EnterMarket(1, DateTime.Now);
+            userController.Login(1, nominator, nominatorPassword, DateTime.Now);
+            Assert.ThrowsException<ArgumentException>(() => userController.NominateStoreManager(1, nominator, "arya stark", member2StoreId, DateTime.Now));
         }
 
         [TestMethod]
-        public void TestNominateStoreOwner_NoPermission()
+        public void TestNominateStoreManager_Failure_NoPermission()
         {
-            userController.EnterMarket();
+            userController.EnterMarket(1, DateTime.Now);
             string nominator = "member1";
-            userController.Login(nominator, "pass1");
-            Assert.ThrowsException<MemberAccessException>(() => userController.NominateStoreOwner(nominator, "member5", member2StoreId));
+            userController.Login(1, nominator, "pass1", DateTime.Now);
+            Assert.ThrowsException<MemberAccessException>(() => userController.NominateStoreManager(1, nominator, "member5", member2StoreId, DateTime.Now));
         }
 
-        [TestMethod]
-        [DataRow("member2", "pass2")]
-        [DataRow("member3", "pass3")]
-        public void TestNominateStoreOwner_NominatedAlreadyStoreOwner(string nominator, string nominatorPassword)
-        {
-            userController.EnterMarket();
-            userController.Login(nominator, nominatorPassword);
-            Assert.ThrowsException<InvalidOperationException>(() => userController.NominateStoreOwner(nominator, "member4", member2StoreId));
-        }
-
-        [TestMethod]
-        [DataRow("member2", "pass2")]
-        [DataRow("member3", "pass3")]
-        [DataRow("member4", "pass4")]
-        public void TestNominateStoreOwner_SelfNomination(string nominator, string nominatorPassword)
-        {
-            userController.EnterMarket();
-            userController.Login(nominator, nominatorPassword);
-            Assert.ThrowsException<InvalidOperationException>(() => userController.NominateStoreOwner(nominator, nominator, member2StoreId));
-        }
-
-        [TestMethod]
-        [DataRow("member3", "pass3")]
-        [DataRow("member4", "pass4")]
-        public void TestNominateStoreOwner_CircularNomination(string nominator, string nominatorPassword)
-        {
-            userController.EnterMarket();
-            userController.Login(nominator, nominatorPassword);
-            Assert.ThrowsException<InvalidOperationException>(() => userController.NominateStoreOwner(nominator, "member2", member2StoreId));
-        }
-
-        [TestMethod]
-        [DataRow("member2", "pass2")]
-        [DataRow("member3", "pass3")]
-        [DataRow("member4", "pass4")]
-        public void TestNominateStoreManager_Success(string nominator, string nominatorPassword)
-        {
-            userController.EnterMarket();
-            userController.Login(nominator, nominatorPassword);
-            userController.NominateStoreManager(nominator, "member1", member2StoreId);
-        }
-
-        [TestMethod]
-        [DataRow("member2")]
-        [DataRow("member3")]
-        [DataRow("member4")]
-        public void TestNominateStoreManager_NominatorNotLoggedIn(string nominator)
-        {
-            userController.EnterMarket();
-            Assert.ThrowsException<ArgumentException>(() => userController.NominateStoreManager(nominator, "member1", member2StoreId));
-        }
-
-        [TestMethod]
-        [DataRow("member2", "pass2")]
-        [DataRow("member3", "pass3")]
-        [DataRow("member4", "pass4")]
-        public void TestNominateStoreManager_NoSuchNominated(string nominator, string nominatorPassword)
-        {
-            userController.EnterMarket();
-            userController.Login(nominator, nominatorPassword);
-            Assert.ThrowsException<ArgumentException>(() => userController.NominateStoreManager(nominator, "arya stark", member2StoreId));
-        }
-
-        [TestMethod]
-        public void TestNominateStoreManager_NoPermission()
-        {
-            userController.EnterMarket();
-            string nominator = "member1";
-            userController.Login(nominator, "pass1");
-            Assert.ThrowsException<MemberAccessException>(() => userController.NominateStoreManager(nominator, "member5", member2StoreId));
-        }
-
-        [TestMethod]
-        [DataRow("member2", "pass2")]
-        [DataRow("member3", "pass3")]
-        public void TestNominateStoreManager_NominatedAlreadyStoreOwner(string nominator, string nominatorPassword)
-        {
-            userController.EnterMarket();
-            userController.Login(nominator, nominatorPassword);
-            Assert.ThrowsException<InvalidOperationException>(() => userController.NominateStoreManager(nominator, "member4", member2StoreId));
-        }
-
-        [TestMethod]
-        [DataRow("member2", "pass2")]
-        [DataRow("member4", "pass4")]
-        public void TestNominateStoreManager_NominatedAlreadyStoreManager(string nominator, string nominatorPassword)
-        {
-            userController.EnterMarket();
-            userController.Login(nominator, nominatorPassword);
-            Assert.ThrowsException<InvalidOperationException>(() => userController.NominateStoreManager(nominator, "member3", member2StoreId));
-        }
-
-        [TestMethod]
-        [DataRow("member2", "pass2")]
-        [DataRow("member3", "pass3")]
-        [DataRow("member4", "pass4")]
-        public void TestNominateStoreManager_SelfNomination(string nominator, string nominatorPassword)
-        {
-            userController.EnterMarket();
-            userController.Login(nominator, nominatorPassword);
-            Assert.ThrowsException<InvalidOperationException>(() => userController.NominateStoreManager(nominator, nominator, member2StoreId));
-        }
-
-        [TestMethod]
-        [DataRow("member3", "pass3")]
-        [DataRow("member4", "pass4")]
-        public void TestNominateStoreManager_CircularNomination(string nominator, string nominatorPassword)
-        {
-            userController.EnterMarket();
-            userController.Login(nominator, nominatorPassword);
-            Assert.ThrowsException<InvalidOperationException>(() => userController.NominateStoreManager(nominator, "member2", member2StoreId));
-        }
-
+        /// Tests for UserController.ReviewProduct method
+        /// <see cref="UserController.ReviewProduct"/>
         [TestMethod]
         public void TestReviewProduct_Success(){
-            userController.EnterMarket();
+            userController.EnterMarket(1, DateTime.Now);
             string username = "member1";
             int id = 1;
+            int rating = 4;
             string review = "Honest review123";
-            userController.Login(username, "pass1");
-            ReviewDTO dto = userController.ReviewProduct(username, id, review);
+            userController.Login(1, username, "pass1", DateTime.Now);
+            ReviewDTO dto = userController.ReviewProduct(1, username, id, review, rating);
             Assert.AreEqual(review, dto.Review);
             Assert.AreEqual(dto.Reviewer, username);
             Assert.AreEqual(dto.ProductId, id);
+            Assert.AreEqual(dto.Rating, rating);
         }
 
-        [TestMethod]
+        [DataTestMethod]
         [DataRow("")]
         [DataRow(null)]
         public void TestReviewProduct_Failure_EmptyOrNullReview(string review){
-            Assert.ThrowsException<ArgumentException>(() => userController.ReviewProduct("User1", 1, review));
+            userController.EnterMarket(1, DateTime.Now);
+            userController.Login(1, "member1", "pass1", DateTime.Now);
+            Assert.ThrowsException<ArgumentException>(() => userController.ReviewProduct(1, "member1", 1, review, 4));
         }
 
         [DataTestMethod]
-        [DataRow("member2", 1, "product1", "desc", 12.0, 1, 1)] //normal case
-        [DataRow("member2", 2, "product2", "descp", 15.0, 3, 1)] //normal case
-        [DataRow("member2", 1, "product3", "desci", 4.0, 5, 1)] //normal case
-        public void TestviewCart_Success(string user, int prodId, string prodName, string desc, double price, int quantity, int storeId)
+        [DataRow(0)]
+        [DataRow(11)]
+        public void TestReviewProduct_Failure_OutOfRangeRating(int rating)
         {
-            userController.EnterMarket();
-            userController.Login("member2", "pass2");
-            ShoppingBagProduct product2 = userController.addToCart(user, new ShoppingBagProduct(prodId, prodName, desc, price, quantity), storeId);
-            ShoppingCartDTO shoppingCart = userController.viewCart(user);
+            userController.EnterMarket(1, DateTime.Now);
+            userController.Login(1, "member1", "pass1", DateTime.Now);
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => userController.ReviewProduct(1, "member1", 1, "TestReview", rating));
+        }
+
+        /// Tests for UserController.viewCart method
+        /// <see cref="UserController.viewCart"/>
+        [DataTestMethod]
+        [DataRow("member2", 1, "product1", "desc", 12.0, 1, 1, "cat1")] //normal case
+        [DataRow("member2", 2, "product2", "descp", 15.0, 3, 1, "cat1")] //normal case
+        [DataRow("member2", 1, "product3", "desci", 4.0, 5, 1, "cat1")] //normal case
+        public void TestviewCart_Success(string user, int prodId, string prodName, string desc, double price, int quantity, int storeId, string category)
+        {
+            userController.EnterMarket(1, DateTime.Now);
+            userController.Login(1, "member2", "pass2", DateTime.Now);
+            ShoppingBagProduct product2 = userController.AddToCart(1, new ShoppingBagProduct(prodId, prodName, desc, price, quantity, category, storeId), storeId);
+            ShoppingCartDTO shoppingCart = userController.viewCart(1);
             //Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(preInsertedProduct.GetProductDTO()));
-            Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(product2.GetProductDTO()));
+            Assert.AreEqual(shoppingCart.shoppingBags[1].products[0], product2.GetProductDTO());
+        }
+
+
+        [DataTestMethod] 
+        [DataRow("member5")] //a member
+        public void TestMemberCancel_Good_Member(string canceledUsername)
+        {
+            userController.EnterMarket(0, DateTime.Now);
+            userController.Login(0, "admin", "admin", DateTime.Now);
+            userController.CancelMember(0, "admin", canceledUsername);
+            Assert.ThrowsException<ArgumentException>(() => userController.GetMember(canceledUsername));
+        }
+
+        [DataTestMethod] 
+        [DataRow("member7")] //not a real member
+        [DataRow("user7")] //not a member
+        public void TestMemberCancel_Fail(string canceledUsername)
+        {
+            userController.EnterMarket(0, DateTime.Now);
+            userController.Login(0, "admin", "admin", DateTime.Now);
+            userController.EnterMarket(7, DateTime.Now);
+            //userController.Register(7, "user7", "pass7", new DateTime(5));
+            Assert.ThrowsException<ArgumentException>(() => userController.CancelMember(0, "admin", canceledUsername));
         }
 
         [DataTestMethod]
-        [DataRow("member1", 1, "product1", "desc", 12.0, 1, 1)] //not loggedin user
-        [DataRow("member3", 2, "product2", "descp", 15.0, 3, 1)] //not loggedin user
-        public void TestviewCart_Failure(string user, int prodId, string prodName, string desc, double price, int quantity, int storeId)
+        [DataRow(1,"member1")] //not an admin
+        public void Test_GetMembersOnlineStats_Fail(int userId, string actingUsername)
         {
-            userController.EnterMarket();
-            userController.Login("member2", "pass2");
-            ShoppingBagProduct product2 = userController.addToCart("member2", new ShoppingBagProduct(prodId, prodName, desc, price, quantity), storeId);
-            Assert.ThrowsException<ArgumentException>(() => userController.viewCart(user));
-            //Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(preInsertedProduct.GetProductDTO()));
-            //Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(product2.GetProductDTO()));
+            userController.EnterMarket(userId, DateTime.Now);
+            userController.Login(1, actingUsername, "pass1", DateTime.Now);
+            Assert.ThrowsException<MemberAccessException>(() => userController.GetMembersOnlineStats(userId, actingUsername));
         }
 
         [DataTestMethod]
-        [DataRow("member2", 1, "product1", "desc", 12.0, 1, 1,1)] //normal case
-        [DataRow("member2", 1, "product1", "descp", 15.0, 3, 1,1)] //normal case
-        [DataRow("member2", 1, "product1", "desci", 4.0, 1, 5,1)] //normal case
-        public void TestEditCart_Success(string user, int prodId, string prodName, string desc, double price, int quantity,int newQuantity, int storeId)
+        [DataRow(0, "admin")] //admin
+        public void Test_GetMembersOnlineStats_Success(int userId, string actingUsername)
         {
-            userController.EnterMarket();
-            userController.Login("member2", "pass2");
-            ShoppingBagProduct product2 = userController.addToCart(user, new ShoppingBagProduct(prodId, prodName, desc, price, quantity), storeId);
-            ShoppingCartDTO shoppingCart = userController.editCart(user, prodId, newQuantity);
-            //Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(preInsertedProduct.GetProductDTO()));
-            ProductDTO product = product2.GetProductDTO();
-            product.Quantity = newQuantity;
-            Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(product));
-        }
-
-        [DataTestMethod]
-        [DataRow("member2", 1, "product1", "desc", 12.0, 1, 0, 1)] //normal case
-        [DataRow("member2", 1, "product1", "descp", 15.0, 3, 0, 1)] //normal case
-        public void TestEditCartDelete_Success(string user, int prodId, string prodName, string desc, double price, int quantity, int newQuantity, int storeId)
-        {
-            userController.EnterMarket();
-            userController.Login("member2", "pass2");
-            ShoppingBagProduct product2 = userController.addToCart(user, new ShoppingBagProduct(prodId, prodName, desc, price, quantity), storeId);
-            ShoppingCartDTO shoppingCart = userController.editCart(user, prodId, newQuantity);
-            //Assert.IsTrue(shoppingCart.shoppingBags[1].products[0].EqualsFields(preInsertedProduct.GetProductDTO()));
-            Assert.IsTrue(shoppingCart.shoppingBags[1].products.Count==0);
-        }
-
-        [DataTestMethod] //prodId is 1
-        [DataRow("member2", 1, "product1", "desc", 12.0, 1, -1, 1)] //negative quantity
-        [DataRow("member2", 5, "product5", "descp", 15.0, 3, 0, 1)] //not a real product delete
-        [DataRow("member2", 5, "product5", "desci", 4.0, 1, 5, 1)] //not a real product edit
-        public void TestEditCart_Failure(string user, int prodId, string prodName, string desc, double price, int quantity, int newQuantity, int storeId)
-        {
-            userController.EnterMarket();
-            userController.Login("member2", "pass2");
-            ShoppingBagProduct product2 = userController.addToCart(user, new ShoppingBagProduct(1, prodName, desc, price, quantity), storeId);
-            Assert.ThrowsException<ArgumentException>(() => userController.editCart(user, prodId, newQuantity));
+            userController.EnterMarket(userId, DateTime.Now);
+            userController.Login(0, actingUsername, "admin", DateTime.Now);
+            userController.EnterMarket(1, DateTime.Now);
+            userController.Login(1, "member1", "pass1", DateTime.Now);
+            bool booly;
+            Assert.IsTrue(userController.GetMembersOnlineStats(userId, actingUsername).ContainsKey(userController.GetMember("member1")));
+            userController.GetMembersOnlineStats(userId, actingUsername).TryGetValue(userController.GetMember("member1"), out booly);
+            Assert.IsTrue(booly==true);
+            userController.GetMembersOnlineStats(userId, actingUsername).TryGetValue(userController.GetMember("member2"), out booly);
+            Assert.IsTrue(booly == false);
         }
     }
 }

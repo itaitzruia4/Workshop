@@ -18,7 +18,7 @@ namespace Workshop.DomainLayer.UserPackage.Security
                 Byte[] result = hash.ComputeHash(enc.GetBytes(message));
 
                 foreach (Byte b in result)
-                Sb.Append(b.ToString("x2"));
+                    Sb.Append(b.ToString("x2"));
             }
 
             return Sb.ToString();

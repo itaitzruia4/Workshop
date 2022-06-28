@@ -10,21 +10,13 @@ namespace Workshop.ServiceLayer.ServiceObjects
 {
     public class ShoppingBag
     {
-        public int storeId { get; set; }
-        public List<Product> products { get; set; }
+        public int StoreId { get; set; }
+        public List<Product> Products { get; set; }
 
-        public ShoppingBag(int storeId, List<Product> products)
-        {
-            this.storeId = storeId;
-            this.products = products;
-        }
         public ShoppingBag(DomainShoppingBag shoppingBag)
         {
-            this.storeId = shoppingBag.storeId;
-            foreach(DomainProduct product in shoppingBag.products)
-            {
-                this.products.Add(new Product(product));
-            }
+            this.StoreId = shoppingBag.storeId;
+            this.Products = shoppingBag.products.Select(x => new Product(x)).ToList();
         }
     }
 }

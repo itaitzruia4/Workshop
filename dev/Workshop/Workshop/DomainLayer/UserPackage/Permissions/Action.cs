@@ -22,6 +22,13 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
         AddPermissionToStoreManager,
         RemovePermissionFromStoreManager,
         GetStoreOrdersList,
-        ViewClosedStore
+        ViewClosedStore,
+        AddDiscount,
+        GetMarketStatistics,
+        CancelMember,
+        GetMembersOnlineStats,
+        AddPurchaseTerm,
+        ViewStorePurchaseHistory,
+        ChangeProductCategory
     }
 }
