@@ -302,8 +302,8 @@ namespace Workshop.DomainLayer.UserPackage
 
             List<StoreRole> nominatedStoreRoles = nominated.GetStoreRoles(storeId), nominatorStoreRoles = nominator.GetStoreRoles(storeId);
 
-            // Check that nominator is not a store owner
-            if (nominatedStoreRoles.Count > 0)
+            // Check that nominee is not a store owner/manager already
+            if (nominatedStoreRoles.Any(sr => sr is StoreManager))
                 throw new InvalidOperationException($"User {nominatedUsername} is already a store owner/manager of store #{storeId}");
 
             // Finally, add the new role
