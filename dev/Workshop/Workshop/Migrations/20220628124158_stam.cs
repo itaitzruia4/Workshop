@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Workshop.Migrations
 {
-    public partial class stam2 : Migration
+    public partial class stam : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
