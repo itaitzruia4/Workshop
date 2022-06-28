@@ -99,7 +99,7 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
             rwl.AcquireReaderLock(Timeout.Infinite);
             foreach(Role role2 in roles)
             {
-                if (role.Equals(role2))
+                if (role.GetType().Equals(role2.GetType()))
                 {
                     rwl.ReleaseReaderLock();
                     throw new InvalidOperationException("This user is already holding the requested role.");
