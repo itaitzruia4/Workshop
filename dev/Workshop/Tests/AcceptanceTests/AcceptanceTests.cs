@@ -3298,5 +3298,25 @@ namespace Tests.AcceptanceTests
             Assert.IsFalse(rst.ErrorOccured);
             Assert.IsNotNull(rst.Value);
         }
+
+        [TestMethod]
+        public void Test_PersistenceOnBidding()
+        {
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972\ndb");
+            Test_Login_Good(1, "member1", "pass1");
+            Test_Login_Good(2, "member2", "pass2");
+            Test_Login_Good(3, "member3", "pass3");
+            Store st = service.CreateNewStore(1, "member1", "pass1", DateTime.Now).Value;
+            Product p = service.AddProduct(1, "member1", st.StoreId, "P1", "D1", 10.0, 5, "Cat1").Value;
+            service.NominateStoreOwner(1, "member1", "member2", st.StoreId, DateTime.Now);
+            Bid b = service.OfferBid(3, "member3", st.StoreId, p.Id, 7.0).Value;
+            service.VoteForBid(2, "member2", st.StoreId, b.BidId, true);
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972\ndb");
+            service.EnterMarket(1, DateTime.Now);
+            service.Login(1, "member1", "pass1", DateTime.Now);
+            Response<Bid> rb = service.VoteForBid(1, "member1", st.StoreId, p.Id, true);
+            Assert.IsFalse(rb.ErrorOccured);
+            Assert.IsNotNull(rb.Value);
+        }
     }
 }
