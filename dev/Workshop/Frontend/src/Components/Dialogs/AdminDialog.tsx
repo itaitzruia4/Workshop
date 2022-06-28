@@ -259,7 +259,8 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
 
                 const url = `ws://127.0.0.1:8800/${token.membername}-live_view`;
                 const conn = new WebSocket(url);
-                conn.addEventListener("message", (ev: any) => updateStats(statsRef.current, ev.data))
+                //conn.addEventListener("message", (ev: any) => updateStats(statsRef.current, ev.data))
+                conn.addEventListener("message", (ev: any) => setStatistics(ev.data));
             })
             .catch(error => {
                 alert(error)
