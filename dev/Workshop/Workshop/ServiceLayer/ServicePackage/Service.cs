@@ -298,12 +298,12 @@ namespace Workshop.ServiceLayer
             {
                 throw new ArgumentException($"The system needs to have at least one admin! Incorrect config file!");
             }
+            Context.USE_DB = USE_DB;
             WasInitializedWithFile = starting_state_file != null ? parse_ss(starting_state_file) : false;
             if (facade == null)
             {
                 facade = new Facade(USE_EXTERNAL_SYSTEM ? new ExternalSystem() : externalSystem, systemManagers);
             }
-            Context.USE_DB = USE_DB;
         }
 
         public Service(IExternalSystem externalSystem)
