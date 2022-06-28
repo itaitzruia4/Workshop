@@ -31,7 +31,6 @@ namespace Workshop.DomainLayer.MarketPackage
 
         private StoreDAL storeDAL;
 
-
         //public Store(int id, string name)
         public HashSet<Member> owners { get; }
         public ConcurrentDictionary<int,Bid> biding_votes { get; set; }

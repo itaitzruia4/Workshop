@@ -61,8 +61,14 @@ namespace Workshop.DomainLayer.UserPackage.Permissions
 
         public void AddNominee(string membername, StoreRole nominee)
         {
-            nominees.Add(membername, nominee);
-            Console.WriteLine("AddNominee %s %s", membername, nominee.ToDAL().RoleType);
+            if (nominees.ContainsKey(membername))
+            {
+                nominees[membername] = nominee;
+            }
+            else
+            {
+                nominees.Add(membername, nominee);
+            }
             NameToRole ntr = new NameToRole(nominee.ToDAL().Id, membername);
             DataHandler.Instance.Value.save(ntr);
             roleDAL.nominees.Add(ntr);
