@@ -61,7 +61,7 @@ namespace Workshop.DataLayer
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (true)
+            if (USE_DB)
             {
                 optionsBuilder.UseSqlServer("Data Source = 34.107.89.228;Initial Catalog=WorkshopDB; Integrated Security = False; User Id = sqlserver; Password = workshop; Encrypt = True; TrustServerCertificate = True; MultipleActiveResultSets = True");
                 optionsBuilder.EnableSensitiveDataLogging();
@@ -88,7 +88,7 @@ namespace Workshop.DataLayer
 
         public override EntityEntry<TEntity> Update<TEntity>(TEntity entity)
         {
-            if (true)
+            if (USE_DB)
             {
                 Logger.Instance.LogEvent($"Updating {entity} in the cache");
                 return base.Update(entity);
@@ -98,7 +98,7 @@ namespace Workshop.DataLayer
 
         public override EntityEntry<TEntity> Add<TEntity>(TEntity entity)
         {
-            if (true)
+            if (USE_DB)
             {
                 Logger.Instance.LogEvent($"Adding {entity} to the cache");
                 return base.Add(entity);

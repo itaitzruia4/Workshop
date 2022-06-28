@@ -249,6 +249,16 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
             (stat, idx) => ({ id: idx, date: stat.date, marketManagers: stat.marketManagers, storeOwners: stat.storeOwners, storeManagers: stat.storeManagers, members: stat.members, guests: stat.guests})
         )
 
+    const stats2APIStats = (stats: Statistics[]): APIStatistics[] =>
+        stats.map(
+            (stat) => ({ date: stat.date, marketManagers: stat.marketManagers, storeOwners: stat.storeOwners, storeManagers: stat.storeManagers, members: stat.members, guests: stat.guests })
+        )
+
+    const parseStats = (statsJson: string): APIStatistics => {
+        const stat = JSON.parse(statsJson);
+        return ({ date: stat.Date, marketManagers: stat.MarketManagers, storeOwners: stat.StoreOwners, storeManagers: stat.StoreManagers, members: stat.Members, guests: stat.Guests })
+    }
+
     const viewStatistics = () => {
         handleViewStatistics(token, fromDate, toDate)
             .then(stats => {
@@ -260,7 +270,15 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
                 const url = `ws://127.0.0.1:8800/${token.membername}-live_view`;
                 const conn = new WebSocket(url);
                 //conn.addEventListener("message", (ev: any) => updateStats(statsRef.current, ev.data))
-                conn.addEventListener("message", (ev: any) => setStatistics(ev.data));
+                conn.addEventListener("message", (ev: any) => {
+                    const last = statsRef.current.length - 1;
+                    const newStats = parseStats(ev.data);
+                    //console.log("ws event stats:", newStats);
+                    //console.log("all but today stats", statsRef.current.slice(0, last));
+                    //console.log("combined", stats2APIStats(statsRef.current.slice(0, last)).concat([newStats]));
+                    //console.log("final stats", addStatsIds(stats2APIStats(statsRef.current.slice(0, last)).concat([newStats])));
+                    setStatistics(addStatsIds(stats2APIStats(statsRef.current.slice(0, last)).concat([newStats])));
+                });
             })
             .catch(error => {
                 alert(error)
