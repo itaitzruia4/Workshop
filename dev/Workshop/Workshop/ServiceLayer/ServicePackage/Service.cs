@@ -310,8 +310,8 @@ namespace Workshop.ServiceLayer
         {
             List<SystemAdminDTO> systemManagers = new List<SystemAdminDTO>();
             systemManagers.Add(new SystemAdminDTO("admin", "admin", "22/08/1972"));
+            Context.USE_DB = true;
             facade = new Facade(externalSystem, systemManagers);
-            Context.USE_DB = false;
         }
 
         public int GetPort()

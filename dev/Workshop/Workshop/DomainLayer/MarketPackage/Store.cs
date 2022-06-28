@@ -83,14 +83,14 @@ namespace Workshop.DomainLayer.MarketPackage
             this.products = new Dictionary<int, Product>();
             this.open = storeDAL.Open;
             this.rwl = new ReaderWriterLock();
-            this.discountPolicy = new DiscountPolicy(storeDAL.DiscountPolicy, this);
-            this.purchasePolicy = new PurchasePolicy(storeDAL.PurchasePolicy, this);
             this.owners = owners;
 
             foreach(ProductDAL product in storeDAL.Products)
             {
                 products.Add(product.Id, new Product(product));
             }
+            this.discountPolicy = new DiscountPolicy(storeDAL.DiscountPolicy, this);
+            this.purchasePolicy = new PurchasePolicy(storeDAL.PurchasePolicy, this);
             this.storeDAL = storeDAL;
         }
 

@@ -26,6 +26,8 @@ namespace Workshop.DataLayer
         public DbSet<MarketController> marketController { get; set; }
         public DbSet<UserController> userController { get; set; }
         public DbSet<Discount> Discount { get; set; }
+        public DbSet<Discount> ProductDiscount { get; set; }
+        public DbSet<Discount> CategoryDiscount { get; set; }
         public DbSet<DiscountPolicy> DiscountPolicy { get; set; }
         public DbSet<PurchasePolicy> PurchasePolicy { get; set; }
         public DbSet<Term> Term { get; set; }

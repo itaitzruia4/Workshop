@@ -23,8 +23,8 @@ namespace Workshop.DataLayer.DataObjects.Market
 
         public Product()
         {
-            this.Id = nextId;
-            nextId++;
+            //this.Id = nextId;
+            //nextId++;
         }
 
         public Product(int id, int store, string name, string description, double price, int quantity, string category)
@@ -36,8 +36,8 @@ namespace Workshop.DataLayer.DataObjects.Market
             Price = price;
             Quantity = quantity;
             Category = category;
-            this.Id = nextId;
-            nextId++;
+            //this.Id = nextId;
+            //nextId++;
         }
     }
 }
