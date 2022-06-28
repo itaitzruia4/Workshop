@@ -2,7 +2,7 @@
 using WebSocketSharp.Server;
 using Workshop.ServiceLayer.ServiceObjects;
 using Workshop.ServiceLayer;
-using System.Web.Helpers;
+using Newtonsoft.Json;
 
 namespace API
 {
@@ -35,7 +35,7 @@ namespace API
         {
             if (!si.ErrorOccured)
             {
-                string tosend = Json.Encode(si.Value);
+                string tosend = JsonConvert.SerializeObject(si.Value);
                 foreach (string path in WebSocketServices.Paths)
                 {
                     WebSocketServices[path].Sessions.Broadcast(tosend);

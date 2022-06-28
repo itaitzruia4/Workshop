@@ -3,4 +3,3 @@ admin~u1~pass1~22/08/1972
 ss~C:\Users\merav\University\Workshop\bar-ss.txt
 port~8800
 es
-db
