@@ -31,7 +31,7 @@ namespace API.Controllers
             {
                 return BadRequest(new FrontResponse<int>(response.ErrorMessage));
             }
-            StatsServer.SendMessageToAllAdmins("GUEST");
+            StatsServer.SendMessageToAllAdmins(Service.TodaysInformation(DateTime.Now.Date));
             return Ok(new FrontResponse<int>(CURR_ID));
         }
 
@@ -54,31 +54,8 @@ namespace API.Controllers
             {
                 return BadRequest(new LoginResponse(response.ErrorMessage));
             }
-            LoginResponse res = new LoginResponse(response.Value.Key, response.Value.Value);
-            bool MANAGER = false;
-            bool OWNER = false;
-            bool MARKET = false;
-            string message = "MEMBER";
-            foreach (Role role in res.Value.Roles)
-            {
-                if (!MARKET && role is MarketManager)
-                {
-                    MARKET = true;
-                }
-                else if (!OWNER && (role is StoreOwner || role is StoreFounder))
-                {
-                    OWNER = true;
-                }
-                else if (!MANAGER && role is StoreManager)
-                {
-                    MANAGER = true;
-                }
-            }
-            if (MARKET) message = "MARKET";
-            else if (OWNER) message = "OWNER";
-            else if (MANAGER) message = "MANAGER";
-            StatsServer.SendMessageToAllAdmins(message);
-            return Ok(res);
+            StatsServer.SendMessageToAllAdmins(Service.TodaysInformation(DateTime.Now.Date));
+            return Ok(new LoginResponse(response.Value.Key, response.Value.Value));
         }
 
         [HttpPost("logout")]

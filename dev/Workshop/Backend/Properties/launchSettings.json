@@ -11,7 +11,7 @@
   "profiles": {
     "API": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\Software Engineering\\Semester B - 2021\\Sadna\\Project repo\\Workshop\\prod-conf.txt\"",
+      "commandLineArgs": "C:\\Users\\merav\\University\\Workshop\\prod-conf.txt",
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

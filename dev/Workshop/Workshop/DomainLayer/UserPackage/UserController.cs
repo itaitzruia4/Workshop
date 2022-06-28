@@ -712,5 +712,17 @@ namespace Workshop.DomainLayer.UserPackage
             }
             return returnVal;
         }
+
+        UserCountInDate IUserController.TodaysInformation(DateTime date)
+        {
+            lock (userCountOnDatePerType.SyncRoot)
+            {
+                if (userCountOnDatePerType.Contains(date.Date))
+                {
+                    return (UserCountInDate)userCountOnDatePerType[date.Date];
+                }
+                throw new ArgumentException("Could not find given date");
+            }
+        }
     }
 }
