@@ -1857,7 +1857,7 @@ namespace Tests.AcceptanceTests
                 "create-new-store(1,user1,store1,16/06/2022)");
             file.Flush();
             file.Close();
-            Service service = new Service($"admin~admin~admin~22/08/1972\nss~{FileName}");
+            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
             Assert.IsTrue(service.WasInitializedWithFile);
             Assert.IsTrue(service.EnterMarket(1, DateTime.Now).ErrorOccured);
             Assert.IsTrue(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1876,7 +1876,7 @@ namespace Tests.AcceptanceTests
                 "create-new-store(1,user1,store1)");
             file.Flush();
             file.Close();
-            Service service = new Service($"admin~admin~admin~22/08/1972\nss~{FileName}");
+            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
             // Expecting error: need to register before logging in
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1, DateTime.Now).ErrorOccured); // Make sure nothing happend after it failed
@@ -1897,7 +1897,7 @@ namespace Tests.AcceptanceTests
                 "blah-blah(1,user1,pass1,store1)");
             file.Flush();
             file.Close();
-            Service service = new Service($"admin~admin~admin~22/08/1972\nss~{FileName}");
+            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1, DateTime.Now).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1916,7 +1916,7 @@ namespace Tests.AcceptanceTests
                 "create-new-store(1,user1,store1,failureInLife1)");
             file.Flush();
             file.Close();
-            Service service = new Service($"admin~admin~admin~22/08/1972\nss~{FileName}");
+            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1, DateTime.Now).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1935,7 +1935,7 @@ namespace Tests.AcceptanceTests
                 "create-new-store(1,user1)");
             file.Flush();
             file.Close();
-            Service service = new Service($"admin~admin~admin~22/08/1972\nss~{FileName}");
+            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1, DateTime.Now).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1954,7 +1954,7 @@ namespace Tests.AcceptanceTests
                 "create-new-store(FAILME,user1,store1)");
             file.Flush();
             file.Close();
-            Service service = new Service($"admin~admin~admin~22/08/1972\nss~{FileName}");
+            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1, DateTime.Now).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -2614,7 +2614,7 @@ namespace Tests.AcceptanceTests
 
         public void Test_MarketManagerDailyInformation_Failure_NotMarketManager()
         {
-            service = new Service("admin~NOTYOU~admin~22/08/1972");
+            service = new Service(externalSystem.Object, "admin~NOTYOU~admin~22/08/1972");
 
             service.EnterMarket(1, DateTime.Parse("May 22, 2022"));
             service.EnterMarket(2, DateTime.Parse("Aug 22, 1980"));
