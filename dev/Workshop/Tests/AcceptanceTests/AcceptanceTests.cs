@@ -3240,6 +3240,8 @@ namespace Tests.AcceptanceTests
             Product p = service.AddProduct(1, "member1", st.StoreId, "Prod1", "Desc1", 10.0, 5, "Cat1").Value;
             service.AddToCart(2, p.Id, st.StoreId, 3);
             service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972\ndb");
+            service.EnterMarket(2, DateTime.Now);
+            service.Login(2, "member2", "pass2", DateTime.Now);
             ShoppingCart sc = service.ViewCart(2).Value;
             Assert.IsNotNull(sc);
             Assert.AreEqual(1, sc.ShoppingBags.Count);
@@ -3272,7 +3274,17 @@ namespace Tests.AcceptanceTests
             Assert.AreEqual(1, stores.Count);
             Assert.AreEqual(st.StoreId, stores.First().StoreId);
             Assert.AreEqual(st.Name, stores.First().Name);
-            Assert.AreEqual(st.Products.First().Id, stores.First().Products.First().Id);
+            Assert.AreEqual(p.Id, stores.First().Products.First().Id);
+        }
+
+        [TestMethod]
+        public void Test_PersistenceOnBid()
+        {
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972\ndb");
+            Test_Login_Good(1, "member1", "pass1");
+            Test_Login_Good(2, "member2", "pass2");
+            Test_Login_Good(3, "member3", "pass3");
+            Store st = service.CreateNewStore(1, "member1", "pass1", DateTime.Now).Value;
         }
     }
 }
