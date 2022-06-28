@@ -108,9 +108,10 @@ function Row(props: { store: Store, order: Order }) {
     );
 }
 
-export default function storePurchaseHistory(props: { store: Store, orders: Order[] }) {
-    const { store, orders } = props;
-    return (      
+export default function storePurchaseHistory(props: { store: Store, orders: Order[] , hasPermission: boolean }) {
+    const { store, orders, hasPermission } = props;
+    return (   
+        hasPermission ? 
         <TableContainer component={Paper}>
             <Table aria-label="collapsible table">
                 <TableHead>
@@ -128,6 +129,8 @@ export default function storePurchaseHistory(props: { store: Store, orders: Orde
                     ))}
                 </TableBody>
             </Table>
-        </TableContainer>
+            </TableContainer> : <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                You dont have permission to view this store's purchase history
+            </Typography>
     );
 }
