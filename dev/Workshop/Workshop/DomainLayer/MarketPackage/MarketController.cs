@@ -28,7 +28,7 @@ namespace Workshop.DomainLayer.MarketPackage
         private ConcurrentDictionary<int, ReaderWriterLock> storesLocks;
         private IExternalSystem ExternalSystem;
         private int STORE_COUNT = 0;
-        private int PRODUCT_COUNT = 1;
+        private int PRODUCT_COUNT = 0;
         private DALMarketController dalMarketController;
 
         public MarketController(IUserController userController, IExternalSystem externalSystem)
@@ -39,7 +39,7 @@ namespace Workshop.DomainLayer.MarketPackage
             this.stores = new ConcurrentDictionary<int, Store>();
             this.storesLocks = new ConcurrentDictionary<int, ReaderWriterLock>();
             STORE_COUNT = 0;
-            PRODUCT_COUNT = 1;
+            PRODUCT_COUNT = 0;
             this.dalMarketController = new DALMarketController(userController.ToDAL(), orderHandler.ToDAL(), new List<DALStore>(), STORE_COUNT, PRODUCT_COUNT);
             dalMarketController.userController = userController.ToDAL();
             DataHandler.Instance.Value.save(dalMarketController);
@@ -140,7 +140,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 Logger.Instance.LogEvent($"User {userId} with member {nominatorUsername} successfuly nominated member {nominatedUsername} as a store owner of store {storeId}");
                 return newRole;
             }
-            userController.notify(new Event("StoreOwnerVoting" + storeId, "There is a store owner voting taking place in store " + storeId, "MarketController"));
+            userController.notify(new Event("StoreOwnerVoting" + storeId, $"There is a store owner voting taking place in store {storeId} on member {nominatedUsername}", "MarketController"));
             return null;
         }
 
@@ -233,7 +233,7 @@ namespace Workshop.DomainLayer.MarketPackage
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("CloseStore" + storeId, "", "MarketController"));
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("BidOfferInStore" + storeId, "", "MarketController"));
             userController.RemoveRegisterToEvent(nominatedMember.Username, new Event("ReviewInStore" + storeId, "", "MarketController"));
-            userController.notify(new Event("RemoveStoreOwnerNominationFrom" + nominated, "Removed store owner nomination from member " + nominated, "MarketController"));
+            userController.notify(new Event("RemoveStoreOwnerNominationFrom" + nominated, "Your store owner nomination has been removed by " + nominator, "MarketController"));
             Logger.Instance.LogEvent($"Member {nominator} successfuly removed store owner nomination from {nominated} in store {storeId}.");
             return nominatedMember;
         }
@@ -543,7 +543,7 @@ namespace Workshop.DomainLayer.MarketPackage
             if (!IsStoreOpen(userId, membername, storeId))
             {
                 stores[storeId].OpenStore();
-                userController.notify(new Event("OpenStore" + storeId, "store " + storeId + "is open" + "by user " + membername, "marketController"));
+                userController.notify(new Event("OpenStore" + storeId, "Store " + storeId + " was opened by user " + membername, "marketController"));
             }
             else
             {
@@ -568,7 +568,7 @@ namespace Workshop.DomainLayer.MarketPackage
                 throw new MemberAccessException("This user is not authorized to close this specified store.");
             if (IsStoreOpen(userId, username, storeId))
             {
-                userController.notify(new Event("CloseStore" + storeId, "store " + storeId + "is close by user" + username, "marketController"));
+                userController.notify(new Event("CloseStore" + storeId, "Store " + storeId + " was closed by user" + username, "marketController"));
                 stores[storeId].CloseStore();
             }
             else
@@ -609,7 +609,6 @@ namespace Workshop.DomainLayer.MarketPackage
             Store store = new Store(storeId, storeName, userController.GetMember(creator));
             stores[storeId] = store;
 
-            STORE_COUNT++;
             this.dalMarketController.STORE_COUNT = STORE_COUNT;
             this.dalMarketController.stores.Add(store.ToDAL());
             DataHandler.Instance.Value.update(this.dalMarketController);
@@ -1202,7 +1201,7 @@ namespace Workshop.DomainLayer.MarketPackage
             Product product = stores[storeId].GetProduct(productId);
             int bidId = stores[storeId].OfferBid(username, storeId, product, price);
 
-            userController.notify(new Event("BidOfferInStore"+ storeId, "Bid offer in store " + storeId + " to Product " + product.Name + ", offered OfferedPrice: " + price, "MarketController"));
+            userController.notify(new Event("BidOfferInStore"+ storeId, $"There is a new bid offer with id {bidId} in store {storeId} to product {product.Name}, for {price} shekels", "MarketController"));
             
             userController.RegisterToEvent(username, new Event("BidAccept" + bidId+ "OfStore"+storeId, "", "MarketController"));
             userController.RegisterToEvent(username, new Event("BidReject" + bidId + "OfStore" + storeId, "", "MarketController"));
@@ -1231,7 +1230,7 @@ namespace Workshop.DomainLayer.MarketPackage
                     stores[storeId].ChangeBidPrice(bidId, newPrice);
                     Bid oldBid = stores[storeId].biding_votes[bidId];
                     oldBid.CounterOfferred = true;
-                    userController.notify(new Event("BidCounter" + bidId + "OfStore" + storeId, "The counter OfferedPrice to your bid on Product " + oldBid.Product.Name + " in the store " + storeId + " is " + newPrice, "MarketController"));
+                    userController.notify(new Event("BidCounter" + bidId + "OfStore" + storeId, "The counter offer to your bid on product " + oldBid.Product.Name + " in store " + storeId + " is " + newPrice, "MarketController"));
                     storesLocks[storeId].ReleaseReaderLock();
                     return oldBid;
                 }

@@ -58,7 +58,7 @@ namespace API.Controllers
             bool MANAGER = false;
             bool OWNER = false;
             bool MARKET = false;
-            string message = "member";
+            string message = "MEMBER";
             foreach (Role role in res.Value.Roles)
             {
                 if (!MARKET && role is MarketManager)
@@ -74,9 +74,9 @@ namespace API.Controllers
                     MANAGER = true;
                 }
             }
-            if (MARKET) message = "market";
-            else if (OWNER) message = "owner";
-            else if (MANAGER) message = "manager";
+            if (MARKET) message = "MARKET";
+            else if (OWNER) message = "OWNER";
+            else if (MANAGER) message = "MANAGER";
             StatsServer.SendMessageToAllAdmins(message);
             return Ok(res);
         }

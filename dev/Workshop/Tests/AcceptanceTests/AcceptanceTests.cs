@@ -1332,7 +1332,7 @@ namespace Tests.AcceptanceTests
                                             "\"percentage\": " + lPercent.ToString() + ", \"productId\": " + id.ToString() +
                                             "}},\"rhs\": {\"tag\": \"SimpleDiscount\", \"priceAction\": { " +
                                             "\"tag\": \"ProductPriceActionSimple\", \"percentage\": " + rPercent.ToString() +
-                                            ",\"productId\": " + id.ToString() + "}}, discountTerm: {tag: 'ProductDiscountSimpleTerm', type: 'q', action: '<', value: 3, productId: 1}}";
+                                            ",\"productId\": " + id.ToString() + "}}, discountTerm: {tag: 'ProductDiscountSimpleTerm', type: 'q', action: '<', value: 3, \"productId\": " + id.ToString() + "}}";
 
             return func;
         }
@@ -1524,7 +1524,7 @@ namespace Tests.AcceptanceTests
             service.AddToCart(1, p1.Id, store.StoreId, 3);
             service.AddToCart(1, p2.Id, store.StoreId, 2);
             service.AddToCart(1, p3.Id, store.StoreId, 5);
-            double expected_price = 680;
+            double expected_price = 720;
             Assert.AreEqual(expected_price, service.BuyCart(1, cc, address, DateTime.Now).Value);
         }
 
@@ -1857,7 +1857,7 @@ namespace Tests.AcceptanceTests
                 "create-new-store(1,user1,store1,16/06/2022)");
             file.Flush();
             file.Close();
-            Service service = new Service($"admin~admin~admin~22/08/1972\nss~{FileName}");
+            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
             Assert.IsTrue(service.WasInitializedWithFile);
             Assert.IsTrue(service.EnterMarket(1, DateTime.Now).ErrorOccured);
             Assert.IsTrue(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1876,7 +1876,7 @@ namespace Tests.AcceptanceTests
                 "create-new-store(1,user1,store1)");
             file.Flush();
             file.Close();
-            Service service = new Service($"admin~admin~admin~22/08/1972\nss~{FileName}");
+            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
             // Expecting error: need to register before logging in
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1, DateTime.Now).ErrorOccured); // Make sure nothing happend after it failed
@@ -1897,7 +1897,7 @@ namespace Tests.AcceptanceTests
                 "blah-blah(1,user1,pass1,store1)");
             file.Flush();
             file.Close();
-            Service service = new Service($"admin~admin~admin~22/08/1972\nss~{FileName}");
+            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1, DateTime.Now).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1916,7 +1916,7 @@ namespace Tests.AcceptanceTests
                 "create-new-store(1,user1,store1,failureInLife1)");
             file.Flush();
             file.Close();
-            Service service = new Service($"admin~admin~admin~22/08/1972\nss~{FileName}");
+            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1, DateTime.Now).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1935,7 +1935,7 @@ namespace Tests.AcceptanceTests
                 "create-new-store(1,user1)");
             file.Flush();
             file.Close();
-            Service service = new Service($"admin~admin~admin~22/08/1972\nss~{FileName}");
+            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1, DateTime.Now).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -1954,7 +1954,7 @@ namespace Tests.AcceptanceTests
                 "create-new-store(FAILME,user1,store1)");
             file.Flush();
             file.Close();
-            Service service = new Service($"admin~admin~admin~22/08/1972\nss~{FileName}");
+            Service service = new Service(externalSystem.Object, $"admin~admin~admin~22/08/1972\nss~{FileName}");
             Assert.IsFalse(service.WasInitializedWithFile);
             Assert.IsFalse(service.EnterMarket(1, DateTime.Now).ErrorOccured);
             Assert.IsFalse(service.Register(1, "user1", "pass1", DateTime.Parse("22/08/1972")).ErrorOccured);
@@ -2386,9 +2386,9 @@ namespace Tests.AcceptanceTests
             service.AddToCart(1, p1.Id, store.StoreId, 3);
             service.AddToCart(1, p2.Id, store.StoreId, 2);
             service.AddToCart(1, p3.Id, store.StoreId, 5);
-            double expected_price = 680.0;
+            double expected_price = 720;
             Assert.AreEqual(expected_price, service.BuyCart(1, cc, address, DateTime.Now).Value);
-            Assert.AreEqual(680.0, service.GetDailyIncomeMarketManager(2, "admin").Value);
+            Assert.AreEqual(expected_price, service.GetDailyIncomeMarketManager(2, "admin").Value);
         }
 
         [TestMethod]
@@ -2473,9 +2473,9 @@ namespace Tests.AcceptanceTests
             service.AddToCart(1, p1.Id, store.StoreId, 3);
             service.AddToCart(1, p2.Id, store.StoreId, 2);
             service.AddToCart(1, p3.Id, store.StoreId, 5);
-            double expected_price = 680.0;
+            double expected_price = 720;
             Assert.AreEqual(expected_price, service.BuyCart(1, cc, address, DateTime.Now).Value);
-            Assert.AreEqual(680.0, service.GetDailyIncomeStore(1, member, store.StoreId).Value);
+            Assert.AreEqual(expected_price, service.GetDailyIncomeStore(1, member, store.StoreId).Value);
         }
 
         [TestMethod]
@@ -2614,7 +2614,7 @@ namespace Tests.AcceptanceTests
 
         public void Test_MarketManagerDailyInformation_Failure_NotMarketManager()
         {
-            service = new Service("admin~NOTYOU~admin~22/08/1972");
+            service = new Service(externalSystem.Object, "admin~NOTYOU~admin~22/08/1972");
 
             service.EnterMarket(1, DateTime.Parse("May 22, 2022"));
             service.EnterMarket(2, DateTime.Parse("Aug 22, 1980"));
@@ -3228,6 +3228,51 @@ namespace Tests.AcceptanceTests
             Assert.IsFalse(service.CounterBid(2, "member2", store.StoreId, bidId, 10.0).ErrorOccured);
             Assert.AreEqual(1, service.TakeNotifications(4, "member4").Value.Count);
             Assert.AreEqual(10.0, service.BuyBidProduct(4, "member4", store.StoreId, bidId, cc, address, DateTime.Now).Value);
+        }
+
+        [TestMethod]
+        public void Test_PersistenceOnUserCart()
+        {
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972\ndb");
+            Test_Login_Good(1, "member1", "pass1");
+            Test_Login_Good(2, "member2", "pass2");
+            Store st = service.CreateNewStore(1, "member1", "S1", DateTime.Now).Value;
+            Product p = service.AddProduct(1, "member1", st.StoreId, "Prod1", "Desc1", 10.0, 5, "Cat1").Value;
+            service.AddToCart(2, p.Id, st.StoreId, 3);
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972\ndb");
+            ShoppingCart sc = service.ViewCart(2).Value;
+            Assert.IsNotNull(sc);
+            Assert.AreEqual(1, sc.ShoppingBags.Count);
+            Assert.AreEqual(1, sc.ShoppingBags.First().Products.Count);
+            Assert.AreEqual(30.0, sc.Price);
+        }
+
+        [TestMethod]
+        public void Test_PersistenceOnStore()
+        {
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972\ndb");
+            Test_Login_Good(1, "member1", "pass1");
+            Store st = service.CreateNewStore(1, "member1", "S1", DateTime.Now).Value;
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972\ndb");
+            List<Store> stores = service.GetAllStores(1).Value;
+            Assert.AreEqual(1, stores.Count);
+            Assert.AreEqual(st.StoreId, stores.First().StoreId);
+            Assert.AreEqual(st.Name, stores.First().Name);
+        }
+
+        [TestMethod]
+        public void Test_PersistenceOnProduct()
+        {
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972\ndb");
+            Test_Login_Good(1, "member1", "pass1");
+            Store st = service.CreateNewStore(1, "member1", "S1", DateTime.Now).Value;
+            Product p = service.AddProduct(1, "member1", st.StoreId, "Prod1", "Desc1", 10.0, 5, "Cat1").Value;
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972\ndb");
+            List<Store> stores = service.GetAllStores(1).Value;
+            Assert.AreEqual(1, stores.Count);
+            Assert.AreEqual(st.StoreId, stores.First().StoreId);
+            Assert.AreEqual(st.Name, stores.First().Name);
+            Assert.AreEqual(st.Products.First().Id, stores.First().Products.First().Id);
         }
     }
 }

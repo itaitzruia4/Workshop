@@ -18,8 +18,8 @@ import {DataGrid, GridColDef} from "@mui/x-data-grid";
 
 import { handleGetMemberInformation, removeMember, getDailyIncome, handleViewStatistics } from '../../Actions/AdminActions';
 import { memberToken } from '../../Types/roles';
-import { Order } from '../../Types/store';
 import { handleGetStorePurchaseHistory } from '../../Actions/StoreActions';
+import { Order } from '../../Types/store';
 
 interface Statistics { id: number, date: string, marketManagers: number, guests: number, members: number, storeOwners: number, storeManagers: number }
 interface APIStatistics { date: string, marketManagers: number, guests: number, members: number, storeOwners: number, storeManagers: number }
@@ -39,7 +39,15 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
     const [fromDate, setFromDate] = React.useState("");
     const [toDate, setToDate] = React.useState("");
 
-    const [statistics, setStatistics] = React.useState<Statistics[] | null>(null);
+    const [statistics, setStatsHook] = React.useState<Statistics[] | null>(null);
+    const statsRef = React.useRef<Statistics[]>([]);
+
+    const setStatistics = (newStats: Statistics[]) => {
+        statsRef.current = newStats;
+        setStatsHook(statsRef.current);
+        console.log("stats ref:", statsRef.current);
+        console.log("stats state:", statistics);
+    }
 
     const statsColumns: GridColDef[] = [
         { field: "date", headerName: "Date", flex: 2 },
@@ -57,10 +65,10 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
         { field: "price", headerName: "Order Date", flex: 1 }
     ];
 
-    const [orders, setOrders] = React.useState<Order[]>([])
+    const [orders, setOrders] = React.useState<Order[]>([]);
 
     const updateStats = (oldStats: Statistics[], role: string): void => {
-        console.log(oldStats);
+        console.log("old stats:", oldStats);
         if (oldStats !== null) {
             const todayIdx = oldStats.length - 1;
             switch (role) {
@@ -251,7 +259,7 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
 
                 const url = `ws://127.0.0.1:8800/${token.membername}-live_view`;
                 const conn = new WebSocket(url);
-                conn.addEventListener("message", (ev: any) => updateStats(statsWithIds, ev.data))
+                conn.addEventListener("message", (ev: any) => updateStats(statsRef.current, ev.data))
             })
             .catch(error => {
                 alert(error)
@@ -432,7 +440,7 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
                 <DialogTitle>Market Statistics</DialogTitle>
                 <DialogContent>
                     <DataGrid 
-                        rows={statistics !== null? statistics: []}
+                        rows={statsRef.current !== null ? statsRef.current : []}
                         columns={statsColumns}
                     />
                 </DialogContent>
