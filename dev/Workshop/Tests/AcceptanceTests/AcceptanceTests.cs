@@ -1332,7 +1332,7 @@ namespace Tests.AcceptanceTests
                                             "\"percentage\": " + lPercent.ToString() + ", \"productId\": " + id.ToString() +
                                             "}},\"rhs\": {\"tag\": \"SimpleDiscount\", \"priceAction\": { " +
                                             "\"tag\": \"ProductPriceActionSimple\", \"percentage\": " + rPercent.ToString() +
-                                            ",\"productId\": " + id.ToString() + "}}, discountTerm: {tag: 'ProductDiscountSimpleTerm', type: 'q', action: '<', value: 3, productId: 1}}";
+                                            ",\"productId\": " + id.ToString() + "}}, discountTerm: {tag: 'ProductDiscountSimpleTerm', type: 'q', action: '<', value: 3, \"productId\": " + id.ToString() + "}}";
 
             return func;
         }
@@ -1524,7 +1524,7 @@ namespace Tests.AcceptanceTests
             service.AddToCart(1, p1.Id, store.StoreId, 3);
             service.AddToCart(1, p2.Id, store.StoreId, 2);
             service.AddToCart(1, p3.Id, store.StoreId, 5);
-            double expected_price = 680;
+            double expected_price = 720;
             Assert.AreEqual(expected_price, service.BuyCart(1, cc, address, DateTime.Now).Value);
         }
 
@@ -2386,9 +2386,9 @@ namespace Tests.AcceptanceTests
             service.AddToCart(1, p1.Id, store.StoreId, 3);
             service.AddToCart(1, p2.Id, store.StoreId, 2);
             service.AddToCart(1, p3.Id, store.StoreId, 5);
-            double expected_price = 680.0;
+            double expected_price = 720;
             Assert.AreEqual(expected_price, service.BuyCart(1, cc, address, DateTime.Now).Value);
-            Assert.AreEqual(680.0, service.GetDailyIncomeMarketManager(2, "admin").Value);
+            Assert.AreEqual(expected_price, service.GetDailyIncomeMarketManager(2, "admin").Value);
         }
 
         [TestMethod]
@@ -2473,9 +2473,9 @@ namespace Tests.AcceptanceTests
             service.AddToCart(1, p1.Id, store.StoreId, 3);
             service.AddToCart(1, p2.Id, store.StoreId, 2);
             service.AddToCart(1, p3.Id, store.StoreId, 5);
-            double expected_price = 680.0;
+            double expected_price = 720;
             Assert.AreEqual(expected_price, service.BuyCart(1, cc, address, DateTime.Now).Value);
-            Assert.AreEqual(680.0, service.GetDailyIncomeStore(1, member, store.StoreId).Value);
+            Assert.AreEqual(expected_price, service.GetDailyIncomeStore(1, member, store.StoreId).Value);
         }
 
         [TestMethod]
