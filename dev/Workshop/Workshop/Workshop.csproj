@@ -331,6 +331,15 @@
     <Compile Include="DomainLayer\UserPackage\Shopping\MemberShoppingBag.cs" />
     <Compile Include="DomainLayer\UserPackage\Shopping\MemberShoppingCart.cs" />
     <Compile Include="DomainLayer\UserPackage\UserCountInDate.cs" />
+    <Compile Include="Migrations\20220628111049_stam2.cs" />
+    <Compile Include="Migrations\20220628111049_stam2.designer.cs">
+      <DependentUpon>20220628111049_stam2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20220628111535_stam3.cs" />
+    <Compile Include="Migrations\20220628111535_stam3.designer.cs">
+      <DependentUpon>20220628111535_stam3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\ContextModelSnapshot.cs" />
     <Compile Include="ServiceLayer\ExternalSystem.cs" />
     <Compile Include="DomainLayer\UserPackage\ILoginChecker.cs" />
     <Compile Include="DomainLayer\MarketPackage\Discounts\AndDiscount.cs" />

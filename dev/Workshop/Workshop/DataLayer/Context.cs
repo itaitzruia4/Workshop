@@ -61,7 +61,7 @@ namespace Workshop.DataLayer
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (USE_DB)
+            if (true)
             {
                 optionsBuilder.UseSqlServer("Data Source = 34.107.89.228;Initial Catalog=WorkshopDB; Integrated Security = False; User Id = sqlserver; Password = workshop; Encrypt = True; TrustServerCertificate = True; MultipleActiveResultSets = True");
                 optionsBuilder.EnableSensitiveDataLogging();
