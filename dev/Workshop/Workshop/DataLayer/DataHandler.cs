@@ -115,6 +115,14 @@ namespace Workshop.DataLayer
             DiscountPolicy.nextId = nextId;
 
             nextId = 0;
+            cache.CategoryDiscount.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            CategoryDiscount.nextId = nextId;
+
+            nextId = 0;
+            cache.ProductDiscount.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
+            ProductDiscount.nextId = nextId;
+
+            nextId = 0;
             cache.PurchasePolicy.ToList().ForEach(item => nextId = Math.Max(nextId, item.Id + 1));
             PurchasePolicy.nextId = nextId;
 
@@ -242,6 +250,8 @@ namespace Workshop.DataLayer
                 cache.userController.RemoveRange(cache.userController);
                 cache.NotificationHandler.RemoveRange(cache.NotificationHandler);
                 cache.Discount.RemoveRange(cache.Discount);
+                cache.CategoryDiscount.RemoveRange(cache.CategoryDiscount);
+                cache.ProductDiscount.RemoveRange(cache.CategoryDiscount);
                 cache.DiscountPolicy.RemoveRange(cache.DiscountPolicy);
                 cache.PurchasePolicy.RemoveRange(cache.PurchasePolicy);
                 cache.Term.RemoveRange(cache.Term);

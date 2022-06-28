@@ -10,7 +10,7 @@ using Workshop.DataLayer;
 namespace Workshop.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20220628161649_Initial")]
+    [Migration("20220628181026_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
