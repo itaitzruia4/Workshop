@@ -321,6 +321,8 @@ namespace Workshop.DomainLayer.MarketPackage
                     return Action.GetMembersOnlineStats;
                 case "AddPurchaseTerm":
                     return Action.AddPurchaseTerm;
+                case "ViewStorePurchaseHistory":
+                    return Action.ViewStorePurchaseHistory;
                 default:
                     throw new ArgumentException($"Unrecognized action: {action}");
             }
