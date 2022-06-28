@@ -88,7 +88,7 @@ namespace Workshop.DataLayer
 
         public override EntityEntry<TEntity> Update<TEntity>(TEntity entity)
         {
-            if (USE_DB)
+            if (true)
             {
                 Logger.Instance.LogEvent($"Updating {entity} in the cache");
                 return base.Update(entity);
@@ -98,7 +98,7 @@ namespace Workshop.DataLayer
 
         public override EntityEntry<TEntity> Add<TEntity>(TEntity entity)
         {
-            if (USE_DB)
+            if (true)
             {
                 Logger.Instance.LogEvent($"Adding {entity} to the cache");
                 return base.Add(entity);
