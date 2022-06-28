@@ -28,7 +28,7 @@ namespace Workshop.DomainLayer.MarketPackage
         private ConcurrentDictionary<int, ReaderWriterLock> storesLocks;
         private IExternalSystem ExternalSystem;
         private int STORE_COUNT = 0;
-        private int PRODUCT_COUNT = 1;
+        private int PRODUCT_COUNT = 0;
         private DALMarketController dalMarketController;
 
         public MarketController(IUserController userController, IExternalSystem externalSystem)
@@ -39,7 +39,7 @@ namespace Workshop.DomainLayer.MarketPackage
             this.stores = new ConcurrentDictionary<int, Store>();
             this.storesLocks = new ConcurrentDictionary<int, ReaderWriterLock>();
             STORE_COUNT = 0;
-            PRODUCT_COUNT = 1;
+            PRODUCT_COUNT = 0;
             this.dalMarketController = new DALMarketController(userController.ToDAL(), orderHandler.ToDAL(), new List<DALStore>(), STORE_COUNT, PRODUCT_COUNT);
             dalMarketController.userController = userController.ToDAL();
             DataHandler.Instance.Value.save(dalMarketController);
