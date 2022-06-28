@@ -1,5 +1,5 @@
 admin~Ron~pass~22/08/1972
 admin~u1~pass1~22/08/1972
-ss~C:\Users\itaig\Desktop\University\spring 22'\Workshop\bar-ss.txt
+ss~C:\Users\merav\University\Workshop\bar-ss.txt
 port~8800
 es

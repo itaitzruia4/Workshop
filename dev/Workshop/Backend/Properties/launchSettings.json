@@ -11,7 +11,7 @@
   "profiles": {
     "API": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\Users\\itaig\\Desktop\\University\\spring 22'\\Workshop\\prod-conf.txt\"",
+      "commandLineArgs": "C:\\Users\\merav\\University\\Workshop\\prod-conf.txt",
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
