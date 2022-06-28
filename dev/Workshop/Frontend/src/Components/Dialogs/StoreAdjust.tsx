@@ -22,9 +22,10 @@ import AddProductDialog from './addProductDialog';
 import AddDiscountDialog from './AddDiscountDialog';
 import AddPurchaseDialog from './AddPurchaseDialog';
 import StoreRolesDialog from './StoreRolesDialog';
+import StorePurchaseHistory from './storePurchaseHistory';
 
 import { memberToken, Actions, StorePermission, hasPermission } from '../../Types/roles';
-import { Store } from "../../Types/store"
+import { Store, Order} from "../../Types/store"
 import { Product } from "../../Types/product"
 import { Cart, Bag } from '../../Types/shopping';
 import { MarketNotification } from '../../Types/Notification';
@@ -78,6 +79,7 @@ export default function StoreAdjust(
     props: {
         store: Store,
         permissions: Actions[],
+        orders: Order[]
         addProduct: (storeId: number, productName: string, description: string, price: number, quantity: number, category: string) => void,
         removeProduct: (storeId: number, productId: number) => void,
         updateProduct: (storeId: number, productId: number, productName: string, price: number, quantity: number, category: string) => void,
@@ -95,7 +97,7 @@ export default function StoreAdjust(
         addActionToManager: (nominee: string, storeId: number, action: string) => void,
         getStorePurchaseHistory: (storeId: number) => void
     }) {
-    const { store, permissions, addProduct, removeProduct, updateProduct, reviewProduct,
+    const { store, permissions,orders, addProduct, removeProduct, updateProduct, reviewProduct,
         addDiscount, addProductDiscount, addCategoryDiscount, addProductPurchasePolicy, addCategoryPurchasePolicy,
         addBagPurchasePolicy, addUserPurchasePolicy, nominateStoreOwner, nominateStoreManager, removeStoreOwnerNomination, addActionToManager, getStorePurchaseHistory } = props
     const [open, setOpen] = React.useState(false);
@@ -175,15 +177,9 @@ export default function StoreAdjust(
                         </ButtonGroup>
                     </TabPanel>
                     <TabPanel value={value} index={3}>
-                    {hasPermission(Actions.ViewStorePurchaseHistory, permissions) ?           
-                            <ButtonGroup variant="outlined" aria-label="outlined button group">
-                                <AddDiscountDialog storeId={store.storeId} permissions={permissions} addDiscount={addDiscount} addProductDiscount={addProductDiscount} addCategoryDiscount={addCategoryDiscount} />
-                                <AddPurchaseDialog storeId={store.storeId} permissions={permissions} addProductPurchase={addProductPurchasePolicy} addCategoryPurchase={addCategoryPurchasePolicy}
-                                    addBagPurchase={addBagPurchasePolicy} addUserPurchase={addUserPurchasePolicy} />
-                            </ButtonGroup>
-                            : <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                You dont have permission to view this store's purchase history
-                            </Typography>}
+                        
+                    
+                        <StorePurchaseHistory store={store} orders={orders} />
                     </TabPanel>
                 </Box>
             </Dialog>

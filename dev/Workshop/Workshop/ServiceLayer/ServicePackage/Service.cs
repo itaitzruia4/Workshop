@@ -20,7 +20,6 @@ using Workshop.DomainLayer.Loggers;
 using System.Globalization;
 using System.IO;
 using Moq;
-using Microsoft.EntityFrameworkCore;
 
 namespace Workshop.ServiceLayer
 {
@@ -29,18 +28,11 @@ namespace Workshop.ServiceLayer
         private Facade facade;
         public readonly bool WasInitializedWithFile;
         private readonly int Port;
-        public Service(string conf)
+        public Service(IExternalSystem externalSystem, string conf)
         {
             string starting_state_file = null;
             bool USE_DB = false;
             bool USE_EXTERNAL_SYSTEM = false;
-            Mock<IExternalSystem> externalSystem = new Mock<IExternalSystem>();
-            externalSystem.Setup(x => x.Supply(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(new Random().Next(10000, 100000));
-            externalSystem.Setup(x => x.Cancel_Supply(It.IsAny<int>())).Returns(1);
-            externalSystem.Setup(x => x.Pay(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(new Random().Next(10000, 100000));
-            externalSystem.Setup(x => x.Cancel_Pay(It.IsAny<int>())).Returns(1);
-            externalSystem.Setup(x => x.IsExternalSystemOnline()).Returns(true);
-
             List<SystemAdminDTO> systemManagers = new List<SystemAdminDTO>();
 
             Func<string, bool> parse_ss = (ssfile) =>
@@ -57,7 +49,7 @@ namespace Workshop.ServiceLayer
                 {
                     Logger.Instance.LogError("Starting state file does not exist");
                 }
-                facade = new Facade(USE_EXTERNAL_SYSTEM ? new ExternalSystem() : externalSystem.Object, systemManagers);
+                facade = new Facade(USE_EXTERNAL_SYSTEM ? new ExternalSystem() : externalSystem, systemManagers);
                 try
                 {
                     foreach (string command in initializationState.Split('\n'))
@@ -296,6 +288,7 @@ namespace Workshop.ServiceLayer
                         break;
                     case "es":
                         if (parts.Length != 1) throw new ArgumentException();
+                        USE_EXTERNAL_SYSTEM = true;
                         break;
                     default:
                         throw new ArgumentException("Unidentified command in config file");
@@ -308,8 +301,9 @@ namespace Workshop.ServiceLayer
             WasInitializedWithFile = starting_state_file != null ? parse_ss(starting_state_file) : false;
             if (facade == null)
             {
-                facade = new Facade(USE_EXTERNAL_SYSTEM ? new ExternalSystem() : externalSystem.Object, systemManagers);
+                facade = new Facade(USE_EXTERNAL_SYSTEM ? new ExternalSystem() : externalSystem, systemManagers);
             }
+            Context.USE_DB = USE_DB;
         }
 
         public Service(IExternalSystem externalSystem)
@@ -317,6 +311,7 @@ namespace Workshop.ServiceLayer
             List<SystemAdminDTO> systemManagers = new List<SystemAdminDTO>();
             systemManagers.Add(new SystemAdminDTO("admin", "admin", "22/08/1972"));
             facade = new Facade(externalSystem, systemManagers);
+            Context.USE_DB = false;
         }
 
         public int GetPort()

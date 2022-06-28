@@ -21,7 +21,7 @@ namespace Workshop.DataLayer
 {
     public class Context: DbContext
     {
-        public static bool USE_DB = false;
+        public static bool USE_DB;
         public List<DbSet<DALObject>> DbSetList;
         public DbSet<MarketController> marketController { get; set; }
         public DbSet<UserController> userController { get; set; }

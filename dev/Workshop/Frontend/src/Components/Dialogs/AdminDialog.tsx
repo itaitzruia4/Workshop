@@ -16,8 +16,10 @@ import Paper from '@mui/material/Paper';
 import {DataGrid, GridColDef} from "@mui/x-data-grid"; 
 
 
-import { handleGetMemberInformation, getStorePurchaseHistory, removeMember, getDailyIncome, handleViewStatistics } from '../../Actions/AdminActions';
+import { handleGetMemberInformation, removeMember, getDailyIncome, handleViewStatistics } from '../../Actions/AdminActions';
 import { memberToken } from '../../Types/roles';
+import { Order } from '../../Types/store';
+import { handleGetStorePurchaseHistory } from '../../Actions/StoreActions';
 
 interface Statistics { id: number, date: string, marketManagers: number, guests: number, members: number, storeOwners: number, storeManagers: number }
 interface APIStatistics { date: string, marketManagers: number, guests: number, members: number, storeOwners: number, storeManagers: number }
@@ -26,6 +28,7 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
 
     const [open, setOpen] = React.useState(isOpen);
     const [removeMemberOpen, setRemoveMemberOpen] = React.useState(false);
+    const [historyInputOpen, setHistoryInputOpen] = React.useState(false);
     const [historyOpen, setHistoryOpen] = React.useState(false);
     const [memberInfoOpen, setMemberInfoOpen] = React.useState(false);
     const [statsInputOpen, setStatsInputOpen] = React.useState(false);
@@ -36,14 +39,9 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
     const [fromDate, setFromDate] = React.useState("");
     const [toDate, setToDate] = React.useState("");
 
-    const [statistics, setStatistics] = React.useState<Statistics[]>([]);
-    React.useEffect(() => {
-        if (fromDate && toDate) {
-            viewStatistics();
-        }
-    }, []);
+    const [statistics, setStatistics] = React.useState<Statistics[] | null>(null);
 
-    const columns: GridColDef[] = [
+    const statsColumns: GridColDef[] = [
         { field: "date", headerName: "Date", flex: 2 },
         { field: "marketManagers", headerName: "Market Managers", flex: 1 },
         { field: "storeOwners", headerName: "Store Owners", flex: 1 },
@@ -52,63 +50,75 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
         { field: "guests", headerName: "Guests", flex: 1 }
     ];
 
-    const updateStats = (role: string): void => {
-        const todayIdx = statistics.length - 1;
-        switch (role) {
-            case "GUEST":
-                setStatistics(statistics.slice(0, todayIdx).concat([{
-                    id: statistics[todayIdx].id,
-                    date: statistics[todayIdx].date,
-                    marketManagers: statistics[todayIdx].marketManagers,
-                    guests: statistics[todayIdx].guests + 1,
-                    members: statistics[todayIdx].members,
-                    storeOwners: statistics[todayIdx].storeOwners,
-                    storeManagers: statistics[todayIdx].storeManagers
-                }]));
-                break;
-            case "MEMBER":
-                setStatistics(statistics.slice(0, todayIdx).concat([{
-                    id: statistics[todayIdx].id,
-                    date: statistics[todayIdx].date,
-                    marketManagers: statistics[todayIdx].marketManagers,
-                    guests: statistics[todayIdx].guests - 1,
-                    members: statistics[todayIdx].members + 1,
-                    storeOwners: statistics[todayIdx].storeOwners,
-                    storeManagers: statistics[todayIdx].storeManagers
-                }]));
-                break;
-            case "STOREMANAGER":
-                setStatistics(statistics.slice(0, todayIdx).concat([{
-                    id: statistics[todayIdx].id,
-                    date: statistics[todayIdx].date,
-                    marketManagers: statistics[todayIdx].marketManagers,
-                    guests: statistics[todayIdx].guests - 1,
-                    members: statistics[todayIdx].members,
-                    storeOwners: statistics[todayIdx].storeOwners,
-                    storeManagers: statistics[todayIdx].storeManagers + 1
-                }]));
-                break;
-            case "STOREOWNER":
-                setStatistics(statistics.slice(0, todayIdx).concat([{
-                    id: statistics[todayIdx].id,
-                    date: statistics[todayIdx].date,
-                    marketManagers: statistics[todayIdx].marketManagers,
-                    guests: statistics[todayIdx].guests - 1,
-                    members: statistics[todayIdx].members,
-                    storeOwners: statistics[todayIdx].storeOwners + 1,
-                    storeManagers: statistics[todayIdx].storeManagers
-                }]));
-                break;
-            case "MARKETMANAGER":
-                setStatistics(statistics.slice(0, todayIdx).concat([{
-                    id: statistics[todayIdx].id,
-                    date: statistics[todayIdx].date,
-                    marketManagers: statistics[todayIdx].marketManagers + 1,
-                    guests: statistics[todayIdx].guests,
-                    members: statistics[todayIdx].members,
-                    storeOwners: statistics[todayIdx].storeOwners,
-                    storeManagers: statistics[todayIdx].storeManagers
-                }]));
+    const orderColumns: GridColDef[] = [
+        { field: "id", headerName: "Order ID", flex: 2 },
+        { field: "buyerName", headerName: "Buyer Name", flex: 1 },
+        { field: "date", headerName: "Order Date", flex: 1 },
+        { field: "price", headerName: "Order Date", flex: 1 }
+    ];
+
+    const [orders, setOrders] = React.useState<Order[]>([])
+
+    const updateStats = (oldStats: Statistics[], role: string): void => {
+        console.log(oldStats);
+        if (oldStats !== null) {
+            const todayIdx = oldStats.length - 1;
+            switch (role) {
+                case "GUEST":
+                    setStatistics(oldStats.slice(0, todayIdx).concat([{
+                        id: oldStats[todayIdx].id,
+                        date: oldStats[todayIdx].date,
+                        marketManagers: oldStats[todayIdx].marketManagers,
+                        guests: oldStats[todayIdx].guests + 1,
+                        members: oldStats[todayIdx].members,
+                        storeOwners: oldStats[todayIdx].storeOwners,
+                        storeManagers: oldStats[todayIdx].storeManagers
+                    }]));
+                    break;
+                case "MEMBER":
+                    setStatistics(oldStats.slice(0, todayIdx).concat([{
+                        id: oldStats[todayIdx].id,
+                        date: oldStats[todayIdx].date,
+                        marketManagers: oldStats[todayIdx].marketManagers,
+                        guests: oldStats[todayIdx].guests - 1,
+                        members: oldStats[todayIdx].members + 1,
+                        storeOwners: oldStats[todayIdx].storeOwners,
+                        storeManagers: oldStats[todayIdx].storeManagers
+                    }]));
+                    break;
+                case "STOREMANAGER":
+                    setStatistics(oldStats.slice(0, todayIdx).concat([{
+                        id: oldStats[todayIdx].id,
+                        date: oldStats[todayIdx].date,
+                        marketManagers: oldStats[todayIdx].marketManagers,
+                        guests: oldStats[todayIdx].guests - 1,
+                        members: oldStats[todayIdx].members,
+                        storeOwners: oldStats[todayIdx].storeOwners,
+                        storeManagers: oldStats[todayIdx].storeManagers + 1
+                    }]));
+                    break;
+                case "STOREOWNER":
+                    setStatistics(oldStats.slice(0, todayIdx).concat([{
+                        id: oldStats[todayIdx].id,
+                        date: oldStats[todayIdx].date,
+                        marketManagers: oldStats[todayIdx].marketManagers,
+                        guests: oldStats[todayIdx].guests - 1,
+                        members: oldStats[todayIdx].members,
+                        storeOwners: oldStats[todayIdx].storeOwners + 1,
+                        storeManagers: oldStats[todayIdx].storeManagers
+                    }]));
+                    break;
+                case "MARKETMANAGER":
+                    setStatistics(oldStats.slice(0, todayIdx).concat([{
+                        id: oldStats[todayIdx].id,
+                        date: oldStats[todayIdx].date,
+                        marketManagers: oldStats[todayIdx].marketManagers + 1,
+                        guests: oldStats[todayIdx].guests,
+                        members: oldStats[todayIdx].members,
+                        storeOwners: oldStats[todayIdx].storeOwners,
+                        storeManagers: oldStats[todayIdx].storeManagers
+                    }]));
+            }
         }
     }
 
@@ -134,9 +144,28 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
         setOpen(true);
     };
 
-    const handleOpenHistory = () => {
+    const handleOpenHistoryInput = () => {
         setOpen(false);
-        setHistoryOpen(true);
+        setHistoryInputOpen(true);
+    };
+
+    const handleCloseHistoryInput = () => {
+        setHistoryInputOpen(false);
+        setOpen(true);
+    };
+
+    const handleGetStorePurchaseHist = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        handleGetStorePurchaseHistory(token, storeId)
+            .then(value => { 
+                setOrders(value);
+                setHistoryOpen(true);
+            })
+            .catch(error => {
+                alert(error)
+            });
+        setStoreId(0);
+        handleCloseHistory();
     };
 
     const handleCloseHistory = () => {
@@ -185,14 +214,6 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
         handleCloseRemoveMember();
     };
 
-    const handleGetStorePurchaseHistory = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        // TODO figure out how to load purchase history into the dialog
-        getStorePurchaseHistory(token, storeId);
-        setStoreId(0);
-        handleCloseHistory();
-    };
-
     const handleGetMemberInfo = () => {
         handleGetMemberInformation(token)
             .then(data => {
@@ -223,13 +244,14 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
     const viewStatistics = () => {
         handleViewStatistics(token, fromDate, toDate)
             .then(stats => {
-                setStatistics(addStatsIds(stats));
+                const statsWithIds = addStatsIds(stats);
+                setStatistics(statsWithIds);
                 setFromDate("");
                 setToDate("");
 
-                //const url = "http://localhost:5165/api/useractions/marketmanagerdaily";
-                //const conn = new WebSocket(url);
-                //conn.addEventListener("message", (ev: MessageEvent<string>) => updateStats(ev.data))
+                const url = `ws://127.0.0.1:8800/${token.membername}-live_view`;
+                const conn = new WebSocket(url);
+                conn.addEventListener("message", (ev: any) => updateStats(statsWithIds, ev.data))
             })
             .catch(error => {
                 alert(error)
@@ -245,7 +267,7 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
                 <DialogTitle>Admin Menu</DialogTitle>
                 <DialogContent>
                     <Button onClick={handleOpenRemoveMember}>Remove Member</Button>
-                    <Button onClick={handleOpenHistory}>View Store Purchase History</Button>
+                    <Button onClick={handleOpenHistoryInput}>View Store Purchase History</Button>
                     <Button onClick={handleOpenMemberInfo}>Members Information</Button>
                     <Button onClick={handleGetDailyIncome}>Daily Market Income</Button>
                     <Button onClick={handleOpenStatsInput}>Market Statistics</Button>
@@ -280,13 +302,13 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={historyOpen} onClose={handleCloseHistory}>
+            <Dialog open={historyInputOpen} onClose={handleCloseHistoryInput}>
                 <DialogTitle>Store Purchase History</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Purchase History
+                        Store Purchase History
                     </DialogContentText>
-                    <form onSubmit={handleGetStorePurchaseHistory} id="historyForm" >
+                    <form onSubmit={handleGetStorePurchaseHist} id="historyForm">
                         <TextField
                             value={storeId}
                             autoFocus
@@ -301,8 +323,21 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
                     </form>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseHistory}>Back</Button>
+                    <Button onClick={handleCloseHistoryInput}>Back</Button>
                     <Button variant="contained" type="submit" form="historyForm">OK</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={historyOpen} onClose={handleCloseHistory} fullScreen>
+                <DialogTitle>Store Purchase History</DialogTitle>
+                <DialogContent>
+                    <DataGrid
+                        rows={orders}
+                        columns={orderColumns}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseHistory}>Back</Button>
                 </DialogActions>
             </Dialog>
 
@@ -396,40 +431,9 @@ export default function AdminDialog(isOpen: boolean, token: memberToken) {
             <Dialog open={statsOpen} onClose={handleCloseStats} fullScreen>
                 <DialogTitle>Market Statistics</DialogTitle>
                 <DialogContent>
-                    {/*<TableContainer component={Paper}>*/}
-                    {/*    <Table sx={{ minWidth: 250 }} aria-label="simple table">*/}
-                    {/*        <TableHead>*/}
-                    {/*            <TableRow>*/}
-                    {/*                <TableCell>Date</TableCell>*/}
-                    {/*                <TableCell align="center">Market Managers</TableCell>*/}
-                    {/*                <TableCell align="center">Store Owners</TableCell>*/}
-                    {/*                <TableCell align="center">Store Managers</TableCell>*/}
-                    {/*                <TableCell align="center">Members</TableCell>*/}
-                    {/*                <TableCell align="center">Guests</TableCell>*/}
-                    {/*            </TableRow>*/}
-                    {/*        </TableHead>*/}
-                    {/*        <TableBody>*/}
-                    {/*            {statistics.map((row) => (*/}
-                    {/*                <TableRow*/}
-                    {/*                    key={row.date}*/}
-                    {/*                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}*/}
-                    {/*                >*/}
-                    {/*                    <TableCell component="th" scope="row">*/}
-                    {/*                        {row.date}*/}
-                    {/*                    </TableCell>*/}
-                    {/*                    <TableCell align="center">{row.marketManagers}</TableCell>*/}
-                    {/*                    <TableCell align="center">{row.storeOwners}</TableCell>*/}
-                    {/*                    <TableCell align="center">{row.storeManagers}</TableCell>*/}
-                    {/*                    <TableCell align="center">{row.members}</TableCell>*/}
-                    {/*                    <TableCell align="center">{row.guests}</TableCell>*/}
-                    {/*                </TableRow>*/}
-                    {/*            ))}*/}
-                    {/*        </TableBody>*/}
-                    {/*    </Table>*/}
-                    {/*</TableContainer>*/}
                     <DataGrid 
-                        rows={statistics}
-                        columns={columns}
+                        rows={statistics !== null? statistics: []}
+                        columns={statsColumns}
                     />
                 </DialogContent>
                 <DialogActions>
