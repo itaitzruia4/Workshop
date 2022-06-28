@@ -938,5 +938,17 @@ namespace Workshop.ServiceLayer
                 return new Response<List<Bid>>(ex.Message, userId);
             }
         }
+
+        Response<StatisticsInformation> IService.TodaysInformation(DateTime date)
+        {
+            try
+            {
+                return new Response<StatisticsInformation>(new StatisticsInformation(facade.TodaysInformation(date)), -1);
+            }
+            catch (Exception ex)
+            {
+                return new Response<StatisticsInformation>("Could not get today's statistics", -1);
+            }
+        }
     }
 }
