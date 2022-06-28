@@ -3282,7 +3282,7 @@ namespace Tests.AcceptanceTests
         }
 
         [TestMethod]
-        public void Test_PersistenceOnBid()
+        public void Test_PersistenceOnStoreOwnerVoting()
         {
             service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972\ndb");
             Test_Login_Good(1, "member1", "pass1");
