@@ -193,7 +193,7 @@ function Profile() {
                     <IconButton
                         edge="start"
                         color="inherit"
-                        onClick={() => (permissionsInfo.length > 0 && permissionsInfo[0].storeId === -1) ? routeChange('/admin', token)  : routeChange('/member', token)}
+                        onClick={() => (permissionsInfo.length > 0 && permissionsInfo[0].storeId === -1) ? routeChange('/admin', token)()  : routeChange('/member', token)()}
                         aria-label="close"
                     >
                         <CloseIcon />
@@ -216,7 +216,7 @@ function Profile() {
                     const permissions = permissionsById(store.storeId, permissionsInfo);
                     return (
                         
-                        isManager(store.storeId, permissionsInfo) ?
+                        isManager(store.storeId, permissionsInfo) || permissions.length > 0 ?
                             <Grid item >
                                 <StoreCard store={store} permissions={permissions} orders={getOrders(orders, store.storeId ) }
                                     closeStore={closeStore} openStore={openStore} addProduct={addProduct}

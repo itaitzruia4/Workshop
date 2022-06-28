@@ -177,7 +177,7 @@ export default function StoreAdjust(
                         </ButtonGroup>
                     </TabPanel>
                     <TabPanel value={value} index={3}>     
-                        <StorePurchaseHistory store={store} orders={orders} hasPermission={!hasPermission(Actions.ViewStorePurchaseHistory, permissions)} />
+                        <StorePurchaseHistory store={store} orders={orders} hasPermission={hasPermission(Actions.ViewStorePurchaseHistory, permissions)} />
                     </TabPanel>
                 </Box>
             </Dialog>

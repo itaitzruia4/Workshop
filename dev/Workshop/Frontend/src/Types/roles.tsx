@@ -56,7 +56,7 @@ export interface StorePermission {userId: number, membername: string, storeId: n
 
 export const permissionsById = (id: number, storePermissions: StorePermission[]): Actions[] => {
     const actions = [...Array(Math.ceil(Object.keys(Actions).length / 2))].map((_, i) => i as Actions);
-    if (storePermissions.length > 0 && storePermissions[0].storeId === -1) { return actions }
+    if (storePermissions.length > 0 && storePermissions[0].storeId === -1) { return storePermissions[0].permissions }
     const storePermission = storePermissions.filter(sp => sp.storeId === id)
     return storePermission.length > 0 ? storePermission[0].permissions : [];
 }
