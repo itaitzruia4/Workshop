@@ -26,7 +26,7 @@ namespace API.Controllers
             {
                 return BadRequest(new FrontResponse<Store>(response.ErrorMessage));
             }
-            StatsServer.SendMessageToAllAdmins("STOREOWNER");
+            StatsServer.SendMessageToAllAdmins(Service.TodaysInformation(DateTime.Now.Date));
             return Ok(new FrontResponse<Store>(response.Value));
         }
 
@@ -60,7 +60,7 @@ namespace API.Controllers
             {
                 return BadRequest(new FrontResponse<StoreManager>(response.ErrorMessage));
             }
-            StatsServer.SendMessageToAllAdmins("STOREMANAGER");
+            StatsServer.SendMessageToAllAdmins(Service.TodaysInformation(DateTime.Now.Date));
             return Ok(new FrontResponse<StoreManager>(response.Value));
         }
 
@@ -74,7 +74,7 @@ namespace API.Controllers
             }
             if (response.Value != null)
             {
-                StatsServer.SendMessageToAllAdmins("STOREOWNER");
+                StatsServer.SendMessageToAllAdmins(Service.TodaysInformation(DateTime.Now.Date));
             }
             return Ok(new FrontResponse<StoreOwner>(response.Value));
         }

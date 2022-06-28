@@ -48,5 +48,6 @@ namespace Workshop.DomainLayer.UserPackage
         void CancelMember(int userId, string actingUsername, string canceledUsername);
         List<ServiceLayer.ServiceObjects.PermissionInformation> GetMemberPermissions(int userId, string membername);
         List<UserCountInDate> MarketManagerDailyRangeInformation(int userId, string membername, DateTime beginning, DateTime end);
+        UserCountInDate TodaysInformation(DateTime date);
     }
 }

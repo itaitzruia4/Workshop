@@ -1,5 +1,8 @@
 ﻿using System.Text;
 using WebSocketSharp.Server;
+using Workshop.ServiceLayer.ServiceObjects;
+using System.Web.Helpers;
+using Workshop.ServiceLayer;
 
 namespace API
 {
@@ -28,11 +31,15 @@ namespace API
             }
         }
 
-        public void SendMessageToAllAdmins(string message)
+        public void SendMessageToAllAdmins(Response<StatisticsInformation> si)
         {
-            foreach (string path in WebSocketServices.Paths)
+            if (!si.ErrorOccured)
             {
-                WebSocketServices[path].Sessions.Broadcast(message);
+                string tosend = Json.Encode(si.Value);
+                foreach (string path in WebSocketServices.Paths)
+                {
+                    WebSocketServices[path].Sessions.Broadcast(tosend);
+                }
             }
         }
     }

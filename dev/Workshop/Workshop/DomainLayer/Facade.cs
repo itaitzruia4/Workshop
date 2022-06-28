@@ -20,7 +20,6 @@ namespace Workshop.DomainLayer
     {
         private IUserController UserController;
         private IMarketController MarketController;
-
         internal Facade(IExternalSystem externalSystem, List<SystemAdminDTO> systemAdmins)
         {
             //DALMarketController market = DataHandler.Instance.Value.find<DALMarketController>(0);
@@ -273,5 +272,9 @@ namespace Workshop.DomainLayer
             return MarketController.GetBidsStatus(userId, username, storeId);
         }
 
+        internal UserCountInDate TodaysInformation(DateTime date)
+        {
+            return UserController.TodaysInformation(date);
+        }
     }
 }
