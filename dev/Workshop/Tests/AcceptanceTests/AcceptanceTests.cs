@@ -3229,5 +3229,50 @@ namespace Tests.AcceptanceTests
             Assert.AreEqual(1, service.TakeNotifications(4, "member4").Value.Count);
             Assert.AreEqual(10.0, service.BuyBidProduct(4, "member4", store.StoreId, bidId, cc, address, DateTime.Now).Value);
         }
+
+        [TestMethod]
+        public void Test_PersistenceOnUserCart()
+        {
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972\ndb");
+            Test_Login_Good(1, "member1", "pass1");
+            Test_Login_Good(2, "member2", "pass2");
+            Store st = service.CreateNewStore(1, "member1", "S1", DateTime.Now).Value;
+            Product p = service.AddProduct(1, "member1", st.StoreId, "Prod1", "Desc1", 10.0, 5, "Cat1").Value;
+            service.AddToCart(2, p.Id, st.StoreId, 3);
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972\ndb");
+            ShoppingCart sc = service.ViewCart(2).Value;
+            Assert.IsNotNull(sc);
+            Assert.AreEqual(1, sc.ShoppingBags.Count);
+            Assert.AreEqual(1, sc.ShoppingBags.First().Products.Count);
+            Assert.AreEqual(30.0, sc.Price);
+        }
+
+        [TestMethod]
+        public void Test_PersistenceOnStore()
+        {
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972\ndb");
+            Test_Login_Good(1, "member1", "pass1");
+            Store st = service.CreateNewStore(1, "member1", "S1", DateTime.Now).Value;
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972\ndb");
+            List<Store> stores = service.GetAllStores(1).Value;
+            Assert.AreEqual(1, stores.Count);
+            Assert.AreEqual(st.StoreId, stores.First().StoreId);
+            Assert.AreEqual(st.Name, stores.First().Name);
+        }
+
+        [TestMethod]
+        public void Test_PersistenceOnProduct()
+        {
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972\ndb");
+            Test_Login_Good(1, "member1", "pass1");
+            Store st = service.CreateNewStore(1, "member1", "S1", DateTime.Now).Value;
+            Product p = service.AddProduct(1, "member1", st.StoreId, "Prod1", "Desc1", 10.0, 5, "Cat1").Value;
+            service = new Service(externalSystem.Object, "admin~admin~admin~22/08/1972\ndb");
+            List<Store> stores = service.GetAllStores(1).Value;
+            Assert.AreEqual(1, stores.Count);
+            Assert.AreEqual(st.StoreId, stores.First().StoreId);
+            Assert.AreEqual(st.Name, stores.First().Name);
+            Assert.AreEqual(st.Products.First().Id, stores.First().Products.First().Id);
+        }
     }
 }

@@ -38,8 +38,6 @@ namespace Workshop.DomainLayer.MarketPackage
         private volatile int bid_id_count;
         public ConcurrentDictionary<Member, KeyValuePair<Member, HashSet<Member>>> owner_voting { get; }
 
-
-
         public Store(int id, string name, Member founder)
         {
             if (name == null || name.Equals(""))
