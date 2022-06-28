@@ -122,7 +122,6 @@ namespace Workshop.DomainLayer.MarketPackage
             {
                 if (nominator_voter_pair.Value.Add(voter))
                 {
-                    Console.WriteLine("VoteForStoreOwnerNominee1: %s", nominator_voter_pair.Key.Username);
                     return nominator_voter_pair.Value.Count == owners.Count ? nominator_voter_pair.Key : null;
                 }
                 else
@@ -135,7 +134,6 @@ namespace Workshop.DomainLayer.MarketPackage
                 HashSet<Member> temp = new HashSet<Member>();
                 temp.Add(voter);
                 owner_voting.TryAdd(nominee, new KeyValuePair<Member, HashSet<Member>>(voter, temp));
-                Console.WriteLine("VoteForStoreOwnerNominee2: %s", voter.Username);
                 return 1 == owners.Count ? voter : null;
             }
         }
